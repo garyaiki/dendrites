@@ -1,4 +1,6 @@
-/**
+/** Estimate frequency of values
+  * 
+  * @see https://github.com/twitter/algebird/...CountMinSketch.scala
   */
 package org.gs.akka.algebird
 
