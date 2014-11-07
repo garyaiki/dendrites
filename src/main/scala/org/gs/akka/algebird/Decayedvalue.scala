@@ -18,19 +18,29 @@ object Decayedvalue {
     val rnd = new scala.util.Random
     (1 to 10).map { _ => rnd.nextInt(1000).toDouble }.toSeq
   }
+  val zippedDataTime = data.zipWithIndex
 
   val HalfLife = 10.0
   val normalization = HalfLife / math.log(2)
 
   implicit val monoid = DecayedValue.monoidWithEpsilon(1e-3)
 
-  data.zipWithIndex.scanLeft(Monoid.zero[DecayedValue]) { (previous, data) =>
-    val (value, time) = data
-    Monoid.plus(previous, DecayedValue.build(value, time, HalfLife))
+  val allZipp = zippedDataTime.scanLeft(Monoid.zero[DecayedValue]) { (previous, zippedDataTime) =>
+    Monoid.plus(previous, DecayedValue.build(zippedDataTime._1, zippedDataTime._2, HalfLife))
   }
-  Platform.currentTime
-  val previous = DecayedValue.build(350.0, Platform.currentTime.toDouble, HalfLife)
-  val next = DecayedValue.build(351.0, Platform.currentTime.toDouble, HalfLife)
-  val decayed = Monoid.plus(previous, next)
+
+  val splitDateTime = zippedDataTime splitAt (zippedDataTime.size / 2)
+  val firstDateTime = splitDateTime._1
+  val lastDateTime = splitDateTime._2
+
+  val firstZipp = firstDateTime.scanLeft(Monoid.zero[DecayedValue]) { (previous, firstDateTime) =>
+    Monoid.plus(previous, DecayedValue.build(firstDateTime._1, firstDateTime._2, HalfLife))
+  }
+
+  val nextZipp = lastDateTime.scanLeft(firstZipp.last) { (previous, lastDateTime) =>
+    Monoid.plus(previous, DecayedValue.build(lastDateTime._1, lastDateTime._2, HalfLife))
+  }
+
+
 
 }
