@@ -7,7 +7,6 @@
 package org.gs.akka.algebird
 
 import com.twitter.algebird._
-import scala.compat.Platform
 
 /** @author garystruthers
   *
@@ -40,6 +39,8 @@ object Decayedvalue {
   val nextZipp = lastDateTime.scanLeft(firstZipp.last) { (previous, lastDateTime) =>
     Monoid.plus(previous, DecayedValue.build(lastDateTime._1, lastDateTime._2, HalfLife))
   }
+  
+  val combinedAll = firstZipp ++ nextZipp.tail
 
 
 
