@@ -1,4 +1,5 @@
 /**
+  * @see https://github.com/twitter/algebird/...Field.scala
   */
 package org.gs.akka.algebird
 
@@ -7,16 +8,19 @@ import com.twitter.algebird._
 /** @author garystruthers
   *
   */
-object Field {
+object FIeld {
 
+  val f = Field
+  val div = f.div(12.0,3.0)
+  
   val ff = FloatField
-  val one = ff.one
-  val zero = ff.zero
-  val negate = ff.negate(2.0f)
-  val plus = ff plus (1.0f, 2.0f)
-  val minus = ff minus (1.0f, 2.0f)
-  val times = ff times (1.0f, 2.0f)
-  val div = ff div (1.0f, 2.0f)
+  val fone = ff.one
+  val fzero = ff.zero
+  val fnegate = ff.negate(2.0f)
+  val fplus = ff plus (1.0f, 2.0f)
+  val fminus = ff minus (1.0f, 2.0f)
+  val ftimes = ff times (1.0f, 2.0f)
+  val fdiv = ff div (1.0f, 2.0f)
 
   val df = DoubleField
   val dfone = df.one

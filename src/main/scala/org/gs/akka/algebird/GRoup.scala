@@ -1,6 +1,6 @@
 /** aggregate comparable objects, numerics, and strings
   *
-  * @see https://github.com/twitter/algebird...OrderedSemigroup.scala
+  * @see https://github.com/twitter/algebird...Group.scala
   */
 package org.gs.akka.algebird
 
