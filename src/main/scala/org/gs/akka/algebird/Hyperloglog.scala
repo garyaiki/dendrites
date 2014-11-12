@@ -6,7 +6,7 @@ package org.gs.akka.algebird
 import com.twitter.algebird._
 
 /** @author garystruthers
-  *
+  *test
   */
 object Hyperloglog {
 
@@ -33,5 +33,4 @@ object Hyperloglog {
     val exact = exactCount(data).toDouble
     val approxCount = aggregator(data.map(int2Bytes(_))).approximateSize.estimate.toDouble
   })
-
 }
