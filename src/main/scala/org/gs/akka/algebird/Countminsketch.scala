@@ -20,7 +20,6 @@ object Countminsketch {
   val est = cms.frequency(5L) //Approximate(0,1,1,0.9932620530009145)
   val estEst = cms.frequency(5L).estimate // Long 1
   val hh = cms.heavyHitters // TreeSet(5,6)
-  a.present(cms)
 
   val DELTA = 1E-10
   val EPS = 0.001

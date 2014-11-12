@@ -1,6 +1,6 @@
 /** @see https://github.com/twitter/algebird/...QTree.scala
   * @see http://www.snip2code.com/Snippet/67332/Calculating-the-median-distance-and-time
-  * @see
+  * @see http://www.cs.virginia.edu/~son/cs851/papers/ucsb.sensys04.pdf
   */
 package org.gs.akka.algebird
 
