@@ -6,7 +6,7 @@ package org.gs.akka.algebird
 import com.twitter.algebird._
 
 /** @author garystruthers
-  *
+  *t
   */
 object Hyperloglog {
 
