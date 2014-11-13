@@ -1,6 +1,7 @@
 /** @see https://github.com/twitter/algebird/...QTree.scala
   * @see http://www.snip2code.com/Snippet/67332/Calculating-the-median-distance-and-time
   * @see http://www.cs.virginia.edu/~son/cs851/papers/ucsb.sensys04.pdf
+  * @see http://www.prelert.com/blog/q-digest-an-algorithm-for-computing-approximate-quantiles-on-a-collection-of-integers/
   */
 package org.gs.akka.algebird
 
@@ -31,5 +32,6 @@ object Qtree {
   val rangeSumBounds = buildQTree.rangeSumBounds(lower, upper)
   val rangeCountBounds = buildQTree.rangeCountBounds(lower, upper)
   val compress = buildQTree.compress(1)
+  val mergedNext = merged.merge(QTree(2.0))
 
 }

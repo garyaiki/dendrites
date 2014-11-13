@@ -1,6 +1,7 @@
 /** Estimate frequency of values
   *
   * @see https://github.com/twitter/algebird/...CountMinSketch.scala
+  * @see https://tech.shareaholic.com/2012/12/03/the-count-min-sketch-how-to-count-over-large-keyspaces-when-about-right-is-good-enough/
   */
 package org.gs.akka.algebird
 
