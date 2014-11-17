@@ -70,4 +70,14 @@ object FUnctor {
   }
   val list = describe(jlist)
   val box2 = describe(Box2(Holder(4), Holder(5)))
+  implicit object ListFunctor extends Functor[List] {
+    def map[A, B](fa: List[A])(f: A => B): List[B] = (for (a <- fa) yield f(a))
+  }
+  implicit object OptionFunctor extends Functor[Option] {
+    def map[A, B](fa: Option[A])(f: A => B): Option[B] = (for (a <- fa) yield f(a))
+  }
+  implicit object VectorFunctor extends Functor[Vector] {
+    def map[A, B](fa: Vector[A])(f: A => B): Vector[B] = (for (a <- fa) yield f(a))
+  }
+
 }
