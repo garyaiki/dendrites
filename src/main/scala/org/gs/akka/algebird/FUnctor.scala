@@ -8,7 +8,7 @@ import com.twitter.algebird._
   *
   */
 object FUnctor {
-//type class example
+  //type class example
   object Math {
     import annotation.implicitNotFound
     @implicitNotFound(msg = "Cannot find NumberLike type class for ${T}")
@@ -33,7 +33,7 @@ object FUnctor {
   import Math.NumberLike
   def mean[T](xs: Vector[T])(implicit ev: NumberLike[T]): T =
     ev.divide(xs.reduce(ev.plus(_, _)), xs.size)
-  def median[T : NumberLike](xs: Vector[T]): T = xs(xs.size / 2)
+  def median[T: NumberLike](xs: Vector[T]): T = xs(xs.size / 2)
   def quartiles[T: NumberLike](xs: Vector[T]): (T, T, T) =
     (xs(xs.size / 4), median(xs), xs(xs.size / 4 * 3))
   def iqr[T: NumberLike](xs: Vector[T]): T = quartiles(xs) match {
@@ -48,4 +48,26 @@ object FUnctor {
   val mxsim = median(xsi)
   val mxsiq = quartiles(xsi)
   val mxsiqr = iqr(xsi)
+
+  import java.util.{ List => JList }
+
+  case class Box2[A](a1: A, a2: A)
+  implicit object Box2Functor extends Functor[Box2] {
+    def map[A, B](b: Box2[A])(f: A => B): Box2[B] = Box2(f(b.a1), f(b.a2))
+  }
+  import scala.language.higherKinds
+  def describe[A, F[_]: Functor](fa: F[A]) = implicitly[Functor[F]].map(fa)(a => a.toString())
+
+  case class Holder(i: Int)
+  val jlist: JList[Holder] = {
+    val l = new java.util.ArrayList[Holder]()
+    l add Holder(1); l add Holder(2); l add Holder(3)
+    l
+  }
+  implicit object JavaListFunctor extends Functor[JList] {
+    import collection.JavaConverters._
+    def map[A, B](fa: JList[A])(f: A => B): JList[B] = (for (a <- fa.asScala) yield f(a)).asJava
+  }
+  val list = describe(jlist)
+  val box2 = describe(Box2(Holder(4), Holder(5)))
 }
