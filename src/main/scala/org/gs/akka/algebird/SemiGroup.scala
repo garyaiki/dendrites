@@ -25,15 +25,12 @@ object SemiGroup {
   val sgItd = Semigroup.intTimes[Double](bi, 3.3)
   val sgSo = Semigroup.sumOption[Int](List(1, 2, 3, 4))
   val sgSos = Semigroup.sumOption[String](List("1", "2", "3", "4"))
-  
-  case class KeyValue(k: String, v: Int)
-  implicit object KeyValueSemigroup extends Semigroup[KeyValue]  {
-    def plus(a: KeyValue, b: KeyValue) = {
-      KeyValue(a.k + b.k, a.v + b.v)
-    }
-  }
+
+
+  import examples.{KeyValue, KeyValueSemigroup}
   val kv = KeyValue("a", 1)
-  def sumOption[A](xs: Vector[A])(implicit ev: Semigroup[A]): Option[A] =
-    ev.sumOption(xs)
-  sumOption(Vector(KeyValue("a", 1), KeyValue("b", 2), KeyValue("c", 3)))
+  def sumOption[A](xs: List[A])(implicit ev: Semigroup[A]): Option[A] = ev.sumOption(xs)
+  sumOption(List(KeyValue("a", 1), KeyValue("b", 2), KeyValue("c", 3)))
+  val sgKVit = Semigroup.intTimes[KeyValue](bi, KeyValue("a", 1))
+
 }

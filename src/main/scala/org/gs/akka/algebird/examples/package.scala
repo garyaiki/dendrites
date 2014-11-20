@@ -12,7 +12,7 @@ package object examples {
 
   implicit object KeyValueSemigroup extends Semigroup[KeyValue] {
     def plus(a: KeyValue, b: KeyValue) = {
-      KeyValue(a.k + b.k, a.v + b.v)
+      KeyValue(a.k, a.v + b.v)
     }
   }
 

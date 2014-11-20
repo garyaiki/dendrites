@@ -47,6 +47,15 @@ object MOnoid {
   def sumOption[A](xs: List[A])(implicit ev: Monoid[A]): Option[A] = ev.sumOption(xs)
   sumOption(List(KeyValue("a", 1), KeyValue("b", 2), KeyValue("c", 3)))
   sumOption(List[Option[KeyValue]](Some(KeyValue("a", 1)), Some(KeyValue("b", 2)), Some(KeyValue("c", 3))))
+  val ov = OrVal
+  val ovm = ov.monoid
+  OrVal(true)
+  ovm.plus(OrVal(KeyValueMonoid.isNonZero(KeyValue("a", 1))), OrVal(KeyValueMonoid.isNonZero(KeyValue("a", 1))))
+  AndVal.monoid.plus(AndVal(KeyValueMonoid.isNonZero(KeyValue("a", 1))), AndVal(KeyValueMonoid.isNonZero(KeyValue("a", 1))))
+  OrVal(KeyValueMonoid.isNonZero(KeyValue("a", 1)))
+  AndVal(KeyValueMonoid.isNonZero(KeyValue("a", 1)))
+  val bi = BigInt(10)
+  val mKVit = Monoid.intTimes[KeyValue](bi, KeyValue("a", 1))
 
 
 
