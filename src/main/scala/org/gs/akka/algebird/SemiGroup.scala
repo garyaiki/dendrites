@@ -27,10 +27,6 @@ object SemiGroup {
   val sgSos = Semigroup.sumOption[String](List("1", "2", "3", "4"))
 
 
-  import examples.{KeyValue, KeyValueSemigroup}
-  val kv = KeyValue("a", 1)
   def sumOption[A](xs: List[A])(implicit ev: Semigroup[A]): Option[A] = ev.sumOption(xs)
-  sumOption(List(KeyValue("a", 1), KeyValue("b", 2), KeyValue("c", 3)))
-  val sgKVit = Semigroup.intTimes[KeyValue](bi, KeyValue("a", 1))
 
 }
