@@ -29,4 +29,7 @@ object GRoup {
   val nn0 = oG.negate(Some(0)) // Some(0)
   val nn1 = oG.negate(Some(1)) // Some(-1)
   val nnN = oG.negate(None) //None
+
+  def conditionalNegate[A](x: A, f: A => Boolean)(implicit ev: Group[A]): A =
+      if (f(x)) ev.negate(x) else x
 }

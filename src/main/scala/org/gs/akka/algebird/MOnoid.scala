@@ -44,7 +44,10 @@ object MOnoid {
   def sum[A](xs: List[A])(implicit ev: Monoid[A]): A = ev.sum(xs)
   sum(List(KeyValue("a", 1), KeyValue("b", 2), KeyValue("c", 3)))
   sum(List(1,2,3))
+  
   def sumOption[A](xs: List[A])(implicit ev: Monoid[A]): Option[A] = ev.sumOption(xs)
+  def cutZero[A](x: A)(implicit ev: Monoid[A]): Boolean = if (x != ev.zero) true else false
+
   sumOption(List(KeyValue("a", 1), KeyValue("b", 2), KeyValue("c", 3)))
   sumOption(List[Option[KeyValue]](Some(KeyValue("a", 1)), Some(KeyValue("b", 2)), Some(KeyValue("c", 3))))
   val ov = OrVal
