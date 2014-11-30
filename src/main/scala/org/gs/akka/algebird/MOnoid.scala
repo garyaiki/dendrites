@@ -2,6 +2,10 @@
   */
 package org.gs.akka.algebird
 
+import examples._
+
+
+
 import com.twitter.algebird._
 
 /** @author garystruthers
@@ -39,17 +43,24 @@ object MOnoid {
   val nm = Monoid.from(toZ)(associativeFn)
   val z = nm.zero
 
-  import examples.{KeyValue, KeyValueMonoid}
   val kv = KeyValue("a", 1)
-  def sum[A](xs: List[A])(implicit ev: Monoid[A]): A = ev.sum(xs)
-  sum(List(KeyValue("a", 1), KeyValue("b", 2), KeyValue("c", 3)))
-  sum(List(1,2,3))
-  
-  def sumOption[A](xs: List[A])(implicit ev: Monoid[A]): Option[A] = ev.sumOption(xs)
-  def cutZero[A](x: A)(implicit ev: Monoid[A]): Boolean = if (x != ev.zero) true else false
 
-  sumOption(List(KeyValue("a", 1), KeyValue("b", 2), KeyValue("c", 3)))
-  sumOption(List[Option[KeyValue]](Some(KeyValue("a", 1)), Some(KeyValue("b", 2)), Some(KeyValue("c", 3))))
+  def sum[A](xs: List[A])(implicit ev: Monoid[A]): A = ev.sum(xs)
+  val kvl = List(KeyValue("a", 1), KeyValue("b", 2), KeyValue("c", 3))
+  sum[KeyValue](kvl)(KeyValueMonoid)
+  sum(List(1,2,3))
+  implicit object ListFunctor extends Functor[List] {
+    def map[A, B](fa: List[A])(f: A => B): List[B] = (for (a <- fa) yield f(a))
+  }
+
+  import scala.language.higherKinds
+  def aToString[A](ev: Monoid[A])(a: A): String = if(a != ev.zero) a.toString else ""
+  val cA2S = aToString[KeyValue](KeyValueMonoid)_
+  val lf = ListFunctor.map(kvl)(cA2S)
+  val lf2 = ListFunctor.map(kvl)((a: KeyValue) => KeyValue(a.k, a.v + 5))
+  def isZero[A](x: A)(implicit ev: Monoid[A]): Boolean = x == ev.zero
+  def isNotZero[A](x: A)(implicit ev: Monoid[A]): Boolean = x != ev.zero
+  def monoidFilter[A](x: A, f: A => Boolean): Boolean = f(x)
   val ov = OrVal
   val ovm = ov.monoid
   OrVal(true)
@@ -58,7 +69,7 @@ object MOnoid {
   OrVal(KeyValueMonoid.isNonZero(KeyValue("a", 1)))
   AndVal(KeyValueMonoid.isNonZero(KeyValue("a", 1)))
   val bi = BigInt(10)
-  val mKVit = Monoid.intTimes[KeyValue](bi, KeyValue("a", 1))
+  val mKVit = Monoid.intTimes[KeyValue](bi, KeyValue("a", 1))(KeyValueMonoid)
 
 
 

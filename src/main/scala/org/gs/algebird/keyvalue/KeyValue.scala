@@ -8,15 +8,8 @@ import com.twitter.algebird.Semigroup
   *
   */
 object TypedKeyValue {
-  //sealed abstract class KV
 
   case class KeyValue[A, B](k: A, v: B)
-  def extractValues[A, B](l: List[KeyValue[A, B]]) = for {
-    kv <- l
-    kvu <- KeyValue.unapply(kv)
-  } yield {
-    kvu._2
-  }
 
   val kvBD = List(KeyValue("a", BigDecimal(1)), KeyValue("b", BigDecimal(2)),
     KeyValue("c", BigDecimal(3)), KeyValue("d", BigDecimal(4)))
@@ -25,31 +18,29 @@ object TypedKeyValue {
   val kvL = List(KeyValue("a", 1L), KeyValue("b", 2L), KeyValue("c", 3L), KeyValue("d", 4L))
   val kvS = List(KeyValue("a", "1"), KeyValue("b", "2"), KeyValue("c", "3"), KeyValue("d", "4"))
 
-  val a = extractValues(kvBD)
-  val b = extractValues(kvD)
-  val c = extractValues(kvI)
-  val d = extractValues(kvL)
-  val e = extractValues(kvS)
+  import org.gs._
+  val ap = extractElement[BigDecimal](kvBD, 1)
+  val bp = extractElement[Double](kvD, 1)
+  val cp = extractElement[Int](kvI, 1)
+  val dp = extractElement[Long](kvL, 1)
+  val ep = extractElement[String](kvS, 1)
 
-  type A = String
-  type B = Int
-  type C = KeyValue[A, B]
+  val tSBD = List(("a", BigDecimal(1)), ("b", BigDecimal(2)),
+    ("c", BigDecimal(3)), ("d", BigDecimal(4)))
+  val tSD = List(("a", 1.0), ("b", 2.0), ("c", 3.0), ("d", 4.0))
+  val tSI = List(("a", 1), ("b", 2), ("c", 3), ("d", 4))
+  val tSL = List(("a", 1L), ("b", 2L), ("c", 3L), ("d", 4L))
+  val tSS = List(("a", "1"), ("b", "2"), ("c", "3"), ("d", "4"))
 
-  implicit object KeyValueSemigroup extends Semigroup[C] {
-    def plus(a: C, b: C) = KeyValue(a.k, a.v + b.v)
-  }
+  
+  val atBD = extractElement[BigDecimal](tSBD, 1)
+  val btD = extractElement[Double](tSD, 1)
+  val ctI = extractElement[Int](tSI, 1)
+  val dtL = extractElement[Long](tSL, 1)
+  val etS = extractElement[String](tSS, 1)
 
-  val kvbdu = KeyValue.unapply(KeyValue("a", BigDecimal(1)))
-  val kvbdus = for (kv <- kvBD) yield {
-    KeyValue.unapply(kv)
-  }
 
-  val kvbdus2 = for {
-    kv <- kvBD
-    kvu <- KeyValue.unapply(kv)
-  } yield {
-    kvu._2
-  }
-  val flatkvbd = kvbdus.flatten
-
+  def sumOption[A](xs: List[A])(implicit ev: Semigroup[A]): Option[A] = ev.sumOption(xs)
+  // sumOption(at)
+  val p: Product = KeyValue("b", 2.0)
 }
