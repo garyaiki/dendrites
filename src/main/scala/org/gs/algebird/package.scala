@@ -108,8 +108,8 @@ package object algebird {
   }
 
   /** AverageValue of a Seq of Numeric elements
-    * 
-    * @tparam A: Numeric 
+    *
+    * @tparam A: Numeric
     * @param xs Seq
     * @param evidence implicit Numeric[A]
     * @return AverageValue
@@ -118,4 +118,22 @@ package object algebird {
     val at = andThen[A, Double, AveragedValue](xs, implicitly[Numeric[A]].toDouble)(Averager.prepare(_))
     at.reduce(AveragedGroup.plus(_, _))
   }
+
+  /** Quickly estimate count of distinct integer values using HyperLogLog
+    * @param xs sequence of integers
+    * @param agg HyperLogLogAggregator, initialized with # of bits for hashing
+    * @return estimate count
+    */
+  def estimateDistinctVals(xs: Seq[Int])(implicit agg: HyperLogLogAggregator): Double = {
+    agg(xs.map(HyperLogLog.int2Bytes(_))).estimatedSize
+  }
+
+  /** Quickly find strings not in Bloom filter 
+    * @param xs strings to test
+    * @param bf configured and data initialized Bloom filter 
+    * @return tuple ._1 contains matches including false positives, ._2 are not in BF
+    */
+  def bloomFilterPartition(xs: Seq[String])(implicit bf: BF): (Seq[String], Seq[String]) =
+    xs.partition(bf.contains(_).isTrue)
+
 }
