@@ -103,7 +103,7 @@ package object algebird {
     * @param ev implicit Functor[Seq]
     * @return Seq[C]
     */
-  def andThen[A, B, C](fa: Seq[A], f: A => B)(g: B => C)(implicit ev: Functor[Seq]): Seq[C] = {
+  def andThen[A, B, C](fa: Seq[A])(f: A => B)(g: B => C)(implicit ev: Functor[Seq]): Seq[C] = {
     ev.map(ev.map(fa)(f))(g)
   }
 
@@ -115,7 +115,7 @@ package object algebird {
     * @return AverageValue
     */
   def avg[A: Numeric](xs: Seq[A]): AveragedValue = {
-    val at = andThen[A, Double, AveragedValue](xs, implicitly[Numeric[A]].toDouble)(Averager.prepare(_))
+    val at = andThen[A, Double, AveragedValue](xs)(implicitly[Numeric[A]].toDouble)(Averager.prepare(_))
     at.reduce(AveragedGroup.plus(_, _))
   }
 
@@ -128,12 +128,61 @@ package object algebird {
     agg(xs.map(HyperLogLog.int2Bytes(_))).estimatedSize
   }
 
-  /** Quickly find strings not in Bloom filter 
+  /** Quickly find strings in and not in Bloom filter
     * @param xs strings to test
-    * @param bf configured and data initialized Bloom filter 
-    * @return tuple ._1 contains matches including false positives, ._2 are not in BF
+    * @param bf configured and data initialized Bloom filter
+    * @return tuple ._1 is matches including false positives, ._2 are not in BF
     */
   def bloomFilterPartition(xs: Seq[String])(implicit bf: BF): (Seq[String], Seq[String]) =
     xs.partition(bf.contains(_).isTrue)
 
+  /** Convience creator with default parameters
+    * @param eps
+    * @param delta
+    * @param seed
+    * @return CountMinSketchMonoid
+    */
+  def createCMS_Monoid(eps: Double = 0.001, delta: Double = 1E-10, seed: Int = 1): CountMinSketchMonoid = new CountMinSketchMonoid(eps, delta, seed)
+
+  /** Create a CMS
+    * @param xs data
+    * @param monoid
+    * @return CMS for data
+    */
+  def createCountMinSketch(xs: Seq[Long])(implicit monoid: CountMinSketchMonoid): CMS = {
+    monoid.create(xs)
+  }
+
+  /** Add data to existing CMS
+    * @param xs data
+    * @param cmsL existing CMS
+    * @param monoid
+    * @return cmsL ++ cmsR
+    */
+  def appendCountMinSketch(xs: Seq[Long])(implicit cmsL: CMS, monoid: CountMinSketchMonoid) = {
+    val cmsR = monoid.create(xs)
+    monoid.plus(cmsL, cmsR)
+  }
+
+  /** Turn a sequence of value, time tuples into a seq of DecayedValues
+    *
+    * @param latest used as initial element, if None use implicit monoid.zero else use last
+    * DecayedValue
+    * @param xs sequence of value, time tuples
+    * @param halfLife used to scale value based on time
+    * @param monoid used to scan from initial value
+    * @return seq of DecayedValues
+    */
+  def toDecayedValues(latest: Option[DecayedValue] = None,
+    xs: Seq[(Double, Double)],
+    halfLife: Double)(implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
+    val z = latest match {
+      case None => monoid.zero
+      case Some(x) => x
+    }
+    xs.scanLeft(z) { (previous, xs) =>
+      val (value, time) = xs
+      monoid.plus(previous, DecayedValue.build(value, time, halfLife))
+    }
+  }
 }
