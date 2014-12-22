@@ -4,12 +4,16 @@ package org.gs
 
 import org.gs._
 import scala.collection.immutable.NumericRange
+import org.scalatest._
 
 /** @author garystruthers
   *
   */
-trait TestValuesBuilder {
+trait TestValuesBuilder extends SuiteMixin { this: Suite =>
 
+  abstract override def withFixture(test: NoArgTest) = {
+    super.withFixture(test)
+  }
   def makeCaseClasses[A, B](keyRange: NumericRange.Inclusive[Char])(
     implicit ev: CaseClassLike[A, B]): Seq[B] = {
     for (k <- keyRange) yield {
@@ -43,9 +47,10 @@ trait TestValuesBuilder {
   val keyEithInt = makeCaseClasses[Either[String, Int], KeyEithInt](keyRange)
   val keyEithLong = makeCaseClasses[Either[String, Long], KeyEithLong](keyRange)
   val keyEithStr = makeCaseClasses[Either[String, String], KeyEithStr](keyRange)
-  
+
   val bigDecimals = extractElement[BigDecimal](keyBigDecimal, 1)
   val bigInts = extractElement[BigInt](keyBigInt, 1)
+  val booleans = extractElement[Boolean](keyBoolean, 1)
   val doubles = extractElement[Double](keyDouble, 1)
   val floats = extractElement[Float](keyFloat, 1)
   val ints = extractElement[Int](keyInt, 1)
@@ -54,6 +59,7 @@ trait TestValuesBuilder {
 
   val optBigDecs = extractElement[Option[BigDecimal]](keyOptBigDec, 1)
   val optBigInts = extractElement[Option[BigInt]](keyOptBigInt, 1)
+  val optBooleans = extractElement[Option[Boolean]](keyOptBool, 1)
   val optDoubles = extractElement[Option[Double]](keyOptDouble, 1)
   val optFloats = extractElement[Option[Float]](keyOptFloat, 1)
   val optInts = extractElement[Option[Int]](keyOptInt, 1)
@@ -62,6 +68,7 @@ trait TestValuesBuilder {
 
   val eithBigDecs = extractElement[Either[String, BigDecimal]](keyEithBigDec, 1)
   val eithBigInts = extractElement[Either[String, BigInt]](keyEithBigInt, 1)
+  val eithBooleans = extractElement[Either[String, Boolean]](keyEithBool, 1)
   val eithDoubles = extractElement[Either[String, Double]](keyEithDouble, 1)
   val eithFloats = extractElement[Either[String, Float]](keyEithFloat, 1)
   val eithInts = extractElement[Either[String, Int]](keyEithInt, 1)

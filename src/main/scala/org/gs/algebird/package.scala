@@ -115,7 +115,8 @@ package object algebird {
     * @return AverageValue
     */
   def avg[A: Numeric](xs: Seq[A]): AveragedValue = {
-    val at = andThen[A, Double, AveragedValue](xs)(implicitly[Numeric[A]].toDouble)(Averager.prepare(_))
+    val at = andThen[A, Double, AveragedValue](xs)(implicitly[Numeric[A]].toDouble)(
+        Averager.prepare(_))
     at.reduce(AveragedGroup.plus(_, _))
   }
 
@@ -142,7 +143,8 @@ package object algebird {
     * @param seed
     * @return CountMinSketchMonoid
     */
-  def createCMS_Monoid(eps: Double = 0.001, delta: Double = 1E-10, seed: Int = 1): CountMinSketchMonoid = new CountMinSketchMonoid(eps, delta, seed)
+  def createCMS_Monoid(eps: Double = 0.001, delta: Double = 1E-10, seed: Int = 1):
+    CountMinSketchMonoid = new CountMinSketchMonoid(eps, delta, seed)
 
   /** Create a CMS
     * @param xs data
@@ -174,8 +176,9 @@ package object algebird {
     * @return seq of DecayedValues
     */
   def toDecayedValues(latest: Option[DecayedValue] = None,
-    xs: Seq[(Double, Double)],
-    halfLife: Double)(implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
+                      xs: Seq[(Double, Double)],
+                      halfLife: Double)(
+                      implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
     val z = latest match {
       case None => monoid.zero
       case Some(x) => x
