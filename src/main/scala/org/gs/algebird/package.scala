@@ -30,7 +30,7 @@ package object algebird {
     * @return -x
     */
   def negate[A: Group](x: A): A = implicitly[Group[A]].negate(x)
-
+  
   /** Subtracts an element from another
     * @tparam A: Group element type that can be negated, uses implicit Group[A]
     * @param l
@@ -123,10 +123,10 @@ package object algebird {
   /** Quickly estimate count of distinct integer values using HyperLogLog
     * @param xs sequence of integers
     * @param agg HyperLogLogAggregator, initialized with # of bits for hashing
-    * @return estimate count
+    * @return estimate count in an Approximate object
     */
-  def estimateDistinctVals(xs: Seq[Int])(implicit agg: HyperLogLogAggregator): Double = {
-    agg(xs.map(HyperLogLog.int2Bytes(_))).estimatedSize
+  def estDistinctVals(xs: Seq[Int])(implicit agg: HyperLogLogAggregator): Approximate[Long] = {
+    agg(xs.map(HyperLogLog.int2Bytes(_))).approximateSize
   }
 
   /** Quickly find strings in and not in Bloom filter

@@ -18,7 +18,7 @@ package object gs {
     */
   def extractElement[A](l: Seq[Product], element: Int) =
     for (p <- l) yield p.productElement(element).asInstanceOf[A]
-  
+
   /** Extract a Sequence of 2 element Tuples from a sequence of case classes or tuples
     *
     * Product is the base trait for all case classes and tuples
@@ -33,6 +33,30 @@ package object gs {
   def extractTuple2[A, B](l: Seq[Product], element1: Int, element2: Int): Seq[(A, B)] =
     for (p <- l) yield {
       (p.productElement(element1).asInstanceOf[A],
-       p.productElement(element2).asInstanceOf[B])
+        p.productElement(element2).asInstanceOf[B])
     }
+
+  /** Extract Seq of values from Either Right
+    * @tparam A type of Left element
+    * @tparam B type of Right element
+    * @param in Seq of Either
+    * @return Seq of values in Right
+    */
+  def filterRight[A, B](in: Seq[Either[A, B]]): Seq[B] = in.collect { case Right(r) => r }
+
+  /** Find the arithmetic mean of a generic Sequence of Numeric elements
+    * 
+    * @tparam A is a Numeric type
+    * @param xs
+    * @return mean of xs in Right or error message in Left 
+    */
+  def mean[A: Numeric](xs: Seq[A]): Either[String, A] = implicitly[Numeric[A]] match {
+    case num: Fractional[_] =>
+      import num._;
+      Right(xs.sum / fromInt(xs.size))
+    case num: Integral[_] =>
+      import num._;
+      Right(xs.sum / fromInt(xs.size))
+    case x => Left(s"$x is not divisable")
+  }
 }
