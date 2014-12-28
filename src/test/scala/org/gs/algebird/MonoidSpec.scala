@@ -3,7 +3,7 @@
 package org.gs.algebird
 
 import org.scalatest.{ FlatSpecLike, Matchers }
-import org.gs.TestValuesBuilder
+import org.gs._
 import org.gs.algebird._
 
 /** @author garystruthers
@@ -12,12 +12,11 @@ import org.gs.algebird._
 class MonoidSpec extends FlatSpecLike with TestValuesBuilder {
 
   "A Sequence of BigDecimal" should "be summed by a Monoid" in {
-    val sum = sumOption(bigDecimals).get
-    assert(sum === bigDecimal)
+    assert(sum(bigDecimals) === bigDecimals.sum)
   }
 
   "A Sequence of BigInt" should "be summed by a Monoid" in {
-    assert(sum(bigInts) === bigInt)
+    assert(sum(bigInts) === bigInts.sum)
   }
 
   "A Sequence of Boolean" should "be summed by a Monoid" in {
@@ -25,19 +24,19 @@ class MonoidSpec extends FlatSpecLike with TestValuesBuilder {
   }
   
   "A Sequence of Double" should "be summed by a Monoid" in {
-    assert(sum(doubles) === double)
+    assert(sum(doubles) === doubles.sum)
   }
   
   "A Sequence of Float" should "be summed by a Monoid" in {
-    assert(sum(floats) === float)
+    assert(sum(floats) === floats.sum)
   }
 
   "A Sequence of Int" should "be summed by a Monoid" in {
-    assert(sum(ints) === int)
+    assert(sum(ints) === ints.sum)
   }
 
   "A Sequence of Long" should "be summed by a Monoid" in {
-    assert(sum(longs) === long)
+    assert(sum(longs) === longs.sum)
   }
 
   "A Sequence of String" should "be summed by a Monoid" in {
@@ -45,11 +44,11 @@ class MonoidSpec extends FlatSpecLike with TestValuesBuilder {
   }
 
   "A Sequence of Option[BigDecimal]" should "be summed by a Monoid" in {
-    assert(sum(optBigDecs.flatten) === bigDecimal)
+    assert(sum(optBigDecs.flatten) === optBigDecs.flatten.sum)
   }
 
   "A Sequence of Option[BigInt]" should "be summed by a Monoid" in {
-    assert(sum(optBigInts.flatten) === bigInt)
+    assert(sum(optBigInts.flatten) === optBigInts.flatten.sum)
   }
 
   "A Sequence of Option[Boolean]" should "be summed by a Monoid" in {
@@ -57,19 +56,19 @@ class MonoidSpec extends FlatSpecLike with TestValuesBuilder {
   }
 
   "A Sequence of Option[Double]" should "be summed by a Monoid" in {
-    assert(sum(optDoubles.flatten) === double)
+    assert(sum(optDoubles.flatten) === optDoubles.flatten.sum)
   }
 
   "A Sequence of Option[Float]" should "be summed by a Monoid" in {
-    assert(sum(optFloats.flatten) === float)
+    assert(sum(optFloats.flatten) === optFloats.flatten.sum)
   }
 
   "A Sequence of Option[Int]" should "be summed by a Monoid" in {
-    assert(sum(optInts.flatten) === int)
+    assert(sum(optInts.flatten) === optInts.flatten.sum)
   }
 
   "A Sequence of Option[Long]" should "be summed by a Monoid" in {
-    assert(sum(optLongs.flatten) === long)
+    assert(sum(optLongs.flatten) === optLongs.flatten.sum)
   }
 
   "A Sequence of Option[String]" should "be summed by a Monoid" in {
@@ -77,11 +76,11 @@ class MonoidSpec extends FlatSpecLike with TestValuesBuilder {
   }
 
   "A Sequence of Either[String, BigDecimal]" should "be summed by a Monoid" in {
-    assert(sum(eithBigDecs) === eithBigDec)
+    assert(sum(eithBigDecs).right.get === filterRight(eithBigDecs).sum)
   }
 
   "A Sequence of Either[String, BigInt]" should "be summed by a Monoid" in {
-    assert(sum(eithBigInts) === eithBigInt)
+    assert(sum(eithBigInts).right.get === filterRight(eithBigInts).sum)
   }
 
   "A Sequence of Either[String, Boolean]" should "be summed by a Monoid" in {
@@ -90,19 +89,19 @@ class MonoidSpec extends FlatSpecLike with TestValuesBuilder {
   }
 
   "A Sequence of Either[String, Double]" should "be summed by a Monoid" in {
-    assert(sum(eithDoubles) === eithDouble)
+    assert(sum(eithDoubles).right.get === filterRight(eithDoubles).sum)
   }
 
   "A Sequence of Either[String, Float]" should "be summed by a Monoid" in {
-    assert(sum(eithFloats) === eithFloat)
+    assert(sum(eithFloats).right.get === filterRight(eithFloats).sum)
   }
 
   "A Sequence of Either[String, Int]" should "be summed by a Monoid" in {
-    assert(sum(eithInts) === eithInt)
+    assert(sum(eithInts).right.get === filterRight(eithInts).sum)
   }
 
   "A Sequence of Either[String, Long]" should "be summed by a Monoid" in {
-    assert(sum(eithLongs) === eithLong)
+    assert(sum(eithLongs).right.get === filterRight(eithLongs).sum)
   }
 
   "A Sequence of Either[String, String]" should "be summed by a Monoid" in {
