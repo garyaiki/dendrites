@@ -1,10 +1,16 @@
 /**
   */
-package org.gs
+package org.gs.fixtures
 
 import org.gs._
 import scala.collection.immutable.NumericRange
 import org.scalatest._
+
+import scala.BigDecimal
+import scala.BigInt
+import scala.Right
+import scala.annotation.implicitNotFound
+import org.gs.fixtures._
 
 /** @author garystruthers
   *

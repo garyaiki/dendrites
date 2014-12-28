@@ -5,6 +5,7 @@ package org.gs.algebird
 import org.scalatest.{ FlatSpecLike, Matchers }
 import org.gs._
 import org.gs.algebird._
+import org.gs.fixtures.{CaseClassLike, TestValuesBuilder}
 
 /** @author garystruthers
   *
@@ -53,7 +54,7 @@ class SemigroupSpec extends FlatSpecLike with TestValuesBuilder {
 
   "A Sequence of Option[BigDecimal]" should "be summed by a Semigroup" in {
     val sum = sumOption(optBigDecs.flatten)
-    assert(sum === optBigDecs.flatten.sum)
+    assert(sum.get === optBigDecs.flatten.sum)
   }
 
   "A Sequence of Option[BigInt]" should "be summed by a Semigroup" in {
