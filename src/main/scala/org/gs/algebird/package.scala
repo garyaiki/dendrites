@@ -30,7 +30,7 @@ package object algebird {
     * @return -x
     */
   def negate[A: Group](x: A): A = implicitly[Group[A]].negate(x)
-  
+
   /** Subtracts an element from another
     * @tparam A: Group element type that can be negated, uses implicit Group[A]
     * @param l
@@ -116,11 +116,12 @@ package object algebird {
     */
   def avg[A: Numeric](xs: Seq[A]): AveragedValue = {
     val at = andThen[A, Double, AveragedValue](xs)(implicitly[Numeric[A]].toDouble)(
-        Averager.prepare(_))
+      Averager.prepare(_))
     at.reduce(AveragedGroup.plus(_, _))
   }
 
   /** Quickly estimate count of distinct integer values using HyperLogLog
+    * 
     * @param xs sequence of integers
     * @param agg HyperLogLogAggregator, initialized with # of bits for hashing
     * @return estimate count in an Approximate object
@@ -129,6 +130,18 @@ package object algebird {
     agg(xs.map(HyperLogLog.int2Bytes(_))).approximateSize
   }
 
+  /** Create BloomFilter configure and load it from a Seq of words
+   	*  
+   	* @param words 
+    * @param fpProb false positive probability, 1% default
+    * @return BloomFilter
+    */
+  def createBF(words: Seq[String], fpProb: Double = 0.01): BF = {
+    val wc = words.size
+    val bfMonoid = BloomFilter(wc, fpProb)
+    bfMonoid.create(words: _*)
+  }
+  
   /** Quickly find strings in and not in Bloom filter
     * @param xs strings to test
     * @param bf configured and data initialized Bloom filter
@@ -143,8 +156,7 @@ package object algebird {
     * @param seed
     * @return CountMinSketchMonoid
     */
-  def createCMS_Monoid(eps: Double = 0.001, delta: Double = 1E-10, seed: Int = 1):
-    CountMinSketchMonoid = new CountMinSketchMonoid(eps, delta, seed)
+  def createCMS_Monoid(eps: Double = 0.001, delta: Double = 1E-10, seed: Int = 1): CountMinSketchMonoid = new CountMinSketchMonoid(eps, delta, seed)
 
   /** Create a CMS
     * @param xs data
@@ -176,9 +188,9 @@ package object algebird {
     * @return seq of DecayedValues
     */
   def toDecayedValues(latest: Option[DecayedValue] = None,
-                      xs: Seq[(Double, Double)],
-                      halfLife: Double)(
-                      implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
+    xs: Seq[(Double, Double)],
+    halfLife: Double)(
+      implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
     val z = latest match {
       case None => monoid.zero
       case Some(x) => x
