@@ -156,7 +156,8 @@ package object algebird {
     * @param seed
     * @return CountMinSketchMonoid
     */
-  def createCMS_Monoid(eps: Double = 0.001, delta: Double = 1E-10, seed: Int = 1): CountMinSketchMonoid = new CountMinSketchMonoid(eps, delta, seed)
+  def createCMSMonoid(eps: Double = 0.001, delta: Double = 1E-10, seed: Int = 1): 
+        CountMinSketchMonoid = new CountMinSketchMonoid(eps, delta, seed)
 
   /** Create a CMS
     * @param xs data

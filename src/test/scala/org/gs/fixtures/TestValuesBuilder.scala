@@ -5,12 +5,7 @@ package org.gs.fixtures
 import org.gs._
 import scala.collection.immutable.NumericRange
 import org.scalatest._
-
-import scala.BigDecimal
-import scala.BigInt
-import scala.Right
 import scala.annotation.implicitNotFound
-import org.gs.fixtures._
 
 /** @author garystruthers
   *
@@ -20,12 +15,14 @@ trait TestValuesBuilder extends SuiteMixin { this: Suite =>
   abstract override def withFixture(test: NoArgTest) = {
     super.withFixture(test)
   }
+
   def makeCaseClasses[A, B](keyRange: NumericRange.Inclusive[Char])(
     implicit ev: CaseClassLike[A, B]): Seq[B] = {
     for (k <- keyRange) yield {
       ev.apply(k)
     }
   }
+
   val keyRange = 'a' to 'z'
   val keyBigDecimal = makeCaseClasses[BigDecimal, KeyBigDecimal](keyRange)
   val keyBigInt = makeCaseClasses[BigInt, KeyBigInt](keyRange)
