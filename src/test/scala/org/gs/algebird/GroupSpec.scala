@@ -3,6 +3,7 @@
 package org.gs.algebird
 
 import org.scalatest.FlatSpecLike
+import com.twitter.algebird.Operators
 import org.gs.fixtures.{CaseClassLike, TestValuesBuilder}
 
 
@@ -18,12 +19,7 @@ class GroupSpec extends FlatSpecLike with TestValuesBuilder {
   "A BigInt" should "be negated by a Group" in {
     assert(negate(bigInt * -1) === bigInt)
   }
-/*
-  "A Boolean" should "be negated by a Group" in {
-    val sum = sumOption(booleans)
-    assert(sum.get === true)
-  }
-*/
+
   "A Double" should "be negated by a Group" in {
     assert(negate(double * -1) === double)
   }
@@ -49,12 +45,7 @@ class GroupSpec extends FlatSpecLike with TestValuesBuilder {
     val v = Some(bigInt * -1)
     assert(negate(v.get) === bigInt)
   }
-/*
-  "A Option[Boolean]" should "be negated by a Group" in {
-    val sum = sumOption(optBooleans.flatten)
-    assert(sum.get === true)
-  }
-*/
+
   "A Option[Double]" should "be negated by a Group" in {
     val v = Some(double * -1)
     assert(negate(v.get) === double)
@@ -104,7 +95,8 @@ class GroupSpec extends FlatSpecLike with TestValuesBuilder {
     val v = Right(long * -1)
     assert(negate(v.right.get) === long)
   }
-
+  
+  val op = Operators
   "A BigDecimal" should "be subtracted by a Group" in {
     assert(minus(bigDecimal, bigDecimal) === 0)
   }
@@ -112,12 +104,7 @@ class GroupSpec extends FlatSpecLike with TestValuesBuilder {
   "A BigInt" should "be subtracted by a Group" in {
     assert(minus(bigInt, bigInt) === 0)
   }
-/*
-  "A Boolean" should "be subtracted by a Group" in {
-    val sum = sumOption(booleans)
-    assert(sum.get === true)
-  }
-*/
+
   "A Double" should "be subtracted by a Group" in {
     assert(minus(double, double) === 0.0)
   }
@@ -141,12 +128,7 @@ class GroupSpec extends FlatSpecLike with TestValuesBuilder {
   "A Option[BigInt]" should "be subtracted by a Group" in {
     assert(minus(optBigInt.get, optBigInt.get) === 0)
   }
-/*
-  "A Option[Boolean]" should "be subtracted by a Group" in {
-    val sum = sumOption(optBooleans.flatten)
-    assert(sum.get === true)
-  }
-*/
+
   "A Option[Double]" should "be subtracted by a Group" in {
     assert(minus(optDouble.get, optDouble.get) === 0.0)
   }

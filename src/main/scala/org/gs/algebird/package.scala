@@ -3,6 +3,7 @@
 package org.gs
 
 import com.twitter.algebird._
+import org.gs.algebird.typeclasses.QTreeLike
 
 /** @author garystruthers
   *
@@ -121,7 +122,7 @@ package object algebird {
   }
 
   /** Quickly estimate count of distinct integer values using HyperLogLog
-    * 
+    *
     * @param xs sequence of integers
     * @param agg HyperLogLogAggregator, initialized with # of bits for hashing
     * @return estimate count in an Approximate object
@@ -131,8 +132,8 @@ package object algebird {
   }
 
   /** Create BloomFilter configure and load it from a Seq of words
-   	*  
-   	* @param words 
+    *
+    * @param words
     * @param fpProb false positive probability, 1% default
     * @return BloomFilter
     */
@@ -141,7 +142,7 @@ package object algebird {
     val bfMonoid = BloomFilter(wc, fpProb)
     bfMonoid.create(words: _*)
   }
-  
+
   /** Quickly find strings in and not in Bloom filter
     * @param xs strings to test
     * @param bf configured and data initialized Bloom filter
@@ -156,8 +157,7 @@ package object algebird {
     * @param seed
     * @return CountMinSketchMonoid
     */
-  def createCMSMonoid(eps: Double = 0.001, delta: Double = 1E-10, seed: Int = 1): 
-        CountMinSketchMonoid = new CountMinSketchMonoid(eps, delta, seed)
+  def createCMSMonoid(eps: Double = 0.001, delta: Double = 1E-10, seed: Int = 1): CountMinSketchMonoid = new CountMinSketchMonoid(eps, delta, seed)
 
   /** Create a CMS
     * @param xs data
@@ -188,17 +188,34 @@ package object algebird {
     * @param monoid used to scan from initial value
     * @return seq of DecayedValues
     */
-  def toDecayedValues(latest: Option[DecayedValue] = None,
-    xs: Seq[(Double, Double)],
-    halfLife: Double)(
-      implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
-    val z = latest match {
+  def toDecayedValues(xs: Seq[(Double, Double)], halfLife: Double, last: Option[DecayedValue] = None)(implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
+    val z = last match {
       case None => monoid.zero
       case Some(x) => x
     }
-    xs.scanLeft(z) { (previous, xs) =>
-      val (value, time) = xs
-      monoid.plus(previous, DecayedValue.build(value, time, halfLife))
+
+    def op(previous: DecayedValue, x: (Double, Double)) = {
+      val (value, time) = x
+      val d = time match {
+        case x if (time < 1.0) => 1.0
+        case x if (time < halfLife) => time
+        case _ => halfLife
+      }
+      //      val d = if(time < halfLife) time else halfLife
+      monoid.plus(previous, DecayedValue.build(value, time, d))
     }
+    xs.scanLeft(z)(op)
+  }
+
+  /** Build a QTree from a Seq
+    *
+    * @tparam A: BigDecimal, BigInt, Double, Float, Int, Long
+    * @param vals
+    * @param ev Typeclass to build from Seq
+    * @param sg 
+    * @return 
+    */
+  def buildQTree[A](vals: Seq[A])(implicit ev: QTreeLike[A], sg: QTreeSemigroup[A]): QTree[A] = {
+    vals.map { ev(_) }.reduce { sg.plus(_, _) }
   }
 }

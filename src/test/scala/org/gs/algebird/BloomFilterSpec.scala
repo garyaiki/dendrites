@@ -42,20 +42,20 @@ class BloomFilterSpec extends FlatSpecLike with BloomFilterBuilder {
    for(i <- wordsTestWords) { assert(wordsBF.contains(i).isTrue)}
   }
   
-  "A properNames BloomFilter" should "have < fpProb false positives" in {
+  "A properNames BloomFilter" should "have <= fpProb * 2 false positives" in {
    val falsePositives = for {
      i <- properFalseWords
      if properBF.contains(i).isTrue
    } yield i
-   assert(falsePositives.size < properNames.size * fpProb)
+   assert(falsePositives.size <= properNames.size * (fpProb * 2))
   }
 
-  "A connectives BloomFilter" should "have < fpProb false positives" in {
+  "A connectives BloomFilter" should "have <= fpProb * 2 false positives" in {
    val falsePositives = for {
      i <- connectivesFalseWords
      if connectivesBF.contains(i).isTrue
    } yield i
-   assert(falsePositives.size < connectives.size * fpProb)
+   assert(falsePositives.size < connectives.size * (fpProb * 2))
   }
 
   "A words BloomFilter" should "have < fpProb false positives" in {

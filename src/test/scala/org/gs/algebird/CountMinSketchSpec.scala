@@ -21,17 +21,33 @@ class CountMinSketchSpec extends FlatSpecLike with CountMinSketchBuilder {
   val longs = testLongs(longZips)
 
   implicit val m = createCMSMonoid()
-  val cms = createCountMinSketch(longs)
-  assert(longs.size === cms.totalCount)
+  implicit val cms = createCountMinSketch(longs)
+
+  "A CountMinSketch" should "estimate distinct values" in {
+    assert(longs.size === cms.totalCount)
+  }
+
   val rnd = new Random(1)
 
-  "A highly skewed CountMinSketch" should "make good frequency estimates" in {
-    for {
-      i <- 0 until 10
-    } {
+  "A CountMinSketch" should "estimate frequency of values" in {
+    for (i <- 0 until 10) {
       val j = ipRange(rnd.nextInt(ipRange length))
       val longAddr = longZips(j)
       assert(cms.frequency(longAddr._1).estimate === j)
     }
-  }  
+  }
+
+  val cmsLR = appendCountMinSketch(longs)
+
+  "An appended CountMinSketch" should "estimate distinct values" in {
+    assert(cmsLR.totalCount === (cms.totalCount * 2))
+  }
+
+  "An appended CountMinSketch" should "estimate frequency of values" in {
+    for (i <- 0 until 10) {
+      val j = ipRange(rnd.nextInt(ipRange length))
+      val longAddr = longZips(j)
+      assert(cmsLR.frequency(longAddr._1).estimate === (j * 2))
+    }
+  }
 }

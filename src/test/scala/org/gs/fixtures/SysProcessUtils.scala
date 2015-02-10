@@ -44,27 +44,4 @@ trait SysProcessUtils {
     for (line <- fileLines) yield line.trim.toLowerCase
   }
 }
-object app extends SysProcessUtils {
-  def main(args: Array[String]) = {
-    val pNames = properNamesPath()
-    val wc = wordCount(pNames)
 
-    val words = readWords(pNames)
-    val one = words.contains("gary")
-    val two = words.contains("struthers")
-    val three = words.contains("crispin")
-    println(s"gary:$one struthers:$two crispin:$three")
-
-    val NUM_HASHES = 3000
-    val WIDTH = 32000
-    val SEED = 10000
-    import com.twitter.algebird._
-    val bfMonoid = BloomFilter(wc, 0.01)
-    val bf = bfMonoid.create(words: _*)
-    val gary = (bf.contains("gary").isTrue)
-    val struthers = (bf.contains("Struthers").isTrue)
-    val crispin = (bf.contains("Crispin").isTrue)
-    println(s"gary:$gary struthers:$struthers crispin:$crispin")
-
-  }
-}

@@ -18,20 +18,7 @@ trait BloomFilterBuilder extends SuiteMixin with SysProcessUtils { this: Suite =
   abstract override def withFixture(test: NoArgTest) = {
     super.withFixture(test)
   }
-/*
-  def fromFile(path: String): (Int, Seq[String]) = {
-    val wc = wordCount(path)
-    val words = readWords(path)
-    (wc, words)
-  }
-  
-  def createBF(numAndEntries: (Int, Seq[String]), fpProb: Double = 0.01): BF = {
-    val wc = numAndEntries._1
-    val words = numAndEntries._2
-    val bfMonoid = BloomFilter(wc, fpProb)
-    bfMonoid.create(words: _*)
-  }
-*/  
+ 
   def testWords(wordCount: Int, wds: Seq[String], numRandoms: Int): IndexedSeq[String] = {
     val words = wds.toIndexedSeq
     val rnd = new Random
