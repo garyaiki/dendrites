@@ -93,7 +93,7 @@ class MinSpec extends FlatSpecLike with TestValuesBuilder {
   }
 
   "A Sequence of Either[String, Float]" should "return its Min" in {
-    
+    assert(min(filterRight(eithFloats)) === floats.min)
   }
 
   "A Sequence of Either[String, Int]" should "return its Min" in {

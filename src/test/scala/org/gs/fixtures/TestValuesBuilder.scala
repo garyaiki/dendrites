@@ -12,7 +12,7 @@ import scala.annotation.implicitNotFound
   */
 trait TestValuesBuilder extends SuiteMixin { this: Suite =>
 
-  abstract override def withFixture(test: NoArgTest) = {
+  abstract override def withFixture(test: NoArgTest): Outcome = {
     super.withFixture(test)
   }
 
@@ -77,7 +77,7 @@ trait TestValuesBuilder extends SuiteMixin { this: Suite =>
   val eithInts = extractElement[Either[String, Int]](keyEithInt, 1)
   val eithLongs = extractElement[Either[String, Long]](keyEithLong, 1)
   val eithStrs = extractElement[Either[String, String]](keyEithStr, 1)
-  
+
   val bigDecimal = BigDecimal(2847)
   val bigInt = BigInt(2847)
   val double = 3130.0

@@ -6,7 +6,7 @@ package org.gs.fixtures
   *
   */
 trait TrigUtils {
-  
+
   def sinePeriod(amplitude: Int): Seq[Double] = {
     val r = 0 to 360
     for(i <- r) yield {
@@ -14,7 +14,6 @@ trait TrigUtils {
       BigDecimal(s).setScale(4, BigDecimal.RoundingMode.HALF_UP).toDouble
     }
   }
-
 }
 
 object TestTrigUtils extends TrigUtils{

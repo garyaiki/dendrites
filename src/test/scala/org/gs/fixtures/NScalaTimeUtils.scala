@@ -30,12 +30,13 @@ trait NScalaTimeUtils {
       i <- r
     } yield incDateTime(i, period)
   }
-  
+
   def toLongs(xs: Seq[DateTime]): Seq[Long] = xs.map( _.getMillis)
 
   def toDoubles(xs: Seq[DateTime]): Seq[Double] = xs.map( _.getMillis.toDouble)
 }
-object app extends NScalaTimeUtils {
+
+object ScalaTimeApp extends NScalaTimeUtils {
   def main(args: Array[String]): Unit = {
     val days = createPeriodRange(0 until 5, Days.ZERO)
     val longs = toLongs(days)
@@ -46,16 +47,5 @@ object app extends NScalaTimeUtils {
     for {
       t <- dr
     } print(s"t:$t ${sin(t.toDouble / twoPi)} ")
-      
-//    } print(s"t:$t ${100 * sin((t % 6).toDouble)} ")
-/*
-    for (i <- createPeriodRange(0 until 5, Seconds.ZERO)) print(s"seconds:$i ");println
-    for (i <- createPeriodRange(0 until 5, Minutes.ZERO)) print(s"minutes:$i ");println
-    for (i <- createPeriodRange(0 until 5, Hours.ZERO)) print(s"hours:$i ");println
-    for (i <- createPeriodRange(0 until 5, Days.ZERO)) print(s"days:$i ");println
-    for (i <- createPeriodRange(0 until 6, Weeks.ZERO)) print(s"weeks:$i ");println
-    for (i <- createPeriodRange(0 until 5, Months.ZERO)) print(s"months:$i ");println
-    for (i <- createPeriodRange(0 until 5, Years.ZERO)) print(s"years:$i ");println
-    */
   }
 }

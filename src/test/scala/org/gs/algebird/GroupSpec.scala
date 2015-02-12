@@ -95,7 +95,7 @@ class GroupSpec extends FlatSpecLike with TestValuesBuilder {
     val v = Right(long * -1)
     assert(negate(v.right.get) === long)
   }
-  
+
   val op = Operators
   "A BigDecimal" should "be subtracted by a Group" in {
     assert(minus(bigDecimal, bigDecimal) === 0)

@@ -23,11 +23,11 @@ class MonoidSpec extends FlatSpecLike with TestValuesBuilder {
   "A Sequence of Boolean" should "be summed by a Monoid" in {
     assert(sum(booleans) === true)
   }
-  
+
   "A Sequence of Double" should "be summed by a Monoid" in {
     assert(sum(doubles) === doubles.sum)
   }
-  
+
   "A Sequence of Float" should "be summed by a Monoid" in {
     assert(sum(floats) === floats.sum)
   }

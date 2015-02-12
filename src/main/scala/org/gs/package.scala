@@ -16,7 +16,7 @@ package object gs {
     * @return sequence of just that element
     * @throws ClassCastException if element doesn't match type param
     */
-  def extractElement[A](l: Seq[Product], element: Int) =
+  def extractElement[A](l: Seq[Product], element: Int): Seq[A] =
     for (p <- l) yield p.productElement(element).asInstanceOf[A]
 
   /** Extract a Sequence of 2 element Tuples from a sequence of case classes or tuples
@@ -45,10 +45,10 @@ package object gs {
   def filterRight[A, B](in: Seq[Either[A, B]]): Seq[B] = in.collect { case Right(r) => r }
 
   /** Find the arithmetic mean of a generic Sequence of Numeric elements
-    * 
+    *
     * @tparam A is a Numeric type
     * @param xs
-    * @return mean of xs in Right or error message in Left 
+    * @return mean of xs in Right or error message in Left
     */
   def mean[A: Numeric](xs: Seq[A]): Either[String, A] = implicitly[Numeric[A]] match {
     case num: Fractional[_] =>

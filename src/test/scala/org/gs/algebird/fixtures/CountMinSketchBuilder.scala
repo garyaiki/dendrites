@@ -15,7 +15,7 @@ import com.twitter.algebird._
   */
 trait CountMinSketchBuilder extends SuiteMixin { this: Suite =>
 
-  abstract override def withFixture(test: NoArgTest) = {
+  abstract override def withFixture(test: NoArgTest): Outcome = {
     super.withFixture(test)
   }
 
@@ -38,9 +38,9 @@ trait CountMinSketchBuilder extends SuiteMixin { this: Suite =>
         throw new IllegalArgumentException("non-Inet4Address cannot be converted to a Long")
     }
   }
-  
+
   val ipRange = 1 to 255
-  
+
   def inetAddresses(ipRange: Range): IndexedSeq[InetAddress] = for {
       i <- ipRange
     } yield InetAddress.getByAddress(Array[Byte](i.toByte, i.toByte, i.toByte, i.toByte))

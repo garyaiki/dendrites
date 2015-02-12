@@ -32,3 +32,7 @@ libraryDependencies ++= Seq("org.scalatest" % "scalatest_2.11" % "2.2.1" % "test
 	"joda-time" % "joda-time" % "2.6",
 	"org.joda" % "joda-convert" % "1.2"
 )
+
+scalastyleFailOnError := false
+
+(scalastyleConfig in Test) := baseDirectory.value / "scalastyle-test-config.xml"

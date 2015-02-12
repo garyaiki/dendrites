@@ -15,10 +15,10 @@ import com.twitter.algebird._
   */
 trait QTreeBuilder extends SuiteMixin with TestValuesBuilder { this: Suite =>
 
-  abstract override def withFixture(test: NoArgTest) = {
+  abstract override def withFixture(test: NoArgTest): Outcome = {
     super.withFixture(test)
   }
-  
+
   val level = 5
   val q1 = 102.0
   val q2 = 109.0

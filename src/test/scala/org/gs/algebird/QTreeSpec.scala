@@ -39,7 +39,7 @@ class QTreeSpec extends FlatSpecLike with TestValuesBuilder with QTreeBuilder {
     assert(qtBD.rangeSumBounds(lb, ub) === (sum, sum))
     assert(qtBD.rangeCountBounds(lb, ub) === (size, size))
   }
-  
+
   "A Sequence of BigDecimal" should "return an InterQuartileMean" in {
     val iqm = qtBD.interQuartileMean
     assert(iqm._1 > 100.0)
@@ -68,13 +68,13 @@ class QTreeSpec extends FlatSpecLike with TestValuesBuilder with QTreeBuilder {
     assert(qtBI.rangeSumBounds(lb, ub) === (sum, sum))
     assert(qtBI.rangeCountBounds(lb, ub) === (size, size))
   }
-  
+
   "A Sequence of BigInt" should "return an InterQuartileMean" in {
     val iqm = qtBI.interQuartileMean
     assert(iqm._1 > 100.0)
     assert(iqm._2 < 109.1)
   }
-  
+
   "A Sequence of Double" should "return a QTree[Double]" in {
     val size = doubles.size
     assert(qtD.count === size)
@@ -97,7 +97,7 @@ class QTreeSpec extends FlatSpecLike with TestValuesBuilder with QTreeBuilder {
     assert(qtD.rangeSumBounds(lb, ub) === (sum, sum))
     assert(qtD.rangeCountBounds(lb, ub) === (size, size))
   }
-  
+
   "A Sequence of Double" should "return an InterQuartileMean" in {
     val iqm = qtD.interQuartileMean
     assert(iqm._1 > 75.0)
@@ -126,7 +126,7 @@ class QTreeSpec extends FlatSpecLike with TestValuesBuilder with QTreeBuilder {
     assert(qtF.rangeSumBounds(lb, ub) === (sum, sum))
     assert(qtF.rangeCountBounds(lb, ub) === (size, size))
   }
-  
+
   "A Sequence of Float" should "return an InterQuartileMean" in {
     val iqm = qtF.interQuartileMean
     assert(iqm._1 > 110.0)
@@ -155,7 +155,7 @@ class QTreeSpec extends FlatSpecLike with TestValuesBuilder with QTreeBuilder {
     assert(qtI.rangeSumBounds(lb, ub) === (sum, sum))
     assert(qtI.rangeCountBounds(lb, ub) === (size, size))
   }
-  
+
   "A Sequence of Int" should "return an InterQuartileMean" in {
     val iqm = qtI.interQuartileMean
     assert(iqm._1 > 100.0)
@@ -184,7 +184,7 @@ class QTreeSpec extends FlatSpecLike with TestValuesBuilder with QTreeBuilder {
     assert(qtL.rangeSumBounds(lb, ub) === (sum, sum))
     assert(qtL.rangeCountBounds(lb, ub) === (size, size))
   }
-  
+
   "A Sequence of Long" should "return an InterQuartileMean" in {
     val iqm = qtL.interQuartileMean
     assert(iqm._1 > 100.0)

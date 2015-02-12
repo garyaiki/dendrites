@@ -93,7 +93,7 @@ class MaxSpec extends FlatSpecLike with TestValuesBuilder {
   }
 
   "A Sequence of Either[String, Float]" should "return its Max" in {
-    
+
   }
 
   "A Sequence of Either[String, Int]" should "return its Max" in {

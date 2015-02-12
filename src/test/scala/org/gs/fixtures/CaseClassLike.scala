@@ -44,13 +44,13 @@ trait CaseClassLike[A, B] {
   */
 object CaseClassLike {
   def altTF(k: Char) = if (k % 2 == 0) (true) else (false)
-  
+
   implicit val mc = new java.math.MathContext(2)
-  
+
   def exDouble(k: Char)(implicit ev: java.math.MathContext) = BigDecimal(k.toInt * 1.1, ev).toDouble
-  def exFloat(k: Char) = k.toInt * 1.1f
-  def exStr(k: Char) = k.toString.toUpperCase()
-  def exLeftStr(k: Char) = s"Error key:$k"
+  def exFloat(k: Char): Float = k.toInt * 1.1f
+  def exStr(k: Char): String = k.toString.toUpperCase()
+  def exLeftStr(k: Char): String = s"Error key:$k"
 
   implicit object CaseClassLikeBigDecimal extends CaseClassLike[BigDecimal, KeyBigDecimal] {
     def apply(k: Char): KeyBigDecimal = KeyBigDecimal(k.toString, k.toInt)

@@ -70,32 +70,32 @@ class RingSpec extends FlatSpecLike with TestValuesBuilder {
   }
 
   "A Either[String, BigDecimal]" should "be multiplied by a Ring" in {
-    assert(times(eithBigDec.right.get, eithBigDec.right.get) === 
+    assert(times(eithBigDec.right.get, eithBigDec.right.get) ===
       eithBigDec.right.get * eithBigDec.right.get)
   }
 
   "A Either[String, BigInt]" should "be multiplied by a Ring" in {
-    assert(times(eithBigInt.right.get, eithBigInt.right.get) === 
+    assert(times(eithBigInt.right.get, eithBigInt.right.get) ===
       eithBigInt.right.get * eithBigInt.right.get)
   }
 
   "A Either[String, Double]" should "be multiplied by a Ring" in {
-    assert(times(eithDouble.right.get, eithDouble.right.get) === 
+    assert(times(eithDouble.right.get, eithDouble.right.get) ===
       eithDouble.right.get * eithDouble.right.get)
   }
 
   "A Either[String, Float]" should "be multiplied by a Ring" in {
-    assert(times(eithFloat.right.get, eithFloat.right.get) === 
+    assert(times(eithFloat.right.get, eithFloat.right.get) ===
       eithFloat.right.get * eithFloat.right.get)
   }
 
   "A Either[String, Int]" should "be multiplied by a Ring" in {
-    assert(times(eithInt.right.get, eithInt.right.get) === 
+    assert(times(eithInt.right.get, eithInt.right.get) ===
       eithInt.right.get * eithInt.right.get)
   }
 
   "A Either[String, Long]" should "be multiplied by a Ring" in {
-    assert(times(eithLong.right.get, eithLong.right.get) === 
+    assert(times(eithLong.right.get, eithLong.right.get) ===
       eithLong.right.get * eithLong.right.get)
   }
 
@@ -106,11 +106,11 @@ class RingSpec extends FlatSpecLike with TestValuesBuilder {
   "A Sequence of BigInt" should "get a product from a Ring " in {
     assert(product(bigInts) === bigInts.product)
   }
-  
+
   "A Sequence of Double" should "get a product from a Ring " in {
     assert(product(doubles) === doubles.product)
   }
-  
+
   "A Sequence of Float" should "get a product from a Ring " in {
     assert(product(floats) === floats.product)
   }

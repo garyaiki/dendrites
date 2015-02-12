@@ -157,7 +157,8 @@ package object algebird {
     * @param seed
     * @return CountMinSketchMonoid
     */
-  def createCMSMonoid(eps: Double = 0.001, delta: Double = 1E-10, seed: Int = 1): CountMinSketchMonoid = new CountMinSketchMonoid(eps, delta, seed)
+  def createCMSMonoid(eps: Double = 0.001, delta: Double = 1E-10, seed: Int = 1):
+        CountMinSketchMonoid = new CountMinSketchMonoid(eps, delta, seed)
 
   /** Create a CMS
     * @param xs data
@@ -174,7 +175,7 @@ package object algebird {
     * @param monoid
     * @return cmsL ++ cmsR
     */
-  def appendCountMinSketch(xs: Seq[Long])(implicit cmsL: CMS, monoid: CountMinSketchMonoid) = {
+  def appendCountMinSketch(xs: Seq[Long])(implicit cmsL: CMS, monoid: CountMinSketchMonoid): CMS = {
     val cmsR = monoid.create(xs)
     monoid.plus(cmsL, cmsR)
   }
@@ -188,13 +189,16 @@ package object algebird {
     * @param monoid used to scan from initial value
     * @return seq of DecayedValues
     */
-  def toDecayedValues(xs: Seq[(Double, Double)], halfLife: Double, last: Option[DecayedValue] = None)(implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
+  def toDecayedValues(xs: Seq[(Double, Double)],
+                      halfLife: Double,
+                      last: Option[DecayedValue] = None
+                      )(implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
     val z = last match {
       case None => monoid.zero
       case Some(x) => x
     }
 
-    def op(previous: DecayedValue, x: (Double, Double)) = {
+    def op(previous: DecayedValue, x: (Double, Double)): DecayedValue = {
       val (value, time) = x
       val d = time match {
         case x if (time < 1.0) => 1.0
@@ -212,8 +216,8 @@ package object algebird {
     * @tparam A: BigDecimal, BigInt, Double, Float, Int, Long
     * @param vals
     * @param ev Typeclass to build from Seq
-    * @param sg 
-    * @return 
+    * @param sg
+    * @return
     */
   def buildQTree[A](vals: Seq[A])(implicit ev: QTreeLike[A], sg: QTreeSemigroup[A]): QTree[A] = {
     vals.map { ev(_) }.reduce { sg.plus(_, _) }
