@@ -2,14 +2,15 @@
   */
 package org.gs.algebird
 
+import language.postfixOps
+import util.Random
+import com.twitter.algebird._
+import com.twitter.algebird.CMSHasherImplicits._
 import org.scalatest.FlatSpecLike
 import org.scalatest.Matchers._
-import org.gs.algebird.fixtures.CountMinSketchBuilder
-import org.gs.algebird._
 import org.gs._
-import com.twitter.algebird._
-import util.Random
-import language.postfixOps
+import org.gs.algebird._
+import org.gs.algebird.fixtures.CountMinSketchBuilder
 
 /** @author garystruthers
   *
@@ -20,7 +21,7 @@ class CountMinSketchSpec extends FlatSpecLike with CountMinSketchBuilder {
   val longZips = inetToLongZip(addrs)
   val longs = testLongs(longZips)
 
-  implicit val m = createCMSMonoid()
+  implicit val m = createCMSMonoid[Long]()
   implicit val cms = createCountMinSketch(longs)
 
   "A CountMinSketch" should "estimate distinct values" in {

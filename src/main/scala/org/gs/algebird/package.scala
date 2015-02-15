@@ -155,17 +155,20 @@ package object algebird {
     * @param eps
     * @param delta
     * @param seed
-    * @return CountMinSketchMonoid
+    * @return CMSMonoid[K]
     */
-  def createCMSMonoid(eps: Double = 0.001, delta: Double = 1E-10, seed: Int = 1):
-        CountMinSketchMonoid = new CountMinSketchMonoid(eps, delta, seed)
+  def createCMSMonoid[K: Ordering: CMSHasher](eps: Double = 0.001,
+                                              delta: Double = 1E-10,
+                                              seed: Int = 1):
+        CMSMonoid[K] = new CMSMonoid[K](eps, delta, seed)
 
   /** Create a CMS
     * @param xs data
     * @param monoid
     * @return CMS for data
     */
-  def createCountMinSketch(xs: Seq[Long])(implicit monoid: CountMinSketchMonoid): CMS = {
+  def createCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])
+                                                  (implicit monoid: CMSMonoid[K]): CMS[K] = {
     monoid.create(xs)
   }
 
@@ -175,17 +178,19 @@ package object algebird {
     * @param monoid
     * @return cmsL ++ cmsR
     */
-  def appendCountMinSketch(xs: Seq[Long])(implicit cmsL: CMS, monoid: CountMinSketchMonoid): CMS = {
+  def appendCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])
+                                                  (implicit cmsL: CMS[K],
+                                                   monoid: CMSMonoid[K]): CMS[K] = {
     val cmsR = monoid.create(xs)
     monoid.plus(cmsL, cmsR)
   }
 
   /** Turn a sequence of value, time tuples into a seq of DecayedValues
     *
-    * @param latest used as initial element, if None use implicit monoid.zero else use last
-    * DecayedValue
+
     * @param xs sequence of value, time tuples
     * @param halfLife used to scale value based on time
+    * @param last is initial element, if None use implicit monoid.zero
     * @param monoid used to scan from initial value
     * @return seq of DecayedValues
     */
@@ -205,7 +210,6 @@ package object algebird {
         case x if (time < halfLife) => time
         case _ => halfLife
       }
-      //      val d = if(time < halfLife) time else halfLife
       monoid.plus(previous, DecayedValue.build(value, time, d))
     }
     xs.scanLeft(z)(op)
