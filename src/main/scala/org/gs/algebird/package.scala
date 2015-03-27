@@ -5,22 +5,132 @@ package org.gs
 import com.twitter.algebird._
 import org.gs.algebird.typeclasses.QTreeLike
 
-/** @author garystruthers
+/** Aggregation functions for distributed systems. Simplifies using Twitter Algebird.
   *
+  * Algebird provides implicit implementations of common types which are imported here. Class
+  * extraction methods in org.gs can be used to extract a field from your case classes and tuples.
+  * When the extracted field is an already supported type, you don't have to write custom Algebird
+  * classes.
+  * @see org.gs.package
+  *
+  * ScalaTests are in src/test/scala/org.gs.algebird
+  *
+  * ==Semigroup plus obeys associtive law in asychronous system==
+  * @see org.gs.algebird.SemigroupSpec.scala
+  *
+  * Sum elements of a list that may be empty.
+  * {{{
+  * val bigDecimals: Seq[BigDecimal]
+  * val opt = sumOption(bigDecimals)
+  * val sum = opt.get
+  * Either can be used to return errors from remote system
+  * val eithBigInts = Seq[Either[String, BigInt]]
+  * val eith = sumOption(eithBigInts).get
+  * val sum2 = eith.right.get
+  * }}}
+  *
+  * ==Monoid extends Semigroup with zero element==
+  * @see org.gs.algebird.MonoidSpec.scala
+  *
+  * Sum elements of a list for a type that has a zero under addition.
+  * {{{
+  * val doubles: Seq[Double]
+  * val sum = sum(doubles)
+  * val optBigInts: Seq[Option[BigInt]]
+  * val sum2 = sum(optBigInts.flatten)
+  * Either can be used to return errors from remote system
+  * val eithFloats = Seq[Either[String, Float]]
+  * val sum3 = sum(eithFloats).right.get
+  * }}}
+  *
+  * ==Group extends Monoid with minus, negate==
+  * @see org.gs.algebird.GroupSpec.scala
+  *
+  * Negate a value
+  * {{{
+  * val float = 3131.7f
+  * val neg = negate(float)
+  * val double = 3130.0
+  * val neg2 = negate(double.get)
+  * Either can be used to return errors from remote system
+  * val int = 2847
+  * val neg3 = negate(int.right.get)
+  * }}}
+  *
+  * Subract a value from another
+  * {{{
+  * val float = 3131.7f
+  * val diff = minus(float, 1.7f)
+  * val opt = Some(3130.0)
+  * val diff2 = minus(opt.get, 30.0)
+  * Either can be used to return errors from remote system
+  * val eithLong = 2847L
+  * val diff3 = minus(eithLong.right.get, 47L)
+  * }}}
+  *
+  * ==Ring extends Group with times, product and one identity under multiplication==
+  * @see org.gs.algebird.RingSpec.scala
+  *
+  * Multiply a value by another
+  * {{{
+  * val float = 3131.7f
+  * val prod = times(float, 1.7f)
+  * val opt = Some(3130.0)
+  * val prod2 = times(opt.get, 30.0)
+  * Either can be used to return errors from remote system
+  * val eithLong = 2847L
+  * val prod3 = times(eithLong.right.get, 47L)
+  * }}}
+  *
+  * Multiply elements of a list (((xs[0] * xs[1]) * xs[2]) * xs[3]) for a type that has a one.
+  * {{{
+  * val doubles: Seq[Double]
+  * val prod = product(doubles)
+  * val optBigInts: Seq[Option[BigInt]]
+  * val prod2 = product(optBigInts.flatten)
+  * Either can be used to return errors from remote system
+  * val eithFloats = Seq[Either[String, Float]]
+  * val prod3 = product(eithFloats).right.get
+  * }}}
+  *
+  * ==Field extends Ring with minus, negate==
+  * @see org.gs.algebird.FieldSpec.scala
+  *
+  * Invert a value a -> 1/a
+  * {{{
+  * val float = 3131.7f
+  * val neg = negate(float)
+  * val double = 3130.0
+  * val neg2 = negate(double.get)
+  * Either can be used to return errors from remote system
+  * val int = 2847
+  * val neg3 = negate(int.right.get)
+  * }}}
+  *
+  * Subract a value from another
+  * {{{
+  * val float = 3131.7f
+  * val diff = minus(float, 1.7f)
+  * val opt = Some(3130.0)
+  * val diff2 = minus(opt.get, 30.0)
+  * Either can be used to return errors from remote system
+  * val eithLong = 2847L
+  * val diff3 = minus(eithLong.right.get, 47L)
+  * }}}
+  * @author garystruthers
   */
 package object algebird {
 
   /** Sums list elements
     * @tparam A: Semigroup element type that can be added, uses implicit Semigroup[A]
     * @param xs list
-    * @return Option of sum or None for empty list
+    * @return Some(sum) or None if xs empty
     */
   def sumOption[A: Semigroup](xs: Seq[A]): Option[A] = implicitly[Semigroup[A]].sumOption(xs)
 
   /** Sums list elements
     * @tparam A: Monoid element type that can be added, has zero, uses implicit Monoid[A]
     * @param xs list
-    * @param ev Monoid for type A
     * @return sum or Monoid[A] zero for empty list
     */
   def sum[A: Monoid](xs: Seq[A]): A = implicitly[Monoid[A]].sum(xs)
@@ -55,20 +165,6 @@ package object algebird {
     */
   def product[A: Ring](xs: Seq[A]): A = implicitly[Ring[A]].product(xs)
 
-  /** Find maximum element in a Seq
-    * @tparam A: Ordering element type that can be ordered, uses Ordering[A]
-    * @param xs Seq[A]
-    * @return max element
-    */
-  def max[A: Ordering](xs: Seq[A]): A = MaxAggregator[A].reduce(xs)
-
-  /** Find minum element in a Seq
-    * @tparam A: Ordering element type that can be ordered, uses Ordering[A]
-    * @param xs Seq[A]
-    * @return min element
-    */
-  def min[A: Ordering](xs: Seq[A]): A = MinAggregator[A].reduce(xs)
-
   /** Reciprocal of an element
     * @tparam A: Field element type that can divide 1 and there is an implicit Field[A]
     * @param x element to divide one
@@ -84,14 +180,88 @@ package object algebird {
     */
   def div[A: Field](l: A, r: A): A = implicitly[Field[A]].div(l, r)
 
+  /** Find maximum element in a Seq
+    * @tparam A: Ordering element type that can be ordered, uses Ordering[A]
+    * @param xs Seq[A]
+    * @return max element
+    */
+  def max[A: Ordering](xs: Seq[A]): A = MaxAggregator[A].reduce(xs)
+
+  /** Find minum element in a Seq
+    * @tparam A: Ordering element type that can be ordered, uses Ordering[A]
+    * @param xs Seq[A]
+    * @return min element
+    */
+  def min[A: Ordering](xs: Seq[A]): A = MinAggregator[A].reduce(xs)
+
   /** Field[BigDecimal] implicit
     * BigDecimal implicits supported in Algebird with NumericRing[BigDecimal]
     *
     */
   implicit object BigDecimalField extends NumericRing[BigDecimal] with Field[BigDecimal] {
-    override def inverse(v: BigDecimal): BigDecimal = 1 / v
+    override def inverse(v: BigDecimal): BigDecimal = {
+      assertNotZero(v)
+      1 / v
+    }
   }
 
+  /** Field[BigInt] implicit
+    * BigInt implicits supported in Algebird with NumericRing[BigInt]
+    *
+    */
+  implicit object BigIntField extends NumericRing[BigInt] with Field[BigInt] {
+    override def div(l: BigInt, r: BigInt): BigInt = {
+      assertNotZero(r)
+      l / r
+    }
+    override def inverse(v: BigInt): BigInt = {
+      assertNotZero(v)
+      1 / v
+    }
+  }
+
+  /** Field[Int] implicit
+    *
+    * Int implicits supported in Algebird with IntRing
+    */
+  implicit object IntField extends Field[Int] {
+    def zero = IntRing.zero
+    def one = IntRing.one
+    override def negate(v: Int) = IntRing.negate(v)
+    def plus(l: Int, r: Int) = IntRing.plus(l, r)
+    override def minus(l: Int, r: Int) = IntRing.minus(l, r)
+    def times(l: Int, r: Int) = IntRing.times(l, r)
+    override def div(l: Int, r: Int): Int = {
+      assertNotZero(r)
+      l / r
+    }
+    override def inverse(v: Int): Int = {
+      assertNotZero(v)
+      1 / v
+    }
+  }
+
+  /** Field[Long] implicit
+    *
+    * Long implicits supported in Algebird with LongRing
+    *
+    */
+  implicit object LongField extends Field[Long] {
+    def zero = LongRing.zero
+    def one = LongRing.one
+    override def negate(v: Long) = LongRing.negate(v)
+    def plus(l: Long, r: Long) = LongRing.plus(l, r)
+    override def minus(l: Long, r: Long) = LongRing.minus(l, r)
+    def times(l: Long, r: Long) = LongRing.times(l, r)
+    override def div(l: Long, r: Long): Long = {
+      assertNotZero(r)
+      l / r
+    }
+    override def inverse(v: Long): Long = {
+      assertNotZero(v)
+      1 / v
+    }
+  }
   /** map sequence[A] to sequence[B] */
   implicit object SeqFunctor extends Functor[Seq] {
     def map[A, B](fa: Seq[A])(f: A => B): Seq[B] = (for (a <- fa) yield f(a))
@@ -158,17 +328,15 @@ package object algebird {
     * @return CMSMonoid[K]
     */
   def createCMSMonoid[K: Ordering: CMSHasher](eps: Double = 0.001,
-                                              delta: Double = 1E-10,
-                                              seed: Int = 1):
-        CMSMonoid[K] = new CMSMonoid[K](eps, delta, seed)
+    delta: Double = 1E-10,
+    seed: Int = 1): CMSMonoid[K] = new CMSMonoid[K](eps, delta, seed)
 
   /** Create a CMS
     * @param xs data
     * @param monoid
     * @return CMS for data
     */
-  def createCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])
-                                                  (implicit monoid: CMSMonoid[K]): CMS[K] = {
+  def createCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])(implicit monoid: CMSMonoid[K]): CMS[K] = {
     monoid.create(xs)
   }
 
@@ -178,16 +346,15 @@ package object algebird {
     * @param monoid
     * @return cmsL ++ cmsR
     */
-  def appendCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])
-                                                  (implicit cmsL: CMS[K],
-                                                   monoid: CMSMonoid[K]): CMS[K] = {
+  def appendCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])(implicit cmsL: CMS[K],
+    monoid: CMSMonoid[K]): CMS[K] = {
     val cmsR = monoid.create(xs)
     monoid.plus(cmsL, cmsR)
   }
 
   /** Turn a sequence of value, time tuples into a seq of DecayedValues
     *
-
+    *
     * @param xs sequence of value, time tuples
     * @param halfLife used to scale value based on time
     * @param last is initial element, if None use implicit monoid.zero
@@ -195,9 +362,8 @@ package object algebird {
     * @return seq of DecayedValues
     */
   def toDecayedValues(xs: Seq[(Double, Double)],
-                      halfLife: Double,
-                      last: Option[DecayedValue] = None
-                      )(implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
+    halfLife: Double,
+    last: Option[DecayedValue] = None)(implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
     val z = last match {
       case None => monoid.zero
       case Some(x) => x
