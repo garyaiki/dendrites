@@ -15,10 +15,147 @@ import org.gs.algebird.typeclasses.QTreeLike
   *
   * ScalaTests are in src/test/scala/org.gs.algebird
   *
-  * ==Semigroup plus obeys associtive law in asychronous system==
+  * ==AveragedValue find local average then sum them to global average==
+  * @see org.gs.algebird.AveragedSpec.scala
+  *
+  * Average sequences separately then combine.
+  * {{{
+  * val bigDecimals: Seq[BigDecimal]
+  * val avgL = avg(bigDecimals)
+  * val bigDecimals2: Seq[BigDecimal]
+  * val avgR = avg(bigDecimals)
+  * val av = AveragedGroup.plus(avgL, avgR)
+  * }}}
+  *
+  * ==BloomFilter fast find if a word is in a dictionary==
+  * OSX has dictionaries you can use to create BloomFilters
+  * @see org.gs.fixtures.SysProcessUtils.scala for Paths to properNames, connectives, and words and 
+  * functions to read their words
+  * 
+  * @see org.gs.algebird.fixtures.BloomFilterBuilder.scala for creation of BloomFilters for these
+  * dictionaries and select test words for them.
+  * 
+  * @see org.gs.algebird.BloomFilterSpec.scala
+  * 
+  * Create a BloomFilter for OSX words dictionary
+  * {{{
+  * val falsePositivepProb: Double = 0.01
+  * val words = readWords(wordsPath)
+  * val wordsBF = createBF(words, fpProb)
+  * }}}
+  * 
+  * Is word in BloomFilter
+  * {{{
+  * val falsePositivepProb: Double = 0.01
+  * val word = "path"
+  * val inDict = wordsBF.contains(word).isTrue
+  * }}}
+  * 
+  * Is false positive rate acceptable
+  * {{{
+  * val falsePositivepProb: Double = 0.01
+  * val wordsFalseWords: IndexedSeq[String]
+  * val falsePositives = for {
+  *   i <- wordsFalseWords
+  *   if wordsBF.contains(i).isTrue
+  * } yield i
+  * val acceptable = falsePositives.size < words.size * fpProb
+  * }}}
+  *
+  * ==CountMinSketch==
+  * @see org.gs.algebird.CountMinSketchSpec.scala
+  *
+  * Estimate total number of elements seen so far
+  * {{{
+  * // test data values repeated a random number of times
+  * val addrs = inetAddresses(ipRange)
+  * val longZips = inetToLongZip(addrs)
+  * val longs = testLongs(longZips)
+  * 
+  * implicit val m = createCMSMonoid[Long]()
+  * implicit val cms = createCountMinSketch(longs)
+  * val estimatedCount = cms.totalCount
+  * }}}
+  *
+  * Estimate count of elements with the same value as the one selected
+  * {{{
+  * // test data values repeated a random number of times
+  * val addrs = inetAddresses(ipRange)
+  * val longZips = inetToLongZip(addrs)
+  * val longs = testLongs(longZips)
+  * 
+  * implicit val m = createCMSMonoid[Long]()
+  * implicit val cms = createCountMinSketch(longs)
+  * val estFreq = cms.frequency(longZips(5))
+  * }}}
+  *
+  *
+  * Append a CountMinSketch then estimate combined total number of elements seen so far
+  * {{{ 
+  * implicit val m = createCMSMonoid[Long]()
+  * implicit val cmsL = createCountMinSketch(longs)
+  * val cmsR = createCountMinSketch(longs2)
+  * val cmsLR = appendCountMinSketch(longs2)
+  * val estimatedCount = cmsLR.totalCount
+  * }}}
+  *
+  * Append a CountMinSketch then estimate count of elements with the same value as the one selected
+  * {{{
+  * implicit val m = createCMSMonoid[Long]()
+  * implicit val cmsL = createCountMinSketch(longs)
+  * val cmsR = createCountMinSketch(longs2)
+  * val cmsLR = appendCountMinSketch(longs2)
+  * val estFreq = cmsLR.frequency(longZips(5))
+  * }}}
+  * 
+  * ==Functor, map, andThen for Sequence types==
+  *
+  * Map elements of a sequence.
+  * {{{
+  * def wrapMax[Int](x: Int) = Max(x)
+  * val wm = SeqFunctor.map[Int, Max[Int]](List(1,2,3,4))(wrapMax)
+  * 
+  * val bigDecimals: Seq[BigDecimal]
+  * val negBigDecimals = SeqFunctor.map[BigDecimal, BigDecimal](bigDecimals)(negate)
+  * val invertedBigDecimals = SeqFunctor.map[BigDecimal, BigDecimal](bigDecimals)(inverse)
+  * }}}
+  *
+  * Map the mapped elements of a sequence: f() andThen g().
+  * {{{
+  * val bigDecimals: Seq[BigDecimal]
+  * val invertedNegBigDecimals = andThen[BigDecimal, BigDecimal, BigDecimal](ap)( inverse)( negate)
+  * }}}
+  *
+  * ==Max Min for Sequence types that have a Semigroup, Monoid and Ordering==
+  * @see org.gs.algebird.MaxSpec.scala
+  * @see org.gs.algebird.MinSpec.scala
+  *
+  * Get Max element of a sequence.
+  * {{{
+  * val bigDecimals: Seq[BigDecimal]
+  * val max = max(bigDecimals)
+  * val optBigDecs: [Option[BigDecimal]]
+  * val max2 = max(optBigDecs.flatten)
+  * Either can be used to return errors from remote system
+  * val eithBigInts = Seq[Either[String, BigInt]]
+  * val max3 = max(filterRight(eithBigInts)
+  * }}}
+  *
+  * Get Min element of a sequence.
+  * {{{
+  * val bigDecimals: Seq[BigDecimal]
+  * val min = min(bigDecimals)
+  * val optBigDecs: [Option[BigDecimal]]
+  * val min2 = min(optBigDecs.flatten)
+  * Either can be used to return errors from remote system
+  * val eithBigInts = Seq[Either[String, BigInt]]
+  * val min3 = min(filterRight(eithBigInts)
+  * }}}
+  *
+  * ==Semigroup, plus function obeys associtive law in asychronous system==
   * @see org.gs.algebird.SemigroupSpec.scala
   *
-  * Sum elements of a list that may be empty.
+  * Sum elements of a sequence that may be empty.
   * {{{
   * val bigDecimals: Seq[BigDecimal]
   * val opt = sumOption(bigDecimals)
@@ -32,7 +169,7 @@ import org.gs.algebird.typeclasses.QTreeLike
   * ==Monoid extends Semigroup with zero element==
   * @see org.gs.algebird.MonoidSpec.scala
   *
-  * Sum elements of a list for a type that has a zero under addition.
+  * Sum elements of a sequence for a type that has a zero under addition.
   * {{{
   * val doubles: Seq[Double]
   * val sum = sum(doubles)
@@ -82,7 +219,7 @@ import org.gs.algebird.typeclasses.QTreeLike
   * val prod3 = times(eithLong.right.get, 47L)
   * }}}
   *
-  * Multiply elements of a list (((xs[0] * xs[1]) * xs[2]) * xs[3]) for a type that has a one.
+  * Multiply elements of a sequence (((xs[0] * xs[1]) * xs[2]) * xs[3]) for a type that has a one.
   * {{{
   * val doubles: Seq[Double]
   * val prod = product(doubles)
@@ -121,17 +258,17 @@ import org.gs.algebird.typeclasses.QTreeLike
   */
 package object algebird {
 
-  /** Sums list elements
+  /** Sums sequence elements
     * @tparam A: Semigroup element type that can be added, uses implicit Semigroup[A]
-    * @param xs list
+    * @param xs sequence
     * @return Some(sum) or None if xs empty
     */
   def sumOption[A: Semigroup](xs: Seq[A]): Option[A] = implicitly[Semigroup[A]].sumOption(xs)
 
-  /** Sums list elements
+  /** Sums sequence elements
     * @tparam A: Monoid element type that can be added, has zero, uses implicit Monoid[A]
-    * @param xs list
-    * @return sum or Monoid[A] zero for empty list
+    * @param xs sequence
+    * @return sum or Monoid[A] zero for empty sequence
     */
   def sum[A: Monoid](xs: Seq[A]): A = implicitly[Monoid[A]].sum(xs)
 
@@ -158,10 +295,10 @@ package object algebird {
     */
   def times[A: Ring](l: A, r: A): A = implicitly[Ring[A]].times(l, r)
 
-  /** Multiplies list elements
+  /** Multiplies sequence elements
     * @tparam A: Ring element type that can be multiplied, has a one, uses implicit Ring[A]
-    * @param xs list
-    * @return sum or Monoid[A] zero for empty list
+    * @param xs sequence
+    * @return sum or Monoid[A] zero for empty sequence
     */
   def product[A: Ring](xs: Seq[A]): A = implicitly[Ring[A]].product(xs)
 
@@ -322,6 +459,7 @@ package object algebird {
     xs.partition(bf.contains(_).isTrue)
 
   /** Convience creator with default parameters
+    * @tparam K type of elements to be counted
     * @param eps
     * @param delta
     * @param seed
@@ -332,17 +470,20 @@ package object algebird {
     seed: Int = 1): CMSMonoid[K] = new CMSMonoid[K](eps, delta, seed)
 
   /** Create a CMS
+    * @tparam K type of elements to be counted
     * @param xs data
     * @param monoid
     * @return CMS for data
     */
-  def createCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])(implicit monoid: CMSMonoid[K]): CMS[K] = {
+  def createCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])(implicit monoid: CMSMonoid[K]):
+        CMS[K] = {
     monoid.create(xs)
   }
 
   /** Add data to existing CMS
+    * @tparam K type of elements to be counted
     * @param xs data
-    * @param cmsL existing CMS
+    * @param cmsL an existing CMS, typically your previous cms
     * @param monoid
     * @return cmsL ++ cmsR
     */
@@ -353,7 +494,6 @@ package object algebird {
   }
 
   /** Turn a sequence of value, time tuples into a seq of DecayedValues
-    *
     *
     * @param xs sequence of value, time tuples
     * @param halfLife used to scale value based on time

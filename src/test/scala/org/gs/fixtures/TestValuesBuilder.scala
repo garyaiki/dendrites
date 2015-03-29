@@ -77,6 +77,14 @@ trait TestValuesBuilder extends SuiteMixin { this: Suite =>
   val eithInts = extractElement[Either[String, Int]](keyEithInt, 1)
   val eithLongs = extractElement[Either[String, Long]](keyEithLong, 1)
   val eithStrs = extractElement[Either[String, String]](keyEithStr, 1)
+  
+  // 'a' - 32 = 'A'
+  val bigDecimals2 = bigDecimals.map(x => x - 32)
+  val bigInts2 = bigInts.map(x => x - 32)
+  val doubles2 = doubles.map(x => x - 32)
+  val floats2 = floats.map(x => x - 32)
+  val ints2 = ints.map(x => x - 32)
+  val longs2 = longs.map(x => x - 32)
 
   val bigDecimal = BigDecimal(2847)
   val bigInt = BigInt(2847)

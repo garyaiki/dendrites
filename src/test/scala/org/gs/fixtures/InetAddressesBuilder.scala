@@ -1,19 +1,15 @@
 /**
   */
-package org.gs.algebird.fixtures
+package org.gs.fixtures
 
-import org.gs._
-import org.gs.fixtures.SysProcessUtils
-import org.gs.algebird._
-import language.postfixOps
-import util.Random
 import org.scalatest._
-import com.twitter.algebird._
+import java.net.Inet4Address
+import java.net.InetAddress
 
 /** @author garystruthers
   *
   */
-trait CountMinSketchBuilder extends SuiteMixin { this: Suite =>
+trait InetAddressesBuilder extends SuiteMixin { this: Suite =>
 
   abstract override def withFixture(test: NoArgTest): Outcome = {
     super.withFixture(test)

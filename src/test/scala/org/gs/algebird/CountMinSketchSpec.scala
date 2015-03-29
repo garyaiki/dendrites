@@ -10,12 +10,12 @@ import org.scalatest.FlatSpecLike
 import org.scalatest.Matchers._
 import org.gs._
 import org.gs.algebird._
-import org.gs.algebird.fixtures.CountMinSketchBuilder
+import org.gs.fixtures.InetAddressesBuilder
 
 /** @author garystruthers
   *
   */
-class CountMinSketchSpec extends FlatSpecLike with CountMinSketchBuilder {
+class CountMinSketchSpec extends FlatSpecLike with InetAddressesBuilder {
 
   val addrs = inetAddresses(ipRange)
   val longZips = inetToLongZip(addrs)
@@ -24,13 +24,13 @@ class CountMinSketchSpec extends FlatSpecLike with CountMinSketchBuilder {
   implicit val m = createCMSMonoid[Long]()
   implicit val cms = createCountMinSketch(longs)
 
-  "A CountMinSketch" should "estimate distinct values" in {
+  "A CountMinSketch" should "estimate number of elements seen so far" in {
     assert(longs.size === cms.totalCount)
   }
 
   val rnd = new Random(1)
 
-  "A CountMinSketch" should "estimate frequency of values" in {
+  it should "estimate frequency of values" in {
     for (i <- 0 until 10) {
       val j = ipRange(rnd.nextInt(ipRange length))
       val longAddr = longZips(j)
@@ -44,7 +44,7 @@ class CountMinSketchSpec extends FlatSpecLike with CountMinSketchBuilder {
     assert(cmsLR.totalCount === (cms.totalCount * 2))
   }
 
-  "An appended CountMinSketch" should "estimate frequency of values" in {
+  it should "estimate frequency of values" in {
     for (i <- 0 until 10) {
       val j = ipRange(rnd.nextInt(ipRange length))
       val longAddr = longZips(j)
