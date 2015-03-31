@@ -3,8 +3,8 @@
 package org.gs
 
 import com.twitter.algebird._
+import org.gs.algebird.typeclasses.HyperLogLogLike
 import org.gs.algebird.typeclasses.QTreeLike
-
 /** Aggregation functions for distributed systems. Simplifies using Twitter Algebird.
   *
   * Algebird provides implicit implementations of common types which are imported here. Class
@@ -106,6 +106,57 @@ import org.gs.algebird.typeclasses.QTreeLike
   * val cmsR = createCountMinSketch(longs2)
   * val cmsLR = appendCountMinSketch(longs2)
   * val estFreq = cmsLR.frequency(longZips(5))
+  * }}}
+  *
+  * ==DecayedValue==
+  * @see org.gs.algebird.DecayedValueSpec.scala
+  *
+  * Moving average from the initial value to specified index
+  * {{{
+  * // test data values, a sine wave (because it rises and falls)
+  * val sines = genSineWave(100, 0 to 360)
+  * val days = Range.Double(0.0, 361.0, 1.0)
+  * val sinesZip = sines.zip(days)
+  * 
+  * val decayedValues = toDecayedValues(sinesZip, 10.0, None)
+  * val avgAt90 = decayedValues(90).average(10.0)
+  * }}}
+  * 
+  * Moving average from specified index to specified index
+  * {{{
+  * val avg80to90 = decayedValues(90).averageFrom(10.0, 80.0, 90.0)
+  * }}}
+  * 
+  * ==HyperLogLog==
+  * @see org.gs.algebird.HyperLogLogSpec.scala
+  *
+  * Create sequence of HLL from a sequence of Int
+  * {{{
+  * val ints: Seq[Int]
+  * val ints2: Seq[Int]
+  * implicit val ag = HyperLogLogAggregator(12)
+  * val hll = createHLL(ints)
+  * val hll2 = createHLL(ints2)
+  * val hlls = Vector(hll, hll2)
+  * }}}
+  * Create sequence of HLL from a sequence of Long
+  * {{{
+  * val longs: Seq[Long]
+  * val longs2: Seq[Long]
+  * implicit val ag = HyperLogLogAggregator(12)
+  * val hll = createHLL(longs)
+  * val hll2 = createHLL(longs2)
+  * val hlls = Vector(hll, hll2)
+  * }}}
+  * Sum a Sequence of HLL and estimate total size
+  * {{{
+  * val sum = hlls.reduce(_ + _)
+  * val size = sum.estimatedSize
+  * }}}
+  * Sum a Sequence of Approximate and estimate total size
+  * {{{
+  * val approxs = Vector(hll.approximateSize, hll2.approximateSize)
+  * val sum = approxs.reduce(_ + _)
   * }}}
   * 
   * ==Functor, map, andThen for Sequence types==
@@ -428,16 +479,6 @@ package object algebird {
     at.reduce(AveragedGroup.plus(_, _))
   }
 
-  /** Quickly estimate count of distinct integer values using HyperLogLog
-    *
-    * @param xs sequence of integers
-    * @param agg HyperLogLogAggregator, initialized with # of bits for hashing
-    * @return estimate count in an Approximate object
-    */
-  def estDistinctVals(xs: Seq[Int])(implicit agg: HyperLogLogAggregator): Approximate[Long] = {
-    agg(xs.map(HyperLogLog.int2Bytes(_))).approximateSize
-  }
-
   /** Create BloomFilter configure and load it from a Seq of words
     *
     * @param words
@@ -520,7 +561,26 @@ package object algebird {
     }
     xs.scanLeft(z)(op)
   }
-
+    
+  /** Create HyperLogLog
+    *
+    * @tparam A: Int, Long
+    * @param xs sequence of integers or longs
+    * @param agg HyperLogLogAggregator, initialized with # of bits for hashing
+    * @return an HLL
+    */
+  def createHLL[A](xs: Seq[A])(implicit ev: HyperLogLogLike[A], agg: HyperLogLogAggregator): HLL =
+    ev(xs)
+    
+  /** Estimate total count of distinct integer values in multiple HyperLogLogs
+    *
+    * @param xs sequence of HLL
+    * @return estimate count in an Approximate object
+    */
+  def estDistinctVals(xs: Seq[HLL]): Approximate[Long] = {
+    xs.reduce(_ + _).approximateSize
+  }
+  
   /** Build a QTree from a Seq
     *
     * @tparam A: BigDecimal, BigInt, Double, Float, Int, Long
