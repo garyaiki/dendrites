@@ -569,7 +569,7 @@ package object algebird {
     * @param agg HyperLogLogAggregator, initialized with # of bits for hashing
     * @return an HLL
     */
-  def createHLL[A](xs: Seq[A])(implicit ev: HyperLogLogLike[A], agg: HyperLogLogAggregator): HLL =
+  def createHLL[A: HyperLogLogLike](xs: Seq[A])(implicit ev: HyperLogLogLike[A], agg: HyperLogLogAggregator): HLL =
     ev(xs)
     
   /** Estimate total count of distinct integer values in multiple HyperLogLogs
@@ -589,7 +589,7 @@ package object algebird {
     * @param sg
     * @return
     */
-  def buildQTree[A](vals: Seq[A])(implicit ev: QTreeLike[A], sg: QTreeSemigroup[A]): QTree[A] = {
+  def buildQTree[A: QTreeLike](vals: Seq[A])(implicit ev: QTreeLike[A], sg: QTreeSemigroup[A]): QTree[A] = {
     vals.map { ev(_) }.reduce { sg.plus(_, _) }
   }
 }
