@@ -23,7 +23,7 @@ object HyperLogLogLike {
     def apply(xs: Seq[Int])(implicit agg: HyperLogLogAggregator): HLL = 
       agg(xs.map(HyperLogLog.int2Bytes(_)))
   }
-
+  
   implicit object HLLLong extends HyperLogLogLike[Long] {
     def apply(xs: Seq[Long])(implicit agg: HyperLogLogAggregator): HLL = 
       agg(xs.map(HyperLogLog.long2Bytes(_)))

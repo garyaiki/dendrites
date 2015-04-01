@@ -21,12 +21,13 @@ class AveragedSpec extends FlatSpecLike with TestValuesBuilder {
     assert(av.value === (m.right.get.toDouble +- 0.005))
   }
 
-  it should "be associative" in {
-    val avgL = avg(bigDecimals)
-    val avgR = avg(bigDecimals2)
+  it should "be summable in a Sequence" in {
+    val avg0 = avg(bigDecimals)
+    val avg1 = avg(bigDecimals2)
+    val avgs = Vector[AveragedValue](avg0, avg1)
     val m = mean(bigDecimals ++ bigDecimals2)
-    val av = AveragedGroup.plus(avgL, avgR)
-    assert(av.value === (m.right.get.toDouble +- 0.005))
+    val avgSum = sumAverageValues(avgs)
+    assert(avgSum.value === (m.right.get.toDouble +- 0.005))
   }
 
   "An AveragedValue of BigInts" should "be near their mean" in {
@@ -36,12 +37,13 @@ class AveragedSpec extends FlatSpecLike with TestValuesBuilder {
     assert(av.value === (m.right.get.toDouble +- 0.5))
   }
 
-  it should "be associative" in {
-    val avgL = avg(bigInts)
-    val avgR = avg(bigInts2)
+  it should "be summable in a Sequence" in {
+    val avg0 = avg(bigInts)
+    val avg1 = avg(bigInts2)
     val m = mean(bigInts ++ bigInts2)
-    val av = AveragedGroup.plus(avgL, avgR)
-    assert(av.value === (m.right.get.toDouble +- 0.5))
+    val avgs = Vector[AveragedValue](avg0, avg1)
+    val avgSum = sumAverageValues(avgs)
+    assert(avgSum.value === (m.right.get.toDouble +- 0.5))
   }
 
   "An AveragedValue of Doubles" should "be near their mean" in {
@@ -51,12 +53,13 @@ class AveragedSpec extends FlatSpecLike with TestValuesBuilder {
     assert(av.value === (m.right.get +- 0.005))
   }
 
-  it should "be associative" in {
-    val avgL = avg(doubles)
-    val avgR = avg(doubles2)
+  it should "be summable in a Sequence" in {
+    val avg0 = avg(doubles)
+    val avg1 = avg(doubles2)
     val m = mean(doubles ++ doubles2)
-    val av = AveragedGroup.plus(avgL, avgR)
-    assert(av.value === (m.right.get.toDouble +- 0.005))
+    val avgs = Vector[AveragedValue](avg0, avg1)
+    val avgSum = sumAverageValues(avgs)
+    assert(avgSum.value === (m.right.get.toDouble +- 0.5))
   }
 
   "An AveragedValue of Floats" should "be near their mean" in {
@@ -66,14 +69,15 @@ class AveragedSpec extends FlatSpecLike with TestValuesBuilder {
     assert(av.value === (m.right.get.toDouble +- 0.005))
   }
 
-  it should "be associative" in {
-    val avgL = avg(floats)
-    val avgR = avg(floats2)
+  it should "be summable in a Sequence" in {
+    val avg0 = avg(floats)
+    val avg1 = avg(floats2)
     val m = mean(floats ++ floats2)
-    val av = AveragedGroup.plus(avgL, avgR)
-    assert(av.value === (m.right.get.toDouble +- 0.005))
+    val avgs = Vector[AveragedValue](avg0, avg1)
+    val avgSum = sumAverageValues(avgs)
+    assert(avgSum.value === (m.right.get.toDouble +- 0.5))
   }
-  
+
   "An AveragedValue of Ints" should "be near their mean" in {
     val av = avg(ints)
     val m = mean(ints)
@@ -81,14 +85,15 @@ class AveragedSpec extends FlatSpecLike with TestValuesBuilder {
     assert(av.value === (m.right.get.toDouble +- 0.5))
   }
 
-  it should "be associative" in {
-    val avgL = avg(ints)
-    val avgR = avg(ints2)
+  it should "be summable in a Sequence" in {
+    val avg0 = avg(ints)
+    val avg1 = avg(ints2)
     val m = mean(ints ++ ints2)
-    val av = AveragedGroup.plus(avgL, avgR)
-    assert(av.value === (m.right.get.toDouble +- 0.5))
+    val avgs = Vector[AveragedValue](avg0, avg1)
+    val avgSum = sumAverageValues(avgs)
+    assert(avgSum.value === (m.right.get.toDouble +- 0.5))
   }
-  
+
   "An AveragedValue of Longs" should "be near their mean" in {
     val av = avg(longs)
     val m = mean(ints)
@@ -96,12 +101,13 @@ class AveragedSpec extends FlatSpecLike with TestValuesBuilder {
     assert(av.value === (m.right.get.toDouble +- 0.5))
   }
 
-  it should "be associative" in {
-    val avgL = avg(longs)
-    val avgR = avg(longs2)
+  it should "be summable in a Sequence" in {
+    val avg0 = avg(longs)
+    val avg1 = avg(longs2)
     val m = mean(longs ++ longs2)
-    val av = AveragedGroup.plus(avgL, avgR)
-    assert(av.value === (m.right.get.toDouble +- 0.5))
+    val avgs = Vector[AveragedValue](avg0, avg1)
+    val avgSum = sumAverageValues(avgs)
+    assert(avgSum.value === (m.right.get.toDouble +- 0.5))
   }
 
 }

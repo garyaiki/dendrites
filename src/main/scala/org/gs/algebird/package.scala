@@ -18,133 +18,129 @@ import org.gs.algebird.typeclasses.QTreeLike
   * ==AveragedValue find local average then sum them to global average==
   * @see org.gs.algebird.AveragedSpec.scala
   *
-  * Average sequences separately then combine.
+  * Average a Sequence of values
   * {{{
   * val bigDecimals: Seq[BigDecimal]
-  * val avgL = avg(bigDecimals)
+  * val avg0 = avg(bigDecimals)
+  * }}}
+  * Average a sequence of AveragedValues
+  * {{{
   * val bigDecimals2: Seq[BigDecimal]
-  * val avgR = avg(bigDecimals)
-  * val av = AveragedGroup.plus(avgL, avgR)
+  * val avg1 = avg(bigDecimals2)
+  * val avgs = Vector[AveragedValue](avg0, avg1)
+  * val avgSum = sumAverageValues(avgs)
   * }}}
   *
   * ==BloomFilter fast find if a word is in a dictionary==
   * OSX has dictionaries you can use to create BloomFilters
-  * @see org.gs.fixtures.SysProcessUtils.scala for Paths to properNames, connectives, and words and 
+  * @see org.gs.fixtures.SysProcessUtils.scala for Paths to properNames, connectives, and words and
   * functions to read their words
-  * 
   * @see org.gs.algebird.fixtures.BloomFilterBuilder.scala for creation of BloomFilters for these
   * dictionaries and select test words for them.
-  * 
   * @see org.gs.algebird.BloomFilterSpec.scala
-  * 
+  *
   * Create a BloomFilter for OSX words dictionary
   * {{{
   * val falsePositivepProb: Double = 0.01
   * val words = readWords(wordsPath)
   * val wordsBF = createBF(words, fpProb)
   * }}}
-  * 
+  *
   * Is word in BloomFilter
   * {{{
   * val falsePositivepProb: Double = 0.01
   * val word = "path"
   * val inDict = wordsBF.contains(word).isTrue
   * }}}
-  * 
+  *
   * Is false positive rate acceptable
   * {{{
   * val falsePositivepProb: Double = 0.01
   * val wordsFalseWords: IndexedSeq[String]
   * val falsePositives = for {
-  *   i <- wordsFalseWords
-  *   if wordsBF.contains(i).isTrue
+  * i <- wordsFalseWords
+  * if wordsBF.contains(i).isTrue
   * } yield i
   * val acceptable = falsePositives.size < words.size * fpProb
   * }}}
   *
   * ==CountMinSketch==
   * @see org.gs.algebird.CountMinSketchSpec.scala
+  * Test data is IP addresses repeated a random number of times
+  * @see org.gs.fixtures.InetAddressesBuilder.scala
   *
   * Estimate total number of elements seen so far
   * {{{
-  * // test data values repeated a random number of times
   * val addrs = inetAddresses(ipRange)
   * val longZips = inetToLongZip(addrs)
   * val longs = testLongs(longZips)
-  * 
+  *
   * implicit val m = createCMSMonoid[Long]()
-  * implicit val cms = createCountMinSketch(longs)
+  * val cms = createCountMinSketch(longs)
   * val estimatedCount = cms.totalCount
   * }}}
   *
   * Estimate count of elements with the same value as the one selected
   * {{{
-  * // test data values repeated a random number of times
-  * val addrs = inetAddresses(ipRange)
-  * val longZips = inetToLongZip(addrs)
-  * val longs = testLongs(longZips)
-  * 
-  * implicit val m = createCMSMonoid[Long]()
-  * implicit val cms = createCountMinSketch(longs)
   * val estFreq = cms.frequency(longZips(5))
   * }}}
   *
-  *
-  * Append a CountMinSketch then estimate combined total number of elements seen so far
-  * {{{ 
-  * implicit val m = createCMSMonoid[Long]()
-  * implicit val cmsL = createCountMinSketch(longs)
-  * val cmsR = createCountMinSketch(longs2)
-  * val cmsLR = appendCountMinSketch(longs2)
-  * val estimatedCount = cmsLR.totalCount
+  * Sum a Sequence of CountMinSketch then estimate combined total number of elements
+  * {{{
+  * val cms1 = createCountMinSketch(longs)
+  * val cmss = Vector(cms, cms1)
+  * val cmsSum = sumCountMinSketch(cmss)
+  * val estimatedCount = cmsSum.totalCount
   * }}}
   *
-  * Append a CountMinSketch then estimate count of elements with the same value as the one selected
+  * From a Sequence of CountMinSketch estimate count of elements with the indexed same value
   * {{{
-  * implicit val m = createCMSMonoid[Long]()
-  * implicit val cmsL = createCountMinSketch(longs)
-  * val cmsR = createCountMinSketch(longs2)
-  * val cmsLR = appendCountMinSketch(longs2)
-  * val estFreq = cmsLR.frequency(longZips(5))
+  * val estFreq = cmsSum.frequency(longZips(5))
   * }}}
   *
   * ==DecayedValue==
   * @see org.gs.algebird.DecayedValueSpec.scala
+  * Test data is a sine wave with a value for each of 360 degrees with a corresponding time value
+  * The idea is a rising and falling value over a year
+  * @see org.gs.fixtures.TrigUtils
   *
   * Moving average from the initial value to specified index
   * {{{
-  * // test data values, a sine wave (because it rises and falls)
   * val sines = genSineWave(100, 0 to 360)
   * val days = Range.Double(0.0, 361.0, 1.0)
   * val sinesZip = sines.zip(days)
-  * 
+  *
   * val decayedValues = toDecayedValues(sinesZip, 10.0, None)
   * val avgAt90 = decayedValues(90).average(10.0)
   * }}}
-  * 
+  *
   * Moving average from specified index to specified index
   * {{{
   * val avg80to90 = decayedValues(90).averageFrom(10.0, 80.0, 90.0)
   * }}}
-  * 
+  *
   * ==HyperLogLog==
   * @see org.gs.algebird.HyperLogLogSpec.scala
   *
-  * Create sequence of HLL from a sequence of Int
+  * Create a HLL from a sequence of Int
   * {{{
-  * val ints: Seq[Int]
-  * val ints2: Seq[Int]
   * implicit val ag = HyperLogLogAggregator(12)
+  * val ints: Seq[Int]
   * val hll = createHLL(ints)
+  * }}}
+  * Create a sequence of HLL
+  * val ints2: Seq[Int]
   * val hll2 = createHLL(ints2)
   * val hlls = Vector(hll, hll2)
   * }}}
-  * Create sequence of HLL from a sequence of Long
+  * Create a HLL from a sequence of Long
   * {{{
   * val longs: Seq[Long]
-  * val longs2: Seq[Long]
-  * implicit val ag = HyperLogLogAggregator(12)
   * val hll = createHLL(longs)
+  * }}}
+  * Create a sequence of HLL
+  * {{{
+  * val longs2: Seq[Long]
   * val hll2 = createHLL(longs2)
   * val hlls = Vector(hll, hll2)
   * }}}
@@ -153,19 +149,43 @@ import org.gs.algebird.typeclasses.QTreeLike
   * val sum = hlls.reduce(_ + _)
   * val size = sum.estimatedSize
   * }}}
+  * Create a sequence of Approximate HHL approximate
+  * Map a sequence of HLL to a sequence of Approximate
+  * val hlls = Vector(hll, hll2)
+  * val approxs = mapHLL2Approximate(hlls)
+  * }}}
   * Sum a Sequence of Approximate and estimate total size
   * {{{
-  * val approxs = Vector(hll.approximateSize, hll2.approximateSize)
   * val sum = approxs.reduce(_ + _)
   * }}}
-  * 
+  *
+  * ==QTree==
+  * @see org.gs.algebird.QTreeSpec.scala
+  * Build QTree from a Sequence
+  * @see org.gs.algebird.fixtures.QTreeBuilder
+  * {{{
+  * val level = 5
+  * implicit val qtBDSemigroup = new QTreeSemigroup[BigDecimal](level)
+  * val qtBD = buildQTree[BigDecimal](bigDecimals)
+  * }}}
+  * Get its InterQuartileMean
+  * {{{
+  * val iqm = qtBD.interQuartileMean
+  * // iqm._1 lower bound
+  * // iqm._2 upper bound
+  * }}}
+  * Sum a Sequence of QTrees to a QTree
+  * {{{
+  * val qTrees = Vector(qtBD, qtBD2)
+  * val sumQTree = sumQTrees(qTrees)
+  * }}}
   * ==Functor, map, andThen for Sequence types==
   *
   * Map elements of a sequence.
   * {{{
   * def wrapMax[Int](x: Int) = Max(x)
   * val wm = SeqFunctor.map[Int, Max[Int]](List(1,2,3,4))(wrapMax)
-  * 
+  *
   * val bigDecimals: Seq[BigDecimal]
   * val negBigDecimals = SeqFunctor.map[BigDecimal, BigDecimal](bigDecimals)(negate)
   * val invertedBigDecimals = SeqFunctor.map[BigDecimal, BigDecimal](bigDecimals)(inverse)
@@ -183,6 +203,8 @@ import org.gs.algebird.typeclasses.QTreeLike
   *
   * Get Max element of a sequence.
   * {{{
+  * val iqm = qtBD.interQuartileMean
+  * 
   * val bigDecimals: Seq[BigDecimal]
   * val max = max(bigDecimals)
   * val optBigDecs: [Option[BigDecimal]]
@@ -479,6 +501,9 @@ package object algebird {
     at.reduce(AveragedGroup.plus(_, _))
   }
 
+  def sumAverageValues(xs: Seq[AveragedValue]): AveragedValue = {
+    xs.reduce(AveragedGroup.plus(_, _))
+  }
   /** Create BloomFilter configure and load it from a Seq of words
     *
     * @param words
@@ -516,22 +541,18 @@ package object algebird {
     * @param monoid
     * @return CMS for data
     */
-  def createCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])(implicit monoid: CMSMonoid[K]):
-        CMS[K] = {
+  def createCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])(implicit monoid: CMSMonoid[K]): CMS[K] = {
     monoid.create(xs)
   }
 
-  /** Add data to existing CMS
-    * @tparam K type of elements to be counted
-    * @param xs data
-    * @param cmsL an existing CMS, typically your previous cms
+  /** Sum a Sequence of CMS
+    * @tparam K type of elements in CMS
+    * @param xs Sequence of CMS
     * @param monoid
-    * @return cmsL ++ cmsR
+    * @return CMS as the sum of Sequence of CMS
     */
-  def appendCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])(implicit cmsL: CMS[K],
-    monoid: CMSMonoid[K]): CMS[K] = {
-    val cmsR = monoid.create(xs)
-    monoid.plus(cmsL, cmsR)
+  def sumCountMinSketch[K: Ordering: CMSHasher](xs: Seq[CMS[K]])(implicit monoid: CMSMonoid[K]): CMS[K] = {
+    xs.reduce(monoid.plus(_, _))
   }
 
   /** Turn a sequence of value, time tuples into a seq of DecayedValues
@@ -561,7 +582,7 @@ package object algebird {
     }
     xs.scanLeft(z)(op)
   }
-    
+
   /** Create HyperLogLog
     *
     * @tparam A: Int, Long
@@ -569,18 +590,27 @@ package object algebird {
     * @param agg HyperLogLogAggregator, initialized with # of bits for hashing
     * @return an HLL
     */
-  def createHLL[A: HyperLogLogLike](xs: Seq[A])(implicit ev: HyperLogLogLike[A], agg: HyperLogLogAggregator): HLL =
-    ev(xs)
-    
+  def createHLL[A: HyperLogLogLike](xs: Seq[A])(
+    implicit ev: HyperLogLogLike[A], agg: HyperLogLogAggregator): HLL = ev(xs)
+
+  /** Map Sequence of HyperLogLogs to Sequence of Approximate
+    *
+    * @param xs sequence of HLL
+    * @return Sequence of Approximate
+    */
+  def mapHLL2Approximate(xs: Seq[HLL]): Seq[Approximate[Long]] = {
+    xs.map(_.approximateSize)
+  }
+
   /** Estimate total count of distinct integer values in multiple HyperLogLogs
     *
     * @param xs sequence of HLL
     * @return estimate count in an Approximate object
     */
-  def estDistinctVals(xs: Seq[HLL]): Approximate[Long] = {
+  def sumHLLApproximateSizes(xs: Seq[HLL]): Approximate[Long] = {
     xs.reduce(_ + _).approximateSize
   }
-  
+
   /** Build a QTree from a Seq
     *
     * @tparam A: BigDecimal, BigInt, Double, Float, Int, Long
@@ -589,7 +619,19 @@ package object algebird {
     * @param sg
     * @return
     */
-  def buildQTree[A: QTreeLike](vals: Seq[A])(implicit ev: QTreeLike[A], sg: QTreeSemigroup[A]): QTree[A] = {
+  def buildQTree[A: QTreeLike](vals: Seq[A])(
+        implicit ev: QTreeLike[A], sg: QTreeSemigroup[A]): QTree[A] = {
     vals.map { ev(_) }.reduce { sg.plus(_, _) }
   }
+
+  /** Sum a Sequence of QTrees
+    *
+    * @tparam A: BigDecimal, BigInt, Double, Float, Int, Long
+    * @param vals
+    * @param ev Typeclass to build from Seq
+    * @param sg
+    * @return
+    */
+  def sumQTrees[A: QTreeSemigroup](qTrees: Seq[QTree[A]])(implicit sg: QTreeSemigroup[A]): QTree[A] =
+    qTrees.reduce(sg.plus(_, _))
 }

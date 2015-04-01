@@ -22,10 +22,12 @@ class CountMinSketchSpec extends FlatSpecLike with InetAddressesBuilder {
   val longs = testLongs(longZips)
 
   implicit val m = createCMSMonoid[Long]()
-  implicit val cms = createCountMinSketch(longs)
+  val cms0 = createCountMinSketch(longs)
+  val cms1 = createCountMinSketch(longs)
+  val cmss = Vector(cms0, cms1)
 
   "A CountMinSketch" should "estimate number of elements seen so far" in {
-    assert(longs.size === cms.totalCount)
+    assert(longs.size === cms0.totalCount)
   }
 
   val rnd = new Random(1)
@@ -34,21 +36,21 @@ class CountMinSketchSpec extends FlatSpecLike with InetAddressesBuilder {
     for (i <- 0 until 10) {
       val j = ipRange(rnd.nextInt(ipRange length))
       val longAddr = longZips(j)
-      assert(cms.frequency(longAddr._1).estimate === j)
+      assert(cms0.frequency(longAddr._1).estimate === j)
     }
   }
 
-  val cmsLR = appendCountMinSketch(longs)
-
-  "An appended CountMinSketch" should "estimate distinct values" in {
-    assert(cmsLR.totalCount === (cms.totalCount * 2))
+  it should "sum total count over a Sequence of them" in {
+    val cms = sumCountMinSketch(cmss)
+    assert(cms.totalCount === (cms0.totalCount + cms1.totalCount))
   }
 
-  it should "estimate frequency of values" in {
+  it should "sum estimate frequency of values over a Sequence of them" in {
     for (i <- 0 until 10) {
       val j = ipRange(rnd.nextInt(ipRange length))
       val longAddr = longZips(j)
-      assert(cmsLR.frequency(longAddr._1).estimate === (j * 2))
+      val cms = sumCountMinSketch(cmss)
+      assert(cms.frequency(longAddr._1).estimate === (j * 2))
     }
   }
 }
