@@ -2,7 +2,7 @@ name := "AkkaAlgebird"
 
 version := "0.0.1"
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.6"
 
 scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-feature")
 
