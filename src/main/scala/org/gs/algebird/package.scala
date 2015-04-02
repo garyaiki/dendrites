@@ -303,29 +303,35 @@ import org.gs.algebird.typeclasses.QTreeLike
   * val prod3 = product(eithFloats).right.get
   * }}}
   *
-  * ==Field extends Ring with minus, negate==
+  * ==Field extends Ring with inverse, div==
   * @see org.gs.algebird.FieldSpec.scala
   *
   * Invert a value a -> 1/a
   * {{{
   * val float = 3131.7f
-  * val neg = negate(float)
-  * val double = 3130.0
-  * val neg2 = negate(double.get)
+  * val recip = inverse(float)
+  * }}}
+  * {{{
+  * val optDouble = Some(3130.0)
+  * val recip = inverse(double.get)
+  * }}}
   * Either can be used to return errors from remote system
-  * val int = 2847
-  * val neg3 = negate(int.right.get)
+  * val eithInt = Right(2847)
+  * val recip = inverse(eithInt.right.get)
   * }}}
   *
-  * Subract a value from another
+  * Dividee a value by another
   * {{{
   * val float = 3131.7f
-  * val diff = minus(float, 1.7f)
+  * val quotient = div(float, 1.7f)
+  * }}}
+  * {{{
   * val opt = Some(3130.0)
-  * val diff2 = minus(opt.get, 30.0)
-  * Either can be used to return errors from remote system
+  * val quotient = div(opt.get, 30.0)
+  * }}}
+  * {{{
   * val eithLong = 2847L
-  * val diff3 = minus(eithLong.right.get, 47L)
+  * val quotient = div(eithLong.right.get, 47L)
   * }}}
   * @author garystruthers
   */
