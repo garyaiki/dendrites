@@ -1,0 +1,22 @@
+<configuration> <!-- http://logback.qos.ch/manual/configuration.html -->
+
+	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+		<File>./logs/akka.log</File>
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%-5level %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<root level="info">
+		<appender-ref ref="FILE" />
+		<appender-ref ref="STDOUT" />
+	</root>
+
+</configuration>

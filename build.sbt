@@ -16,6 +16,7 @@ libraryDependencies ++= Seq("org.scalatest" % "scalatest_2.11" % "2.2.1" % "test
     "junit" % "junit" % "4.11" % "test",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
     "com.typesafe.akka" %% "akka-actor" % "2.3.6",
+    "ch.qos.logback" % "logback-classic" % "1.1.3",
     "com.typesafe.akka" %% "akka-slf4j" % "2.3.6",
     "com.typesafe.akka" %% "akka-remote" % "2.3.6",
     "com.typesafe.akka" %% "akka-cluster" % "2.3.6",
