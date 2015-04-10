@@ -31,7 +31,8 @@ libraryDependencies ++= Seq("org.scalatest" % "scalatest_2.11" % "2.2.1" % "test
 	"com.googlecode.javaewah" % "JavaEWAH" % "0.9.2",
 	"com.github.nscala-time" %% "nscala-time" % "1.6.0",
 	"joda-time" % "joda-time" % "2.6",
-	"org.joda" % "joda-convert" % "1.2"
+	"org.joda" % "joda-convert" % "1.2",
+	"com.chuusai" %% "shapeless" % "2.2.0-RC4"
 )
 
 scalastyleFailOnError := false
