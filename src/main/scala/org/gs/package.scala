@@ -59,4 +59,16 @@ package object gs {
       Right(xs.sum / fromInt(xs.size))
     case x => Left(s"$x is not divisable")
   }
+
+  import scala.reflect.runtime.universe._
+  /** Report type information, uses scala's enhanced reflection, useful for logging and debugging
+    *
+    * to use, import scala.reflect.runtime.universe._
+    * @see http://docs.scala-lang.org/overviews/reflection/overview.html
+ 
+    * @param implicit WeakTypeTag 
+    * @return type information of element
+    */
+  def weakParamInfo[T](x: T)(implicit tag: WeakTypeTag[T]): List[Type] =
+          tag.tpe match { case TypeRef(_, _, args) => args }
 }

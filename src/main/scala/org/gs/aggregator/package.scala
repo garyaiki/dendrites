@@ -28,16 +28,16 @@ package object aggregator {
       def loop(l: HList, acc: Int): Product = l match {
         case hd :: tl if (acc == n) => hd match { case a: Product => a }
         case hd :: tl               => loop(tl, acc + 1)
-        case _ => None
+        case _                      => None
       }
 
       loop(hl, 0)
     }
 
-    def select(x: Product): Product = {
+    def select[T](clzz: Class[T]): Product = {
       @tailrec
       def loop(l: HList): Product = l match {
-        case hd :: tl if(hd.getClass == x.getClass) => hd match { case a: Product => a }
+        case hd :: tl if (hd.isInstanceOf[T]) => hd match { case a: Product => a }
         case hd :: tl => loop(tl)
         case _ => None
       }
