@@ -53,11 +53,11 @@ object CaseClassLike {
   def exLeftStr(k: Char): String = s"Error key:$k"
 
   implicit object CaseClassLikeBigDecimal extends CaseClassLike[BigDecimal, KeyBigDecimal] {
-    def apply(k: Char): KeyBigDecimal = KeyBigDecimal(k.toString, k.toInt)
+    def apply(k: Char): KeyBigDecimal = KeyBigDecimal(k.toString, BigDecimal(k.toInt))
   }
 
   implicit object CaseClassLikeBigInt extends CaseClassLike[BigInt, KeyBigInt] {
-    def apply(k: Char): KeyBigInt = KeyBigInt(k.toString, k.toInt)
+    def apply(k: Char): KeyBigInt = KeyBigInt(k.toString, BigInt(k.toInt))
   }
 
   implicit object CaseClassLikeBoolean extends CaseClassLike[Boolean, KeyBoolean] {
@@ -77,7 +77,7 @@ object CaseClassLike {
   }
 
   implicit object CaseClassLikeLong extends CaseClassLike[Long, KeyLong] {
-    def apply(k: Char): KeyLong = KeyLong(k.toString, k.toInt)
+    def apply(k: Char): KeyLong = KeyLong(k.toString, k.toLong)
   }
 
   implicit object CaseClassLikeString extends CaseClassLike[String, KeyString] {
@@ -85,11 +85,11 @@ object CaseClassLike {
   }
 
   implicit object CaseClassLikeOptBigDec extends CaseClassLike[Option[BigDecimal], KeyOptBigDec] {
-    def apply(k: Char): KeyOptBigDec = KeyOptBigDec(k.toString, Some(k.toInt))
+    def apply(k: Char): KeyOptBigDec = KeyOptBigDec(k.toString, Some(BigDecimal(k.toInt)))
   }
 
   implicit object CaseClassLikeOptBigInt extends CaseClassLike[Option[BigInt], KeyOptBigInt] {
-    def apply(k: Char): KeyOptBigInt = KeyOptBigInt(k.toString, Some(k.toInt))
+    def apply(k: Char): KeyOptBigInt = KeyOptBigInt(k.toString, Some(BigInt(k.toInt)))
   }
   implicit object CaseClassLikeOptBool extends CaseClassLike[Option[Boolean], KeyOptBool] {
     def apply(k: Char): KeyOptBool = KeyOptBool(k.toString, Some(altTF(k)))
@@ -108,7 +108,7 @@ object CaseClassLike {
   }
 
   implicit object CaseClassLikeOptLong extends CaseClassLike[Option[Long], KeyOptLong] {
-    def apply(k: Char): KeyOptLong = KeyOptLong(k.toString, Some(k.toInt))
+    def apply(k: Char): KeyOptLong = KeyOptLong(k.toString, Some(k.toLong))
   }
 
   implicit object CaseClassLikeOptStr extends CaseClassLike[Option[String], KeyOptStr] {
@@ -117,12 +117,12 @@ object CaseClassLike {
 
   implicit object CaseClassLikeEithBigDec extends
       CaseClassLike[Either[String, BigDecimal], KeyEithBigDec] {
-    def apply(k: Char): KeyEithBigDec = KeyEithBigDec(k.toString, Right(k.toInt))
+    def apply(k: Char): KeyEithBigDec = KeyEithBigDec(k.toString, Right(BigDecimal(k.toInt)))
   }
 
   implicit object CaseClassLikeEithBigInt extends
       CaseClassLike[Either[String, BigInt], KeyEithBigInt] {
-    def apply(k: Char): KeyEithBigInt = KeyEithBigInt(k.toString, Right(k.toInt))
+    def apply(k: Char): KeyEithBigInt = KeyEithBigInt(k.toString, Right(BigInt(k.toInt)))
   }
 
   implicit object CaseClassLikeEithBool extends
@@ -145,7 +145,7 @@ object CaseClassLike {
   }
 
   implicit object CaseClassLikeEithLong extends CaseClassLike[Either[String, Long], KeyEithLong] {
-    def apply(k: Char): KeyEithLong = KeyEithLong(k.toString, Right(k.toInt))
+    def apply(k: Char): KeyEithLong = KeyEithLong(k.toString, Right(k.toLong))
   }
 
   implicit object CaseClassLikeEithStr extends CaseClassLike[Either[String, String], KeyEithStr] {
