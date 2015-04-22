@@ -7,19 +7,38 @@ package org.gs
   */
 package object aggregator {
 
+  type TypeFilter = Any => Boolean
+
   /** Return only the fields of a case class or tuple that match a predicate
     *
     * Can be used to filter by type
-    * @param x case class or tuple
-    * @param f filter function
+    * @param e case class or tuple
+    * @param f filter or predicate function
     * @return matching elements
     */
-  def filterType[P <: Product](e: P)(f: Any => Boolean) = {
-
+  def productFilter[P <: Product](e: P, f: TypeFilter) = {
+    //println(s"productFilter e:$e")
     val iter = e.productIterator
     iter.filter(f).toIndexedSeq
   }
 
+  type ProductFilter[P <: Product] = (P, TypeFilter) => IndexedSeq[Any]
+
+  /** Returns only matching elements of mixed case class or tuple types
+    *
+    * 
+    * @param xs Indexed Sequence of heterogeneous types of case classes or tuples 
+    * @param pf function returns only elements of case class or tuple matching predicate
+    * @param f predicate or filter function(common types below)
+    * @return IndexedSeq of matching elements
+    */
+  def filterProducts[P <: Product](xs: IndexedSeq[P], pf: ProductFilter[P], f: TypeFilter): IndexedSeq[Any] = {
+    val l = for (e <- xs) yield pf(e, f)
+    //println(s"filterProducts l:$l")
+    l.flatten
+  }
+
+  def isType[A](e: Any): Boolean = e.isInstanceOf[A]
   def isBigDecimal(e: Any): Boolean = e.isInstanceOf[BigDecimal]
   def isBigInt(e: Any): Boolean = e.isInstanceOf[BigInt]
   def isBoolean(e: Any) = e.isInstanceOf[Boolean]
