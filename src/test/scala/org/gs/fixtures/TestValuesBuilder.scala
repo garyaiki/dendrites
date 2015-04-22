@@ -2,7 +2,7 @@
   */
 package org.gs.fixtures
 
-import org.gs._
+import org.gs.filters._
 import scala.collection.immutable.NumericRange
 import org.scalatest._
 import scala.annotation.implicitNotFound

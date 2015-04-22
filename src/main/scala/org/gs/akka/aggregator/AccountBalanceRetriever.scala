@@ -8,7 +8,7 @@ import scala.reflect.runtime.universe._
 import akka.actor._
 import akka.contrib.pattern.Aggregator
 import org.gs._
-import org.gs.aggregator._
+import org.gs.filters._
 import shapeless._
 
 /** Sample and test code for the aggregator patter.

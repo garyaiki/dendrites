@@ -3,7 +3,7 @@
 package org.gs.algebird
 
 import org.scalatest.FlatSpecLike
-import org.gs._
+import org.gs.filters._
 import org.gs.fixtures.{CaseClassLike, TestValuesBuilder}
 
 /** @author garystruthers

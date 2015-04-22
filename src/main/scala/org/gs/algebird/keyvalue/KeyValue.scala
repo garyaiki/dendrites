@@ -2,8 +2,8 @@
   */
 package org.gs.algebird.keyvalue
 
-import com.twitter.algebird.Semigroup
-import com.twitter.algebird.Monoid
+import com.twitter.algebird._
+import org.gs.filters._
 
 /** @author garystruthers
   *
@@ -30,20 +30,20 @@ object TypedKeyValue {
   val kvRBD = List(KeyValue("a", Right(BigDecimal(1))), KeyValue("b", Right(BigDecimal(2))),
     KeyValue("c", Right(BigDecimal(3))), KeyValue("d", Right(BigDecimal(4))))
 
-  import org.gs._
-  val ap = extractElement[BigDecimal](kvBD, 1)
-  val aBIp = extractElement[BigInt](kvBI, 1)
 
-  val bp = extractElement[Double](kvD, 1)
-  val cp = extractElement[Int](kvI, 1)
-  val dp = extractElement[Long](kvL, 1)
-  val ep = extractElement[String](kvS, 1)
-  val fp = extractElement[Boolean](kvB, 1)
-  val ffp = extractElement[Float](kvF, 1)
-  val cEp = extractElement[Either[String, Int]](kvEI, 1)
-  val cRp = extractElement[Either[String, Int]](kvRI, 1)
-  val aEp = extractElement[Either[String, BigDecimal]](kvEBD, 1)
-  val aRp = extractElement[Either[String, BigDecimal]](kvRBD, 1)
+  val ap = extractElementByIndex[BigDecimal](kvBD, 1)
+  val aBIp = extractElementByIndex[BigInt](kvBI, 1)
+
+  val bp = extractElementByIndex[Double](kvD, 1)
+  val cp = extractElementByIndex[Int](kvI, 1)
+  val dp = extractElementByIndex[Long](kvL, 1)
+  val ep = extractElementByIndex[String](kvS, 1)
+  val fp = extractElementByIndex[Boolean](kvB, 1)
+  val ffp = extractElementByIndex[Float](kvF, 1)
+  val cEp = extractElementByIndex[Either[String, Int]](kvEI, 1)
+  val cRp = extractElementByIndex[Either[String, Int]](kvRI, 1)
+  val aEp = extractElementByIndex[Either[String, BigDecimal]](kvEBD, 1)
+  val aRp = extractElementByIndex[Either[String, BigDecimal]](kvRBD, 1)
 
   val tSBD = List(("a", BigDecimal(1)), ("b", BigDecimal(2)),
     ("c", BigDecimal(3)), ("d", BigDecimal(4)))
@@ -52,11 +52,11 @@ object TypedKeyValue {
   val tSL = List(("a", 1L), ("b", 2L), ("c", 3L), ("d", 4L))
   val tSS = List(("a", "1"), ("b", "2"), ("c", "3"), ("d", "4"))
 
-  val atBD = extractElement[BigDecimal](tSBD, 1)
-  val btD = extractElement[Double](tSD, 1)
-  val ctI = extractElement[Int](tSI, 1)
-  val dtL = extractElement[Long](tSL, 1)
-  val etS = extractElement[String](tSS, 1)
+  val atBD = extractElementByIndex[BigDecimal](tSBD, 1)
+  val btD = extractElementByIndex[Double](tSD, 1)
+  val ctI = extractElementByIndex[Int](tSI, 1)
+  val dtL = extractElementByIndex[Long](tSL, 1)
+  val etS = extractElementByIndex[String](tSS, 1)
 
   import org.gs.algebird._
   val bdf = BigDecimalField
@@ -128,15 +128,45 @@ object TypedKeyValue {
   product(dp)
   product(fp)
   product(ffp)
-  inverse(BigDecimal(1))(bdf)
+
+  inverse(BigDecimal(1)) //(bdf)
   inverse(7.0)
   inverse(7.0f)
-  import com.twitter.algebird.Fold
+  def wrapMax[Int](x: Int) = Max(x)
+  val wm = SeqFunctor.map[Int, Max[Int]](List(1,2,3,4))(wrapMax)
+  val mZero = Max(0)
+  val mA = MaxAggregator[Int]
+mA.reduce(List(1,2,3,4))
+  def max[A: Ordering](xs: Seq[A]): A = MaxAggregator[A].reduce(xs)
 
-  val fl = Fold.fold[BigDecimal, BigDecimal, BigDecimal]((acc, b) => acc + b + 1, BigDecimal(0), BigDecimal => BigDecimal)
-  val sfl = fl.overTraversable(ap)
-  val ffl = Fold.first[BigDecimal]
-  ffl.overTraversable(ap)
-  val fll = Fold.last[BigDecimal]
-  fll.overTraversable(ap)
+  SeqFunctor.map[BigDecimal, BigDecimal](ap)(inverse)
+  SeqFunctor.map[BigDecimal, BigDecimal](ap)(negate)
+
+  andThen[BigDecimal, BigDecimal, BigDecimal](ap)( inverse)( negate)
+  Max(5)
+  import com.twitter.algebird.Operators._
+  def maxNumericResult[T](x: T, y: T)(implicit num: Numeric[T]) = (Max(x) + Max(y)).get
+  val mL = Max(List(1, 2, 3, 4))
+  val mx = Max
+  val mxl = mx.listMonoid[Int]
+  def max[T](x: T, y: T) = {
+    val m1 = Max(x)
+    val m2 = Max(y)
+
+  }
+
+  val et2 = extractTuple2ByIndex[String, BigDecimal](kvBD, 0, 1)
+  val et2a = (et2.toMap)
+  val et2ma = et2a.+(("e", BigDecimal(5)))
+  val rContains = MapAlgebra.rightContainsLeft(et2ma, et2.toMap)
+  val rContains2 = MapAlgebra.rightContainsLeft(et2.toMap, et2ma)
+  val et2B = extractTuple2ByIndex[String, BigDecimal](kvB, 0, 1)
+  val rContains3 = MapAlgebra.rightContainsLeft(et2.toMap, et2B.toMap)
+  val et2Zero = et2.:+(("e", BigDecimalField.zero))
+  val removeZeros = MapAlgebra.removeZeros(et2Zero.toMap)
+  val sumByKey = MapAlgebra.sumByKey(et2Zero ++ et2Zero)
+  val joinByKey = MapAlgebra.join(et2Zero.toMap, et2B.toMap)
+  val toGraph = MapAlgebra.toGraph(et2Zero.toMap)
+  def square(x: BigDecimal) = if (x % 2 == 0) Some(x * x) else None
+
 }
