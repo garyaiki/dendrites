@@ -32,7 +32,7 @@ package object filters {
     * @param f predicate or filter function(common types below)
     * @return IndexedSeq of matching elements
     */
-  def filterProducts[P <: Product](xs: IndexedSeq[P], pf: ProductFilter[P], f: TypeFilter): IndexedSeq[Any] = {
+  def filterProducts[P <: Product](xs: Seq[P], pf: ProductFilter[P], f: TypeFilter): Seq[Any] = {
     val l = for (e <- xs) yield pf(e, f)
     //println(s"filterProducts l:$l")
     l.flatten
