@@ -19,6 +19,8 @@ class ProductFilterSpec extends FlatSpecLike with TestValuesBuilder {
   
   "A Product Filter" should "return all BigDecimal fields from a sequence of case classes" in {
     val filtered = filterProducts(mixCaseClasses, productFilter, isBigDecimal)
+    val flat = filtered
+    val dbug = filtered.find { x => !x.isInstanceOf[BigDecimal] }
     assert(keyBigDecimal.size === filtered.size)
     assert(filtered.forall(isBigDecimal))
   }

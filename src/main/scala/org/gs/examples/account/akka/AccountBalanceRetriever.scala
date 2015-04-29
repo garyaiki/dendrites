@@ -1,4 +1,4 @@
-package org.gs.akka.aggregator
+package org.gs.examples.account.akka
 
 import scala.collection._
 import scala.concurrent.duration._
@@ -8,6 +8,8 @@ import scala.reflect.runtime.universe._
 import akka.actor._
 import akka.contrib.pattern.Aggregator
 import org.gs._
+import org.gs.akka.aggregator.{CantUnderstand, TimedOut}
+import org.gs.examples.account._
 import org.gs.filters._
 import org.gs.reflection._
 import shapeless._
@@ -17,39 +19,10 @@ import shapeless._
   * http://jaxenter.com/tutorial-asynchronous-programming-with-akka-actors-46220.html
   */
 
-sealed trait AccountType
-case object Checking extends AccountType
-case object Savings extends AccountType
-case object MoneyMarket extends AccountType
 
-final case class GetCustomerAccountBalances(id: Long, accountTypes: Set[AccountType])
-final case class GetAccountBalances(id: Long)
 
-final case class AccountBalances(accountType: AccountType,
-                                 balance: Option[List[(Long, BigDecimal)]])
 
-final case class CheckingAccountBalances(balances: Option[List[(Long, BigDecimal)]])
-final case class SavingsAccountBalances(balances: Option[List[(Long, BigDecimal)]])
-final case class MoneyMarketAccountBalances(balances: Option[List[(Long, BigDecimal)]])
 
-class SavingsAccountProxy extends Actor {
-  def receive = {
-    case GetAccountBalances(id: Long) ⇒
-      sender() ! SavingsAccountBalances(Some(List((1, 150000), (2, 29000))))
-  }
-}
-class CheckingAccountProxy extends Actor {
-  def receive = {
-    case GetAccountBalances(id: Long) ⇒
-      sender() ! CheckingAccountBalances(Some(List((3, 15000))))
-  }
-}
-class MoneyMarketAccountProxy extends Actor {
-  def receive = {
-    case GetAccountBalances(id: Long) ⇒
-      sender() ! MoneyMarketAccountBalances(None)
-  }
-}
 
 class AccountBalanceRetriever extends Actor with Aggregator with ActorLogging {
 
@@ -57,7 +30,7 @@ class AccountBalanceRetriever extends Actor with Aggregator with ActorLogging {
 
   expectOnce {
     case GetCustomerAccountBalances(id, types) ⇒
-      new AccountAggregator(sender(), id, types)
+      new AccountAggregator(sender(), id, accountTypes)
     case _ ⇒
       sender() ! CantUnderstand
       context.stop(self)
@@ -66,8 +39,6 @@ class AccountBalanceRetriever extends Actor with Aggregator with ActorLogging {
   class AccountAggregator(originalSender: ActorRef,
                           id: Long, types: Set[AccountType]) {
     val results = ArrayBuffer.fill[Product](3)(None)
-    //    var results: Aggregate[HList] = Aggregate()
-    //      mutable.ArrayBuffer.empty[(AccountType, Option[List[(Long, BigDecimal)]])]
 
     if (types.size > 0)
       types foreach {

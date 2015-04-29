@@ -17,7 +17,7 @@ package object filters {
     * @return matching elements
     */
   def productFilter[P <: Product](e: P, f: TypeFilter) = {
-    //println(s"productFilter e:$e")
+//    println(s"productFilter e:$e")
     val iter = e.productIterator
     iter.filter(f).toIndexedSeq
   }
@@ -33,9 +33,12 @@ package object filters {
     * @return IndexedSeq of matching elements
     */
   def filterProducts[P <: Product](xs: Seq[P], pf: ProductFilter[P], f: TypeFilter): Seq[Any] = {
-    val l = for (e <- xs) yield pf(e, f)
-    //println(s"filterProducts l:$l")
-    l.flatten
+    val l = for {
+      e <- xs 
+      ef <- pf(e, f)
+    } yield ef
+//    println(s"filterProducts l:${l}")
+    l
   }
 
   def isType[A](e: Any): Boolean = e.isInstanceOf[A]

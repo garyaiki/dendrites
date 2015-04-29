@@ -1,13 +1,13 @@
 /** @see http://www.scala-lang.org/api/current/index.html#scala.Product
   */
-package org
+package org.gs
 
 import scala.reflect.runtime.universe._
 
 /** @author Gary Struthers
   *
   */
-package object gs {
+package object reflection {
 
   /** Report type information, uses scala's enhanced reflection, useful for logging and debugging
     *
