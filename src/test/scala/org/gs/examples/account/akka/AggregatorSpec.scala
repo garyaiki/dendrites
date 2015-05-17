@@ -16,6 +16,8 @@ import scala.reflect.runtime.universe._
 
 import org.gs._
 import org.gs.examples.account._
+import org.gs.examples.account.akka.AccountBalanceRetriever._
+
 import org.gs.reflection._
 /** Sample and test code for the aggregator patter.
   * This is based on Jamie Allen's tutorial at
@@ -29,7 +31,7 @@ import org.gs.reflection._
 class AggregatorSpec extends TestKit(ActorSystem("test")) with ImplicitSender with FunSuiteLike with Matchers {
 
   test("Test request 1 account type") {
-    system.actorOf(Props[AccountBalanceRetriever]) ! GetCustomerAccountBalances(1, Set(Savings))
+    system.actorOf(AccountBalanceRetriever.props) ! GetCustomerAccountBalances(1, Set(Savings))
     receiveOne(10.seconds) match {
       case result: IndexedSeq[Product] ⇒
         assert(isElementEqual(result(1), 0, Savings))
@@ -39,7 +41,7 @@ class AggregatorSpec extends TestKit(ActorSystem("test")) with ImplicitSender wi
   }
 
   test("Test request 3 account types") {
-    system.actorOf(Props[AccountBalanceRetriever]) !
+    system.actorOf(AccountBalanceRetriever.props) !
       GetCustomerAccountBalances(2, Set(Checking, Savings, MoneyMarket))
     receiveOne(10.seconds) match {
       case result: IndexedSeq[Product] ⇒ {
