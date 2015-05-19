@@ -9,7 +9,7 @@ import org.scalatest.FunSuiteLike
 import org.scalatest.Matchers
 
 //#demo-code
-import scala.collection
+//import scala.collection
 import scala.concurrent.duration._
 import scala.math.BigDecimal.int2bigDecimal
 import scala.reflect.runtime.universe._
