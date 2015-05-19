@@ -19,10 +19,10 @@ trait ResultAggregator {
   
   def addResult(i: Int, p: Product, recipient: ActorRef) = {
     results.update(i, p)
-    collectBalances(recipient)
+    collectResults(recipient)
   }
 
-  def collectBalances(recipient: ActorRef, force: Boolean = false) {
+  def collectResults(recipient: ActorRef, force: Boolean = false) {
     val resultCount = results.count(_ != None)
     if ((resultCount == results.size) || force) {
       val result = results.toIndexedSeq
