@@ -5,10 +5,13 @@ package org.gs.akka.aggregator
 import akka.actor.{ Actor, ActorRef }
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.immutable.Set
+import scala.reflect.runtime.universe._
+import akka.actor.ActorLogging
+import org.gs.reflection._
 /** @author garystruthers
   *
   */
-trait ResultAggregator {
+trait ResultAggregator extends ActorLogging {
   this: Actor ⇒
 
   private val results = new ArrayBuffer[Product]()
@@ -26,7 +29,7 @@ trait ResultAggregator {
     val resultCount = results.count(_ != None)
     if ((resultCount == results.size) || force) {
       val result = results.toIndexedSeq
-      //        log.debug(s"$result:${weakParamInfo(result)} cnt:$resultCount ts:${types.size} frc:$force")
+      log.debug(s"$result:${weakParamInfo(result)} cnt:$resultCount types size:${results.size} frc:$force")
       recipient ! result // Make sure it's immutable
       context.stop(self)
     }

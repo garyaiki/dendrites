@@ -1,15 +1,14 @@
 package org.gs.examples.account.akka
 
-import akka.actor.Actor
-import akka.actor.ActorContext
+import akka.actor.{Actor, ActorContext}
 import akka.actor._
 import akka.contrib.pattern.Aggregator
-import scala.collection.mutable.ArrayBuffer
+import org.gs.akka.aggregator.ResultAggregator
 import org.gs.examples.account._
-import org.gs.examples.account.akka.AccountBalanceRetriever._
+import CheckingAccountProxy._
 
-class CheckingAccountProxy extends Actor with Aggregator {
-  override def receive = {
+class CheckingAccountProxy extends Actor {
+  def receive = {
     case GetAccountBalances(id: Long) ⇒
       sender() ! CheckingAccountBalances(Some(List((3, 15000))))
   }
@@ -17,4 +16,17 @@ class CheckingAccountProxy extends Actor with Aggregator {
 
 object CheckingAccountProxy {
   def props = Props[CheckingAccountProxy]
+  case class CheckingAccountBalances(balances: Option[List[(Long, BigDecimal)]])
+}
+
+trait CheckingAccountFetcher {
+  this: Actor with ResultAggregator with Aggregator ⇒
+  
+  def fetchCheckingAccountsBalance(context: ActorContext, id: Long, recipient: ActorRef) {
+    context.actorOf(CheckingAccountProxy.props) ! GetAccountBalances(id)
+    expectOnce {
+      case CheckingAccountBalances(balances) ⇒
+        addResult(0, (Checking -> balances), recipient)
+    }
+  }
 }
