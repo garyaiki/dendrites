@@ -3,6 +3,7 @@
 package org.gs.algebird
 
 import org.scalatest.{ FlatSpecLike, Matchers }
+import org.scalatest.Matchers._
 import org.gs._
 import org.gs.algebird._
 import org.gs.fixtures.{ CaseClassLike, TestValuesBuilder }
@@ -15,7 +16,7 @@ class HyperLogLogSpec extends FlatSpecLike with TestValuesBuilder {
 
   "A HyperLogLog" should "estimate total number of integers from a Sequence of Int" in {
     val hll = createHLL(ints)
-    assert(hll.estimatedSize === ints.size)
+    assert(hll.estimatedSize === (ints.size.toDouble +- 0.09) )
   }
 
   it should "map a Sequence of HLL to a Sequence of Approximate" in {
@@ -32,12 +33,12 @@ class HyperLogLogSpec extends FlatSpecLike with TestValuesBuilder {
     val hll2 = createHLL(ints2)
     val hlls = Vector(hll, hll2)
     val sum = hlls.reduce(_ + _)
-    assert(sum.estimatedSize === ints.size + ints2.size)
+    assert(sum.estimatedSize === ((ints.size + ints2.size).toDouble +- 0.4))
   }
 
   it should "estimate total number of longs from a Sequence of Long" in {
     val hll = createHLL(longs)
-    assert(hll.estimatedSize === longs.size)
+    assert(hll.estimatedSize === (longs.size.toDouble +- 0.09))
   }
   
   it should "estimate total number of longs from a Sequence of HLL" in {
@@ -45,7 +46,7 @@ class HyperLogLogSpec extends FlatSpecLike with TestValuesBuilder {
     val hll2 = createHLL(longs2)
     val hlls = Vector(hll, hll2)
     val sum = hlls.reduce(_ + _)
-    assert(sum.estimatedSize === longs.size + longs2.size)
+    assert(sum.estimatedSize === ((longs.size + longs2.size).toDouble +- 0.4))
   }
 
   it should "estimate total number of integers from a Sequence of Approximate" in {

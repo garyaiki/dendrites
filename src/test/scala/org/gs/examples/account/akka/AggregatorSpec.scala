@@ -39,7 +39,7 @@ class AggregatorSpec extends TestKit(ActorSystem("test")) with ImplicitSender wi
         assert(false, "Expect 1 AccountType, got $result ${weakParamInfo(result)}")
     }
   }
-
+ 
   test("Test request 3 account types") {
     system.actorOf(AccountBalanceRetriever.props) !
       GetCustomerAccountBalances(2, Set(Checking, Savings, MoneyMarket))

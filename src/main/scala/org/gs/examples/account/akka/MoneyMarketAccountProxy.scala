@@ -4,7 +4,7 @@ import akka.actor.{ Actor, ActorContext }
 import akka.actor._
 import akka.contrib.pattern.Aggregator
 import org.gs.akka.aggregator.ResultAggregator
-import org.gs.examples.account.{ GetAccountBalances, MoneyMarket }
+import org.gs.examples.account.{ GetAccountBalances, MoneyMarket, MoneyMarketAccountBalances }
 import MoneyMarketAccountProxy._
 
 class MoneyMarketAccountProxy extends Actor {
@@ -16,7 +16,6 @@ class MoneyMarketAccountProxy extends Actor {
 
 object MoneyMarketAccountProxy {
   def props = Props[MoneyMarketAccountProxy]
-  case class MoneyMarketAccountBalances(balances: Option[List[(Long, BigDecimal)]])
 }
 
 trait MoneyMarketAccountFetcher {

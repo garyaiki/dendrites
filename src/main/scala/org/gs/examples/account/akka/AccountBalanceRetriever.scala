@@ -32,7 +32,15 @@ class AccountBalanceRetriever extends Actor
       sender() ! CantUnderstand
       stop(self)
   }
-  
+  /*
+  override val supervisorStrategy = 
+    OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1.second) {
+    case _: ArithmeticException => SupervisorStrategy.Resume
+    case _: NullPointerException => SupervisorStrategy.Restart
+    case _: IllegalArgumentException => SupervisorStrategy.Stop
+    case _: Exception => SupervisorStrategy.Escalate
+  }
+  */
   class AccountAggregator(originalSender: ActorRef, id: Long, types: Set[AccountType]) {
 
     initResults[AccountType](types)

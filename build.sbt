@@ -12,28 +12,43 @@ site.includeScaladoc()
 
 resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
 
-libraryDependencies ++= Seq("org.scalatest" % "scalatest_2.11" % "2.2.1" % "test",
+resolvers += "spray repo" at "http://repo.spray.io"
+
+libraryDependencies ++= {
+  val akkaV = "2.3.11"
+  val scalaTestV = "2.2.5"
+  val algebirdV = "0.10.2"
+  val akkaHttpV = "1.0-RC3"
+  Seq("org.scalatest" % "scalatest_2.11" % scalaTestV % "test",
     "junit" % "junit" % "4.11" % "test",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
-    "com.typesafe.akka" %% "akka-actor" % "2.3.6",
+    "com.typesafe.akka" %% "akka-actor" % akkaV,
     "ch.qos.logback" % "logback-classic" % "1.1.3",
-    "com.typesafe.akka" %% "akka-slf4j" % "2.3.6",
-    "com.typesafe.akka" %% "akka-remote" % "2.3.6",
-    "com.typesafe.akka" %% "akka-cluster" % "2.3.6",
-    "com.typesafe.akka" %% "akka-agent" % "2.3.6", 
-    "com.typesafe.akka" %% "akka-testkit" % "2.3.6"% "test",
-    "com.typesafe.akka" %% "akka-contrib" % "2.3.6",
-    "com.typesafe.akka" %% "akka-persistence-experimental" % "2.3.6",
-    "com.twitter" % "algebird_2.11" % "0.9.0",
-    "com.twitter" % "algebird-core_2.11" % "0.9.0",
-    "com.twitter" % "algebird-test_2.11" % "0.9.0",
+    "com.typesafe.akka" %% "akka-slf4j" % akkaV,
+    "com.typesafe.akka" %% "akka-remote" % akkaV,
+    "com.typesafe.akka" %% "akka-cluster" % akkaV,
+    "com.typesafe.akka" %% "akka-agent" % akkaV, 
+    "com.typesafe.akka" %% "akka-testkit" % akkaV % "test",
+    "com.typesafe.akka" %% "akka-contrib" % akkaV,
+    "com.typesafe.akka" %% "akka-persistence-experimental" % akkaV,
+    "com.typesafe.akka" %% "akka-stream-experimental" % akkaHttpV,
+    "com.typesafe.akka" %% "akka-http-core-experimental" % akkaHttpV,
+    "com.typesafe.akka" %% "akka-http-experimental" % akkaHttpV,
+    "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaHttpV,
+    "com.typesafe.akka" %% "akka-http-testkit-experimental" % akkaHttpV,
+    "com.twitter" % "algebird_2.11" % algebirdV,
+    "com.twitter" % "algebird-core_2.11" % algebirdV,
+    "com.twitter" % "algebird-test_2.11" % algebirdV,
+    "io.spray" %%  "spray-json" % "1.3.2",
+    "org.parboiled" %% "parboiled" % "2.1.0",
     "commons-io" % "commons-io" % "2.4" % "test",
-	"com.googlecode.javaewah" % "JavaEWAH" % "0.9.2",
+	"com.googlecode.javaewah" % "JavaEWAH" % "1.0.2",
 	"com.github.nscala-time" %% "nscala-time" % "1.6.0",
 	"joda-time" % "joda-time" % "2.6",
 	"org.joda" % "joda-convert" % "1.2",
 	"com.chuusai" %% "shapeless" % "2.2.0-RC4"
-)
+  )
+}
 
 scalastyleFailOnError := false
 

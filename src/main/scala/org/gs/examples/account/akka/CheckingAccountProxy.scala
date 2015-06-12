@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorContext}
 import akka.actor._
 import akka.contrib.pattern.Aggregator
 import org.gs.akka.aggregator.ResultAggregator
-import org.gs.examples.account._
+import org.gs.examples.account.{Checking, CheckingAccountBalances, GetAccountBalances}
 import CheckingAccountProxy._
 
 class CheckingAccountProxy extends Actor {
@@ -16,7 +16,6 @@ class CheckingAccountProxy extends Actor {
 
 object CheckingAccountProxy {
   def props = Props[CheckingAccountProxy]
-  case class CheckingAccountBalances(balances: Option[List[(Long, BigDecimal)]])
 }
 
 trait CheckingAccountFetcher {

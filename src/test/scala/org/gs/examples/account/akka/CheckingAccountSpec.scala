@@ -9,7 +9,7 @@ import scala.collection.mutable.ArrayBuffer
 import org.gs.examples.account.AccountType
 import org.gs.examples.account.Checking
 import akka.testkit.TestActorRef
-import org.gs.examples.account.GetAccountBalances
+import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances}
 import org.gs.examples.account.akka.CheckingAccountProxy._
 
 class CheckingAccountSpec extends TestKit(ActorSystem("test"))
