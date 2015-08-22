@@ -1,8 +1,7 @@
-package org.gs.examples.account.akkahttp
+package org.gs.examples.account.http
 
 import akka.actor.ActorSystem
 import akka.event.{LoggingAdapter, Logging}
-import akka.http.scaladsl.Http
 import akka.http.scaladsl.client.RequestBuilding
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.marshalling.ToResponseMarshallable
@@ -10,17 +9,15 @@ import akka.http.scaladsl.model.{HttpResponse, HttpRequest}
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.stream.{ActorFlowMaterializer, FlowMaterializer}
+import akka.stream.Materializer
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import com.typesafe.config.Config
-import com.typesafe.config.ConfigFactory
 import java.io.IOException
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.math._
 import spray.json.DefaultJsonProtocol
-
 import org.gs.examples.account._
-import org.gs.examples.account.akkahttp._
+import org.gs.examples.account.http._
 
 
 trait BalancesProtocols extends DefaultJsonProtocol {
@@ -33,7 +30,7 @@ trait BalancesProtocols extends DefaultJsonProtocol {
 trait BalancesService extends BalancesProtocols {
   implicit val system: ActorSystem
   implicit def executor: ExecutionContextExecutor
-  implicit val materializer: FlowMaterializer
+  implicit val materializer: Materializer
 
   def config: Config
   val logger: LoggingAdapter
@@ -65,27 +62,25 @@ trait BalancesService extends BalancesProtocols {
   
   val routes = {
     logRequestResult("org.gs.examples.account.akkahttp.microserver") {
-      pathSingleSlash {
-        complete("root")
-      } ~
-        path("account" / "balances" / "checking") {
-          (post & entity(as[GetAccountBalances])) { getAccountBalances =>
+
+        path("account" / "balances" / "checking" / "GetAccountBalances") {
+    	    parameter('id.as[Long]) { id =>
+    	      complete {
+    		      fetchCheckingBalances(id)
+    	      }
+    	    }
+        } ~
+        path("account" / "balances" / "mm" / "GetAccountBalances") {
+          parameter('id.as[Long]) { id =>
             complete {
-              fetchCheckingBalances(getAccountBalances.id)
+              fetchMMBalances(id)
             }
           }
         } ~
-        path("account" / "balances" / "mm") {
-          (post & entity(as[GetAccountBalances])) { getAccountBalances =>
+        path("account" / "balances" / "savings" / "GetAccountBalances") {
+          parameter('id.as[Long]) { id =>
             complete {
-              fetchMMBalances(getAccountBalances.id)
-            }
-          }
-        } ~
-        path("account" / "balances" / "savings") {
-          (post & entity(as[GetAccountBalances])) { getAccountBalances =>
-            complete {
-              fetchSavingsBalances(getAccountBalances.id)
+              fetchSavingsBalances(id)
             }
           }
         }
@@ -93,13 +88,3 @@ trait BalancesService extends BalancesProtocols {
   }
 }
 
-object Microserver extends App with BalancesService {
-  override implicit val system = ActorSystem()
-  override implicit val executor = system.dispatcher
-  override implicit val materializer = ActorFlowMaterializer()
-
-  override val config = ConfigFactory.load()
-  override val logger = Logging(system, getClass)
-
-  Http().bindAndHandle(routes, config.getString("http.interface"), config.getInt("http.port"))
-}

@@ -5,7 +5,7 @@ package org.gs.examples.account
 /** @author garystruthers
   *
   */
-package object akkahttp {
+package object http {
 
   val checkingBalances = Map(
     1L -> Some(List(
