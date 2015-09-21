@@ -1,33 +1,26 @@
 package org.gs.examples.account.http
 
 import scala.concurrent.Future
+import scala.util.{Failure, Success, Try}
 import akka.actor.ActorSystem
+import akka.event.{ LoggingAdapter, Logging }
 import akka.stream.ActorMaterializer
 import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.typesafe.config.{ Config, ConfigFactory }
 import org.gs.akka.http._
 import org.gs.examples.account._
 import org.gs.http._
 
-class CheckingBalancesClient()(implicit val system: ActorSystem, val mat: ActorMaterializer) extends BalancesProtocols {
-
-  import system.dispatcher
-
-  def call(id: Long, baseUrl: StringBuilder): Future[HttpResponse] = {
-    val balancesQuery = caseClassToGetQuery(GetAccountBalances(id))
-    val uriS = baseUrl.append(balancesQuery).toString
-    Http().singleRequest(HttpRequest(uri = uriS))
-  }
-
-  def extractResponse(f: Future[HttpResponse]) {
-    f.onSuccess {
-      case r: HttpResponse => println(s"response:$r status:${r.status} entitity:${r.entity}")
-    }
-    f.onFailure {
-      case x => println(s"Client failed $x")
-    }
-  }
+class CheckingBalancesClient()(implicit val system: ActorSystem, val mat: ActorMaterializer) extends
+        BalancesClients {
+  import CheckingBalancesClient._
+  val hostConfig = CheckingBalancesClient.getHostConfig()
+  val config = hostConfig._1  
+  override implicit val materializer = ActorMaterializer()
+  override val logger = Logging(system, getClass)
 }
 
 object CheckingBalancesClient {
@@ -58,9 +51,14 @@ object CheckingBalancesClient {
     val hostConfig = CheckingBalancesClient.getHostConfig()
     val flow = ClientConnectionPool(hostConfig._2, hostConfig._3)
     val client = CheckingBalancesClient()
-
-    val f = client.call(1L, CheckingBalancesClient.configBaseUrl(hostConfig))
-    client.extractResponse(f)
+    val f = client.requestCheckingBalances(1L, CheckingBalancesClient.configBaseUrl(hostConfig))
+    implicit val executor = system.dispatcher
+    f.onComplete {
+      case Success(x) => {
+        println(s"Success checkingBalances:$x")
+      }
+      case Failure(e) => println(s"FAIL ${e.getMessage}")
+    }
   }
 
 }

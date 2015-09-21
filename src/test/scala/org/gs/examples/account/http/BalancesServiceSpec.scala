@@ -105,15 +105,4 @@ class BalancesServiceSpec extends FlatSpec with Matchers with ScalatestRouteTest
       handled shouldEqual false
     }
   }
-/*
-    Post(s"/ip", IpPairSummaryRequest(ip1Info.ip, "asdfg")) ~> routes ~> check {
-      status shouldBe BadRequest
-      responseAs[String].length should be > 0
-    }
-
-    Post(s"/ip", IpPairSummaryRequest("asdfg", ip1Info.ip)) ~> routes ~> check {
-      status shouldBe BadRequest
-      responseAs[String].length should be > 0
-    }
-  }*/
 }
