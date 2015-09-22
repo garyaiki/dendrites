@@ -15,7 +15,7 @@ import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.collection.mutable.ArrayBuffer
 import scala.util.{ Failure, Success, Try }
-import org.gs.examples.account.httpakka.CheckingAccountClient._
+import org.gs.examples.account.http.actor.CheckingAccountClient._
 
 class BalancesClientsSpec extends WordSpecLike
   with Matchers
@@ -25,6 +25,7 @@ class BalancesClientsSpec extends WordSpecLike
   val config = hostConfig._1
   val flow = ClientConnectionPool(hostConfig._2, hostConfig._3)
   val baseURL = CheckingBalancesClient.configBaseUrl(hostConfig)
+  val badBaseURL = baseURL.dropRight(1)
 
   implicit val system = ActorSystem("akka-aggregator")
   override implicit val materializer = ActorMaterializer()
@@ -66,10 +67,20 @@ class BalancesClientsSpec extends WordSpecLike
   }
  
   it should {
-    "throw UnsupportedContentTypeException for bad ids" in {
+    "not find bad ids" in {
       val futureResult = client.requestCheckingBalances(4L, baseURL)
-      whenReady(futureResult.failed, timeout) { e =>
-        e shouldBe a [UnsupportedContentTypeException]
+      whenReady(futureResult, timeout) { result =>
+        result should equal(Left("Checking account 4 not found"))
+      }
+    }
+  }
+  
+  it should {
+    "fail bad request URLs" in {
+      val futureResult = client.requestCheckingBalances(1L, badBaseURL)
+      whenReady(futureResult, timeout) { result =>
+        result should equal(Left(
+            "FAIL id:1 404 Not Found The requested resource could not be found."))
       }
     }
   }

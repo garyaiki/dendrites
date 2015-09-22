@@ -1,4 +1,4 @@
-package org.gs.examples.account.httpakka
+package org.gs.examples.account.http.actor
 
 
 import akka.actor.{ Actor, ActorContext, ActorRef, ActorSystem, Props }
@@ -25,8 +25,13 @@ class CheckingAccountClient extends Actor with BalancesClients {
   override val logger = Logging(system, getClass)
   def receive = {
     case GetAccountBalances(id: Long) ⇒ {
+      try {
       val f = requestCheckingBalances(id, CheckingBalancesClient.configBaseUrl(hostConfig))
       f pipeTo sender
+      } catch {
+        case e: Exception =>
+          sender() ! akka.actor.Status.Failure(e)
+      }
     }
   }
 }

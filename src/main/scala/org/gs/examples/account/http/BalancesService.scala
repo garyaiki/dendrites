@@ -44,24 +44,28 @@ trait BalancesClients extends BalancesProtocols {
     Http().singleRequest(HttpRequest(uri = uriS))
   }
 
-  def requestCheckingBalances(id: Long, baseUrl: StringBuilder):
-          Future[Either[String, CheckingAccountBalances]] = {
-    
+  def requestCheckingBalances(id: Long, baseUrl: StringBuilder): Future[Either[String, CheckingAccountBalances]] = {
+
     call(id, baseUrl).flatMap { response =>
-      response.status match {
-        case OK         => Unmarshal(response.entity).to[CheckingAccountBalances].map(Right(_))
-        case BadRequest => Future.successful(Left(s"FAIL bad request:${response.status}"))
+        response.status match {
+        case OK => {
+          val st = response.entity.contentType.mediaType.subType
+          st match {
+            case "json" => Unmarshal(response.entity).to[CheckingAccountBalances].map(Right(_))
+            case "plain" => Unmarshal(response.entity).to[String].map(Left(_))
+          }
+        }
+        case BadRequest => Future.successful(Left(s"FAIL id:$id bad request:${response.status}"))
         case _ => Unmarshal(response.entity).to[String].flatMap { entity =>
-          val error = s"Error: checking account balances status:${response.status} entity:$entity"
+          val error = s"FAIL id:$id ${response.status} $entity"
           logger.error(error)
-          Future.failed(new IOException(error))
+          Unmarshal(error).to[String].map(Left(_))
         }
       }
     }
   }
 
-  def requestMMBalances(id: Long, baseUrl: StringBuilder):
-          Future[Either[String, MoneyMarketAccountBalances]] = {
+  def requestMMBalances(id: Long, baseUrl: StringBuilder): Future[Either[String, MoneyMarketAccountBalances]] = {
     call(id, baseUrl).flatMap { response =>
       response.status match {
         case OK         => Unmarshal(response.entity).to[MoneyMarketAccountBalances].map(Right(_))
@@ -75,8 +79,7 @@ trait BalancesClients extends BalancesProtocols {
     }
   }
 
-  def requestSavingsBalances(id: Long, baseUrl: StringBuilder):
-          Future[Either[String, SavingsAccountBalances]] = {
+  def requestSavingsBalances(id: Long, baseUrl: StringBuilder): Future[Either[String, SavingsAccountBalances]] = {
     call(id, baseUrl).flatMap { response =>
       response.status match {
         case OK         => Unmarshal(response.entity).to[SavingsAccountBalances].map(Right(_))

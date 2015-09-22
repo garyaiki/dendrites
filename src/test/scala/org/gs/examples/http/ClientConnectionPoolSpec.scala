@@ -1,4 +1,4 @@
-package org.gs.examples.akka.http
+package org.gs.examples.http
 
 import akka.actor.ActorSystem
 import akka.event.{ LoggingAdapter, Logging }
