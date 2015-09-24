@@ -15,14 +15,8 @@
     </encoder>
   </appender>
   
-  <logger name="org.gs.examples.account.akka.AccountBalanceRetrieverSpec" level="debug" />
-  <logger name="org.gs.examples.account.akka.AccountBalanceRetriever" level="debug" />
-  <logger name="org.gs.examples.account.akka.AccountAggregator" level="debug" />
-  <logger name="org.gs.examples.account.akka.CheckingAccountProxy" level="debug" />
-  <logger name="org.gs.examples.account.akka.MoneyMarketAccountProxy" level="debug" />
-  <logger name="org.gs.examples.account.akka.SavingsAccountProxy" level="debug" />
-  <logger name="org.gs.examples.account.http.actor.CheckingAccountClient" level="debug" />
-  <logger name="org.gs.examples.account.http.actor.CheckingAccountClientSpec" level="debug" />
+  <logger name="org.gs.examples.account.akka" level="debug" />
+  <logger name="org.gs.examples.account.http.actor" level="debug" />
 
 	<root level="info">
 		<appender-ref ref="FILE" />
