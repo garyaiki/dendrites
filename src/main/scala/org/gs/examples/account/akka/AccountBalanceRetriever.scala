@@ -1,22 +1,23 @@
 package org.gs.examples.account.akka
-import scala.collection.immutable.Set
-import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.duration._
-import scala.math.BigDecimal.int2bigDecimal
-import scala.reflect.runtime.universe._
+
 import akka.actor._
 import akka.contrib.pattern.Aggregator
 import org.gs._
 import org.gs.akka.aggregator.{ CantUnderstand, ResultAggregator, TimedOut }
 import org.gs.examples.account._
 import org.gs.examples.account.akka.AccountBalanceRetriever._
+import scala.collection.immutable.Set
+import scala.collection.mutable.ArrayBuffer
+import scala.concurrent.duration._
+import scala.math.BigDecimal.int2bigDecimal
+import scala.reflect.runtime.universe._
 
 /** Sample and test code for the aggregator patter.
   * This is based on Jamie Allen's tutorial at
   * http://jaxenter.com/tutorial-asynchronous-programming-with-akka-actors-46220.html
   */
 
-class AccountBalanceRetriever extends Actor
+class AccountBalanceRetriever( actors: Map[AccountType, Props]) extends Actor
   with MoneyMarketAccountFetcher
   with SavingsAccountFetcher
   with CheckingAccountFetcher
@@ -25,9 +26,20 @@ class AccountBalanceRetriever extends Actor
   with ActorLogging {
 
   import context._
+
+  override def preStart() = {
+    
+    //log.debug(s"Starting ${this.toString()}")
+  }
+  
+  override def preRestart(reason: Throwable, message: Option[Any]) {
+    log.error(reason, "Restarting due to [{}] when processing [{}]",
+        reason.getMessage, message.getOrElse(""))
+  }
+  
   expectOnce {
     case GetCustomerAccountBalances(id, types) ⇒
-      new AccountAggregator(sender(), id, accountTypes)
+      new AccountAggregator(sender(), id, actors)
     case _ ⇒
       sender() ! CantUnderstand
       stop(self)
@@ -41,8 +53,8 @@ class AccountBalanceRetriever extends Actor
     case _: Exception => SupervisorStrategy.Escalate
   }
   */
-  class AccountAggregator(originalSender: ActorRef, id: Long, types: Set[AccountType]) {
-
+  class AccountAggregator(originalSender: ActorRef, id: Long, actors: Map[AccountType, Props]) {
+    val types = actors.keySet
     initResults[AccountType](types)
     if (types.size > 0)
       types foreach {
@@ -60,6 +72,10 @@ class AccountBalanceRetriever extends Actor
 }
 
 object AccountBalanceRetriever {
-  def props = Props[AccountBalanceRetriever]
+  def createProps(actors: Map[AccountType, Props]): Props = {
+    Props(classOf[AccountBalanceRetriever], actors)
+  }
+
+  
   case class GetCustomerAccountBalances(id: Long, accountTypes: Set[AccountType])
 }

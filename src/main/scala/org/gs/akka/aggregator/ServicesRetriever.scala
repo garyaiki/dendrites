@@ -1,13 +1,15 @@
 package org.gs.akka.aggregator
 
+import akka.actor.ActorLogging
+import akka.actor._
+import akka.contrib.pattern.Aggregator
 import scala.collection._
 import scala.concurrent.duration._
 import scala.math.BigDecimal.int2bigDecimal
 import scala.util.{ Success, Failure }
 import scala.concurrent.TimeoutException
 
-import akka.actor._
-import akka.contrib.pattern.Aggregator
+
 import org.gs.akka.aggregator.examples._
 /**
  * Sample and test code for the aggregator patter.
@@ -17,10 +19,18 @@ import org.gs.akka.aggregator.examples._
 
 final case class TellServices[A](id: Long, proxyMessages: List[(Props, AnyRef)], resultType: A)
 
-class ServicesRetriever[A] extends Actor with Aggregator {
-
+class ServicesRetriever[A] extends Actor with Aggregator with ActorLogging {
   import context._
 
+  override def preStart() = {
+    //log.debug(s"Starting ${this.toString()}")
+  }
+  
+  override def preRestart(reason: Throwable, message: Option[Any]) {
+    log.error(reason, "Restarting due to [{}] when processing [{}]",
+        reason.getMessage, message.getOrElse(""))
+  }
+  
   expectOnce {
     case TellServices(id, proxies, resultType) ⇒
       new ServicesAggregator(sender(), id, proxies, resultType)

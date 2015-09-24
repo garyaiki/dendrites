@@ -1,5 +1,6 @@
 package org.gs.akka.aggregator
 
+import akka.actor.ActorLogging
 import akka.actor._
 import akka.contrib.pattern.Aggregator
 import scala.concurrent.duration._
@@ -14,8 +15,17 @@ final case class FinalResponse(qualifiedValues: List[String])
  * An actor sample demonstrating use of unexpect and chaining.
  * This is just an example and not a complete test case.
  */
-class ChainingSample extends Actor with Aggregator {
+class ChainingSample extends Actor with Aggregator with ActorLogging {
 
+  override def preStart() = {
+    //log.debug(s"Starting ${this.toString()}")
+  }
+  
+  override def preRestart(reason: Throwable, message: Option[Any]) {
+    log.error(reason, "Restarting due to [{}] when processing [{}]",
+        reason.getMessage, message.getOrElse(""))
+  }
+  
   expectOnce {
     case InitialRequest(name) ⇒ new MultipleResponseHandler(sender(), name)
   }

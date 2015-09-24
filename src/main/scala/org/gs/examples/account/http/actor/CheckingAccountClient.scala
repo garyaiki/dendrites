@@ -1,7 +1,7 @@
 package org.gs.examples.account.http.actor
 
 
-import akka.actor.{ Actor, ActorContext, ActorRef, ActorSystem, Props }
+import akka.actor.{ Actor, ActorContext, ActorLogging, ActorRef, ActorSystem, Props }
 import akka.contrib.pattern.Aggregator
 import akka.event.{ LoggingAdapter, Logging }
 import akka.http.scaladsl.model._
@@ -15,14 +15,24 @@ import org.gs.examples.account.http.{ BalancesClients, CheckingBalancesClient }
 
 import CheckingAccountClient._
 
-class CheckingAccountClient extends Actor with BalancesClients {
+class CheckingAccountClient extends Actor with BalancesClients with ActorLogging {
   import context._
+
+  override def preStart() = {
+    //log.debug(s"Starting ${this.toString()}")
+  }
+  
+  override def preRestart(reason: Throwable, message: Option[Any]) {
+    log.error(reason, "Restarting due to [{}] when processing [{}]",
+        reason.getMessage, message.getOrElse(""))
+  }
+  
   import CheckingBalancesClient._
   val hostConfig = CheckingBalancesClient.getHostConfig()
   val config = hostConfig._1
   override implicit val system = context.system
   override implicit val materializer = ActorMaterializer()
-  override val logger = Logging(system, getClass)
+  override val logger = log
   def receive = {
     case GetAccountBalances(id: Long) ⇒ {
       try {

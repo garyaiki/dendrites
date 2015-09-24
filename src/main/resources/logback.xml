@@ -5,18 +5,24 @@
 	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
 		<File>./logs/akka-${bySecond}.log</File>
 		<encoder>
-			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
-			</pattern>
+			<pattern>%date{ISO8601} %-5level %logger{36} %X{sourceThread} - %msg%n</pattern>
 		</encoder>
 	</appender>
 
-  <logger name="org.gs.akka.aggregator.AccountBalanceRetriever" level="DEBUG" />
-
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern>%-5level %msg%n</pattern>
-		</encoder>
-	</appender>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%date{ISO8601} %-5level %logger{36} %X{sourceThread} - %msg%n</pattern>
+    </encoder>
+  </appender>
+  
+  <logger name="org.gs.examples.account.akka.AccountBalanceRetrieverSpec" level="debug" />
+  <logger name="org.gs.examples.account.akka.AccountBalanceRetriever" level="debug" />
+  <logger name="org.gs.examples.account.akka.AccountAggregator" level="debug" />
+  <logger name="org.gs.examples.account.akka.CheckingAccountProxy" level="debug" />
+  <logger name="org.gs.examples.account.akka.MoneyMarketAccountProxy" level="debug" />
+  <logger name="org.gs.examples.account.akka.SavingsAccountProxy" level="debug" />
+  <logger name="org.gs.examples.account.http.actor.CheckingAccountClient" level="debug" />
+  <logger name="org.gs.examples.account.http.actor.CheckingAccountClientSpec" level="debug" />
 
 	<root level="info">
 		<appender-ref ref="FILE" />
