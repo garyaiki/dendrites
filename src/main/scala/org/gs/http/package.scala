@@ -2,6 +2,7 @@
   */
 package org.gs
 
+import com.typesafe.config.{ Config, ConfigFactory }
 import org.gs._
 
 /** @author garystruthers
@@ -9,6 +10,21 @@ import org.gs._
   */
 package object http {
 
+    def getHostConfig(ipPath: String, portPath: String, config: Config = ConfigFactory.load()):
+            (Config, String, Int) = {
+    val ip = config.getString(ipPath)
+    val port = config.getInt(portPath)
+    (config, ip, port)
+  }
+
+  def configBaseUrl(pathPath: String, hostConfig: (Config, String, Int)): StringBuilder = {
+    val config = hostConfig._1
+    val ip = hostConfig._2
+    val port = hostConfig._3
+    val path = config.getString(pathPath)
+    createUrl("http", ip, port, path)
+  }
+  
   def createUrl(scheme: String, domain: String, port: Int, path: String): StringBuilder = {
     require(scheme == "http" || scheme == "https", s"scheme:$scheme must be http or https")
     val domainPattern = """[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}""".r

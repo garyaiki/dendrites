@@ -6,7 +6,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.client.RequestBuilding
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.marshalling.ToResponseMarshallable
-import akka.http.scaladsl.model.{ HttpResponse, HttpRequest }
+import akka.http.scaladsl.model.{ HttpEntity, HttpResponse, HttpRequest }
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.unmarshalling.Unmarshal
@@ -23,7 +23,7 @@ import org.gs.examples.account._
 import org.gs.examples.account.http._
 import org.gs.http._
 
-trait BalancesProtocols extends DefaultJsonProtocol {
+sealed trait BalancesProtocols extends DefaultJsonProtocol {
   implicit val getAccountBalancesFormat = jsonFormat1(GetAccountBalances)
   implicit val checkingAccountBalancesFormat = jsonFormat1(CheckingAccountBalances)
   implicit val moneyMarketAccountBalancesFormat = jsonFormat1(MoneyMarketAccountBalances)
@@ -32,27 +32,30 @@ trait BalancesProtocols extends DefaultJsonProtocol {
 
 trait BalancesClients extends BalancesProtocols {
   implicit val system: ActorSystem
-  //implicit def executor: ExecutionContextExecutor
   implicit val materializer: Materializer
-
-  def config: Config
-  val logger: LoggingAdapter
-
+  
   def call(id: Long, baseUrl: StringBuilder): Future[HttpResponse] = {
     val balancesQuery = caseClassToGetQuery(GetAccountBalances(id))
     val uriS = (baseUrl ++ balancesQuery).mkString
     Http().singleRequest(HttpRequest(uri = uriS))
   }
 
-  def requestCheckingBalances(id: Long, baseUrl: StringBuilder): Future[Either[String, CheckingAccountBalances]] = {
+  def mapChecking(entity: HttpEntity): Future[Right[String, AnyRef]] = {
+    Unmarshal(entity).to[CheckingAccountBalances].map(Right(_))
+  }
+  
+  def mapPlain(entity: HttpEntity): Future[Left[String, Nothing]] = {
+    Unmarshal(entity).to[String].map(Left(_))
+  }
+  def requestCheckingBalances(id: Long, baseUrl: StringBuilder, mapper: (HttpEntity) => Future[Right[String, AnyRef]])(implicit logger: LoggingAdapter): Future[Either[String, AnyRef]] = {
 
     call(id, baseUrl).flatMap { response =>
-        response.status match {
+      response.status match {
         case OK => {
           val st = response.entity.contentType.mediaType.subType
           st match {
-            case "json" => Unmarshal(response.entity).to[CheckingAccountBalances].map(Right(_))
-            case "plain" => Unmarshal(response.entity).to[String].map(Left(_))
+            case "json"  => mapper(response.entity) //mapChecking(response.entity) //Unmarshal(response.entity).to[CheckingAccountBalances].map(Right(_))
+            case "plain" => mapPlain(response.entity)
           }
         }
         case BadRequest => Future.successful(Left(s"FAIL id:$id bad request:${response.status}"))
@@ -65,10 +68,16 @@ trait BalancesClients extends BalancesProtocols {
     }
   }
 
-  def requestMMBalances(id: Long, baseUrl: StringBuilder): Future[Either[String, MoneyMarketAccountBalances]] = {
+  def requestMMBalances(id: Long, baseUrl: StringBuilder)(implicit logger: LoggingAdapter): Future[Either[String, MoneyMarketAccountBalances]] = {
     call(id, baseUrl).flatMap { response =>
       response.status match {
-        case OK         => Unmarshal(response.entity).to[MoneyMarketAccountBalances].map(Right(_))
+        case OK => {
+          val st = response.entity.contentType.mediaType.subType
+          st match {
+            case "json"  => Unmarshal(response.entity).to[MoneyMarketAccountBalances].map(Right(_))
+            case "plain" => mapPlain(response.entity)
+          }
+        }
         case BadRequest => Future.successful(Left(s"FAIL bad request:${response.status}"))
         case _ => Unmarshal(response.entity).to[String].flatMap { entity =>
           val error = s"Error: money market accnt balances status:${response.status} entity:$entity"
@@ -79,10 +88,16 @@ trait BalancesClients extends BalancesProtocols {
     }
   }
 
-  def requestSavingsBalances(id: Long, baseUrl: StringBuilder): Future[Either[String, SavingsAccountBalances]] = {
+  def requestSavingsBalances(id: Long, baseUrl: StringBuilder)(implicit logger: LoggingAdapter): Future[Either[String, SavingsAccountBalances]] = {
     call(id, baseUrl).flatMap { response =>
       response.status match {
-        case OK         => Unmarshal(response.entity).to[SavingsAccountBalances].map(Right(_))
+        case OK => {
+          val st = response.entity.contentType.mediaType.subType
+          st match {
+            case "json"  => Unmarshal(response.entity).to[SavingsAccountBalances].map(Right(_))
+            case "plain" => mapPlain(response.entity)
+          }
+        }
         case BadRequest => Future.successful(Left(s"FAIL bad request:${response.status}"))
         case _ => Unmarshal(response.entity).to[String].flatMap { entity =>
           val error = s"Error savings account balances status:${response.status} entity:$entity"
@@ -99,7 +114,7 @@ trait BalancesService extends BalancesProtocols {
   implicit def executor: ExecutionContextExecutor
   implicit val materializer: Materializer
 
-  def config: Config
+  // def config: Config
   val logger: LoggingAdapter
 
   def fetchCheckingBalances(id: Long): Either[String, CheckingAccountBalances] = {
