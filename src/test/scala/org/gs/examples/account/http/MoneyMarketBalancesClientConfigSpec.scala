@@ -1,7 +1,6 @@
 package org.gs.examples.account.http
 import akka.actor.ActorSystem
 import akka.event.{ LoggingAdapter, Logging }
-import akka.http.scaladsl.unmarshalling.Unmarshaller.UnsupportedContentTypeException
 import akka.stream.ActorMaterializer
 import java.util.concurrent.Executors
 import org.gs.akka.http.ClientConnectionPool
@@ -25,16 +24,16 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.{ Failure, Success, Try }
 import org.gs.examples.account.http.actor.CheckingAccountClient._
 
-class MoneyMarketBalancesClientsSpec extends WordSpecLike with Matchers with BalancesClients {
+class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers with BalancesProtocols {
   implicit val system = ActorSystem("akka-aggregator")
   override implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   implicit val executor = Executors.newSingleThreadExecutor()
-  val client = new MoneyMarketBalancesClient()
-  val hostConfig = client.hostConfig
+  val clientConfig = new MoneyMarketBalancesClientConfig()
+  val hostConfig = clientConfig.hostConfig
   val config = hostConfig._1
-  val flow = ClientConnectionPool(hostConfig._2, hostConfig._3)
-  val baseURL = client.baseURL
+  //val flow = ClientConnectionPool(hostConfig._2, hostConfig._3)
+  val baseURL = clientConfig.baseURL
   val badBaseURL = baseURL.dropRight(1)
 
   val timeout = Timeout(3000 millis)
@@ -43,7 +42,7 @@ class MoneyMarketBalancesClientsSpec extends WordSpecLike with Matchers with Bal
     "get balances for id 1" in {
       val id = 1L
       val callFuture = HigherOrderCalls.call(GetAccountBalances(id), baseURL)
-      val responseFuture = HigherOrderCalls.byId(id, callFuture, client.mapMoneyMarket, mapPlain)
+      val responseFuture = HigherOrderCalls.byId(id, callFuture, mapMoneyMarket, mapPlain)
 
       whenReady(responseFuture, timeout) { result =>
         result should equal(Right(MoneyMarketAccountBalances(Some(List((1, 11000.1))))))
@@ -55,7 +54,7 @@ class MoneyMarketBalancesClientsSpec extends WordSpecLike with Matchers with Bal
     "get balances for id 2" in {
       val id = 2L
       val callFuture = HigherOrderCalls.call(GetAccountBalances(id), baseURL)
-      val responseFuture = HigherOrderCalls.byId(id, callFuture, client.mapMoneyMarket, mapPlain)
+      val responseFuture = HigherOrderCalls.byId(id, callFuture, mapMoneyMarket, mapPlain)
       whenReady(responseFuture, timeout) { result =>
         result should equal(Right(MoneyMarketAccountBalances(Some(List((2L, BigDecimal(22000.20)),
           (22L, BigDecimal(22200.22)))))))
@@ -67,7 +66,7 @@ class MoneyMarketBalancesClientsSpec extends WordSpecLike with Matchers with Bal
     "get balances for id 3" in {
       val id = 3L
       val callFuture = HigherOrderCalls.call(GetAccountBalances(id), baseURL)
-      val responseFuture = HigherOrderCalls.byId(id, callFuture, client.mapMoneyMarket, mapPlain)
+      val responseFuture = HigherOrderCalls.byId(id, callFuture, mapMoneyMarket, mapPlain)
       whenReady(responseFuture, timeout) { result =>
         result should equal(Right(MoneyMarketAccountBalances(Some(List((3L, BigDecimal(33000.30)),
           (33L, BigDecimal(33300.33)),
@@ -80,7 +79,7 @@ class MoneyMarketBalancesClientsSpec extends WordSpecLike with Matchers with Bal
     "not find bad ids" in {
       val id = 4L
       val callFuture = HigherOrderCalls.call(GetAccountBalances(id), baseURL)
-      val responseFuture = HigherOrderCalls.byId(id, callFuture, client.mapMoneyMarket, mapPlain)
+      val responseFuture = HigherOrderCalls.byId(id, callFuture, mapMoneyMarket, mapPlain)
       whenReady(responseFuture, timeout) { result =>
         result should equal(Left("Money Market account 4 not found"))
       }
@@ -91,8 +90,7 @@ class MoneyMarketBalancesClientsSpec extends WordSpecLike with Matchers with Bal
     "fail bad request URLs" in {
       val id = 1L
       val callFuture = HigherOrderCalls.call(GetAccountBalances(id), badBaseURL)
-      //val client = new CheckingBalancesClient()
-      val responseFuture = HigherOrderCalls.byId(id, callFuture, client.mapMoneyMarket, mapPlain)
+      val responseFuture = HigherOrderCalls.byId(id, callFuture, mapMoneyMarket, mapPlain)
       whenReady(responseFuture, timeout) { result =>
         result should equal(Left(
           "FAIL id:1 404 Not Found The requested resource could not be found."))

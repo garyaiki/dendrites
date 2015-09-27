@@ -10,23 +10,22 @@ import akka.stream.scaladsl._
 import com.typesafe.config.Config
 import org.gs.akka.aggregator.ResultAggregator
 import org.gs.examples.account.{ Savings, SavingsAccountBalances, GetAccountBalances }
-import org.gs.examples.account.http.{ BalancesClients, SavingsBalancesClient }
+import org.gs.examples.account.http.{ BalancesProtocols, SavingsBalancesClientConfig }
 import org.gs.http._
 
-
-class SavingsAccountClient extends Actor with BalancesClients with ActorLogging {
+class SavingsAccountClient extends Actor with BalancesProtocols with ActorLogging {
   import context._
   override implicit val system = context.system
   override implicit val materializer = ActorMaterializer()
   implicit val logger = log
-  val client = new SavingsBalancesClient()
-  val hostConfig = client.hostConfig
+  val clientConfig = new SavingsBalancesClientConfig()
+  val hostConfig = clientConfig.hostConfig
   val config = hostConfig._1
-
+/*
   override def preStart() = {
-    //log.debug(s"Starting ${this.toString()}")
+    log.debug(s"Starting ${this.toString()}")
   }
-
+*/
   override def preRestart(reason: Throwable, message: Option[Any]) {
     log.error(reason, "Restarting due to [{}] when processing [{}]",
       reason.getMessage, message.getOrElse(""))
@@ -34,8 +33,8 @@ class SavingsAccountClient extends Actor with BalancesClients with ActorLogging 
 
   def receive = {
     case GetAccountBalances(id: Long) ⇒ {
-      val callFuture = HigherOrderCalls.call(GetAccountBalances(id), client.baseURL)
-      val responseFuture = HigherOrderCalls.byId(id, callFuture, client.mapSavings, mapPlain)
+      val callFuture = HigherOrderCalls.call(GetAccountBalances(id), clientConfig.baseURL)
+      val responseFuture = HigherOrderCalls.byId(id, callFuture, mapSavings, mapPlain)
       responseFuture pipeTo sender
     }
   }

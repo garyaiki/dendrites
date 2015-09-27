@@ -19,7 +19,7 @@ import org.gs.examples.account.{
 class BalancesServiceSpec extends FlatSpec with Matchers with ScalatestRouteTest with BalancesService {
   override def testConfigSource = "akka.loglevel = WARNING"
   def config = testConfig
-  override val logger = NoLogging
+  val logger = NoLogging
 
   val goodId = 1L
   val balanceQuery = GetAccountBalances(goodId)
