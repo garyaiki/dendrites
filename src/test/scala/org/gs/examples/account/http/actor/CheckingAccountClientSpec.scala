@@ -1,23 +1,10 @@
 package org.gs.examples.account.http.actor
 
 import akka.actor._
-import akka.http.scaladsl.unmarshalling.Unmarshaller.UnsupportedContentTypeException
-import akka.pattern.ask
 import akka.testkit.{ ImplicitSender, TestActorRef, TestKit }
-
-import org.scalatest.WordSpecLike
-import org.scalatest.MustMatchers
-import org.gs.testdriven.StopSystemAfterAll
-
-import scala.collection.mutable.ArrayBuffer
-import scala.util.Failure
-
 import org.gs.examples.account.{ AccountType, Checking, CheckingAccountBalances, GetAccountBalances }
-
-import org.gs.examples.account.http.actor.CheckingAccountClient._
-import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.time.SpanSugar._
-
+import org.gs.testdriven.StopSystemAfterAll
+import org.scalatest.{MustMatchers,WordSpecLike}
 
 class CheckingAccountClientSpec extends TestKit(ActorSystem("test"))
   with ImplicitSender

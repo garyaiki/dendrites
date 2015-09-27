@@ -68,6 +68,10 @@ trait BalancesClients extends BalancesProtocols {
     }
   }
 
+  def mapMoneyMarket(entity: HttpEntity): Future[Right[String, AnyRef]] = {
+    Unmarshal(entity).to[MoneyMarketAccountBalances].map(Right(_))
+  }
+  
   def requestMMBalances(id: Long, baseUrl: StringBuilder)(implicit logger: LoggingAdapter): Future[Either[String, MoneyMarketAccountBalances]] = {
     call(id, baseUrl).flatMap { response =>
       response.status match {
@@ -88,6 +92,10 @@ trait BalancesClients extends BalancesProtocols {
     }
   }
 
+  def mapSavings(entity: HttpEntity): Future[Right[String, AnyRef]] = {
+    Unmarshal(entity).to[SavingsAccountBalances].map(Right(_))
+  }
+  
   def requestSavingsBalances(id: Long, baseUrl: StringBuilder)(implicit logger: LoggingAdapter): Future[Either[String, SavingsAccountBalances]] = {
     call(id, baseUrl).flatMap { response =>
       response.status match {

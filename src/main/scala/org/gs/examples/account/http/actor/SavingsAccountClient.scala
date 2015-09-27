@@ -9,19 +9,17 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl._
 import com.typesafe.config.Config
 import org.gs.akka.aggregator.ResultAggregator
-import org.gs.examples.account.{ Checking, CheckingAccountBalances, GetAccountBalances }
-import org.gs.examples.account.http.{ BalancesClients, CheckingBalancesClient }
+import org.gs.examples.account.{ Savings, SavingsAccountBalances, GetAccountBalances }
+import org.gs.examples.account.http.{ BalancesClients, SavingsBalancesClient }
 import org.gs.http._
 
-//import CheckingAccountClient._
 
-class CheckingAccountClient extends Actor with BalancesClients with ActorLogging {
+class SavingsAccountClient extends Actor with BalancesClients with ActorLogging {
   import context._
   override implicit val system = context.system
   override implicit val materializer = ActorMaterializer()
   implicit val logger = log
-  //import CheckingBalancesClient._
-  val client = new CheckingBalancesClient()
+  val client = new SavingsBalancesClient()
   val hostConfig = client.hostConfig
   val config = hostConfig._1
 
@@ -37,25 +35,24 @@ class CheckingAccountClient extends Actor with BalancesClients with ActorLogging
   def receive = {
     case GetAccountBalances(id: Long) ⇒ {
       val callFuture = HigherOrderCalls.call(GetAccountBalances(id), client.baseURL)
-      val responseFuture = HigherOrderCalls.byId(id, callFuture, client.mapChecking, mapPlain)
-      //val f = requestCheckingBalances(id, client.baseURL, client.mapChecking)
+      val responseFuture = HigherOrderCalls.byId(id, callFuture, client.mapSavings, mapPlain)
       responseFuture pipeTo sender
     }
   }
 }
 
-object CheckingAccountClient {
-  def props = Props[CheckingAccountClient]
+object SavingsAccountClient {
+  def props = Props[SavingsAccountClient]
 }
 
-trait CheckingAccountCaller {
+trait SavingsAccountCaller {
   this: Actor with ResultAggregator with Aggregator ⇒
 
-  def fetchCheckingAccountsBalance(context: ActorContext, id: Long, recipient: ActorRef) {
-    context.actorOf(CheckingAccountClient.props) ! GetAccountBalances(id)
+  def fetchSavingsAccountsBalance(context: ActorContext, id: Long, recipient: ActorRef) {
+    context.actorOf(SavingsAccountClient.props) ! GetAccountBalances(id)
     expectOnce {
-      case CheckingAccountBalances(balances) ⇒
-        addResult(0, (Checking -> balances), recipient)
+      case SavingsAccountBalances(balances) ⇒
+        addResult(0, (Savings -> balances), recipient)
     }
   }
 }
