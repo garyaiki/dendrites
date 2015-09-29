@@ -2,15 +2,11 @@ package org.gs.examples.account.akka
 
 import akka.actor._
 import akka.contrib.pattern.Aggregator
-import org.gs._
 import org.gs.akka.aggregator.{ CantUnderstand, ResultAggregator, TimedOut }
 import org.gs.examples.account._
 import org.gs.examples.account.akka.AccountBalanceRetriever._
 import scala.collection.immutable.Set
-import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration._
-import scala.math.BigDecimal.int2bigDecimal
-import scala.reflect.runtime.universe._
 
 /** Sample and test code for the aggregator patter.
   * This is based on Jamie Allen's tutorial at
@@ -18,11 +14,9 @@ import scala.reflect.runtime.universe._
   */
 
 class AccountBalanceRetriever(actors: Map[AccountType, Props]) extends Actor
-  with MoneyMarketAccountFetcher
-  with SavingsAccountFetcher
-  with CheckingAccountFetcher
-  with ResultAggregator
   with Aggregator
+  with ResultAggregator
+  with AccountPartialFunctions
   with ActorLogging {
 
   import context._
@@ -54,25 +48,16 @@ class AccountBalanceRetriever(actors: Map[AccountType, Props]) extends Actor
   }
   */
   class AccountAggregator(originalSender: ActorRef, id: Long, actors: Map[AccountType, Props]) {
-
+    def f = pfPlusSender(originalSender)(_)
+    val pf = PartialFunction(f)
+    val msg = new GetAccountBalances(id)
     val types = actors.keySet
     initResults[AccountType](types)
     if (types.size > 0)
       types foreach {
-        case Checking ⇒ {
-          def fWithSender(originalSender: ActorRef)(a: Any) = a match {
-            case CheckingAccountBalances(balances) => addResult(0, (Checking -> balances), originalSender)
-            case MoneyMarketAccountBalances(balances) ⇒ addResult(2, (MoneyMarket -> balances), originalSender)
-          }
-
-          def f = fWithSender(originalSender)(_)
-          val pfCloseOverSender = PartialFunction(f)
-          val msg = new GetAccountBalances(id)
-          fetchAccountsBalance(actors.get(Checking).get, PartialFunction(f), msg, originalSender)
-        }
-        //case Checking    ⇒ fetchCheckingAccountsBalance(actors.get(Checking).get, context, id, originalSender)
-        case Savings     ⇒ fetchSavingsAccountsBalance(context, id, originalSender)
-        case MoneyMarket ⇒ fetchMoneyMarketAccountsBalance(context, id, originalSender)
+        case Checking ⇒ fetchResult(actors.get(Checking).get, pf, msg, originalSender)
+        case Savings     ⇒ fetchResult(actors.get(Savings).get, pf, msg, originalSender)
+        case MoneyMarket ⇒ fetchResult(actors.get(MoneyMarket).get, pf, msg, originalSender)
       }
     else collectResults(originalSender)
 

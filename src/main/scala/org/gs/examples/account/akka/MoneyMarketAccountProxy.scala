@@ -8,11 +8,11 @@ import org.gs.examples.account.{ GetAccountBalances, MoneyMarket, MoneyMarketAcc
 import MoneyMarketAccountProxy._
 
 class MoneyMarketAccountProxy extends Actor with ActorLogging {
-
+  /*
   override def preStart() = {
-    //log.debug(s"Starting ${this.toString()}")
+    log.debug(s"Starting ${this.toString()}")
   }
-  
+  */
   override def preRestart(reason: Throwable, message: Option[Any]) {
     log.error(reason, "Restarting due to [{}] when processing [{}]",
         reason.getMessage, message.getOrElse(""))
@@ -26,16 +26,4 @@ class MoneyMarketAccountProxy extends Actor with ActorLogging {
 
 object MoneyMarketAccountProxy {
   def props = Props[MoneyMarketAccountProxy]
-}
-
-trait MoneyMarketAccountFetcher {
-  this: Actor with ResultAggregator with Aggregator ⇒
-
-  def fetchMoneyMarketAccountsBalance(context: ActorContext, id: Long, recipient: ActorRef) {
-    context.actorOf(Props[MoneyMarketAccountProxy]) ! GetAccountBalances(id)
-    expectOnce {
-      case MoneyMarketAccountBalances(balances) ⇒
-        addResult(2, (MoneyMarket -> balances), recipient)
-    }
-  }
 }
