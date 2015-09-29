@@ -30,12 +30,29 @@ object CheckingAccountProxy {
 
 trait CheckingAccountFetcher {
   this: Actor with ResultAggregator with Aggregator ⇒
+
   
-  def fetchCheckingAccountsBalance(context: ActorContext, id: Long, recipient: ActorRef) {
-    context.actorOf(CheckingAccountProxy.props) ! GetAccountBalances(id)
+  def fetchCheckingAccountsBalance(props: Props, context: ActorContext, id: Long, recipient: ActorRef) {
+    //val props = CheckingAccountProxy.props
+    printf("CheckingAccountProxy Props: %s\n", props)
+    context.actorOf(props) ! GetAccountBalances(id)
     expectOnce {
       case CheckingAccountBalances(balances) ⇒
         addResult(0, (Checking -> balances), recipient)
     }
+  }
+  
+  def fetchAccountsBalance(props: Props, pf:PartialFunction[Any, Unit], msg: Product, recipient: ActorRef) {
+/*    def pf:PartialFunction[Any, Unit] = {
+      case CheckingAccountBalances(balances) ⇒
+        addResult(0, (Checking -> balances), recipient)
+    }*/
+    //val props = CheckingAccountProxy.props
+    print(s"CheckingAccountProxy Props:$props PartialFunction:$pf")
+    this.context.actorOf(props) ! msg
+    expectOnce(pf) /*{
+      case CheckingAccountBalances(balances) ⇒
+        addResult(0, (Checking -> balances), recipient)
+    }*/
   }
 }

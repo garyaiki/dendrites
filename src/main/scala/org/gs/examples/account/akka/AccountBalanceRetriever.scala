@@ -17,7 +17,7 @@ import scala.reflect.runtime.universe._
   * http://jaxenter.com/tutorial-asynchronous-programming-with-akka-actors-46220.html
   */
 
-class AccountBalanceRetriever( actors: Map[AccountType, Props]) extends Actor
+class AccountBalanceRetriever(actors: Map[AccountType, Props]) extends Actor
   with MoneyMarketAccountFetcher
   with SavingsAccountFetcher
   with CheckingAccountFetcher
@@ -28,15 +28,15 @@ class AccountBalanceRetriever( actors: Map[AccountType, Props]) extends Actor
   import context._
 
   override def preStart() = {
-    
+    for ((k, v) <- actors) printf("key: %s, value: %s\n", k, v)
     //log.debug(s"Starting ${this.toString()}")
   }
-  
+
   override def preRestart(reason: Throwable, message: Option[Any]) {
     log.error(reason, "Restarting due to [{}] when processing [{}]",
-        reason.getMessage, message.getOrElse(""))
+      reason.getMessage, message.getOrElse(""))
   }
-  
+
   expectOnce {
     case GetCustomerAccountBalances(id, types) ⇒
       new AccountAggregator(sender(), id, actors)
@@ -54,11 +54,23 @@ class AccountBalanceRetriever( actors: Map[AccountType, Props]) extends Actor
   }
   */
   class AccountAggregator(originalSender: ActorRef, id: Long, actors: Map[AccountType, Props]) {
+
     val types = actors.keySet
     initResults[AccountType](types)
     if (types.size > 0)
       types foreach {
-        case Checking    ⇒ fetchCheckingAccountsBalance(context, id, originalSender)
+        case Checking ⇒ {
+          def fWithSender(originalSender: ActorRef)(a: Any) = a match {
+            case CheckingAccountBalances(balances) => addResult(0, (Checking -> balances), originalSender)
+            case MoneyMarketAccountBalances(balances) ⇒ addResult(2, (MoneyMarket -> balances), originalSender)
+          }
+
+          def f = fWithSender(originalSender)(_)
+          val pfCloseOverSender = PartialFunction(f)
+          val msg = new GetAccountBalances(id)
+          fetchAccountsBalance(actors.get(Checking).get, PartialFunction(f), msg, originalSender)
+        }
+        //case Checking    ⇒ fetchCheckingAccountsBalance(actors.get(Checking).get, context, id, originalSender)
         case Savings     ⇒ fetchSavingsAccountsBalance(context, id, originalSender)
         case MoneyMarket ⇒ fetchMoneyMarketAccountsBalance(context, id, originalSender)
       }
@@ -76,6 +88,5 @@ object AccountBalanceRetriever {
     Props(classOf[AccountBalanceRetriever], actors)
   }
 
-  
   case class GetCustomerAccountBalances(id: Long, accountTypes: Set[AccountType])
 }
