@@ -1,4 +1,4 @@
-package org.gs.examples.account.akka
+package org.gs.examples.account.http.actor
 
 import akka.actor._
 import akka.contrib.pattern.Aggregator
@@ -13,11 +13,9 @@ import scala.concurrent.duration._
   * http://jaxenter.com/tutorial-asynchronous-programming-with-akka-actors-46220.html
   */
 
-class AccountBalanceRetriever(actors: Map[AccountType, Props]) extends Actor
-  with Aggregator
+class AccountBalanceRestfulRetriever(actors: Map[AccountType, Props]) extends Actor
   with ResultAggregator
-  with AccountPartialFunctions
-  with ActorLogging {
+  with AccountRestfulPartialFunctions {
 
   import context._
 
@@ -68,9 +66,9 @@ class AccountBalanceRetriever(actors: Map[AccountType, Props]) extends Actor
   }
 }
 
-object AccountBalanceRetriever {
+object AccountBalanceRestfulRetriever {
   def createProps(actors: Map[AccountType, Props]): Props = {
-    Props(classOf[AccountBalanceRetriever], actors)
+    Props(classOf[AccountBalanceRestfulRetriever], actors)
   }
 
   case class GetCustomerAccountBalances(id: Long, accountTypes: Set[AccountType])
