@@ -13,22 +13,13 @@ import scala.concurrent.duration._
   * http://jaxenter.com/tutorial-asynchronous-programming-with-akka-actors-46220.html
   */
 
-class AccountBalanceRetriever(actors: Map[AccountType, Props]) extends Actor
-  with Aggregator
-  with ResultAggregator
-  with AccountPartialFunctions
-  with ActorLogging {
+class AccountBalanceRetriever(actors: Map[AccountType, Props]) extends AccountBalanceActor
+  with AccountPartialFunctions {
 
   import context._
 
   override def preStart() = {
-    for ((k, v) <- actors) printf("key: %s, value: %s\n", k, v)
-    //log.debug(s"Starting ${this.toString()}")
-  }
-
-  override def preRestart(reason: Throwable, message: Option[Any]) {
-    log.error(reason, "Restarting due to [{}] when processing [{}]",
-      reason.getMessage, message.getOrElse(""))
+    for ((k, v) <- actors) log.debug(s"key:$k, value:$v")
   }
 
   expectOnce {
@@ -39,33 +30,13 @@ class AccountBalanceRetriever(actors: Map[AccountType, Props]) extends Actor
       stop(self)
   }
 
-  override val supervisorStrategy = 
+  override val supervisorStrategy =
     OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1.second) {
-    case _: ArithmeticException => SupervisorStrategy.Resume
-    case _: NullPointerException => SupervisorStrategy.Restart
-    case _: IllegalArgumentException => SupervisorStrategy.Stop
-    case _: Exception => SupervisorStrategy.Escalate
-  }
-
-  class AccountAggregator(originalSender: ActorRef, id: Long, actors: Map[AccountType, Props]) {
-    def f = pfPlusSender(originalSender)(_)
-    val pf = PartialFunction(f)
-    val msg = new GetAccountBalances(id)
-    val types = actors.keySet
-    initResults[AccountType](types)
-    if (types.size > 0)
-      types foreach {
-        case Checking ⇒ fetchResult(actors.get(Checking).get, pf, msg, originalSender)
-        case Savings  ⇒ fetchResult(actors.get(Savings).get, pf, msg, originalSender)
-        case MoneyMarket ⇒ fetchResult(actors.get(MoneyMarket).get, pf, msg, originalSender)
-      }
-    else collectResults(originalSender)
-
-    system.scheduler.scheduleOnce(1.second, self, TimedOut)
-    expect {
-      case TimedOut ⇒ collectResults(originalSender, force = true)
+      case _: ArithmeticException      => SupervisorStrategy.Resume
+      case _: NullPointerException     => SupervisorStrategy.Restart
+      case _: IllegalArgumentException => SupervisorStrategy.Stop
+      case _: Exception                => SupervisorStrategy.Escalate
     }
-  }
 }
 
 object AccountBalanceRetriever {

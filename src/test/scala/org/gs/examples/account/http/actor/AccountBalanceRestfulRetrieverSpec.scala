@@ -7,7 +7,7 @@ import akka.contrib.pattern.Aggregator
 import akka.testkit.{ ImplicitSender, TestKit }
 import org.gs._
 import org.gs.examples.account._
-import org.gs.examples.account.akka.AccountBalanceRetriever._
+import org.gs.examples.account.http.actor.AccountBalanceRestfulRetriever._
 import org.scalatest.FunSuiteLike
 import org.scalatest.Matchers
 import scala.concurrent.duration._
@@ -33,7 +33,7 @@ class AccountBalanceRestfulRetrieverSpec extends TestKit(ActorSystem("test")) wi
     //val s = Set(Savings)
     //val ks: Set[AccountType] = actors.keySet
     system.actorOf(props) ! GetCustomerAccountBalances(1, Set(Savings))
-    receiveOne(10.seconds) match {
+    receiveOne(3.seconds) match {
       case result: IndexedSeq[Product] ⇒ {
         assert(result(1) === (Savings,Some(List((1,111000.1)))))
       }

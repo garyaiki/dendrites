@@ -1,12 +1,23 @@
 package org.gs.examples.account.http.actor
 
-import akka.actor.{ Actor, ActorContext, ActorLogging, ActorRef }
-import akka.contrib.pattern.Aggregator
+import akka.actor.{ Actor, ActorLogging, ActorRef }
 import org.gs.akka.aggregator.ResultAggregator
 import org.gs.examples.account.{ Checking, CheckingAccountBalances, MoneyMarket,
-                  MoneyMarketAccountBalances, Savings, SavingsAccountBalances,  GetAccountBalances }
+                                 MoneyMarketAccountBalances, Savings, SavingsAccountBalances }
+import org.gs.examples.account.akka.PartialFunctionPlusSender
 
-trait AccountRestfulPartialFunctions {
+/** "expectOnce" result handler used by CheckingAccountClient, MoneyMarketAccountClient, and
+ *  SavingsAccountClient child actors. Before creating actor curry originalSender then transform
+ *  pfPlusSender from a regular function to a PartialFunction
+ *  {{{
+ *  def f = pfPlusSender(originalSender)(_)
+ *  val pf = PartialFunction(f)
+ *  }}}
+ *  
+ * @author garystruthers
+ *
+ */
+trait AccountRestfulPartialFunctions extends PartialFunctionPlusSender {
   this: Actor with ResultAggregator ⇒
   def pfPlusSender(originalSender: ActorRef)(a: Any) = a match {
     case Right(CheckingAccountBalances(balances)) =>
