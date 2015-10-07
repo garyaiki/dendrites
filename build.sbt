@@ -17,8 +17,8 @@ resolvers += "spray repo" at "http://repo.spray.io"
 libraryDependencies ++= {
   val akkaV = "2.3.11"
   val scalaTestV = "2.2.5"
-  val algebirdV = "0.10.2"
-  val akkaHttpV = "1.0-RC4"
+  val algebirdV = "0.11.0"
+  val akkaHttpV = "1.0"
   Seq("org.scalatest" % "scalatest_2.11" % scalaTestV % "test",
     "junit" % "junit" % "4.11" % "test",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
@@ -32,6 +32,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-contrib" % akkaV,
     "com.typesafe.akka" %% "akka-persistence-experimental" % akkaV,
     "com.typesafe.akka" %% "akka-stream-experimental" % akkaHttpV,
+    "com.typesafe.akka" %% "akka-stream-testkit-experimental" % akkaHttpV,
     "com.typesafe.akka" %% "akka-http-core-experimental" % akkaHttpV,
     "com.typesafe.akka" %% "akka-http-experimental" % akkaHttpV,
     "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaHttpV,
