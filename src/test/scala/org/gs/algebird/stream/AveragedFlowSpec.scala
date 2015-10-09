@@ -1,6 +1,6 @@
 /**
   */
-package org.gs.algebird
+package org.gs.algebird.stream
 
 import akka.actor.ActorSystem
 import akka.event.{ LoggingAdapter, Logging }
