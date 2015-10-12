@@ -8,21 +8,17 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{ Flow, Keep }
 import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
 import com.twitter.algebird._
-import com.twitter.algebird.CMSHasherImplicits._
-import java.net.InetAddress
-import language.postfixOps
 import org.scalatest.FlatSpecLike
 import org.scalatest.Matchers._
 import org.gs.aggregator._
 import org.gs.algebird._
-import org.gs.fixtures.{ CaseClassLike, InetAddressesBuilder, TrigUtils }
+import org.gs.fixtures.TrigUtils
 import scala.collection.immutable.Range
-import util.Random
 
 /** @author garystruthers
   *
   */
-class DecayedValueFlowSpec extends FlatSpecLike with TrigUtils with InetAddressesBuilder {
+class DecayedValueFlowSpec extends FlatSpecLike with TrigUtils {
   implicit val system = ActorSystem("akka-aggregator")
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
@@ -30,9 +26,8 @@ class DecayedValueFlowSpec extends FlatSpecLike with TrigUtils with InetAddresse
   val sines = genSineWave(100, 0 to 360)
   val days = Range.Double(0.0, 361.0, 1.0)
   val sinesZip = sines.zip(days)
-  val curriedToDecayedValues = curryToDecayedValues(10.0) _
   val decayedValues: Flow[Seq[(Double, Double)], Seq[DecayedValue], Unit] =
-    Flow[Seq[(Double, Double)]].map(curriedToDecayedValues)
+    Flow[Seq[(Double, Double)]].map(toDecayedValues(10.0) _)
   val (pub, sub) = TestSource.probe[Seq[(Double, Double)]]
     .via(decayedValues)
     .toMat(TestSink.probe[Seq[DecayedValue]])(Keep.both).run()

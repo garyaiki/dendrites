@@ -569,9 +569,9 @@ package object algebird {
     * @param monoid used to scan from initial value
     * @return seq of DecayedValues
     */
-  def toDecayedValues(xs: Seq[(Double, Double)],
-    halfLife: Double,
-    last: Option[DecayedValue] = None)(implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
+  def toDecayedValues( halfLife: Double, last: Option[DecayedValue] = None)
+                     (xs: Seq[(Double, Double)])
+                     (implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
     val z = last match {
       case None => monoid.zero
       case Some(x) => x
@@ -593,7 +593,8 @@ package object algebird {
     *
     * @tparam A: Int, Long
     * @param xs sequence of integers or longs
-    * @param agg HyperLogLogAggregator, initialized with # of bits for hashing
+    * @param ev implicit HyperLogLogLike typeclass to create HLL
+    * @param agg implicit HyperLogLogAggregator, initialized with # of bits for hashing
     * @return an HLL
     */
   def createHLL[A: HyperLogLogLike](xs: Seq[A])(

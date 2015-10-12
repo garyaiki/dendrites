@@ -22,7 +22,7 @@ class DecayedValueSpec extends FlatSpecLike with TrigUtils {
   val meanDay270 = sines.take(270).sum / 270
   val meanDay360 = sines.take(360).sum / 360
   val sinesZip = sines.zip(days)
-  val decayedValuesten = toDecayedValues(sinesZip, 10.0, None)
+  val decayedValuesten = toDecayedValues(10.0, None)(sinesZip)
 
   "A DecayedValue average with halfLife 10.0" should "exceed the mean at 90º" in {
     assert(decayedValuesten(90).average(10.0) > meanDay90)

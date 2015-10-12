@@ -23,7 +23,6 @@ class AveragedFlowSpec extends FlatSpecLike with TestValuesBuilder {
   implicit val logger = Logging(system, getClass)
 
   "An AveragedValue Flow of BigDecimals" should "be near its mean" in {
-    val avgBDFlow: Flow[Seq[BigDecimal], AveragedValue, Unit] = Flow[Seq[BigDecimal]].map(avg[BigDecimal])
 
     val (pubBD, subBD) = TestSource.probe[Seq[BigDecimal]]
       .via(avgBDFlow)
@@ -40,7 +39,6 @@ class AveragedFlowSpec extends FlatSpecLike with TestValuesBuilder {
   }
 
   "An AveragedValue Flow of BigInts" should "be near its mean" in {
-    val avgBIFlow: Flow[Seq[BigInt], AveragedValue, Unit] = Flow[Seq[BigInt]].map(avg[BigInt])
 
     val (pubBI, subBI) = TestSource.probe[Seq[BigInt]]
       .via(avgBIFlow)
@@ -55,7 +53,6 @@ class AveragedFlowSpec extends FlatSpecLike with TestValuesBuilder {
   }
 
   "An AveragedValue Flow of Doubles" should "be near their mean" in {
-    val avgDFlow: Flow[Seq[Double], AveragedValue, Unit] = Flow[Seq[Double]].map(avg[Double])
 
     val (pubD, subD) = TestSource.probe[Seq[Double]]
       .via(avgDFlow)
@@ -70,7 +67,6 @@ class AveragedFlowSpec extends FlatSpecLike with TestValuesBuilder {
   }
 
   "An AveragedValue Flow of Floats" should "be near their mean" in {
-    val avgFFlow: Flow[Seq[Float], AveragedValue, Unit] = Flow[Seq[Float]].map(avg[Float])
 
     val (pubF, subF) = TestSource.probe[Seq[Float]]
       .via(avgFFlow)
@@ -85,7 +81,6 @@ class AveragedFlowSpec extends FlatSpecLike with TestValuesBuilder {
   }
 
   "An AveragedValue Flow of Ints" should "be near their mean" in {
-    val avgIFlow: Flow[Seq[Int], AveragedValue, Unit] = Flow[Seq[Int]].map(avg[Int])
 
     val (pubI, subI) = TestSource.probe[Seq[Int]]
       .via(avgIFlow)
@@ -100,7 +95,6 @@ class AveragedFlowSpec extends FlatSpecLike with TestValuesBuilder {
   }
 
   "An AveragedValue Flow of Longs" should "be near their mean" in {
-    val avgLFlow: Flow[Seq[Long], AveragedValue, Unit] = Flow[Seq[Long]].map(avg[Long])
 
     val (pubL, subL) = TestSource.probe[Seq[Long]]
       .via(avgLFlow)

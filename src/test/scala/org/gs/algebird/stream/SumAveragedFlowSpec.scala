@@ -11,6 +11,7 @@ import org.scalatest.FlatSpecLike
 import org.scalatest.Matchers._
 import org.gs.aggregator._
 import org.gs.algebird._
+import org.gs.algebird.stream._
 import org.gs.fixtures.{ CaseClassLike, TestValuesBuilder }
 import com.twitter.algebird._
 
@@ -23,13 +24,11 @@ class SumAveragedFlowSpec extends FlatSpecLike with TestValuesBuilder {
   implicit val logger = Logging(system, getClass)
 
   "A sum of AveragedValues" should "be near the sum of their means" in {
-    val avgBDFlow: Flow[Seq[BigDecimal], Seq[AveragedValue], Unit] =
-            Flow[Seq[BigDecimal]].map(avg[BigDecimal]).grouped(2)
     val sumAvgBDFlow: Flow[Seq[AveragedValue], AveragedValue, Unit] =
             Flow[Seq[AveragedValue]].map(sumAverageValues)
 
     val (pubBD, subBD) = TestSource.probe[Seq[BigDecimal]]
-      .via(avgBDFlow)
+      .via(avgBDFlow.grouped(2))
       .via(sumAvgBDFlow)
       .toMat(TestSink.probe[AveragedValue])(Keep.both)
       .run()
