@@ -6,7 +6,7 @@ import org.scalatest.{ FlatSpecLike, Matchers }
 import org.scalatest.Matchers._
 import org.gs._
 import org.gs.algebird._
-import org.gs.fixtures.{ CaseClassLike, TestValuesBuilder }
+import org.gs.fixtures.TestValuesBuilder
 import com.twitter.algebird.HyperLogLogAggregator
 /** @author garystruthers
   *

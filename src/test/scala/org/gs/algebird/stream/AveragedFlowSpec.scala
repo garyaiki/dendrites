@@ -11,7 +11,7 @@ import org.scalatest.FlatSpecLike
 import org.scalatest.Matchers._
 import org.gs.aggregator._
 import org.gs.algebird._
-import org.gs.fixtures.{ CaseClassLike, TestValuesBuilder }
+import org.gs.fixtures.TestValuesBuilder
 import com.twitter.algebird._
 
 /** @author garystruthers

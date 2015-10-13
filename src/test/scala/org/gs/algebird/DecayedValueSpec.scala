@@ -6,7 +6,7 @@ import com.twitter.algebird._
 import org.scalatest.FlatSpecLike
 //import org.scalatest.Matchers._
 import org.gs._
-import org.gs.fixtures.{ CaseClassLike, NScalaTimeUtils, TestValuesBuilder, TrigUtils }
+import org.gs.fixtures.{ NScalaTimeUtils, TestValuesBuilder, TrigUtils }
 import org.gs.algebird._
 
 /** @author garystruthers
