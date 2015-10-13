@@ -17,13 +17,13 @@ package object stream {
     * @return AveragedValue
     */
   def avgFlow[A: TypeTag: Numeric]: Flow[Seq[A], AveragedValue, Unit] = Flow[Seq[A]].map(avg[A])
-  
+
   /** Flow to sum sequences of AveragedValues to a single AveragedValue
     *
     * @return AveragedValue
     */
   def sumAvgFlow: Flow[Seq[AveragedValue], AveragedValue, Unit] =
-            Flow[Seq[AveragedValue]].map(sumAverageValues)
+    Flow[Seq[AveragedValue]].map(sumAverageValues)
 
   /** Flow to estimate size of HLL
     *
@@ -53,13 +53,15 @@ package object stream {
   def maxFlow[A: Ordering]: Flow[Seq[A], A, Unit] =
     Flow[Seq[A]].map(max[A])
 
+  def minFlow[A: Ordering]: Flow[Seq[A], A, Unit] =
+    Flow[Seq[A]].map(min[A])
+
   def flattenFlow[A: Ordering]: Flow[Seq[Option[A]], Seq[A], Unit] =
     Flow[Seq[Option[A]]].map(_.flatten)
 
   def collectRightFlow[A, B]: Flow[Seq[Either[A, B]], Seq[B], Unit] =
     Flow[Seq[Either[A, B]]].collect(PartialFunction(filterRight))
 
-  
   /** Flow to find average of sequence of BigDecimals
     *
     * @return AveragedValue
