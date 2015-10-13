@@ -23,41 +23,39 @@ class SumAveragedFlowSpec extends FlatSpecLike with TestValuesBuilder {
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
 
+   
   "A sum of AveragedValues" should "be near the sum of their means" in {
-    val sumAvgBDFlow: Flow[Seq[AveragedValue], AveragedValue, Unit] =
-            Flow[Seq[AveragedValue]].map(sumAverageValues)
-
-    val (pubBD, subBD) = TestSource.probe[Seq[BigDecimal]]
+    val (pub, sub) = TestSource.probe[Seq[BigDecimal]]
       .via(avgBDFlow.grouped(2))
-      .via(sumAvgBDFlow)
+      .via(sumAvgFlow)
       .toMat(TestSink.probe[AveragedValue])(Keep.both)
       .run()
-    subBD.request(2)
-    pubBD.sendNext(bigDecimals)
-    pubBD.sendNext(bigDecimals2)
-    val avBD = subBD.expectNext()
-    pubBD.sendComplete()
-    subBD.expectComplete()
+    sub.request(2)
+    pub.sendNext(bigDecimals)
+    pub.sendNext(bigDecimals2)
+    val avBD = sub.expectNext()
+    pub.sendComplete()
+    sub.expectComplete()
     assert(avBD.count === bigDecimals.size + bigDecimals2.size)
     val mBD = mean(bigDecimals ++ bigDecimals2)
     assert(avBD.value === (mBD.right.get.toDouble +- 0.005))
   }
-
+/* 
   "A sum of AveragedValues" should "combine steps into 1 Flow" in {
-    val avgSBDFlow: Flow[Seq[BigDecimal], AveragedValue, Unit] = 
+    val avgFlow: Flow[Seq[BigDecimal], AveragedValue, Unit] = 
             Flow[Seq[BigDecimal]].map(avg[BigDecimal]).grouped(2).map(sumAverageValues)
 
-    val (pubBD, subBD) = TestSource.probe[Seq[BigDecimal]]
-      .via(avgSBDFlow)
+    val (pub, sub) = TestSource.probe[Seq[BigDecimal]]
+      .via(avgFlow)
       .toMat(TestSink.probe[AveragedValue])(Keep.both)
       .run()
-    subBD.request(2)
-    pubBD.sendNext(bigDecimals)
-    pubBD.sendNext(bigDecimals2)
-    val avSBD = subBD.expectNext()
-    pubBD.sendComplete()
-    subBD.expectComplete()
+    sub.request(2)
+    pub.sendNext(bigDecimals)
+    pub.sendNext(bigDecimals2)
+    val avSBD = sub.expectNext()
+    pub.sendComplete()
+    sub.expectComplete()
     val mSBD = mean(bigDecimals ++ bigDecimals2)
     assert(avSBD.value === (mSBD.right.get.toDouble +- 0.005))
-  }
+  }*/
 }

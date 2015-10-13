@@ -24,15 +24,15 @@ class AveragedFlowSpec extends FlatSpecLike with TestValuesBuilder {
 
   "An AveragedValue Flow of BigDecimals" should "be near its mean" in {
 
-    val (pubBD, subBD) = TestSource.probe[Seq[BigDecimal]]
-      .via(avgBDFlow)
+    val (pub, sub) = TestSource.probe[Seq[BigDecimal]]
+      .via(avgFlow)
       .toMat(TestSink.probe[AveragedValue])(Keep.both)
       .run()
-    subBD.request(1)
-    pubBD.sendNext(bigDecimals)
-    val avBD = subBD.expectNext()
-    pubBD.sendComplete()
-    subBD.expectComplete()
+    sub.request(1)
+    pub.sendNext(bigDecimals)
+    val avBD = sub.expectNext()
+    pub.sendComplete()
+    sub.expectComplete()
     assert(avBD.count === bigDecimals.size)
     val mBD = mean(bigDecimals)
     assert(avBD.value === (mBD.right.get.toDouble +- 0.005))
@@ -40,13 +40,13 @@ class AveragedFlowSpec extends FlatSpecLike with TestValuesBuilder {
 
   "An AveragedValue Flow of BigInts" should "be near its mean" in {
 
-    val (pubBI, subBI) = TestSource.probe[Seq[BigInt]]
-      .via(avgBIFlow)
+    val (pub, sub) = TestSource.probe[Seq[BigInt]]
+      .via(avgFlow)
       .toMat(TestSink.probe[AveragedValue])(Keep.both)
       .run()
-    subBI.request(1)
-    pubBI.sendNext(bigInts)
-    val avBI = subBI.expectNext()
+    sub.request(1)
+    pub.sendNext(bigInts)
+    val avBI = sub.expectNext()
     val mBI = mean(bigInts)
     assert(avBI.count === bigInts.size)
     assert(avBI.value === (mBI.right.get.toDouble +- 0.5))
@@ -54,13 +54,13 @@ class AveragedFlowSpec extends FlatSpecLike with TestValuesBuilder {
 
   "An AveragedValue Flow of Doubles" should "be near their mean" in {
 
-    val (pubD, subD) = TestSource.probe[Seq[Double]]
-      .via(avgDFlow)
+    val (pub, sub) = TestSource.probe[Seq[Double]]
+      .via(avgFlow)
       .toMat(TestSink.probe[AveragedValue])(Keep.both)
       .run()
-    subD.request(1)
-    pubD.sendNext(doubles)
-    val avD = subD.expectNext()
+    sub.request(1)
+    pub.sendNext(doubles)
+    val avD = sub.expectNext()
     val mD = mean(doubles)
     assert(avD.count === doubles.size)
     assert(avD.value === (mD.right.get +- 0.005))
@@ -68,13 +68,13 @@ class AveragedFlowSpec extends FlatSpecLike with TestValuesBuilder {
 
   "An AveragedValue Flow of Floats" should "be near their mean" in {
 
-    val (pubF, subF) = TestSource.probe[Seq[Float]]
-      .via(avgFFlow)
+    val (pub, sub) = TestSource.probe[Seq[Float]]
+      .via(avgFlow)
       .toMat(TestSink.probe[AveragedValue])(Keep.both)
       .run()
-    subF.request(1)
-    pubF.sendNext(floats)
-    val avF = subF.expectNext()
+    sub.request(1)
+    pub.sendNext(floats)
+    val avF = sub.expectNext()
     val mF = mean(floats)
     assert(avF.count === floats.size)
     assert(avF.value === (mF.right.get.toDouble +- 0.005))
@@ -82,13 +82,13 @@ class AveragedFlowSpec extends FlatSpecLike with TestValuesBuilder {
 
   "An AveragedValue Flow of Ints" should "be near their mean" in {
 
-    val (pubI, subI) = TestSource.probe[Seq[Int]]
-      .via(avgIFlow)
+    val (pub, sub) = TestSource.probe[Seq[Int]]
+      .via(avgFlow)
       .toMat(TestSink.probe[AveragedValue])(Keep.both)
       .run()
-    subI.request(1)
-    pubI.sendNext(ints)
-    val avI = subI.expectNext()
+    sub.request(1)
+    pub.sendNext(ints)
+    val avI = sub.expectNext()
     val mI = mean(ints)
     assert(avI.count === ints.size)
     assert(avI.value === (mI.right.get.toDouble +- 0.5))
@@ -96,13 +96,13 @@ class AveragedFlowSpec extends FlatSpecLike with TestValuesBuilder {
 
   "An AveragedValue Flow of Longs" should "be near their mean" in {
 
-    val (pubL, subL) = TestSource.probe[Seq[Long]]
-      .via(avgLFlow)
+    val (pub, sub) = TestSource.probe[Seq[Long]]
+      .via(avgFlow)
       .toMat(TestSink.probe[AveragedValue])(Keep.both)
       .run()
-    subL.request(1)
-    pubL.sendNext(longs)
-    val avL = subL.expectNext()
+    sub.request(1)
+    pub.sendNext(longs)
+    val avL = sub.expectNext()
     val mL = mean(longs)
     assert(avL.count === ints.size)
     assert(avL.value === (mL.right.get.toDouble +- 0.5))
