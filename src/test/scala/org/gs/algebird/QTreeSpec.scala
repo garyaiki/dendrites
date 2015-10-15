@@ -7,15 +7,15 @@ import com.twitter.algebird._
 import org.scalatest.FlatSpecLike
 import org.scalatest.Matchers._
 import org.gs._
-import org.gs.fixtures.TestValuesBuilder
+//import org.gs.fixtures.TestValuesBuilder
 import org.gs.algebird._
-import org.gs.algebird.typeclasses.QTreeLike
+//import org.gs.algebird.typeclasses.QTreeLike
 import org.gs.algebird.fixtures.QTreeBuilder
 
 /** @author garystruthers
   *
   */
-class QTreeSpec extends FlatSpecLike with TestValuesBuilder with QTreeBuilder {
+class QTreeSpec extends FlatSpecLike with QTreeBuilder {
 
   "A QTree" should "be created from a Sequence of BigDecimal" in {
     val size = bigDecimals.size
