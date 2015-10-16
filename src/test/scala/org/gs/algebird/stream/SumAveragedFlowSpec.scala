@@ -40,22 +40,4 @@ class SumAveragedFlowSpec extends FlatSpecLike with TestValuesBuilder {
     val mBD = mean(bigDecimals ++ bigDecimals2)
     assert(avBD.value === (mBD.right.get.toDouble +- 0.005))
   }
-/* 
-  "A sum of AveragedValues" should "combine steps into 1 Flow" in {
-    val avgFlow: Flow[Seq[BigDecimal], AveragedValue, Unit] = 
-            Flow[Seq[BigDecimal]].map(avg[BigDecimal]).grouped(2).map(sumAverageValues)
-
-    val (pub, sub) = TestSource.probe[Seq[BigDecimal]]
-      .via(avgFlow)
-      .toMat(TestSink.probe[AveragedValue])(Keep.both)
-      .run()
-    sub.request(2)
-    pub.sendNext(bigDecimals)
-    pub.sendNext(bigDecimals2)
-    val avSBD = sub.expectNext()
-    pub.sendComplete()
-    sub.expectComplete()
-    val mSBD = mean(bigDecimals ++ bigDecimals2)
-    assert(avSBD.value === (mSBD.right.get.toDouble +- 0.005))
-  }*/
 }

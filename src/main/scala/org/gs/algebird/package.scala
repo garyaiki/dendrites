@@ -13,7 +13,7 @@ import org.gs.algebird.typeclasses.QTreeLike
   * classes.
   * @see org.gs.package
   *
-  * ScalaTests are in src/test/scala/org.gs.algebird
+  * @author Gary Struthers
   *
   * ==AveragedValue find local average then sum them to global average==
   * @see org.gs.algebird.AveragedSpec.scala
@@ -333,7 +333,6 @@ import org.gs.algebird.typeclasses.QTreeLike
   * val eithLong = 2847L
   * val quotient = div(eithLong.right.get, 47L)
   * }}}
-  * @author garystruthers
   */
 package object algebird {
 
