@@ -12,9 +12,11 @@ class MoneyMarketAccountClientSpec extends TestKit(ActorSystem("test"))
   with MustMatchers
   with StopSystemAfterAll {
 
+  val clientConfig = MoneyMarketAccountClient.clientConfig
+
   "A MoneyMarketAccountClient" should {
     "get balances when id 1 exists" in {
-      val client = system.actorOf(MoneyMarketAccountClient.props, "MoneyMarket")
+      val client = system.actorOf(MoneyMarketAccountClient.props(clientConfig), "MoneyMarket")
       client ! GetAccountBalances(1L)
       val obj = expectMsg(Right(MoneyMarketAccountBalances(Some(List((1, 11000.1))))))
     }
@@ -22,7 +24,7 @@ class MoneyMarketAccountClientSpec extends TestKit(ActorSystem("test"))
 
   it should {
     "get balances when id 2 exists" in {
-      val client = system.actorOf(MoneyMarketAccountClient.props, "MoneyMarket2")
+      val client = system.actorOf(MoneyMarketAccountClient.props(clientConfig), "MoneyMarket2")
 
       client ! GetAccountBalances(2L)
       val obj = expectMsg(Right(MoneyMarketAccountBalances(Some(List((2L, BigDecimal(22000.20)),
@@ -32,7 +34,7 @@ class MoneyMarketAccountClientSpec extends TestKit(ActorSystem("test"))
 
   it should {
     "get balances when id 3 exists" in {
-      val client = system.actorOf(MoneyMarketAccountClient.props, "MoneyMarket3")
+      val client = system.actorOf(MoneyMarketAccountClient.props(clientConfig), "MoneyMarket3")
 
       client ! GetAccountBalances(3L)
       val obj = expectMsg(Right(MoneyMarketAccountBalances(Some(List((3L, BigDecimal(33000.30)),
@@ -43,7 +45,7 @@ class MoneyMarketAccountClientSpec extends TestKit(ActorSystem("test"))
 
   it should {
     "fail get balances when id 4 doesn't exist" in {
-      val client = system.actorOf(MoneyMarketAccountClient.props, "MoneyMarket4")
+      val client = system.actorOf(MoneyMarketAccountClient.props(clientConfig), "MoneyMarket4")
 
       client ! GetAccountBalances(4L)
             val obj = expectMsg(Left("Money Market account 4 not found"))

@@ -13,16 +13,15 @@ import org.gs.examples.account.{ MoneyMarket, MoneyMarketAccountBalances, GetAcc
 import org.gs.examples.account.http.{ BalancesProtocols, MoneyMarketBalancesClientConfig }
 import org.gs.http._
 
-
-class MoneyMarketAccountClient extends Actor with BalancesProtocols with ActorLogging {
+class MoneyMarketAccountClient(clientConfig: MoneyMarketBalancesClientConfig) extends Actor with
+        BalancesProtocols with ActorLogging {
   import context._
   override implicit val system = context.system
   override implicit val materializer = ActorMaterializer()
   implicit val logger = log
-  val clientConfig = new MoneyMarketBalancesClientConfig()
   val hostConfig = clientConfig.hostConfig
   val config = hostConfig._1
-/* for debugging
+  /* for debugging
   override def preStart() = {
     log.debug(s"Starting ${this.toString()}")
   }
@@ -34,22 +33,25 @@ class MoneyMarketAccountClient extends Actor with BalancesProtocols with ActorLo
 
   def receive = {
     case GetAccountBalances(id: Long) ⇒ {
-      val callFuture = HigherOrderCalls.call(GetAccountBalances(id), clientConfig.baseURL)
-      val responseFuture = HigherOrderCalls.byId(id, callFuture, mapMoneyMarket, mapPlain)
+      val callFuture = HttpCalls.call(GetAccountBalances(id), clientConfig.baseURL)
+      val responseFuture = HttpCalls.byId(id, callFuture, mapPlain, mapMoneyMarket)
       responseFuture pipeTo sender
     }
   }
 }
 
 object MoneyMarketAccountClient {
-  def props = Props[MoneyMarketAccountClient]
+  val clientConfig = new MoneyMarketBalancesClientConfig()
+  def props(clientConfig: MoneyMarketBalancesClientConfig): Props = Props(new MoneyMarketAccountClient(clientConfig))
 }
 
 trait MoneyMarketAccountCaller {
   this: Actor with ResultAggregator with Aggregator ⇒
 
+  val clientConfig = new MoneyMarketBalancesClientConfig()
+
   def fetchMoneyMarketAccountsBalance(context: ActorContext, id: Long, recipient: ActorRef) {
-    context.actorOf(MoneyMarketAccountClient.props) ! GetAccountBalances(id)
+    context.actorOf(MoneyMarketAccountClient.props(clientConfig)) ! GetAccountBalances(id)
     expectOnce {
       case MoneyMarketAccountBalances(balances) ⇒
         addResult(0, (MoneyMarket -> balances), recipient)

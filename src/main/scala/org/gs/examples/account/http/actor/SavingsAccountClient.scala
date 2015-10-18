@@ -13,12 +13,12 @@ import org.gs.examples.account.{ Savings, SavingsAccountBalances, GetAccountBala
 import org.gs.examples.account.http.{ BalancesProtocols, SavingsBalancesClientConfig }
 import org.gs.http._
 
-class SavingsAccountClient extends Actor with BalancesProtocols with ActorLogging {
+class SavingsAccountClient(clientConfig: SavingsBalancesClientConfig) extends Actor with
+        BalancesProtocols with ActorLogging {
   import context._
   override implicit val system = context.system
   override implicit val materializer = ActorMaterializer()
   implicit val logger = log
-  val clientConfig = new SavingsBalancesClientConfig()
   val hostConfig = clientConfig.hostConfig
   val config = hostConfig._1
 /*
@@ -33,22 +33,25 @@ class SavingsAccountClient extends Actor with BalancesProtocols with ActorLoggin
 
   def receive = {
     case GetAccountBalances(id: Long) ⇒ {
-      val callFuture = HigherOrderCalls.call(GetAccountBalances(id), clientConfig.baseURL)
-      val responseFuture = HigherOrderCalls.byId(id, callFuture, mapSavings, mapPlain)
-      responseFuture pipeTo sender
+      val callFuture = HttpCalls.call(GetAccountBalances(id), clientConfig.baseURL)
+      HttpCalls.byId(id, callFuture, mapPlain, mapSavings) pipeTo sender
     }
   }
 }
 
 object SavingsAccountClient {
-  def props = Props[SavingsAccountClient]
+  val clientConfig = new SavingsBalancesClientConfig()
+  def props(clientConfig: SavingsBalancesClientConfig): Props =
+    Props(new SavingsAccountClient(clientConfig))
 }
 
 trait SavingsAccountCaller {
   this: Actor with ResultAggregator with Aggregator ⇒
 
+  val clientConfig = new SavingsBalancesClientConfig()
+
   def fetchSavingsAccountsBalance(context: ActorContext, id: Long, recipient: ActorRef) {
-    context.actorOf(SavingsAccountClient.props) ! GetAccountBalances(id)
+    context.actorOf(SavingsAccountClient.props(clientConfig)) ! GetAccountBalances(id)
     expectOnce {
       case SavingsAccountBalances(balances) ⇒
         addResult(0, (Savings -> balances), recipient)
