@@ -15,7 +15,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /** @author garystruthers
   *
   */
-object HigherOrderCalls {
+object HttpCalls {
 
   def call(cc: Product, baseUrl: StringBuilder)(implicit system: ActorSystem,
           materializer: Materializer): Future[HttpResponse] = {
@@ -24,11 +24,11 @@ object HigherOrderCalls {
     Http().singleRequest(HttpRequest(uri = uriS))
   }
   
-  def byId(id: Long,
-           caller: Future[HttpResponse],
-           mapRight: (HttpEntity) => Future[Right[String, AnyRef]],
-           mapLeft: (HttpEntity) => Future[Left[String, Nothing]])
-                    (implicit system: ActorSystem, logger: LoggingAdapter,
+  def byId(id: Long, 
+           caller: Future[HttpResponse], 
+           mapLeft: (HttpEntity) => Future[Left[String, Nothing]], 
+           mapRight: (HttpEntity) => Future[Right[String, AnyRef]])(
+                    implicit system: ActorSystem, logger: LoggingAdapter, 
                               materializer: Materializer): Future[Either[String, AnyRef]] = {
 
     caller.flatMap { response =>
