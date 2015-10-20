@@ -41,8 +41,8 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
   "A MoneyBalancesClient" should {
     "get balances for id 1" in {
       val id = 1L
-      val callFuture = HttpCalls.call(GetAccountBalances(id), baseURL)
-      val responseFuture = HttpCalls.byId(id, callFuture, mapPlain, mapMoneyMarket)
+      val callFuture = call(GetAccountBalances(id), baseURL)
+      val responseFuture = byId(id, callFuture, mapPlain, mapMoneyMarket)
 
       whenReady(responseFuture, timeout) { result =>
         result should equal(Right(MoneyMarketAccountBalances(Some(List((1, 11000.1))))))
@@ -53,8 +53,8 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
   it should {
     "get balances for id 2" in {
       val id = 2L
-      val callFuture = HttpCalls.call(GetAccountBalances(id), baseURL)
-      val responseFuture = HttpCalls.byId(id, callFuture, mapPlain, mapMoneyMarket)
+      val callFuture = call(GetAccountBalances(id), baseURL)
+      val responseFuture = byId(id, callFuture, mapPlain, mapMoneyMarket)
       whenReady(responseFuture, timeout) { result =>
         result should equal(Right(MoneyMarketAccountBalances(Some(List((2L, BigDecimal(22000.20)),
           (22L, BigDecimal(22200.22)))))))
@@ -65,8 +65,8 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
   it should {
     "get balances for id 3" in {
       val id = 3L
-      val callFuture = HttpCalls.call(GetAccountBalances(id), baseURL)
-      val responseFuture = HttpCalls.byId(id, callFuture, mapPlain, mapMoneyMarket)
+      val callFuture = call(GetAccountBalances(id), baseURL)
+      val responseFuture = byId(id, callFuture, mapPlain, mapMoneyMarket)
       whenReady(responseFuture, timeout) { result =>
         result should equal(Right(MoneyMarketAccountBalances(Some(List((3L, BigDecimal(33000.30)),
           (33L, BigDecimal(33300.33)),
@@ -78,8 +78,8 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
   it should {
     "not find bad ids" in {
       val id = 4L
-      val callFuture = HttpCalls.call(GetAccountBalances(id), baseURL)
-      val responseFuture = HttpCalls.byId(id, callFuture, mapPlain, mapMoneyMarket)
+      val callFuture = call(GetAccountBalances(id), baseURL)
+      val responseFuture = byId(id, callFuture, mapPlain, mapMoneyMarket)
       whenReady(responseFuture, timeout) { result =>
         result should equal(Left("Money Market account 4 not found"))
       }
@@ -89,8 +89,8 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
   it should {
     "fail bad request URLs" in {
       val id = 1L
-      val callFuture = HttpCalls.call(GetAccountBalances(id), badBaseURL)
-      val responseFuture = HttpCalls.byId(id, callFuture, mapPlain, mapMoneyMarket)
+      val callFuture = call(GetAccountBalances(id), badBaseURL)
+      val responseFuture = byId(id, callFuture, mapPlain, mapMoneyMarket)
       whenReady(responseFuture, timeout) { result =>
         result should equal(Left(
           "FAIL id:1 404 Not Found The requested resource could not be found."))

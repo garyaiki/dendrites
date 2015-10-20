@@ -338,7 +338,7 @@ package object algebird {
 
   /** Sums sequence elements
     *
-    * Implicit Semigroup defined in Algebird
+    * Implicit Algebird Semigroup 
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Semigroup Semigroup]]
     * @example [[org.gs.algebird.SemigroupSpec]]
     *
@@ -350,7 +350,7 @@ package object algebird {
 
   /** Sums sequence elements
     *
-    * Implicit Monoid defined in Algebird
+    * Implicit Algebird Monoid 
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Monoid Monoid]]
     * @example [[org.gs.algebird.MonoidSpec]]
     *
@@ -362,7 +362,7 @@ package object algebird {
 
   /** Negates an element
     *
-    * Implicit Group defined in Algebird
+    * Implicit Algebird Group 
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Group Group]]
     * @example [[org.gs.algebird.GroupSpec]]
     *
@@ -374,7 +374,7 @@ package object algebird {
 
   /** Subtracts an element from another
     *
-    * Implicit Group defined in Algebird
+    * Implicit Algebird Group
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Group Group]]
     * @example [[org.gs.algebird.GroupSpec]]
     *
@@ -387,7 +387,7 @@ package object algebird {
 
   /** Multiplies 2 elements
     *
-    * Implicit Ring defined in Algebird and as Field in this file
+    * Implicit Algebird Ring, some types extended to Field in this file
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Ring Ring]]
     * @example [[org.gs.algebird.RingSpec]]
     *
@@ -400,7 +400,7 @@ package object algebird {
 
   /** Multiplies sequence elements
     *
-    * Implicit Ring defined in Algebird and as Field in this file
+    * Implicit Algebird Ring, some types extended to Field in this file
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Ring Ring]]
     * @example [[org.gs.algebird.RingSpec]]
     *
@@ -412,7 +412,7 @@ package object algebird {
 
   /** Reciprocal of an element
     *
-    * Implicit Field defined in this file and Algebird
+    * Implicit Algebird Field, some Field types in this file
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Field Field]]
     * @example [[org.gs.algebird.FieldSpec]]
     *
@@ -424,7 +424,7 @@ package object algebird {
 
   /** Divide an element by another using Field
     *
-    * Implicit Field defined in this file and Algebird
+    * Implicit Algebird Field, some Field types in this file
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Field Field]]
     * @example [[org.gs.algebird.FieldSpec]]
     *
@@ -461,9 +461,8 @@ package object algebird {
 
   /** Field[BigDecimal] implicit
     *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Field Field]]
-    *
     * BigDecimal implicits supported in Algebird with NumericRing[BigDecimal]
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Field Field]]
     */
   implicit object BigDecimalField extends NumericRing[BigDecimal] with Field[BigDecimal] {
     override def inverse(v: BigDecimal): BigDecimal = {
@@ -474,9 +473,8 @@ package object algebird {
 
   /** Field[BigInt] implicit
     *
-    * @see http://twitter.github.io/algebird/#com.twitter.algebird.Field
-    *
     * BigInt implicits supported in Algebird with NumericRing[BigInt]
+    * @see http://twitter.github.io/algebird/#com.twitter.algebird.Field
     */
   implicit object BigIntField extends NumericRing[BigInt] with Field[BigInt] {
     override def div(l: BigInt, r: BigInt): BigInt = {
@@ -491,9 +489,8 @@ package object algebird {
 
   /** Field[Int] implicit
     *
-    * @see http://twitter.github.io/algebird/#com.twitter.algebird.Field
-    *
     * Int implicits supported in Algebird with IntRing
+    * @see http://twitter.github.io/algebird/#com.twitter.algebird.Field
     */
   implicit object IntField extends Field[Int] {
     def zero = IntRing.zero
@@ -514,10 +511,8 @@ package object algebird {
 
   /** Field[Long] implicit
     *
-    * @see http://twitter.github.io/algebird/#com.twitter.algebird.Field
-    *
     * Long implicits supported in Algebird with LongRing
-    *
+    * @see http://twitter.github.io/algebird/#com.twitter.algebird.Field
     */
   implicit object LongField extends Field[Long] {
     def zero = LongRing.zero
@@ -536,16 +531,22 @@ package object algebird {
     }
   }
 
-  /** map sequence[A] to sequence[B]
+  /** map sequence[A] to sequence[B] using Algebird Functor
     *
-    * @example [[org.gs.algebird.keyvalue.TypedKeyValue]]
+    * @example [[http://twitter.github.io/algebird/#com.twitter.algebird.Functor]]
     *
+    * @tparam A original element
+    * @tparam B returned element
+    * @param fa Seq[A]
+    * @param f A => B
+    * @param ev implicit Functor[Seq]
+    * @return Seq[B]
     */
   implicit object SeqFunctor extends Functor[Seq] {
     def map[A, B](fa: Seq[A])(f: A => B): Seq[B] = (for (a <- fa) yield f(a))
   }
 
-  /** Compose 2 functors map Seq[A] -> Seq[B] -> Seq[C]
+  /** Compose 2 functors map Seq[A] -> Seq[B] -> Seq[C] using Algebird Functor
     *
     * @tparam A original element
     * @tparam B intermediate element
@@ -563,6 +564,7 @@ package object algebird {
   /** AverageValue of a Seq of Numeric elements. First create AveragedValue for each element then
     * sum them
     *
+		* @note when there's more than 1 Numeric type in scope you must use explicitly typed avg below
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedGroup$ AveragedGroup]]
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Averager$ Averager]]
@@ -570,7 +572,7 @@ package object algebird {
     *
     * @tparam A: Numeric, elements must be Numeric
     * @param xs Seq
-    * @param evidence implicit Numeric[A], be careful to avoid more than 1 Numeric type in scope
+    * @param evidence implicit Numeric[A]
     * @return AverageValue
     */
   def avg[A: Numeric](xs: Seq[A]): AveragedValue = {
