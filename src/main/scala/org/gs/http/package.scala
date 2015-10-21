@@ -98,30 +98,32 @@ package object http {
     * @param materializer implicit Materializer
     * @return Future[HttpResponse]
     */
-  def call(cc: Product, baseURL: StringBuilder)(implicit system: ActorSystem,
+  def typedQuery(cc: Product, baseURL: StringBuilder)(implicit system: ActorSystem, 
           materializer: Materializer): Future[HttpResponse] = {
     val balancesQuery = caseClassToGetQuery(cc)
     val uriS = (baseURL ++ balancesQuery).mkString
     Http().singleRequest(HttpRequest(uri = uriS))
   }
   
-  /**	Map response
+  /**	Map response to a Future Either Left for error, Right for good result
 		*
-		* @param id
-	  * @param caller
-    * @param mapLeft
-    * @param mapRight
-    * @param system
-    * @param logger
-    * @param materializer
-    * @return
+	  * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.http.scaladsl.model.HttpResponse]]
+	  * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.http.scaladsl.unmarshalling.Unmarshal]]
+		* @example [[org.gs.examples.account.http.actor.CheckingAccountClient]]
+	  * 
+	  * @param caller future returned by query
+    * @param mapLeft plain text response to Left
+    * @param mapRight json response to Right
+    * @param system implicit ActorSystem
+    * @param logger implicit LoggingAdapter
+    * @param materializer implicit Materializer
+    * @return Future[Either[String, AnyRef]]
     */
-def byId(id: Long, 
-           caller: Future[HttpResponse], 
-           mapLeft: (HttpEntity) => Future[Left[String, Nothing]], 
-           mapRight: (HttpEntity) => Future[Right[String, AnyRef]])(
-                    implicit system: ActorSystem, logger: LoggingAdapter, 
-                              materializer: Materializer): Future[Either[String, AnyRef]] = {
+def typedResponse(caller: Future[HttpResponse], 
+                  mapLeft: (HttpEntity) => Future[Left[String, Nothing]], 
+                  mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
+                 (implicit system: ActorSystem, logger: LoggingAdapter, 
+                  materializer: Materializer): Future[Either[String, AnyRef]] = {
 
     caller.flatMap { response =>
       response.status match {
@@ -132,9 +134,9 @@ def byId(id: Long,
             case "plain" => mapLeft(response.entity)
           }
         }
-        case BadRequest => Future.successful(Left(s"FAIL id:$id bad request:${response.status}"))
+        case BadRequest => Future.successful(Left(s"FAIL bad request:${response.status}"))
         case _ => Unmarshal(response.entity).to[String].flatMap { entity =>
-          val error = s"FAIL id:$id ${response.status} $entity"
+          val error = s"FAIL ${response.status} $entity"
           logger.error(error)
           Unmarshal(error).to[String].map(Left(_))
         }
@@ -142,21 +144,29 @@ def byId(id: Long,
     }
   }
 
-
-  def callById(baseURL: StringBuilder,
+  /** Query server, map response
+    *
+    * Create a Partial Function by initializing first parameter list
+    *
+    * @example [[org.gs.examples.account.http.CheckingCallSpec]]
+    *   
+    * @param baseURL
+    * @param mapLeft plain text response to Left
+    * @param mapRight json response to Right
+    * @param cc case class mapped to GET query
+    * @param system implicit ActorSystem
+    * @param logger implicit LoggingAdapter
+    * @param materializer implicit Materializer
+    * @return Future[Either[String, AnyRef]]
+    */
+  def typedQueryResponse(baseURL: StringBuilder, 
                mapLeft: (HttpEntity) => Future[Left[String, Nothing]], 
                mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
-               (cc: Product)
-               (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
-          Future[Either[String, AnyRef]] = {
+              (cc: Product)
+              (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer): 
+               Future[Either[String, AnyRef]] = {
     
-    val callFuture = call(cc, baseURL)
-    val fields = ccToMap(cc).filterKeys(_ != "$outer")
-    val id = fields.get("id") match {
-      case Some(x) => x match {
-        case x: Long => x
-      }
-    }
-    byId(id, callFuture, mapLeft, mapRight)
+    val callFuture = typedQuery(cc, baseURL)
+    typedResponse(callFuture, mapLeft, mapRight)
   }
 }

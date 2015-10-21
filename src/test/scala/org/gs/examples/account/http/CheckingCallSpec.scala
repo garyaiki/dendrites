@@ -35,8 +35,8 @@ class CheckingCallSpec extends WordSpecLike with Matchers with BalancesProtocols
 
   val timeout = Timeout(3000 millis)
 
-  def partial = callById(baseURL, mapPlain, mapChecking) _
-  def badPartial = callById(badBaseURL, mapPlain, mapChecking) _
+  def partial = typedQueryResponse(baseURL, mapPlain, mapChecking) _
+  def badPartial = typedQueryResponse(badBaseURL, mapPlain, mapChecking) _
   
   "A CheckingCallClient" should {
     "get balances for id 1" in {
@@ -92,7 +92,7 @@ class CheckingCallSpec extends WordSpecLike with Matchers with BalancesProtocols
       
       whenReady(responseFuture, timeout) { result =>
         result should equal(Left(
-          "FAIL id:1 404 Not Found The requested resource could not be found."))
+          "FAIL 404 Not Found The requested resource could not be found."))
       }
     }
   }
