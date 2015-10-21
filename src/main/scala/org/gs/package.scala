@@ -8,9 +8,11 @@ package org
 package object gs {
 
   /** Extract case class elements into a Map
-    *  
-    *  @param cc case class (Product is supertype) 
-    *  @return map of field names and values
+    *
+    * @example [[org.gs.http.caseClassToGetQuery]]
+    *   
+    * @param cc case class (Product is supertype) 
+    * @return map of field names and values
     */
   def ccToMap(cc: Product) = cc.getClass.getDeclaredFields.foldLeft(Map[String, Any]()) {
     (a, f) =>
@@ -20,10 +22,12 @@ package object gs {
   
   /** Does the indexed case class field have desired type? 
     *  
-    *  @param case class (Product is supertype)
-    *  @param ele field element
-    *  @param theType type to match
-    *  @return true if element has theType
+    * @example [[org.gs.examples.account.akka.AccountBalanceRetrieverSpec]]
+    * 
+    * @param case class (Product is supertype)
+    * @param ele field element
+    * @param theType type to match
+    * @return true if element has theType
     */
   def isElementEqual(p: Product, ele: Int, theType: Any): Boolean = {
     p match {

@@ -10,6 +10,7 @@ import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
 import org.scalatest.{ FlatSpecLike, Matchers }
 import org.gs.algebird._
 import org.gs.fixtures.TestValuesBuilder
+import org.gs.stream._
 
 /** @author garystruthers
   *

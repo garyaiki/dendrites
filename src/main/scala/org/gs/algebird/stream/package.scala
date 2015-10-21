@@ -15,32 +15,6 @@ import scala.reflect.runtime.universe._
   */
 package object stream {
 
-  /** Flow to flatten a sequence of Options
-    *
-    * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
-    * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.MaxFlowSpec]]
-    * 
-    * @tparam A elements that extend Ordering
-    * @return values
-    */
-  def flattenFlow[A: Ordering]: Flow[Seq[Option[A]], Seq[A], Unit] =
-          Flow[Seq[Option[A]]].map(_.flatten)
-
-  /** Flow to collect the Right side value from a sequence of Either
-    *
-    * filterRight is converted to a Partial Function then passed to collect
-    * 
-    * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.MaxFlowSpec]]
-    *
-    * @tparam A Left
-    * @tparam B Right
-    * @return value contained in Right
-    */
-  def collectRightFlow[A, B]: Flow[Seq[Either[A, B]], Seq[B], Unit] =
-          Flow[Seq[Either[A, B]]].collect(PartialFunction(filterRight))
-
   /** Flow to average sequence of Numerics. When Numerics are ambiguous use typed avg Flows below
     *
     * @see [[http://www.scala-lang.org/api/2.11.7/scala-reflect/#scala.reflect.api.TypeTags]]
