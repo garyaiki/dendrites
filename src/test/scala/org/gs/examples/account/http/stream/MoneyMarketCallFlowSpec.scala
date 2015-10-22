@@ -33,7 +33,6 @@ class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesPr
   implicit val executor = Executors.newSingleThreadExecutor()
   val clientConfig = new MoneyMarketBalancesClientConfig()
   val hostConfig = clientConfig.hostConfig
-  val config = hostConfig._1
   val baseURL = clientConfig.baseURL
   val badBaseURL = baseURL.dropRight(1)
 

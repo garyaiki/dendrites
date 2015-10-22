@@ -33,7 +33,6 @@ class SavingsCallFlowSpec extends WordSpecLike with Matchers with BalancesProtoc
   implicit val executor = Executors.newSingleThreadExecutor()
   val clientConfig = new SavingsBalancesClientConfig()
   val hostConfig = clientConfig.hostConfig
-  val config = hostConfig._1
   val baseURL = clientConfig.baseURL
   val badBaseURL = baseURL.dropRight(1)
 
