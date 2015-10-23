@@ -2,8 +2,8 @@ package org.gs.examples.account.http.stream
 
 import akka.actor.ActorSystem
 import akka.event.{ LoggingAdapter, Logging }
-import akka.stream.{ActorAttributes, ActorMaterializer}
-import akka.stream.scaladsl.{ Keep, Flow }
+import akka.stream.{ActorAttributes, ActorMaterializer, FlowShape, UniformFanOutShape}
+import akka.stream.scaladsl.{ Broadcast, Keep, Flow, FlowGraph, Source, Zip }
 import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
 import java.util.concurrent.Executors
 import org.gs.akka.http.ClientConnectionPool
@@ -40,8 +40,8 @@ class ParallelCallFlowSpec extends WordSpecLike with Matchers with BalancesProto
   def checkingPartial = typedQueryResponse(checkingBaseURL, mapPlain, mapChecking) _
   def checkingBadPartial = typedQueryResponse(checkingBadBaseURL, mapPlain, mapChecking) _
 
-  def checkingFlow: Flow[Product, Future[Either[String, AnyRef]], Unit] = Flow[Product].map(checkingPartial)
-  def checkingBadFlow: Flow[Product, Future[Either[String, AnyRef]], Unit] = Flow[Product].map(checkingBadPartial)
+  def checkingFlow: Flow[Product, Either[String, AnyRef], Unit] = Flow[Product].mapAsync(1)(checkingPartial)
+  def checkingBadFlow: Flow[Product, Either[String, AnyRef], Unit] = Flow[Product].mapAsync(1)(checkingBadPartial)
   
   val moneyMarketClientConfig = new MoneyMarketBalancesClientConfig()
   val moneyMarketHostConfig = moneyMarketClientConfig.hostConfig
@@ -50,8 +50,9 @@ class ParallelCallFlowSpec extends WordSpecLike with Matchers with BalancesProto
 
   def moneyMarketPartial = typedQueryResponse(moneyMarketBaseURL, mapPlain, mapMoneyMarket) _
   def moneyMarketBadPartial = typedQueryResponse(moneyMarketBadBaseURL, mapPlain, mapMoneyMarket) _
-  def flow: Flow[Product, Future[Either[String, AnyRef]], Unit] = Flow[Product].map(moneyMarketPartial)
-  def badFlow: Flow[Product, Future[Either[String, AnyRef]], Unit] = Flow[Product].map(moneyMarketBadPartial)
+  def moneyMarketFlow: Flow[Product, Either[String, AnyRef], Unit] = Flow[Product].mapAsync(1)(moneyMarketPartial)
+  def moneyMarketBadFlow: Flow[Product, Future[Either[String, AnyRef]], Unit] = Flow[Product].map(moneyMarketBadPartial)
+  def moneyMarketAsyncFlow: Flow[Product, Either[String, AnyRef], Unit] = Flow[Product].mapAsync(2)(moneyMarketPartial)
 
   val savingsClientConfig = new SavingsBalancesClientConfig()
   val savingsHostConfig = savingsClientConfig.hostConfig
@@ -59,27 +60,38 @@ class ParallelCallFlowSpec extends WordSpecLike with Matchers with BalancesProto
   val savingsBadBaseURL = savingsBaseURL.dropRight(1)
   
   def source = TestSource.probe[Product]
-  def sink = TestSink.probe[Future[Either[String, AnyRef]]]
-  
-  val testFlow = source.via(checkingFlow).toMat(sink)(Keep.both)
-  val blockingTestFlow = source.via(checkingFlow).withAttributes(ActorAttributes.dispatcher("akka-aggregator.blocking-dispatcher")).toMat(sink)(Keep.both)
+  def sink = TestSink.probe[(Either[String, AnyRef],Either[String, AnyRef])]
+  def zipper = Zip[Either[String, AnyRef],Either[String, AnyRef]]
+  import FlowGraph.Implicits._ 
 
+  val fg = FlowGraph.partial() { implicit builder =>
+    val bcast: UniformFanOutShape[Product, Product] = builder.add(Broadcast[Product](2))
+    val check: FlowShape[Product,Either[String, AnyRef]] = builder.add(checkingFlow)
+    val mm: FlowShape[Product,Either[String, AnyRef]] = builder.add(moneyMarketFlow)
+    val zip = builder.add(zipper)
+    
+    bcast ~> check ~> zip.in0
+    bcast ~> mm ~> zip.in1
+    FlowShape(bcast.in, zip.out)
+  }.named("partial")
+  val wrappedFlow = Flow.wrap(fg)
+  
   "A ParallelCallFlowClient" should {
     "get balances for id 1" in {
       val id = 1L
-      val (pub, sub) = testFlow.run()
+      val (pub, sub) = source
+      .via(wrappedFlow)
+      .toMat(sink)(Keep.both).run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
-      val responseFuture = sub.expectNext()
+      val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
 
-      whenReady(responseFuture, timeout) { result =>
-        result should equal(Right(CheckingAccountBalances(Some(List((1, 1000.1))))))
-      }
+      response should equal(Right(CheckingAccountBalances(Some(List((1,1000.1))))),Right(MoneyMarketAccountBalances(Some(List((1,11000.1))))))
     }
   }
-
+/*
   it should {
     "get balances for id 2" in {
       val id = 2L
@@ -145,5 +157,5 @@ class ParallelCallFlowSpec extends WordSpecLike with Matchers with BalancesProto
           "FAIL 404 Not Found The requested resource could not be found."))
       }
     }
-  }
+  }*/
 }
