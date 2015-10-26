@@ -16,6 +16,7 @@ import org.gs.examples.account.{
   SavingsAccountBalances
 }
 import org.gs.examples.account.http._
+import org.gs.examples.account.http.stream._
 import org.gs.http._
 import org.gs.testdriven.StopSystemAfterAll
 import org.scalatest.{ Matchers, WordSpecLike }
@@ -31,22 +32,13 @@ class CheckingCallFlowSpec extends WordSpecLike with Matchers with BalancesProto
   override implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   implicit val executor = Executors.newSingleThreadExecutor()
-  val clientConfig = new CheckingBalancesClientConfig()
-  val hostConfig = clientConfig.hostConfig
-  val baseURL = clientConfig.baseURL
-  val badBaseURL = baseURL.dropRight(1)
-
   val timeout = Timeout(3000 millis)
 
-  def partial = typedQueryResponse(baseURL, mapPlain, mapChecking) _
-  def badPartial = typedQueryResponse(badBaseURL, mapPlain, mapChecking) _
-  
   def source = TestSource.probe[Product]
-  def flow: Flow[Product, Future[Either[String, AnyRef]], Unit] = Flow[Product].map(partial)
-  def badFlow: Flow[Product, Future[Either[String, AnyRef]], Unit] = Flow[Product].map(badPartial)
   def sink = TestSink.probe[Future[Either[String, AnyRef]]]
-  val testFlow = source.via(flow).toMat(sink)(Keep.both)
-  
+  val ccf = new CheckingCallFlow
+  val testFlow = source.via(ccf.flow).toMat(sink)(Keep.both)
+
   "A CheckingCallFlowClient" should {
     "get balances for id 1" in {
       val id = 1L
@@ -114,6 +106,13 @@ class CheckingCallFlowSpec extends WordSpecLike with Matchers with BalancesProto
       }
     }
   }
+  
+  val clientConfig = new CheckingBalancesClientConfig()
+  val badBaseURL = clientConfig.baseURL.dropRight(1)
+
+  def badPartial = typedQueryResponse(badBaseURL, mapPlain, mapChecking) _
+
+  def badFlow: Flow[Product, Future[Either[String, AnyRef]], Unit] = Flow[Product].map(badPartial)
 
   it should {
     "fail bad request URLs" in {

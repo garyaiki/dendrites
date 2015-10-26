@@ -31,21 +31,12 @@ class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesPr
   override implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   implicit val executor = Executors.newSingleThreadExecutor()
-  val clientConfig = new MoneyMarketBalancesClientConfig()
-  val hostConfig = clientConfig.hostConfig
-  val baseURL = clientConfig.baseURL
-  val badBaseURL = baseURL.dropRight(1)
-
   val timeout = Timeout(3000 millis)
 
-  def partial = typedQueryResponse(baseURL, mapPlain, mapMoneyMarket) _
-  def badPartial = typedQueryResponse(badBaseURL, mapPlain, mapMoneyMarket) _
-  
   def source = TestSource.probe[Product]
-  def flow: Flow[Product, Future[Either[String, AnyRef]], Unit] = Flow[Product].map(partial)
-  def badFlow: Flow[Product, Future[Either[String, AnyRef]], Unit] = Flow[Product].map(badPartial)
   def sink = TestSink.probe[Future[Either[String, AnyRef]]]
-  val testFlow = source.via(flow).toMat(sink)(Keep.both)
+  val mmcf = new MoneyMarketCallFlow
+  val testFlow = source.via(mmcf.flow).toMat(sink)(Keep.both)
   
   "A MoneyMarketCallFlowClient" should {
     "get balances for id 1" in {
@@ -62,7 +53,6 @@ class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesPr
       }
     }
   }
-
 
   it should {
     "get balances for id 2" in {
@@ -114,6 +104,11 @@ class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesPr
       }
     }
   }
+
+  val clientConfig = new MoneyMarketBalancesClientConfig()
+  val badBaseURL = clientConfig.baseURL.dropRight(1)
+  def badPartial = typedQueryResponse(badBaseURL, mapPlain, mapMoneyMarket) _
+  def badFlow: Flow[Product, Future[Either[String, AnyRef]], Unit] = Flow[Product].map(badPartial)
 
   it should {
     "fail bad request URLs" in {

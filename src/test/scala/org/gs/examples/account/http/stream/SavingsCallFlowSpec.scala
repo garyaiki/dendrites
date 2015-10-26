@@ -31,21 +31,12 @@ class SavingsCallFlowSpec extends WordSpecLike with Matchers with BalancesProtoc
   override implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   implicit val executor = Executors.newSingleThreadExecutor()
-  val clientConfig = new SavingsBalancesClientConfig()
-  val hostConfig = clientConfig.hostConfig
-  val baseURL = clientConfig.baseURL
-  val badBaseURL = baseURL.dropRight(1)
-
   val timeout = Timeout(3000 millis)
-
-  def partial = typedQueryResponse(baseURL, mapPlain, mapSavings) _
-  def badPartial = typedQueryResponse(badBaseURL, mapPlain, mapSavings) _
   
   def source = TestSource.probe[Product]
-  def flow: Flow[Product, Future[Either[String, AnyRef]], Unit] = Flow[Product].map(partial)
-  def badFlow: Flow[Product, Future[Either[String, AnyRef]], Unit] = Flow[Product].map(badPartial)
   def sink = TestSink.probe[Future[Either[String, AnyRef]]]
-  val testFlow = source.via(flow).toMat(sink)(Keep.both)
+  val scf = new SavingsCallFlow
+  val testFlow = source.via(scf.flow).toMat(sink)(Keep.both)
   
   "A SavingsCallFlowClient" should {
     "get balances for id 1" in {
@@ -62,7 +53,6 @@ class SavingsCallFlowSpec extends WordSpecLike with Matchers with BalancesProtoc
       }
     }
   }
-
 
   it should {
     "get balances for id 2" in {
@@ -114,6 +104,11 @@ class SavingsCallFlowSpec extends WordSpecLike with Matchers with BalancesProtoc
       }
     }
   }
+
+  val clientConfig = new SavingsBalancesClientConfig()
+  val badBaseURL = clientConfig.baseURL.dropRight(1)
+  def badPartial = typedQueryResponse(badBaseURL, mapPlain, mapSavings) _
+  def badFlow: Flow[Product, Future[Either[String, AnyRef]], Unit] = Flow[Product].map(badPartial)
 
   it should {
     "fail bad request URLs" in {
