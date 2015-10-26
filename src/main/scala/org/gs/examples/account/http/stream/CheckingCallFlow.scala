@@ -17,6 +17,6 @@ class CheckingCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
 
   def partial = typedQueryResponse(baseURL, mapPlain, mapChecking) _
   
-  def flow: Flow[Product, Future[Either[String, AnyRef]], Unit] = Flow[Product].map(partial)
+  def flow: Flow[Product, Either[String, AnyRef], Unit] = Flow[Product].mapAsync(1)(partial)
 
 }

@@ -7,24 +7,14 @@ import akka.stream.scaladsl.{Keep, Flow}
 import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
 import java.util.concurrent.Executors
 import org.gs.akka.http.ClientConnectionPool
-import org.gs.examples.account.{
-  AccountType,
-  Checking,
-  CheckingAccountBalances,
-  GetAccountBalances,
-  MoneyMarketAccountBalances,
-  SavingsAccountBalances
-}
+import org.gs.examples.account.{ GetAccountBalances, MoneyMarketAccountBalances}
 import org.gs.examples.account.http._
 import org.gs.http._
 import org.gs.testdriven.StopSystemAfterAll
 import org.scalatest.{ Matchers, WordSpecLike }
 import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
-import scala.concurrent.Future
-import scala.util.{ Failure, Success, Try }
 
 class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesProtocols {
   implicit val system = ActorSystem("akka-aggregator")
@@ -34,7 +24,7 @@ class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesPr
   val timeout = Timeout(3000 millis)
 
   def source = TestSource.probe[Product]
-  def sink = TestSink.probe[Future[Either[String, AnyRef]]]
+  def sink = TestSink.probe[Either[String, AnyRef]]
   val mmcf = new MoneyMarketCallFlow
   val testFlow = source.via(mmcf.flow).toMat(sink)(Keep.both)
   
@@ -44,13 +34,11 @@ class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesPr
       val (pub, sub) = testFlow.run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
-      val responseFuture = sub.expectNext()
+      val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
 
-      whenReady(responseFuture, timeout) { result =>
-        result should equal(Right(MoneyMarketAccountBalances(Some(List((1, 11000.1))))))
-      }
+      response should equal(Right(MoneyMarketAccountBalances(Some(List((1, 11000.1))))))
     }
   }
 
@@ -60,14 +48,12 @@ class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesPr
       val (pub, sub) = testFlow.run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
-      val responseFuture = sub.expectNext()
+      val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
       
-      whenReady(responseFuture, timeout) { result =>
-        result should equal(Right(MoneyMarketAccountBalances(Some(List((2L, BigDecimal(22000.20)),
+      response should equal(Right(MoneyMarketAccountBalances(Some(List((2L, BigDecimal(22000.20)),
           (22L, BigDecimal(22200.22)))))))
-      }
     }
   }
 
@@ -77,15 +63,13 @@ class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesPr
       val (pub, sub) = testFlow.run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
-      val responseFuture = sub.expectNext()
+      val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
       
-      whenReady(responseFuture, timeout) { result =>
-        result should equal(Right(MoneyMarketAccountBalances(Some(List((3L, BigDecimal(33000.30)),
+      response should equal(Right(MoneyMarketAccountBalances(Some(List((3L, BigDecimal(33000.30)),
           (33L, BigDecimal(33300.33)),
           (333L, BigDecimal(33330.33)))))))
-      }
     }
   }
 
@@ -95,20 +79,18 @@ class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesPr
       val (pub, sub) = testFlow.run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
-      val responseFuture = sub.expectNext()
+      val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
       
-      whenReady(responseFuture, timeout) { result =>
-        result should equal(Left("Money Market account 4 not found"))
-      }
+      response should equal(Left("Money Market account 4 not found"))
     }
   }
 
   val clientConfig = new MoneyMarketBalancesClientConfig()
   val badBaseURL = clientConfig.baseURL.dropRight(1)
   def badPartial = typedQueryResponse(badBaseURL, mapPlain, mapMoneyMarket) _
-  def badFlow: Flow[Product, Future[Either[String, AnyRef]], Unit] = Flow[Product].map(badPartial)
+  def badFlow: Flow[Product, Either[String, AnyRef], Unit] = Flow[Product].mapAsync(1)(badPartial)
 
   it should {
     "fail bad request URLs" in {
@@ -118,11 +100,8 @@ class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesPr
         .toMat(sink)(Keep.both).run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
-      val responseFuture = sub.expectNext()
-      whenReady(responseFuture, timeout) { result =>
-        result should equal(Left(
-          "FAIL 404 Not Found The requested resource could not be found."))
-      }
+      val response = sub.expectNext()
+      response should equal(Left("FAIL 404 Not Found The requested resource could not be found."))
     }
   }
 }

@@ -17,6 +17,6 @@ class MoneyMarketCallFlow(implicit val system: ActorSystem, logger: LoggingAdapt
 
   def partial = typedQueryResponse(baseURL, mapPlain, mapMoneyMarket) _
   
-  def flow: Flow[Product, Future[Either[String, AnyRef]], Unit] = Flow[Product].map(partial)
+  def flow: Flow[Product, Either[String, AnyRef], Unit] = Flow[Product].mapAsync(1)(partial)
 
 }

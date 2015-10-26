@@ -34,7 +34,7 @@ class SavingsCallFlowSpec extends WordSpecLike with Matchers with BalancesProtoc
   val timeout = Timeout(3000 millis)
   
   def source = TestSource.probe[Product]
-  def sink = TestSink.probe[Future[Either[String, AnyRef]]]
+  def sink = TestSink.probe[Either[String, AnyRef]]
   val scf = new SavingsCallFlow
   val testFlow = source.via(scf.flow).toMat(sink)(Keep.both)
   
@@ -44,13 +44,11 @@ class SavingsCallFlowSpec extends WordSpecLike with Matchers with BalancesProtoc
       val (pub, sub) = testFlow.run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
-      val responseFuture = sub.expectNext()
+      val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
 
-      whenReady(responseFuture, timeout) { result =>
-        result should equal(Right(SavingsAccountBalances(Some(List((1, 111000.1))))))
-      }
+      response should equal(Right(SavingsAccountBalances(Some(List((1, 111000.1))))))
     }
   }
 
@@ -60,14 +58,12 @@ class SavingsCallFlowSpec extends WordSpecLike with Matchers with BalancesProtoc
       val (pub, sub) = testFlow.run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
-      val responseFuture = sub.expectNext()
+      val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
       
-      whenReady(responseFuture, timeout) { result =>
-        result should equal(Right(SavingsAccountBalances(Some(List((2L, BigDecimal(222000.20)),
-          (22L, BigDecimal(222200.22)))))))
-      }
+      response should equal(Right(SavingsAccountBalances(Some(List((2L, BigDecimal(222000.20)),
+              (22L, BigDecimal(222200.22)))))))
     }
   }
 
@@ -77,15 +73,13 @@ class SavingsCallFlowSpec extends WordSpecLike with Matchers with BalancesProtoc
       val (pub, sub) = testFlow.run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
-      val responseFuture = sub.expectNext()
+      val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
       
-      whenReady(responseFuture, timeout) { result =>
-        result should equal(Right(SavingsAccountBalances(Some(List((3L, BigDecimal(333000.30)),
+      response should equal(Right(SavingsAccountBalances(Some(List((3L, BigDecimal(333000.30)),
           (33L, BigDecimal(333300.33)),
           (333L, BigDecimal(333330.33)))))))
-      }
     }
   }
 
@@ -95,20 +89,18 @@ class SavingsCallFlowSpec extends WordSpecLike with Matchers with BalancesProtoc
       val (pub, sub) = testFlow.run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
-      val responseFuture = sub.expectNext()
+      val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
       
-      whenReady(responseFuture, timeout) { result =>
-        result should equal(Left("Savings account 4 not found"))
-      }
+      response should equal(Left("Savings account 4 not found"))
     }
   }
 
   val clientConfig = new SavingsBalancesClientConfig()
   val badBaseURL = clientConfig.baseURL.dropRight(1)
   def badPartial = typedQueryResponse(badBaseURL, mapPlain, mapSavings) _
-  def badFlow: Flow[Product, Future[Either[String, AnyRef]], Unit] = Flow[Product].map(badPartial)
+  def badFlow: Flow[Product, Either[String, AnyRef], Unit] = Flow[Product].mapAsync(1)(badPartial)
 
   it should {
     "fail bad request URLs" in {
@@ -118,11 +110,8 @@ class SavingsCallFlowSpec extends WordSpecLike with Matchers with BalancesProtoc
         .toMat(sink)(Keep.both).run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
-      val responseFuture = sub.expectNext()
-      whenReady(responseFuture, timeout) { result =>
-        result should equal(Left(
-          "FAIL 404 Not Found The requested resource could not be found."))
-      }
+      val response = sub.expectNext()
+      response should equal(Left("FAIL 404 Not Found The requested resource could not be found."))
     }
   }
 }
