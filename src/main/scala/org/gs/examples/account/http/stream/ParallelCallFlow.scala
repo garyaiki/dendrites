@@ -28,6 +28,16 @@ class ParallelCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
     bcast ~> mm ~> zip.in1
     bcast ~> savings ~> zip.in2
     FlowShape(bcast.in, zip.out)
-  }.named("partial")
+  }.named("calls")
   val wrappedFlow = Flow.wrap(fg)
+  
+  val fgLR = FlowGraph.partial() { implicit builder =>
+    val fgCalls = builder.add(wrappedFlow)
+    val fgLR = builder.add(leftRightFlow)
+    
+    fgCalls ~> fgLR
+    FlowShape(fgCalls.inlet, fgLR.outlet)
+  }.named("callsLeftRight")
+  val wrappedCallsLRFlow = Flow.wrap(fgLR)
+
 }
