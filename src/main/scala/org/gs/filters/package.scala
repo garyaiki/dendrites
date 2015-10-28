@@ -17,7 +17,7 @@ package object filters {
     * @return matching elements
     */
   def productFilter[P <: Product](e: P, f: TypeFilter) = {
-//    println(s"productFilter e:$e")
+    //    println(s"productFilter e:$e")
     val iter = e.productIterator
     iter.filter(f).toIndexedSeq
   }
@@ -26,18 +26,18 @@ package object filters {
 
   /** Returns only matching elements of an indexed seq of mixed case class or tuple types
     *
-    * 
-    * @param xs Indexed Sequence of heterogeneous types of case classes or tuples 
+    *
+    * @param xs Indexed Sequence of heterogeneous types of case classes or tuples
     * @param pf function returns only elements of case class or tuple matching predicate
     * @param f predicate or filter function(common types below)
     * @return IndexedSeq of matching elements
     */
   def filterProducts[P <: Product](xs: Seq[P], pf: ProductFilter[P], f: TypeFilter): Seq[Any] = {
     val l = for {
-      e <- xs 
+      e <- xs
       ef <- pf(e, f)
     } yield ef
-//    println(s"filterProducts l:${l}")
+    //    println(s"filterProducts l:${l}")
     l
   }
 
@@ -123,6 +123,44 @@ package object filters {
     case _        => false
   }
 
+  /** Accept Either Left
+    * @tparam A type of Left element
+    * @tparam B type of Right element
+    * @param in Either
+    * @return true if Left
+    */
+  def isLeft[A, B](in: Either[A, B]): Boolean = in match {
+    case Left(l) => true
+    case _       => false
+  }
+
+  /** Accept Either Right
+    * @tparam A type of Left element
+    * @tparam B type of Right element
+    * @param in Either
+    * @return true if Right
+    */
+  def isRight[A, B](in: Either[A, B]): Boolean = in match {
+    case Right(r) => true
+    case _        => false
+  }
+
+  /** Extract value from Either Left
+    * @tparam A type of Left element
+    * @tparam B type of Right element
+    * @param in Either
+    * @return value in Left
+    */
+  def extractLeft[A, B](in: Either[A, B]): A = in match { case Left(l) => l }
+
+  /** Extract value from Either Right
+    * @tparam A type of Left element
+    * @tparam B type of Right element
+    * @param in Either
+    * @return value in Right
+    */
+  def extractRight[A, B](in: Either[A, B]): B = in match { case Right(r) => r }
+
   /** Extract a specified single element from a sequence of case classes or tuples
     *
     * Use when a Sequence contains different tuples or case classes and the element wanted is at the
@@ -163,5 +201,6 @@ package object filters {
     * @return Seq of values in Right
     */
   def filterRight[A, B](in: Seq[Either[A, B]]): Seq[B] = in.collect { case Right(r) => r }
+
 }
 

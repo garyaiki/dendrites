@@ -1,6 +1,7 @@
 package org.gs.examples.account.http
 
 import akka.stream.scaladsl.Flow
+import scala.collection.immutable.Seq
 import scala.collection.mutable.ArrayBuffer
 
 package object stream {
@@ -22,7 +23,7 @@ package object stream {
       case Left(l)  => lefts.append(l)
       case Right(r) => rights.append(r)
     }
-    (lefts.toSeq, rights.toSeq)
+    (Seq(lefts: _*), Seq(rights: _*))
   }
  
   def leftRightFlow: Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef]),

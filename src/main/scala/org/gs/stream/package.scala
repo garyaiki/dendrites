@@ -2,6 +2,7 @@
   */
 package org.gs
 
+import _root_.akka.event.LoggingAdapter
 import _root_.akka.stream.scaladsl.Flow
 import com.twitter.algebird._
 import org.gs.filters._
@@ -39,5 +40,11 @@ package object stream {
     */
   def collectRightFlow[A, B]: Flow[Seq[Either[A, B]], Seq[B], Unit] =
           Flow[Seq[Either[A, B]]].collect(PartialFunction(filterRight))
+
+  
+  def filterRightLogLeft[A, B](in: Either[A, B])(implicit logger: LoggingAdapter): Boolean = in match {
+    case Right(r) => true
+    case Left(l) => logger.info(l.toString); false
+  }
 
 }
