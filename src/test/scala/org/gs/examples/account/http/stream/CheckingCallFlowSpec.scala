@@ -6,7 +6,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Flow}
 import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
 import java.util.concurrent.Executors
-import org.gs.akka.http.ClientConnectionPool
+import org.gs.http.ClientConnectionPool
 import org.gs.examples.account.{ CheckingAccountBalances, GetAccountBalances}
 import org.gs.examples.account.http._
 import org.gs.examples.account.http.stream._

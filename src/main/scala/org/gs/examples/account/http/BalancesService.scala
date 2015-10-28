@@ -73,7 +73,7 @@ trait BalancesService extends BalancesProtocols {
   }
 
   val routes = {
-    logRequestResult("org.gs.examples.account.akkahttp.microserver") {
+    logRequestResult("org.gs.examples.account.http.balancesServer") {
 
       path("account" / "balances" / "checking" / "GetAccountBalances") {
         parameter('id.as[Long]) { id =>

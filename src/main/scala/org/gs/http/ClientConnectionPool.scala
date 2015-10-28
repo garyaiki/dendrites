@@ -1,19 +1,14 @@
 /**
   */
-package org.gs.akka.http
+package org.gs.http
 
-import scala.concurrent.Future
 import scala.util.Try
 import akka.actor.ActorSystem
-import akka.event.Logging
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl._
-//import akka.http.{ ConnectionPoolSettings, ConnectionPoolSetup }
-//import akka.http.ConnectionPoolSetup._
-import akka.http.scaladsl.{ Http, HttpExt }
+import akka.http.scaladsl.HttpExt
 import akka.http.scaladsl.Http.HostConnectionPool
 import akka.http.scaladsl.model.{ HttpResponse, HttpRequest }
-import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 
 /** Akka Http connection pool common behavior

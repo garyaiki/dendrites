@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.event.{ LoggingAdapter, Logging }
 import akka.stream.ActorMaterializer
 import java.util.concurrent.Executors
-import org.gs.akka.http.ClientConnectionPool
+import org.gs.http.ClientConnectionPool
 import org.gs.examples.account.{
   AccountType,
   Checking,
