@@ -162,5 +162,4 @@ class ProductFilterSpec extends FlatSpecLike with TestValuesBuilder {
     assert(keyEithStr.size === filtered.size)
     assert(filtered.forall(isEitherStringString))
   }
-
 }

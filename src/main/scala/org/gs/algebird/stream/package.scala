@@ -4,7 +4,7 @@ package org.gs.algebird
 
 import akka.stream.scaladsl.Flow
 import com.twitter.algebird._
-import org.gs.filters._
+//import org.gs.filters._
 import org.gs.algebird.typeclasses.QTreeLike
 import scala.reflect.runtime.universe._
 

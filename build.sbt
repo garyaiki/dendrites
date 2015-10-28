@@ -15,7 +15,7 @@ resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/release
 resolvers += "spray repo" at "http://repo.spray.io"
 
 libraryDependencies ++= {
-  val akkaV = "2.3.11"
+  val akkaV = "2.3.14"
   val scalaTestV = "2.2.5"
   val algebirdV = "0.11.0"
   val akkaHttpV = "1.0"

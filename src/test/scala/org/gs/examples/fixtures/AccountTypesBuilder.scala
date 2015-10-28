@@ -2,7 +2,6 @@
   */
 package org.gs.examples.fixtures
 
-import org.gs.filters._
 import org.gs.examples.account._
 import scala.collection.immutable.Range
 import scala.math.Numeric.BigDecimalAsIfIntegral
@@ -32,6 +31,7 @@ trait AccountTypesBuilder extends SuiteMixin { this: Suite =>
       balances <- balancesRange
     } yield (id, balances)
   }
+  
   def makeAccountBalances(): IndexedSeq[AccBalances] = {
     def applyType(): AccountType = {
       import scala.util.Random
