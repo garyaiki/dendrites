@@ -4,7 +4,7 @@ import akka.actor._
 import akka.contrib.pattern.Aggregator
 import org.gs.aggregator.actor.{ CantUnderstand, ResultAggregator, TimedOut }
 import org.gs.examples.account._
-import org.gs.examples.account.akka.AccountBalanceActor
+import org.gs.examples.account.actor.AccountBalanceActor
 import org.gs.examples.account.http.actor.AccountBalanceRestfulRetriever._
 import scala.collection.immutable.Set
 import scala.concurrent.duration._
@@ -18,11 +18,11 @@ class AccountBalanceRestfulRetriever(actors: Map[AccountType, Props]) extends Ac
   with AccountRestfulPartialFunctions {
 
   import context._
-
+/*
   override def preStart() = {
     for ((k, v) <- actors) log.debug(s"key:$k, value:$v")
   }
-
+*/
   expectOnce {
     case GetCustomerAccountBalances(id, types) ⇒
       new AccountAggregator(sender(), id, actors)

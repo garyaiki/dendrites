@@ -1,4 +1,4 @@
-package org.gs.examples.account.akka
+package org.gs.examples.account.actor
 
 import akka.actor._
 import org.gs.aggregator.actor.{ PartialFunctionPlusSender, ResultAggregator, TimedOut}

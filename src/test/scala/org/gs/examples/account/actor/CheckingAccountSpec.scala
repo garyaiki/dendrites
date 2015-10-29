@@ -1,16 +1,19 @@
-package org.gs.examples.account.akka
+package org.gs.examples.account.actor
 
 import akka.actor._
 import akka.testkit.{ ImplicitSender, TestKit }
+
 import org.scalatest.WordSpecLike
 import org.scalatest.MustMatchers
 import org.gs.testdriven.StopSystemAfterAll
+
 import scala.collection.mutable.ArrayBuffer
+
 import org.gs.examples.account.AccountType
 import org.gs.examples.account.Checking
+
 import akka.testkit.TestActorRef
 import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances}
-import org.gs.examples.account.akka.CheckingAccountProxy._
 
 class CheckingAccountSpec extends TestKit(ActorSystem("test"))
     with ImplicitSender

@@ -1,13 +1,13 @@
-package org.gs.examples.account.akka
+package org.gs.examples.account.actor
 
-import akka.actor.{ Actor, ActorContext, ActorLogging }
+import akka.actor.{Actor, ActorContext, ActorLogging }
 import akka.actor._
 import akka.contrib.pattern.Aggregator
 import org.gs.aggregator.actor.ResultAggregator
-import org.gs.examples.account.{ GetAccountBalances, MoneyMarket, MoneyMarketAccountBalances }
-import MoneyMarketAccountProxy._
+import org.gs.examples.account.{Checking, CheckingAccountBalances, GetAccountBalances}
+import CheckingAccountProxy._
 
-class MoneyMarketAccountProxy extends Actor with ActorLogging {
+class CheckingAccountProxy extends Actor with ActorLogging {
   /*
   override def preStart() = {
     log.debug(s"Starting ${this.toString()}")
@@ -20,10 +20,10 @@ class MoneyMarketAccountProxy extends Actor with ActorLogging {
   
   def receive = {
     case GetAccountBalances(id: Long) ⇒
-      sender() ! MoneyMarketAccountBalances(None)
+      sender() ! CheckingAccountBalances(Some(List((3, 15000))))
   }
 }
 
-object MoneyMarketAccountProxy {
-  def props = Props[MoneyMarketAccountProxy]
+object CheckingAccountProxy {
+  def props = Props[CheckingAccountProxy]
 }

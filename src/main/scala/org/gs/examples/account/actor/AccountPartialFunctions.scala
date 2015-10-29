@@ -1,4 +1,4 @@
-package org.gs.examples.account.akka
+package org.gs.examples.account.actor
 
 import akka.actor.{ Actor, ActorLogging, ActorRef }
 import org.gs.aggregator.actor.{PartialFunctionPlusSender, ResultAggregator}

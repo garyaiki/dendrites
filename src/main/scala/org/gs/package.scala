@@ -22,7 +22,7 @@ package object gs {
   
   /** Does the indexed case class field have desired type? 
     *  
-    * @example [[org.gs.examples.account.akka.AccountBalanceRetrieverSpec]]
+    * @example [[org.gs.examples.account.actor.AccountBalanceRetrieverSpec]]
     * 
     * @param case class (Product is supertype)
     * @param ele field element
