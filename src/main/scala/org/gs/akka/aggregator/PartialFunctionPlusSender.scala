@@ -1,4 +1,4 @@
-package org.gs.examples.account.akka
+package org.gs.akka.aggregator
 
 import akka.actor.ActorRef
 

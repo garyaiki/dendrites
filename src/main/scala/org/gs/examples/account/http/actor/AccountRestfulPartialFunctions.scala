@@ -4,7 +4,7 @@ import akka.actor.{ Actor, ActorLogging, ActorRef }
 import org.gs.akka.aggregator.ResultAggregator
 import org.gs.examples.account.{ Checking, CheckingAccountBalances, MoneyMarket,
                                  MoneyMarketAccountBalances, Savings, SavingsAccountBalances }
-import org.gs.examples.account.akka.PartialFunctionPlusSender
+import org.gs.akka.aggregator.PartialFunctionPlusSender
 
 /** "expectOnce" result handler used by CheckingAccountClient, MoneyMarketAccountClient, and
  *  SavingsAccountClient child actors. Before creating actor curry originalSender then transform

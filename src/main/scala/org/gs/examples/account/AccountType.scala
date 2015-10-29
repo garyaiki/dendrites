@@ -11,6 +11,7 @@ case object Savings extends AccountType
 case object MoneyMarket extends AccountType
 
 final case class GetAccountBalances(id: Long)
+case class GetCustomerAccountBalances(id: Long, accountTypes: Set[AccountType])
 
 case class CheckingAccountBalances(balances: Option[List[(Long, BigDecimal)]])
 case class MoneyMarketAccountBalances(balances: Option[List[(Long, BigDecimal)]])

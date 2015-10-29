@@ -45,6 +45,4 @@ object AccountBalanceRestfulRetriever {
   def createProps(actors: Map[AccountType, Props]): Props = {
     Props(classOf[AccountBalanceRestfulRetriever], actors)
   }
-
-  case class GetCustomerAccountBalances(id: Long, accountTypes: Set[AccountType])
 }

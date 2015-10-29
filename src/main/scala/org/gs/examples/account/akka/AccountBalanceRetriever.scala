@@ -17,11 +17,11 @@ class AccountBalanceRetriever(actors: Map[AccountType, Props]) extends AccountBa
   with AccountPartialFunctions {
 
   import context._
-
+/*
   override def preStart() = {
     for ((k, v) <- actors) log.debug(s"key:$k, value:$v")
   }
-
+*/
   expectOnce {
     case GetCustomerAccountBalances(id, types) ⇒
       new AccountAggregator(sender(), id, actors)
@@ -43,6 +43,4 @@ object AccountBalanceRetriever {
   def createProps(actors: Map[AccountType, Props]): Props = {
     Props(classOf[AccountBalanceRetriever], actors)
   }
-
-  case class GetCustomerAccountBalances(id: Long, accountTypes: Set[AccountType])
 }
