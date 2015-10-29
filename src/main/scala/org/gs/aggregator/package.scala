@@ -22,6 +22,4 @@ package object aggregator {
       Right(xs.sum / fromInt(xs.size))
     case x => Left(s"$x is not divisable")
   }
-
-
 }

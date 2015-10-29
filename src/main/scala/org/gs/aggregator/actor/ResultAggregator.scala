@@ -1,6 +1,6 @@
 /**
   */
-package org.gs.akka.aggregator
+package org.gs.aggregator.actor
 
 import akka.actor.{ Actor, ActorRef, Props }
 import akka.contrib.pattern.Aggregator

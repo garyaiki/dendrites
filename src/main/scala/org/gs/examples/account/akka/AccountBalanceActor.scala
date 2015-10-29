@@ -1,11 +1,10 @@
 package org.gs.examples.account.akka
 
 import akka.actor._
-import org.gs.akka.aggregator.{ CantUnderstand, ResultAggregator, TimedOut }
+import org.gs.aggregator.actor.{ PartialFunctionPlusSender, ResultAggregator, TimedOut}
 import org.gs.examples.account._
 import scala.collection.immutable.Set
 import scala.concurrent.duration._
-import org.gs.akka.aggregator.PartialFunctionPlusSender
 
 /** Actor code common to AccountBalanceRetriever and AccountBalanceRestfulRetriever.
  *  

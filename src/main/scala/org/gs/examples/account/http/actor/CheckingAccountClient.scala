@@ -4,12 +4,12 @@ import akka.actor.{ Actor, ActorContext, ActorLogging, ActorRef, ActorSystem, Pr
 import akka.contrib.pattern.Aggregator
 import akka.event.{ LoggingAdapter, Logging }
 import akka.http.scaladsl.model._
-import akka.pattern.{ask, pipe}
+import akka.pattern.pipe
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl._
 import akka.util.Timeout
 import com.typesafe.config.Config
-import org.gs.akka.aggregator.ResultAggregator
+import org.gs.aggregator.actor.ResultAggregator
 import org.gs.examples.account.{ Checking, CheckingAccountBalances, GetAccountBalances }
 import org.gs.examples.account.http.{ BalancesProtocols, CheckingBalancesClientConfig }
 import org.gs.http._

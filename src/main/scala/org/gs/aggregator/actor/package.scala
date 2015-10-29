@@ -1,14 +1,13 @@
 /**
  *
  */
-package org.gs.akka
+package org.gs.aggregator
 
 /**
  * @author garystruthers
  *
  */
-package object aggregator {
+package object actor {
   case object TimedOut
   case object CantUnderstand
-
 }

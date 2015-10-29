@@ -3,7 +3,7 @@ package org.gs.examples.account.akka
 import akka.actor.{ Actor, ActorContext, ActorLogging }
 import akka.actor._
 import akka.contrib.pattern.Aggregator
-import org.gs.akka.aggregator.ResultAggregator
+import org.gs.aggregator.actor.ResultAggregator
 import org.gs.examples.account.{ GetAccountBalances, MoneyMarket, MoneyMarketAccountBalances }
 import MoneyMarketAccountProxy._
 

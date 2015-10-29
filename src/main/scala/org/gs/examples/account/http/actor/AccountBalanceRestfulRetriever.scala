@@ -2,7 +2,7 @@ package org.gs.examples.account.http.actor
 
 import akka.actor._
 import akka.contrib.pattern.Aggregator
-import org.gs.akka.aggregator.{ CantUnderstand, ResultAggregator, TimedOut }
+import org.gs.aggregator.actor.{ CantUnderstand, ResultAggregator, TimedOut }
 import org.gs.examples.account._
 import org.gs.examples.account.akka.AccountBalanceActor
 import org.gs.examples.account.http.actor.AccountBalanceRestfulRetriever._

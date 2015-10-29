@@ -8,7 +8,7 @@ import akka.pattern.pipe
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl._
 import com.typesafe.config.Config
-import org.gs.akka.aggregator.ResultAggregator
+import org.gs.aggregator.actor.ResultAggregator
 import org.gs.examples.account.{ MoneyMarket, MoneyMarketAccountBalances, GetAccountBalances }
 import org.gs.examples.account.http.{ BalancesProtocols, MoneyMarketBalancesClientConfig }
 import org.gs.http._
