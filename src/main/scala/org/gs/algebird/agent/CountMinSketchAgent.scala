@@ -4,9 +4,9 @@ import akka.agent.Agent
 import com.twitter.algebird._
 import com.twitter.algebird.CMSHasherImplicits._
 import org.gs.algebird._
+import org.gs.algebird.agent._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-import scala.reflect.runtime.universe._
 
 /** Shared state for CountMinSketch
   *
@@ -14,14 +14,15 @@ import scala.reflect.runtime.universe._
   * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSHasher]
   * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering]]
   * @example [[org.gs.algebird.agent.CountMinSketchAgentSpec]]
-  * @note I couldn't make this as generic because oldState both needs and rejects type parameters
-  * but CMS turns every type into a long so the result is the same
+  * 
+  * @tparam K elements which are implicitly Ordering[K] and CMSHasher[K]
   * 
   * @author garystruthers
   *
   */
-class CountMinSketchAgent(val name: String = "")(implicit ec: ExecutionContext) {
-  implicit val m = createCMSMonoid[Long]()
+class CountMinSketchAgent[K: Ordering: CMSHasher](val name: String = "")
+        (implicit ec: ExecutionContext) {
+  implicit val m = createCMSMonoid[K]()
   val agent = Agent(m.zero)
 
   /** Update agent with sequence of Longs
@@ -29,7 +30,7 @@ class CountMinSketchAgent(val name: String = "")(implicit ec: ExecutionContext) 
     * @param xs Seq
     * @return future of new value after this and all pending updates
     */
-  def update(xs: Seq[Long]): Future[CMS[Long]] = {
+  def update(xs: Seq[K]): Future[CMS[K]] = {
     agent alter (oldState => {
       oldState ++ createCountMinSketch(xs)
     })

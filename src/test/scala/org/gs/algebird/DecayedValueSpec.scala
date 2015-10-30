@@ -3,11 +3,10 @@
 package org.gs.algebird
 
 import com.twitter.algebird._
-import org.scalatest.FlatSpecLike
-//import org.scalatest.Matchers._
 import org.gs._
-import org.gs.fixtures.{ NScalaTimeUtils, TestValuesBuilder, TrigUtils }
 import org.gs.algebird._
+import org.gs.fixtures.{ TestValuesBuilder, TrigUtils }
+import org.scalatest.FlatSpecLike
 
 /** @author garystruthers
   *

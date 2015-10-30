@@ -1,5 +1,6 @@
 package org.gs.algebird.agent
 
+import com.twitter.algebird.CMSHasherImplicits._
 import org.gs.algebird._
 import org.gs.fixtures.TestValuesBuilder
 import org.scalatest.{ Matchers, WordSpecLike }
@@ -15,7 +16,7 @@ class CountMinSketchAgentSpec extends WordSpecLike with Matchers with TestValues
 
   "A CountMinSketchAgent totalCount" should {
     "equal total size" in {
-      val aa = new CountMinSketchAgent("test Longs")
+      val aa = new CountMinSketchAgent[Long]("test Longs")
       val updateFuture = aa.update(longs)
       whenReady(updateFuture, timeout) { result =>
         result.totalCount should equal(longs.size)

@@ -2,7 +2,7 @@ name := "AkkaAlgebird"
 
 version := "0.0.1"
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.7"
 
 scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-feature")
 
@@ -41,13 +41,11 @@ libraryDependencies ++= {
     "com.twitter" % "algebird-core_2.11" % algebirdV,
     "com.twitter" % "algebird-test_2.11" % algebirdV,
     "io.spray" %%  "spray-json" % "1.3.2",
-    "org.parboiled" %% "parboiled" % "2.1.0",
     "commons-io" % "commons-io" % "2.4" % "test",
-	"com.googlecode.javaewah" % "JavaEWAH" % "1.0.2",
-	"com.github.nscala-time" %% "nscala-time" % "1.6.0",
-	"joda-time" % "joda-time" % "2.6",
-	"org.joda" % "joda-convert" % "1.2",
-	"com.chuusai" %% "shapeless" % "2.2.0-RC4"
+	"com.github.nscala-time" %% "nscala-time" % "2.4.0",
+	"joda-time" % "joda-time" % "2.9",
+	"org.joda" % "joda-convert" % "1.8",
+	"com.chuusai" %% "shapeless" % "2.2.5"
   )
 }
 

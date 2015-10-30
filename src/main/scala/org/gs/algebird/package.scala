@@ -628,7 +628,7 @@ package object algebird {
     * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     * @example [[org.gs.algebird.CountMinSketchSpec]]
     *
-    * @tparam K type of elements to be counted
+    * @tparam K elements which are implicitly Ordering[K] and CMSHasher[K]
     * @param eps
     * @param delta
     * @param seed
@@ -645,7 +645,7 @@ package object algebird {
     * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     * @example [[org.gs.algebird.CountMinSketchSpec]]
     *
-    * @tparam K type of elements to be counted
+    * @tparam K elements which are implicitly Ordering[K] and CMSHasher[K]
     * @param xs data
     * @param monoid implicit CMSMonoid for K
     * @return CMS for data
@@ -660,7 +660,7 @@ package object algebird {
     * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     * @example [[org.gs.algebird.CountMinSketchSpec]]
     *
-    * @tparam K type of elements in CMS
+    * @tparam K elements which are implicitly Ordering[K] and CMSHasher[K]
     * @param xs Sequence of CMS
     * @param monoid
     * @return CMS as the sum of Sequence of CMS
