@@ -2,6 +2,7 @@
   */
 package org.gs.algebird.agent
 
+import com.twitter.algebird._
 import org.gs.aggregator._
 import org.gs.algebird._
 import org.gs.fixtures.TestValuesBuilder
@@ -10,7 +11,6 @@ import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
-import com.twitter.algebird._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /** @author garystruthers

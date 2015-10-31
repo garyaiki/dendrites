@@ -40,10 +40,9 @@ class DecayedValueAgent(val name: String = "", halfLife: Double, last: Option[De
     * @param length number to remove
     * @return oldest values Not the latest values
     */
-  def takeDropOld(length: Int): Seq[DecayedValue] = {
-    var oldest = Seq(monoid.zero)
+  def getOld(length: Int): Seq[DecayedValue] = {
+    val oldest = agent.get().take(length)
     agent send (oldState => {
-      oldest = oldState.take(length)
       oldState.drop(length)
     })
     oldest
