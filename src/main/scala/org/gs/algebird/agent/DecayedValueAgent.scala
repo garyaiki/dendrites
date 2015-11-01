@@ -11,9 +11,15 @@ import scala.reflect.runtime.universe._
   *
   * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent]]
   * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValue]
+  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValueMonoid]]
   * @example [[org.gs.algebird.agent.DecayedValueAgentSpec]]
   * @author garystruthers
   *
+  * @param name
+  * @param halfLife to scale value based on time
+  * @param last is initial element, if None use implicit monoid.zero
+  * @param ec execution context for future
+  * @param monoid implicit DecayedValueMonoid to scan from initial value
   */
 class DecayedValueAgent(val name: String = "", halfLife: Double, last: Option[DecayedValue] = None)
         (implicit ec: ExecutionContext, monoid: DecayedValueMonoid) {

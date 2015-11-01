@@ -14,16 +14,19 @@ import scala.reflect.runtime.universe._
   * @example [[org.gs.algebird.agent.AveragedAgentSpec]]
   * @author garystruthers
   *
+  * @param name
+  * @param init optional initial AveragedValue
+  * @param ec execution context for future
   */
-class AveragedAgent(val name: String = "", init: AveragedValue = new AveragedValue(0, 0.0))(implicit ec: ExecutionContext) {
+class AveragedAgent(val name: String = "", init: AveragedValue = new AveragedValue(0, 0.0))
+        (implicit ec: ExecutionContext) {
   val agent = Agent(init)
 
   /** Update agent with sequence of numeric values
     *
-    * @tparam A: Numeric, elements must be Numeric
+    * @tparam A: Numeric, elements implicitly Numeric
     * @param xs Seq
-    * @param evidence implicit Numeric[A]
-    * @return future of new value after this and all pending updates
+    * @return future of new value for this and all pending updates
     */
   def update[A: TypeTag: Numeric](xs: Seq[A]): Future[AveragedValue] = {
     agent alter (oldState => {

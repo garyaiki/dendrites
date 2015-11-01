@@ -15,10 +15,11 @@ import scala.concurrent.Future
   * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering]]
   * @example [[org.gs.algebird.agent.CountMinSketchAgentSpec]]
   * 
-  * @tparam K elements which are implicitly Ordering[K] and CMSHasher[K]
-  * 
   * @author garystruthers
   *
+  * @tparam K elements which are implicitly Ordering[K] and CMSHasher[K]
+  * @param name
+  * @param ec execution context for future
   */
 class CountMinSketchAgent[K: Ordering: CMSHasher](val name: String = "")
         (implicit ec: ExecutionContext) {

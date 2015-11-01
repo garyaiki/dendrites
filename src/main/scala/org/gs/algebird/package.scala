@@ -675,7 +675,7 @@ package object algebird {
     * @example [[org.gs.algebird.DecayedValueSpec]]
     *
     * @param xs sequence of value, time tuples
-    * @param halfLife used to scale value based on time
+    * @param halfLife to scale value based on time
     * @param last is initial element, if None use implicit monoid.zero
     * @param monoid implicit DecayedValueMonoid used to scan from initial value
     * @return seq of DecayedValues
