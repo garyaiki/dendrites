@@ -3,7 +3,7 @@
 A library to concurently receive and aggregate messages and services for Scala and Akka that is asynchronous, non-blocking, and controls back pressure to prevent data loss from overflow.
 
 Restful clients and servers using
-[Akka HTTP](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0/scala/http/index.html) with Scala case class <i class="icon ion-arrow-swap"/> Json
+[Akka HTTP](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0/scala/http/index.html) with Scala case class <i class="icon ion-arrow-swap"/></i> Json
 marshalling/unmarshalling using [spray-json](https://github.com/spray/spray-json). Results from parallel calls are aggregated asynchronously using reuseable [Akka Streams](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0/scala/stream-index.html) components. 
 
 Messages to and from [Akka Actors](http://doc.akka.io/docs/akka/current/scala.html) can be aggregated with a reusable version of the [Akka Aggregator Pattern](http://doc.akka.io/docs/akka/snapshot/contrib/aggregator.html).
