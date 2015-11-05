@@ -32,7 +32,7 @@ trait AccountTypesBuilder extends SuiteMixin { this: Suite =>
     } yield (id, balances)
   }
   
-  def makeAccountBalances(): IndexedSeq[AccBalances] = {
+  def makeAccountBalances(): IndexedSeq[AccBalances[BigDecimal]] = {
     def applyType(): AccountType = {
       import scala.util.Random
       Random.shuffle(acTypes).head
@@ -42,18 +42,19 @@ trait AccountTypesBuilder extends SuiteMixin { this: Suite =>
     val b3 = b.grouped(4)
     val accs = for (i <- b3) yield {
       val xs = i.toList
-      val l: Option[List[(Long, BigDecimal)]] = Some(xs)
-      val ab: AccBalances = (applyType(), l)
-      ab
+      Some(xs)
     }
     accs.toIndexedSeq
   }
-  
-  val accountBalances: IndexedSeq[AccBalances] = makeAccountBalances()
-  val accTypes = accountBalances.map { x => x._1 }
-  val accListIdBals = accountBalances.flatMap(x => x._2)
-  val accIdBals = accListIdBals.toList.flatten.toIndexedSeq // Can't directly flatten Vector of List
-  val accIds = accIdBals.map { x => x._1 }
-  val accVals = accIdBals.map { x => x._2 }
 
+  val accountBalances: IndexedSeq[AccBalances[BigDecimal]] = makeAccountBalances()
+  val accIdBals = accountBalances.flatten // Can't directly flatten Vector of List
+  val accIds = for {
+    i <- accIdBals
+    j <- i
+  } yield j._1
+  val accVals = for {
+    i <- accIdBals
+    j <- i
+  } yield j._2
 }

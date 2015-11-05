@@ -13,13 +13,9 @@ class AccountTypeSpec extends FlatSpecLike with AccountTypesBuilder {
 
   
   "An AccountType ProductFilter" should "return all AccBalance elements" in {
-    val filtered = filterProducts(accountBalances, productFilter, isAccBalances)
+    val filtered = accountBalances.filter(isAccBalances)
 
     assert(accountBalances.size === filtered.size)
-  }
-
-  it should "return all AccountType elements" in {
-    assert(accTypes.forall(isAccountType))
   }
 
   it should "return all id elements" in {
