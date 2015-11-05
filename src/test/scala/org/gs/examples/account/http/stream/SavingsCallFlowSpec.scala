@@ -48,7 +48,7 @@ class SavingsCallFlowSpec extends WordSpecLike with Matchers with BalancesProtoc
       pub.sendComplete()
       sub.expectComplete()
 
-      response should equal(Right(SavingsAccountBalances(Some(List((1, 111000.1))))))
+      response should equal(Right(SavingsAccountBalances[BigDecimal](Some(List((1, 111000.1))))))
     }
   }
 

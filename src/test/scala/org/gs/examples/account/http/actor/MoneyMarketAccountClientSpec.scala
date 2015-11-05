@@ -18,7 +18,7 @@ class MoneyMarketAccountClientSpec extends TestKit(ActorSystem("test"))
     "get balances when id 1 exists" in {
       val client = system.actorOf(MoneyMarketAccountClient.props(clientConfig), "MoneyMarket")
       client ! GetAccountBalances(1L)
-      val obj = expectMsg(Right(MoneyMarketAccountBalances(Some(List((1, 11000.1))))))
+      val obj = expectMsg(Right(MoneyMarketAccountBalances[BigDecimal](Some(List((1, 11000.1))))))
     }
   }
 

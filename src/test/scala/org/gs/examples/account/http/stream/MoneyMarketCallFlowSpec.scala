@@ -38,7 +38,7 @@ class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesPr
       pub.sendComplete()
       sub.expectComplete()
 
-      response should equal(Right(MoneyMarketAccountBalances(Some(List((1, 11000.1))))))
+      response should equal(Right(MoneyMarketAccountBalances[BigDecimal](Some(List((1, 11000.1))))))
     }
   }
 

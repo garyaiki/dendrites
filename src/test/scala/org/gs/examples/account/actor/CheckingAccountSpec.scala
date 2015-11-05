@@ -35,7 +35,7 @@ class CheckingAccountSpec extends TestKit(ActorSystem("test"))
       
       val proxy = system.actorOf(CheckingAccountProxy.props, "Checking") 
       proxy ! GetAccountBalances(1L)
-      expectMsg(CheckingAccountBalances(Some(List((3, 15000)))))
+      expectMsg(CheckingAccountBalances[Int](Some(List((3, 15000)))))
     }
   }
 }

@@ -75,7 +75,7 @@ class ClientConnectionPoolSpec extends FlatSpec
       val response = result._1.get
       result._2 should equal(1)
       response.status match {
-        case OK         => Unmarshal(response.entity).to[CheckingAccountBalances].map(Right(_))
+        case OK => Unmarshal(response.entity).to[CheckingAccountBalances[BigDecimal]].map(Right(_))
         case BadRequest => Future.successful(
                 s"status:${response.status} headers:${response.headers} entity:${response.entity}")
         case _ => Unmarshal(response.entity).to[String].flatMap { entity =>
@@ -95,7 +95,7 @@ class ClientConnectionPoolSpec extends FlatSpec
       val response = result._1.get
       result._2 should equal(2)
       response.status match {
-        case OK         => Unmarshal(response.entity).to[CheckingAccountBalances].map(Right(_))
+        case OK => Unmarshal(response.entity).to[CheckingAccountBalances[BigDecimal]].map(Right(_))
         case BadRequest => Future.successful(
                 s"status:${response.status} headers:${response.headers} entity:${response.entity}")
         case _ => Unmarshal(response.entity).to[String].flatMap { entity =>

@@ -19,7 +19,7 @@ class CheckingAccountClientSpec extends TestKit(ActorSystem("test"))
       val client = system.actorOf(CheckingAccountClient.props(clientConfig), "Checking")
 
       client ! GetAccountBalances(1L)
-      val obj = expectMsg(Right(CheckingAccountBalances(Some(List((1, 1000.1))))))
+      val obj = expectMsg(Right(CheckingAccountBalances[BigDecimal](Some(List((1, 1000.1))))))
     }
   }
 

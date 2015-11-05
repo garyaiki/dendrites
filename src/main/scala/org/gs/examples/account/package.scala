@@ -3,8 +3,9 @@
 package org.gs.examples
 
 import scala.collection.immutable.Set
-/** @author garystruthers
+/** Functions for AccountType
   *
+  *  @author Gary Struthers
   */
 package object account {
 
@@ -12,7 +13,6 @@ package object account {
   def AccBalancesVec[A](xs: AccBalances[A]*) = Vector(xs: _*)
   
   val accountTypes: Set[AccountType] = Set(Checking, Savings, MoneyMarket)
-  val accountSavingsType: Set[AccountType] = Set(Savings)
 
   def isAccBalances[A](e: Any): Boolean = e.isInstanceOf[AccBalances[A]]
 

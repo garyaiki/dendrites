@@ -42,7 +42,7 @@ class SavingsBalancesClientConfigSpec extends WordSpecLike with Matchers with Ba
       val callFuture = typedQuery(GetAccountBalances(id), baseURL)
       val responseFuture = typedResponse(callFuture, mapPlain, mapSavings)
       whenReady(responseFuture, timeout) { result =>
-        result should equal(Right(SavingsAccountBalances(Some(List((1, 111000.1))))))
+        result should equal(Right(SavingsAccountBalances[BigDecimal](Some(List((1, 111000.1))))))
       }
     }
   }

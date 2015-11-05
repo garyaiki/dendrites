@@ -16,15 +16,15 @@ import spray.json.DefaultJsonProtocol
 
 trait BalancesProtocols extends DefaultJsonProtocol {
   implicit val getAccountBalancesFormat = jsonFormat1(GetAccountBalances)
-  implicit val checkingAccountBalancesFormat = jsonFormat1(CheckingAccountBalances)
-  implicit val moneyMarketAccountBalancesFormat = jsonFormat1(MoneyMarketAccountBalances)
-  implicit val savingsAccountBalancesFormat = jsonFormat1(SavingsAccountBalances)
+  implicit val checkingAccountBalancesFormat = jsonFormat1(CheckingAccountBalances[BigDecimal])
+  implicit val moneyMarketAccountBalancesFormat = jsonFormat1(MoneyMarketAccountBalances[BigDecimal])
+  implicit val savingsAccountBalancesFormat = jsonFormat1(SavingsAccountBalances[BigDecimal])
 
   implicit val system: ActorSystem
   implicit val materializer: Materializer
 
   def mapChecking(entity: HttpEntity): Future[Right[String, AnyRef]] = {
-    Unmarshal(entity).to[CheckingAccountBalances].map(Right(_))
+    Unmarshal(entity).to[CheckingAccountBalances[BigDecimal]].map(Right(_))
   }
   
   def mapPlain(entity: HttpEntity): Future[Left[String, Nothing]] = {
@@ -32,11 +32,11 @@ trait BalancesProtocols extends DefaultJsonProtocol {
   }
 
   def mapMoneyMarket(entity: HttpEntity): Future[Right[String, AnyRef]] = {
-    Unmarshal(entity).to[MoneyMarketAccountBalances].map(Right(_))
+    Unmarshal(entity).to[MoneyMarketAccountBalances[BigDecimal]].map(Right(_))
   }
 
   def mapSavings(entity: HttpEntity): Future[Right[String, AnyRef]] = {
-    Unmarshal(entity).to[SavingsAccountBalances].map(Right(_))
+    Unmarshal(entity).to[SavingsAccountBalances[BigDecimal]].map(Right(_))
   }
 }
 
@@ -48,7 +48,7 @@ trait BalancesService extends BalancesProtocols {
   // def config: Config
   //val logger: LoggingAdapter
 
-  def fetchCheckingBalances(id: Long): Either[String, CheckingAccountBalances] = {
+  def fetchCheckingBalances(id: Long): Either[String, CheckingAccountBalances[BigDecimal]] = {
     checkingBalances.get(id) match {
       case Some(x) => Right(CheckingAccountBalances(x))
       case None    => Left(s"Checking account $id not found")
@@ -56,7 +56,7 @@ trait BalancesService extends BalancesProtocols {
     }
   }
 
-  def fetchMMBalances(id: Long): Either[String, MoneyMarketAccountBalances] = {
+  def fetchMMBalances(id: Long): Either[String, MoneyMarketAccountBalances[BigDecimal]] = {
     moneyMarketBalances.get(id) match {
       case Some(x) => Right(MoneyMarketAccountBalances(x))
       case None    => Left(s"Money Market account $id not found")
@@ -64,7 +64,7 @@ trait BalancesService extends BalancesProtocols {
     }
   }
 
-  def fetchSavingsBalances(id: Long): Either[String, SavingsAccountBalances] = {
+  def fetchSavingsBalances(id: Long): Either[String, SavingsAccountBalances[BigDecimal]] = {
     savingsBalances.get(id) match {
       case Some(x) => Right(SavingsAccountBalances(x))
       case None    => Left(s"Savings account $id not found")

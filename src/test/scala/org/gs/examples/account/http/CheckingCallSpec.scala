@@ -44,7 +44,7 @@ class CheckingCallSpec extends WordSpecLike with Matchers with BalancesProtocols
       val responseFuture = partial(GetAccountBalances(id))
 
       whenReady(responseFuture, timeout) { result =>
-        result should equal(Right(CheckingAccountBalances(Some(List((1, 1000.1))))))
+        result should equal(Right(CheckingAccountBalances[BigDecimal](Some(List((1, 1000.1))))))
       }
     }
   }

@@ -42,7 +42,7 @@ class CheckingBalancesClientConfigSpec extends WordSpecLike with Matchers with B
       val responseFuture = typedResponse(callFuture, mapPlain, mapChecking)
 
       whenReady(responseFuture, timeout) { result =>
-        result should equal(Right(CheckingAccountBalances(Some(List((1, 1000.1))))))
+        result should equal(Right(CheckingAccountBalances[BigDecimal](Some(List((1, 1000.1))))))
       }
     }
   }

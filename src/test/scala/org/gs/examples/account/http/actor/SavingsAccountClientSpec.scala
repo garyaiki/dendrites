@@ -18,7 +18,7 @@ class SavingsAccountClientSpec extends TestKit(ActorSystem("test"))
     "get balances when id 1 exists" in {
       val client = system.actorOf(SavingsAccountClient.props(clientConfig), "Savings")
       client ! GetAccountBalances(1L)
-      val obj = expectMsg(Right(SavingsAccountBalances(Some(List((1, 111000.1))))))
+      val obj = expectMsg(Right(SavingsAccountBalances[BigDecimal](Some(List((1, 111000.1))))))
     }
   }
 

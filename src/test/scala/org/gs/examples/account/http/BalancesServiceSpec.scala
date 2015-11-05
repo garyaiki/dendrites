@@ -26,7 +26,7 @@ class BalancesServiceSpec extends FlatSpec with Matchers with ScalatestRouteTest
   val badId = 4L
   val badBalanceQuery = GetAccountBalances(badId)
 
-  val checkingBalances = CheckingAccountBalances(Some(List((goodId, 1000.1))))
+  val checkingBalances = CheckingAccountBalances[BigDecimal](Some(List((goodId, 1000.1))))
 
   val checkingPath = "/account/balances/checking/"
   val balancesQuery = caseClassToGetQuery(balanceQuery)
@@ -45,7 +45,7 @@ class BalancesServiceSpec extends FlatSpec with Matchers with ScalatestRouteTest
     Get(q) ~> routes ~> check {
       status shouldBe OK
       contentType shouldBe `application/json`
-      responseAs[CheckingAccountBalances] shouldBe checkingBalances
+      responseAs[CheckingAccountBalances[BigDecimal]] shouldBe checkingBalances
     }
   }
 
@@ -67,7 +67,7 @@ class BalancesServiceSpec extends FlatSpec with Matchers with ScalatestRouteTest
     Get(mmQ) ~> routes ~> check {
       status shouldBe OK
       contentType shouldBe `application/json`
-      responseAs[MoneyMarketAccountBalances] shouldBe mmBalances
+      responseAs[MoneyMarketAccountBalances[BigDecimal]] shouldBe mmBalances
     }
   }
 
@@ -88,7 +88,7 @@ class BalancesServiceSpec extends FlatSpec with Matchers with ScalatestRouteTest
     Get(saQ) ~> routes ~> check {
       status shouldBe OK
       contentType shouldBe `application/json`
-      responseAs[SavingsAccountBalances] shouldBe saBalances
+      responseAs[SavingsAccountBalances[BigDecimal]] shouldBe saBalances
     }
   }
 

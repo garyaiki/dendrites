@@ -45,7 +45,7 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
       val responseFuture = typedResponse(callFuture, mapPlain, mapMoneyMarket)
 
       whenReady(responseFuture, timeout) { result =>
-        result should equal(Right(MoneyMarketAccountBalances(Some(List((1, 11000.1))))))
+        result should equal(Right(MoneyMarketAccountBalances[BigDecimal](Some(List((1, 11000.1))))))
       }
     }
   }

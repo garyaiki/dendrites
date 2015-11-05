@@ -41,9 +41,9 @@ class ParallelCallFlowSpec extends WordSpecLike with Matchers {
       pub.sendComplete()
       sub.expectComplete()
 
-      response should equal(Right(CheckingAccountBalances(Some(List((1,1000.1))))),
-                            Right(MoneyMarketAccountBalances(Some(List((1,11000.1))))),
-                            Right(SavingsAccountBalances(Some(List((1,111000.1))))))
+      response should equal(Right(CheckingAccountBalances[BigDecimal](Some(List((1,1000.1))))),
+                            Right(MoneyMarketAccountBalances[BigDecimal](Some(List((1,11000.1))))),
+                            Right(SavingsAccountBalances[BigDecimal](Some(List((1,111000.1))))))
     }
   }
 
@@ -59,9 +59,10 @@ class ParallelCallFlowSpec extends WordSpecLike with Matchers {
       pub.sendComplete()
       sub.expectComplete()
 
-      response should equal(Right(CheckingAccountBalances(Some(List((2,2000.2), (22,2200.22))))),
-                          Right(MoneyMarketAccountBalances(Some(List((2,22000.2), (22,22200.22))))),
-                          Right(SavingsAccountBalances(Some(List((2,222000.2), (22,222200.22))))))
+      response should equal(
+          Right(CheckingAccountBalances[BigDecimal](Some(List((2,2000.2), (22,2200.22))))),
+          Right(MoneyMarketAccountBalances[BigDecimal](Some(List((2,22000.2), (22,22200.22))))),
+          Right(SavingsAccountBalances[BigDecimal](Some(List((2,222000.2), (22,222200.22))))))
     }
   }
 
@@ -78,9 +79,12 @@ class ParallelCallFlowSpec extends WordSpecLike with Matchers {
       sub.expectComplete()
 
       response should equal(
-          Right(CheckingAccountBalances(Some(List((3,3000.3), (33,3300.33), (333,3330.33))))),
-          Right(MoneyMarketAccountBalances(Some(List((3,33000.3), (33,33300.33), (333,33330.33))))),
-          Right(SavingsAccountBalances(Some(List((3,333000.3), (33,333300.33), (333,333330.33))))))
+          Right(CheckingAccountBalances[BigDecimal](
+              Some(List((3,3000.3), (33,3300.33), (333,3330.33))))),
+          Right(MoneyMarketAccountBalances[BigDecimal](
+              Some(List((3,33000.3), (33,33300.33), (333,33330.33))))),
+          Right(SavingsAccountBalances[BigDecimal](
+              Some(List((3,333000.3), (33,333300.33), (333,333330.33))))))
     }
   }
 

@@ -20,7 +20,7 @@ class SavingsAccountProxy extends Actor with ActorLogging {
   
   def receive = {
     case GetAccountBalances(id: Long) ⇒
-      sender() ! SavingsAccountBalances(Some(List((1, 150000), (2, 29000))))
+      sender() ! SavingsAccountBalances[Int](Some(List((1, 150000), (2, 29000))))
   }
 }
 

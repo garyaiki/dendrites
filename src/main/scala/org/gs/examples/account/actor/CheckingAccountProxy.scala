@@ -20,7 +20,7 @@ class CheckingAccountProxy extends Actor with ActorLogging {
   
   def receive = {
     case GetAccountBalances(id: Long) ⇒
-      sender() ! CheckingAccountBalances(Some(List((3, 15000))))
+      sender() ! CheckingAccountBalances[Int](Some(List((3, 15000))))
   }
 }
 
