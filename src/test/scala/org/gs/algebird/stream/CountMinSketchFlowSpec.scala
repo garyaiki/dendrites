@@ -23,7 +23,7 @@ import util.Random
   *
   */
 class CountMinSketchFlowSpec extends FlatSpecLike with InetAddressesBuilder {
-  implicit val system = ActorSystem("akka-aggregator")
+  implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
 

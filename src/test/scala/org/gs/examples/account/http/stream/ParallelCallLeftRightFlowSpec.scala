@@ -19,7 +19,7 @@ import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 
 class ParallelCallLeftRightFlowSpec extends WordSpecLike with Matchers {
-  implicit val system = ActorSystem("akka-aggregator")
+  implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   val timeout = Timeout(3000 millis)

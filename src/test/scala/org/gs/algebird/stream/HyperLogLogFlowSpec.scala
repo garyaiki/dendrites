@@ -19,7 +19,7 @@ import com.twitter.algebird._
   *
   */
 class HyperLogLogFlowSpec extends FlatSpecLike with TestValuesBuilder {
-  implicit val system = ActorSystem("akka-aggregator")
+  implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   implicit val ag = HyperLogLogAggregator(12)

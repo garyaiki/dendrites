@@ -6,10 +6,10 @@ import scala.concurrent.duration.MILLISECONDS
 
 class SavingsBalancesClientConfig() {
 
-  val hostConfig = getHostConfig("akka-aggregator.savings-balances.http.interface",
-    "akka-aggregator.savings-balances.http.port")
+  val hostConfig = getHostConfig("dendrites.savings-balances.http.interface",
+    "dendrites.savings-balances.http.port")
   val config = hostConfig._1
-  val baseURL = configBaseUrl("akka-aggregator.savings-balances.http.path", hostConfig)
-  val timeout = new Timeout(config.getInt("akka-aggregator.savings-balances.http.millis"),
+  val baseURL = configBaseUrl("dendrites.savings-balances.http.path", hostConfig)
+  val timeout = new Timeout(config.getInt("dendrites.savings-balances.http.millis"),
       MILLISECONDS)
 }

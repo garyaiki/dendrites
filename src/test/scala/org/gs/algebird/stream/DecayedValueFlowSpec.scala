@@ -19,7 +19,7 @@ import scala.collection.immutable.Range
   *
   */
 class DecayedValueFlowSpec extends FlatSpecLike with TrigUtils {
-  implicit val system = ActorSystem("akka-aggregator")
+  implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   implicit val monoid = DecayedValueMonoid(0.001)

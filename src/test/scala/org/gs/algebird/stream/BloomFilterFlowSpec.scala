@@ -19,7 +19,7 @@ import scala.concurrent.duration._
   *
   */
 class BloomFilterFlowSpec extends FlatSpecLike with BloomFilterBuilder {
-  implicit val system = ActorSystem("akka-aggregator")
+  implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
 

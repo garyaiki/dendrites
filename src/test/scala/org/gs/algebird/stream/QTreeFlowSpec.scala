@@ -17,7 +17,7 @@ import org.gs.algebird.fixtures.QTreeBuilder
   *
   */
 class QTreeFlowSpec extends FlatSpecLike with QTreeBuilder {
-  implicit val system = ActorSystem("akka-aggregator")
+  implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
 

@@ -18,7 +18,7 @@ import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.time.SpanSugar._
 
 class CheckingCallFlowSpec extends WordSpecLike with Matchers with BalancesProtocols {
-  implicit val system = ActorSystem("akka-aggregator")
+  implicit val system = ActorSystem("dendrites")
   override implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   implicit val executor = Executors.newSingleThreadExecutor()
