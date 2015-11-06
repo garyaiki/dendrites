@@ -12,8 +12,8 @@ case object MoneyMarket extends AccountType
 
 final case class GetAccountBalances(id: Long)
 case class GetCustomerAccountBalances(id: Long, accountTypes: Set[AccountType])
-
-case class CheckingAccountBalances[A](balances: AccBalances[A])
-case class MoneyMarketAccountBalances[A](balances: AccBalances[A])
-case class SavingsAccountBalances[A](balances: AccBalances[A])
+sealed trait AccountBalances extends Product
+case class CheckingAccountBalances[A](balances: AccBalances[A]) extends AccountBalances
+case class MoneyMarketAccountBalances[A](balances: AccBalances[A]) extends AccountBalances
+case class SavingsAccountBalances[A](balances: AccBalances[A]) extends AccountBalances
 
