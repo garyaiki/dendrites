@@ -3,8 +3,7 @@
 package org.gs
 
 import com.twitter.algebird._
-import org.gs.algebird.typeclasses.HyperLogLogLike
-import org.gs.algebird.typeclasses.QTreeLike
+import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
 /** Aggregation functions for distributed systems. Simplifies using Twitter Algebird.
   *
   * Algebird provides implicit implementations of common types which are imported here. Class

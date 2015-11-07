@@ -29,7 +29,8 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
   def sinkLeftRight = TestSink.probe[(Seq[String],Seq[AnyRef])]
   val pcf = new ParallelCallFlow
   val wrappedFlow = pcf.wrappedCallsLRFlow
-
+  def source2 = TestSource.probe[Seq[AnyRef]]
+  def sink2 = TestSink.probe[Seq[AnyRef]]
   
   "A ParallelCallAlgebirdFlowClient" should {
     "get balances for id 1" in {
@@ -42,9 +43,9 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-
-      val balancesLists = extractBalancesLists(response._2)
-      balancesLists.flatten should equal (List(1000.1, 11000.1, 111000.1))
+      val balancesLists = extractBalancesVals(response._2)
+      balancesLists should equal (List(1000.1, 11000.1, 111000.1))
+      //println(s"response2:$response2")
     }
   }
 
@@ -59,8 +60,8 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-      val balancesLists = extractBalancesLists(response._2)
-      balancesLists.flatten should equal(List(2000.2,2200.22,22000.2,22200.22,222000.2,222200.22))
+      val balancesLists = extractBalancesVals(response._2)
+      balancesLists should equal(List(2000.2,2200.22,22000.2,22200.22,222000.2,222200.22))
     }
   }
 
@@ -75,8 +76,8 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-      val balancesLists = extractBalancesLists(response._2)
-      balancesLists.flatten should equal(
+      val balancesLists = extractBalancesVals(response._2)
+      balancesLists should equal(
           List(3000.3,3300.33,3330.33,33000.3,33300.33,33330.33,333000.3,333300.33,333330.33))
     }
   }

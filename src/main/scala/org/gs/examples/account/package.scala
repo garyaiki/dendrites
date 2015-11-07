@@ -46,4 +46,9 @@ package object account {
       }
     }
   }
+
+  def extractBalancesVals[A](accountBalances: Seq[AnyRef]) = {
+    val l = extractBalancesLists(accountBalances)
+    l.flatten
+  }
 }
