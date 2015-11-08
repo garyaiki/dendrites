@@ -17,7 +17,7 @@ class ParallelCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
   val scf = new SavingsCallFlow
   
   import FlowGraph.Implicits._ 
-  val fg = FlowGraph.partial() { implicit builder =>
+  val fg = FlowGraph.create() { implicit builder =>
     val bcast: UniformFanOutShape[Product, Product] = builder.add(Broadcast[Product](3))
     val check: FlowShape[Product,Either[String, AnyRef]] = builder.add(ccf.flow)
     val mm: FlowShape[Product,Either[String, AnyRef]] = builder.add(mmcf.flow)
@@ -29,15 +29,15 @@ class ParallelCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
     bcast ~> savings ~> zip.in2
     FlowShape(bcast.in, zip.out)
   }.named("calls")
-  val wrappedFlow = Flow.wrap(fg)
+  val wrappedFlow = Flow.fromGraph(fg)
   
-  val fgLR = FlowGraph.partial() { implicit builder =>
+  val fgLR = FlowGraph.create() { implicit builder =>
     val fgCalls = builder.add(wrappedFlow)
     val fgLR = builder.add(leftRightFlow)
     
     fgCalls ~> fgLR
     FlowShape(fgCalls.inlet, fgLR.outlet)
   }.named("callsLeftRight")
-  val wrappedCallsLRFlow = Flow.wrap(fgLR)
+  val wrappedCallsLRFlow = Flow.fromGraph(fgLR)
 
 }
