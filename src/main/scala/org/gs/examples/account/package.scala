@@ -37,7 +37,7 @@ package object account {
     * @param accountBalances is a Seq of subTypes of AccountBalances
     * @return Seq[List[Product]] call flatten to get List[A]
     */
-  def extractBalancesLists(accountBalances: Seq[AnyRef]): Seq[List[Product]] = {
+  def extractBalancesLists[A](accountBalances: Seq[AnyRef]): Seq[List[A]] = {
     for (i <- accountBalances) yield {
       i match {
         case c: CheckingAccountBalances[BigDecimal]    => extractBalances(c)
@@ -47,7 +47,7 @@ package object account {
     }
   }
 
-  def extractBalancesVals[A](accountBalances: Seq[AnyRef]) = {
+  def extractBalancesVals[A](accountBalances: Seq[AnyRef]): Seq[A] = {
     val l = extractBalancesLists(accountBalances)
     l.flatten
   }
