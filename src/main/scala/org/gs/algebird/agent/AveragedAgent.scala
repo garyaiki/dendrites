@@ -22,15 +22,14 @@ class AveragedAgent(val name: String = "", init: AveragedValue = new AveragedVal
         (implicit ec: ExecutionContext) {
   val agent = Agent(init)
 
-  /** Update agent with sequence of numeric values
+  /** Update agent with another AveragedValue value
     *
-    * @tparam A: Numeric, elements implicitly Numeric
-    * @param xs Seq
+    * @param another AveragedValue
     * @return future of new value for this and all pending updates
     */
-  def update[A: TypeTag: Numeric](xs: Seq[A]): Future[AveragedValue] = {
+  def update(avg: AveragedValue): Future[AveragedValue] = {
     agent alter (oldState => {
-      AveragedGroup.plus(oldState, avg[A](xs))
+      AveragedGroup.plus(oldState, avg)
     })
   }
 }

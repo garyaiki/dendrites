@@ -23,7 +23,8 @@ class AveragedAgentSpec extends WordSpecLike with Matchers with TestValuesBuilde
   "AveragedAgent value of BigDecimals" should {
     "match avg(value)"  in {
       val aa = new AveragedAgent("test BigDecimals")
-      val updateFuture = aa.update(bigDecimals)
+      val another = avg(bigDecimals)
+      val updateFuture = aa.update(another)
       whenReady(updateFuture, timeout) { result =>
         result should equal(avg(bigDecimals))
       }
@@ -33,7 +34,8 @@ class AveragedAgentSpec extends WordSpecLike with Matchers with TestValuesBuilde
   "AveragedAgent value of BigInts" should {
     "match avg(value)"  in {
       val aa = new AveragedAgent("test BigInts")
-      val updateFuture = aa.update(bigInts)
+      val another = avg(bigInts)
+      val updateFuture = aa.update(another)
       whenReady(updateFuture, timeout) { result =>
         result should equal(avg(bigInts))
       }
@@ -43,7 +45,8 @@ class AveragedAgentSpec extends WordSpecLike with Matchers with TestValuesBuilde
   "AveragedAgent value of Doubles" should {
     "match avg(value)"  in {
       val aa = new AveragedAgent("test Doubles")
-      val updateFuture = aa.update(doubles)
+      val another = avg(doubles)
+      val updateFuture = aa.update(another)
       whenReady(updateFuture, timeout) { result =>
         result should equal(avg(doubles))
       }
@@ -53,7 +56,8 @@ class AveragedAgentSpec extends WordSpecLike with Matchers with TestValuesBuilde
   "AveragedAgent value of Floats" should {
     "match avg(value)"  in {
       val aa = new AveragedAgent("test Floats")
-      val updateFuture = aa.update(floats)
+      val another = avg(floats)
+      val updateFuture = aa.update(another)
       whenReady(updateFuture, timeout) { result =>
         result should equal(avg(floats))
       }
@@ -63,7 +67,8 @@ class AveragedAgentSpec extends WordSpecLike with Matchers with TestValuesBuilde
   "AveragedAgent value of Ints" should {
     "match avg(value)"  in {
       val aa = new AveragedAgent("test Ints")
-      val updateFuture = aa.update(ints)
+      val another = avg(ints)
+      val updateFuture = aa.update(another)
       whenReady(updateFuture, timeout) { result =>
         result should equal(avg(ints))
       }
@@ -73,7 +78,8 @@ class AveragedAgentSpec extends WordSpecLike with Matchers with TestValuesBuilde
   "AveragedAgent value of Longss" should {
     "match avg(value)"  in {
       val aa = new AveragedAgent("test Longs")
-      val updateFuture = aa.update(longs)
+      val another = avg(longs)
+      val updateFuture = aa.update(another)
       whenReady(updateFuture, timeout) { result =>
         result should equal(avg(longs))
       }
