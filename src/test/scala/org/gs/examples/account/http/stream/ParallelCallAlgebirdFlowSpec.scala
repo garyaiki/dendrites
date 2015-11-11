@@ -7,6 +7,7 @@ import akka.stream.scaladsl.{ Flow, Keep }
 import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
 import com.twitter.algebird._
 import java.util.concurrent.Executors
+import org.gs.algebird.stream.CreateHLLStage
 import org.gs.algebird.stream._
 import org.gs.http.ClientConnectionPool
 import org.gs.examples.account.{
@@ -94,6 +95,22 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
       //      println(s"avg:$response3")
 
       response3 should equal(AveragedValue(3, 41000.1))
+    }
+
+    "get a HyperLogLog from the Right response" in {
+      val (pub2, sub2) = source2
+        .via(extractBalancesFlow)
+        .transform(() => new CreateHLLStage[BigDecimal])
+        .toMat(TestSink.probe[HLL])(Keep.both).run()
+      sub2.request(1)
+      pub2.sendNext(rightResponse.get)
+      val response3 = sub2.expectNext()
+      println(s"avg:$response3")
+      pub2.sendComplete()
+      sub2.expectComplete()
+      //      println(s"avg:$response3")
+
+      response3.estimatedSize should equal(balancesValues.get.distinct.size.toDouble +- 0.09)
     }
   }
 
