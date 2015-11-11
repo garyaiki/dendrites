@@ -150,8 +150,7 @@ package object stream {
     *    
     * @return max
     */
-  def maxFlow[A: Ordering]: Flow[Seq[A], A, Unit] =
-    Flow[Seq[A]].map(max[A])
+  def maxFlow[A: Ordering]: Flow[Seq[A], A, Unit] = Flow[Seq[A]].map(max[A])
 
   /** Flow to find min value in a sequence
     *
@@ -161,8 +160,7 @@ package object stream {
     *
     * @return min
     */
-  def minFlow[A: Ordering]: Flow[Seq[A], A, Unit] =
-    Flow[Seq[A]].map(min[A])
+  def minFlow[A: Ordering]: Flow[Seq[A], A, Unit] = Flow[Seq[A]].map(min[A])
 
   /** Flow to find max value in a QTree
     *
