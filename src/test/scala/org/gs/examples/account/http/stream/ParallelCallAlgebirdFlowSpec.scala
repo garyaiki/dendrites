@@ -45,11 +45,7 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
     Flow[Seq[AnyRef]].map(extractBalancesVals[BigDecimal])
 
   def source3 = TestSource.probe[Seq[BigDecimal]]
-  def sinkBD = TestSink.probe[Seq[BigDecimal]]
 
-  def prodCast[A](xs: Seq[Product]): Seq[A] = xs.collect {
-    case x: A => x
-  }
   val sink3 = TestSink.probe[AveragedValue]
 
   "A ParallelCallAlgebirdFlowClient" should {
@@ -92,8 +88,6 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
       println(s"avg:$response3")
       pub2.sendComplete()
       sub2.expectComplete()
-      //      println(s"avg:$response3")
-
       response3 should equal(AveragedValue(3, 41000.1))
     }
 
@@ -108,9 +102,35 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
       println(s"avg:$response3")
       pub2.sendComplete()
       sub2.expectComplete()
-      //      println(s"avg:$response3")
-
       response3.estimatedSize should equal(balancesValues.get.distinct.size.toDouble +- 0.09)
+    }
+
+    "get the Max from the Right response" in {
+      val (pub2, sub2) = source2
+        .via(extractBalancesFlow)
+        .via(maxFlow[BigDecimal])
+        .toMat(TestSink.probe[BigDecimal])(Keep.both).run()
+      sub2.request(1)
+      pub2.sendNext(rightResponse.get)
+      val response3 = sub2.expectNext()
+      println(s"avg:$response3")
+      pub2.sendComplete()
+      sub2.expectComplete()
+      response3 should equal(111000.1)
+    }
+
+    "get the Min from the Right response" in {
+      val (pub2, sub2) = source2
+        .via(extractBalancesFlow)
+        .via(minFlow[BigDecimal])
+        .toMat(TestSink.probe[BigDecimal])(Keep.both).run()
+      sub2.request(1)
+      pub2.sendNext(rightResponse.get)
+      val response3 = sub2.expectNext()
+      println(s"avg:$response3")
+      pub2.sendComplete()
+      sub2.expectComplete()
+      response3 should equal(1000.1)
     }
   }
 

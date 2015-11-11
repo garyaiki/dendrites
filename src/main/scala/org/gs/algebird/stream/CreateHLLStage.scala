@@ -9,6 +9,5 @@ import org.gs.algebird.typeclasses.HyperLogLogLike
 class CreateHLLStage[A: HyperLogLogLike](bits: Int = 12) extends PushStage[Seq[A], HLL] {
   implicit val ag = HyperLogLogAggregator(bits)
 
-  override def onPush(elem: Seq[A], ctx: Context[HLL]): SyncDirective =
-    ctx.push(createHLL(elem))
+  override def onPush(elem: Seq[A], ctx: Context[HLL]): SyncDirective = ctx.push(createHLL(elem))
 }
