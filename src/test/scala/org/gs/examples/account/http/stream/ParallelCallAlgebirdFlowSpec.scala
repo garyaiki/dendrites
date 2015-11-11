@@ -40,13 +40,17 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
   var rightResponse: Option[Seq[AnyRef]] = None
   var balancesValues: Option[Seq[BigDecimal]] = None
   val ex = new MapPushStage[Seq[AnyRef], Seq[BigDecimal]](extractBalancesVals[BigDecimal])
+  def exf: Flow[Seq[AnyRef], Seq[BigDecimal], Unit] =
+    Flow[Seq[AnyRef]].map(extractBalancesVals[BigDecimal])
+
   def source3 = TestSource.probe[Seq[BigDecimal]]
-    def sinkBD = TestSink.probe[Seq[BigDecimal]]
+  def sinkBD = TestSink.probe[Seq[BigDecimal]]
 
   def prodCast[A](xs: Seq[Product]): Seq[A] = xs.collect {
-    case x:A => x
+    case x: A => x
   }
   val sink3 = TestSink.probe[AveragedValue]
+
   "A ParallelCallAlgebirdFlowClient" should {
     "get balances for id 1" in {
       val id = 1L
@@ -65,7 +69,7 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
     }
     "extract balances from the Right response" in {
       val (pub2, sub2) = source2
-        .transform(() => ex)
+        .via(extractBalancesFlow)
         .toMat(sink2)(Keep.both).run()
       sub2.request(1)
       pub2.sendNext(rightResponse.get)
@@ -75,11 +79,11 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
       response2 should equal(List(1000.1, 11000.1, 111000.1))
       balancesValues = Some(response2)
     }
-    
+
     "get averaged value from the Right response" in {
       val (pub2, sub2) = source2
-        .transform(() => ex)
-        .via(avgBDFlow)
+        .via(extractBalancesFlow)
+        .via(avgFlow[BigDecimal])
         .toMat(TestSink.probe[AveragedValue])(Keep.both).run()
       sub2.request(1)
       pub2.sendNext(rightResponse.get)
@@ -87,9 +91,9 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
       println(s"avg:$response3")
       pub2.sendComplete()
       sub2.expectComplete()
-//      println(s"avg:$response3")
+      //      println(s"avg:$response3")
 
-      response3 should equal(AveragedValue(3,41000.1))
+      response3 should equal(AveragedValue(3, 41000.1))
     }
   }
 

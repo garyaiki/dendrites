@@ -27,7 +27,7 @@ class HyperLogLogFlowSpec extends FlatSpecLike with TestValuesBuilder {
   val hll2 = createHLL(ints2)
   val hllV = Vector(hll, hll2)
 
-  "A HyperLogLog Flow" should "estimate total number of integers from a Sequence of Int" in {
+  "A HyperLogLog Flow" should "estimate number of distinct integers from a Sequence of Int" in {
     val (pub, sub) = TestSource.probe[HLL]
       .via(estSizeFlow)
       .toMat(TestSink.probe[Double])(Keep.both)
@@ -37,7 +37,7 @@ class HyperLogLogFlowSpec extends FlatSpecLike with TestValuesBuilder {
     val size = sub.expectNext()
     pub.sendComplete()
     sub.expectComplete()
-    assert(size === (ints.size.toDouble +- 0.09))
+    assert(size === (ints.distinct.size.toDouble +- 0.09))
   }
 
   it should "map an HLL to an Approximate" in {

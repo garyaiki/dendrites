@@ -23,21 +23,21 @@ class HyperLogLogAgentSpec extends WordSpecLike with Matchers with TestValuesBui
   val timeout = Timeout(3000 millis)
   
   "HyperLogLogAgent of Ints" should {
-    "estimate total number of integers" in {
+    "estimate number of distinct integers" in {
       val aa = new HyperLogLogAgent[Int]("test Ints")
       val updateFuture = aa.update(ints)
       whenReady(updateFuture, timeout) { result =>
-        result.estimatedSize should equal(ints.size.toDouble +- 0.09)
+        result.estimatedSize should equal(ints.distinct.size.toDouble +- 0.09)
       }
     }
   }
   
   "HyperLogLogAgent of Longs" should {
-    "estimate total number of longs"  in {
+    "estimate number of distinct longs"  in {
       val aa = new HyperLogLogAgent[Long]("test Longs")
       val updateFuture = aa.update(longs)
       whenReady(updateFuture, timeout) { result =>
-        result.estimatedSize should equal(longs.size.toDouble +- 0.09)
+        result.estimatedSize should equal(longs.distinct.size.toDouble +- 0.09)
       }
     }
   }
