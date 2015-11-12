@@ -24,7 +24,7 @@ import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
-import org.gs.stream.MapPushStage
+//import org.gs.stream.MapPushStage
 
 class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
   implicit val system = ActorSystem("dendrites")
@@ -40,7 +40,7 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
   def sink2 = TestSink.probe[Seq[BigDecimal]]
   var rightResponse: Option[Seq[AnyRef]] = None
   var balancesValues: Option[Seq[BigDecimal]] = None
-  val ex = new MapPushStage[Seq[AnyRef], Seq[BigDecimal]](extractBalancesVals[BigDecimal])
+//  val ex = new MapPushStage[Seq[AnyRef], Seq[BigDecimal]](extractBalancesVals[BigDecimal])
   def exf: Flow[Seq[AnyRef], Seq[BigDecimal], Unit] =
     Flow[Seq[AnyRef]].map(extractBalancesVals[BigDecimal])
 

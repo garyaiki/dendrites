@@ -2,10 +2,8 @@ package org.gs.algebird.agent
 
 import akka.agent.Agent
 import com.twitter.algebird._
-import org.gs.algebird._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-import scala.reflect.runtime.universe._
 
 /** Shared state for AveragedValue
   *

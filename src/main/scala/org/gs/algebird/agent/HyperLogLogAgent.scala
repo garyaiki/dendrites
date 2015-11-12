@@ -25,21 +25,19 @@ import scala.reflect.runtime.universe._
   * @param agg HyperLogLogAggregator to add HLLs, 12 bits for 1% accuracy
   * 
   */
-class HyperLogLogAgent[A: HyperLogLogLike](val name: String = "", xs: Option[Seq[A]] = None)
+class HyperLogLogAgent(val name: String = "", init: Option[HLL] = None)
           (implicit ec: ExecutionContext, monoid: HyperLogLogMonoid, agg: HyperLogLogAggregator) {
-  val agent = xs match {
+  val agent = init match {
     case None    => Agent(monoid.zero)
-    case Some(xs) => Agent(createHLL(xs))
+    case Some(hll) => Agent(hll)
   }
 
   /** Update agent with sequence of values
     *
-    * @param xs Seq of Int or Long values
+    * @param hll HyperLogLog
     * @return future of new HLL after this and all pending updates
     */
-  def update(xs: Seq[A]): Future[HLL] = {
-    agent alter (oldState => {
-      oldState + createHLL(xs)
-    })
+  def update(hll: HLL): Future[HLL] = {
+    agent alter (oldState => oldState + hll)
   }
 }

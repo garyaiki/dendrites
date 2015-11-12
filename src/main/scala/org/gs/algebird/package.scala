@@ -3,7 +3,7 @@
 package org.gs
 
 import com.twitter.algebird._
-import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
+import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
 /** Aggregation functions for distributed systems. Simplifies using Twitter Algebird.
   *
   * Algebird provides implicit implementations of common types which are imported here. Class
@@ -337,7 +337,7 @@ package object algebird {
 
   /** Sums sequence elements
     *
-    * Implicit Algebird Semigroup 
+    * Implicit Algebird Semigroup
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Semigroup Semigroup]]
     * @example [[org.gs.algebird.SemigroupSpec]]
     *
@@ -349,7 +349,7 @@ package object algebird {
 
   /** Sums sequence elements
     *
-    * Implicit Algebird Monoid 
+    * Implicit Algebird Monoid
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Monoid Monoid]]
     * @example [[org.gs.algebird.MonoidSpec]]
     *
@@ -361,7 +361,7 @@ package object algebird {
 
   /** Negates an element
     *
-    * Implicit Algebird Group 
+    * Implicit Algebird Group
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Group Group]]
     * @example [[org.gs.algebird.GroupSpec]]
     *
@@ -563,7 +563,7 @@ package object algebird {
   /** AverageValue of a Seq of Numeric elements. First create AveragedValue for each element then
     * sum them
     *
-		* @note when there's more than 1 Numeric type in scope you must use explicitly typed avg below
+    * @note when there's more than 1 Numeric type in scope you must use explicitly typed avg below
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedGroup$ AveragedGroup]]
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Averager$ Averager]]
@@ -621,6 +621,30 @@ package object algebird {
   def bloomFilterPartition(xs: Seq[String])(implicit bf: BF): (Seq[String], Seq[String]) =
     xs.partition(bf.contains(_).isTrue)
 
+  implicit object CMSHasherArrayByte extends CMSHasher[Array[Byte]] {
+    override def hash(a: Int, b: Int, width: Int)(x: Array[Byte]): Int = {
+      val hash: Int = scala.util.hashing.MurmurHash3.arrayHash(x, a)
+      val positiveHash = hash & Int.MaxValue
+      positiveHash % width
+    }
+  }
+
+  def doubleToArrayBytes(d: Double): Array[Byte] = {
+    val l: Long = java.lang.Double.doubleToLongBits(d)
+    java.nio.ByteBuffer.allocate(8).putLong(l).array()
+  }
+  implicit val cmsHasherDouble: CMSHasher[Double] =
+        CMSHasherArrayByte.contramap((d: Double) => doubleToArrayBytes(d))
+
+  def floatToArrayBytes(f: Float): Array[Byte] = doubleToArrayBytes(f.toDouble)
+  implicit val cmsHasherFloat: CMSHasher[Float] =
+        CMSHasherArrayByte.contramap((f: Float) => floatToArrayBytes(f))
+
+  /** Double.NEGATIVE_INFINITY or Double.POSITIVE_INFINITY when > Double */
+  def bigDecimalToArrayBytes(bd: BigDecimal): Array[Byte] =
+        doubleToArrayBytes(bd.toDouble)
+  implicit val cmsHasherBigDecimal: CMSHasher[BigDecimal] =
+        CMSHasherArrayByte.contramap((bd: BigDecimal) => bigDecimalToArrayBytes(bd))
   /** create CMSMonoid
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSMonoid CMSMonoid]]
@@ -634,8 +658,8 @@ package object algebird {
     * @return CMSMonoid[K]
     */
   def createCMSMonoid[K: Ordering: CMSHasher](eps: Double = 0.001,
-              delta: Double = 1E-10,
-              seed: Int = 1): CMSMonoid[K] = new CMSMonoid[K](eps, delta, seed)
+                                              delta: Double = 1E-10,
+                                              seed: Int = 1): CMSMonoid[K] = new CMSMonoid[K](eps, delta, seed)
 
   /** Create a CMS
     *
@@ -649,8 +673,7 @@ package object algebird {
     * @param monoid implicit CMSMonoid for K
     * @return CMS for data
     */
-  def createCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])(implicit monoid: CMSMonoid[K]):
-              CMS[K] = monoid.create(xs)
+  def createCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])(implicit monoid: CMSMonoid[K]): CMS[K] = monoid.create(xs)
 
   /** Sum a Sequence of CMS
     *
@@ -664,8 +687,7 @@ package object algebird {
     * @param monoid
     * @return CMS as the sum of Sequence of CMS
     */
-  def sumCountMinSketch[K: Ordering: CMSHasher](xs: Seq[CMS[K]])(implicit monoid: CMSMonoid[K]):
-              CMS[K] = xs.reduce(monoid.plus(_, _))
+  def sumCountMinSketch[K: Ordering: CMSHasher](xs: Seq[CMS[K]])(implicit monoid: CMSMonoid[K]): CMS[K] = xs.reduce(monoid.plus(_, _))
 
   /** Turn a sequence of value, time tuples into a seq of DecayedValues
     *
@@ -679,8 +701,7 @@ package object algebird {
     * @param monoid implicit DecayedValueMonoid used to scan from initial value
     * @return seq of DecayedValues
     */
-  def toDecayedValues(halfLife: Double, last: Option[DecayedValue] = None)
-            (xs: Seq[(Double, Double)])(implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
+  def toDecayedValues(halfLife: Double, last: Option[DecayedValue] = None)(xs: Seq[(Double, Double)])(implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
     val z = last match {
       case None    => monoid.zero
       case Some(x) => x
@@ -724,7 +745,7 @@ package object algebird {
     * @return Sequence of Approximate
     */
   def mapHLL2Approximate(xs: Seq[HLL]): Seq[Approximate[Long]] = xs.map(_.approximateSize)
-  
+
   /** Estimate total count of distinct integer values in multiple HyperLogLogs
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
@@ -750,8 +771,7 @@ package object algebird {
     * @param sg implicit QTreeSemigroup
     * @return
     */
-  def buildQTree[A: QTreeLike](vals: Seq[A])(implicit ev: QTreeLike[A], sg: QTreeSemigroup[A]):
-            QTree[A] = vals.map { ev(_) }.reduce { sg.plus(_, _) }
+  def buildQTree[A: QTreeLike](vals: Seq[A])(implicit ev: QTreeLike[A], sg: QTreeSemigroup[A]): QTree[A] = vals.map { ev(_) }.reduce { sg.plus(_, _) }
 
   /** Sum a Sequence of QTrees
     *
@@ -765,6 +785,5 @@ package object algebird {
     * @param sg
     * @return
     */
-  def sumQTrees[A: QTreeSemigroup](qTrees: Seq[QTree[A]])(implicit sg: QTreeSemigroup[A]):
-            QTree[A] = qTrees.reduce(sg.plus(_, _))
+  def sumQTrees[A: QTreeSemigroup](qTrees: Seq[QTree[A]])(implicit sg: QTreeSemigroup[A]): QTree[A] = qTrees.reduce(sg.plus(_, _))
 }

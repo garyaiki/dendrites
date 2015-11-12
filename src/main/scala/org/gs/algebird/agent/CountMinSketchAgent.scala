@@ -26,14 +26,12 @@ class CountMinSketchAgent[K: Ordering: CMSHasher](val name: String = "")
   implicit val m = createCMSMonoid[K]()
   val agent = Agent(m.zero)
 
-  /** Update agent with sequence of Longs
+  /** Update agent with sequence of CMS[K]
     *
-    * @param xs Seq
-    * @return future of new value after this and all pending updates
+    * @param other CMS
+    * @return future of combined CMS after this and all pending updates
     */
-  def update(xs: Seq[K]): Future[CMS[K]] = {
-    agent alter (oldState => {
-      oldState ++ createCountMinSketch(xs)
-    })
+  def update(cms: CMS[K]): Future[CMS[K]] = {
+    agent alter (oldState => oldState ++ cms)
   }
 }

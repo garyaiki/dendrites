@@ -11,13 +11,14 @@ import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class CountMinSketchAgentSpec extends WordSpecLike with Matchers with TestValuesBuilder {
-
+  implicit val m = createCMSMonoid[Long]()
   val timeout = Timeout(3000 millis)
 
   "A CountMinSketchAgent totalCount" should {
     "equal total size" in {
       val aa = new CountMinSketchAgent[Long]("test Longs")
-      val updateFuture = aa.update(longs)
+      val cms0 = createCountMinSketch(longs)
+      val updateFuture = aa.update(cms0)
       whenReady(updateFuture, timeout) { result =>
         result.totalCount should equal(longs.size)
       }

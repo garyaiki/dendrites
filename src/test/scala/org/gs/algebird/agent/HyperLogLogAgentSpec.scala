@@ -24,8 +24,9 @@ class HyperLogLogAgentSpec extends WordSpecLike with Matchers with TestValuesBui
   
   "HyperLogLogAgent of Ints" should {
     "estimate number of distinct integers" in {
-      val aa = new HyperLogLogAgent[Int]("test Ints")
-      val updateFuture = aa.update(ints)
+      val aa = new HyperLogLogAgent("test Ints")
+      val hll = createHLL(ints)
+      val updateFuture = aa.update(hll)
       whenReady(updateFuture, timeout) { result =>
         result.estimatedSize should equal(ints.distinct.size.toDouble +- 0.09)
       }
@@ -34,8 +35,9 @@ class HyperLogLogAgentSpec extends WordSpecLike with Matchers with TestValuesBui
   
   "HyperLogLogAgent of Longs" should {
     "estimate number of distinct longs"  in {
-      val aa = new HyperLogLogAgent[Long]("test Longs")
-      val updateFuture = aa.update(longs)
+      val aa = new HyperLogLogAgent("test Longs")
+      val hll = createHLL(longs)
+      val updateFuture = aa.update(hll)
       whenReady(updateFuture, timeout) { result =>
         result.estimatedSize should equal(longs.distinct.size.toDouble +- 0.09)
       }
