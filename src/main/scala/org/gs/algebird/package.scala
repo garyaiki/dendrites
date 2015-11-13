@@ -634,17 +634,17 @@ package object algebird {
     java.nio.ByteBuffer.allocate(8).putLong(l).array()
   }
   implicit val cmsHasherDouble: CMSHasher[Double] =
-        CMSHasherArrayByte.contramap((d: Double) => doubleToArrayBytes(d))
+    CMSHasherArrayByte.contramap((d: Double) => doubleToArrayBytes(d))
 
   def floatToArrayBytes(f: Float): Array[Byte] = doubleToArrayBytes(f.toDouble)
   implicit val cmsHasherFloat: CMSHasher[Float] =
-        CMSHasherArrayByte.contramap((f: Float) => floatToArrayBytes(f))
+    CMSHasherArrayByte.contramap((f: Float) => floatToArrayBytes(f))
 
   /** Double.NEGATIVE_INFINITY or Double.POSITIVE_INFINITY when > Double */
   def bigDecimalToArrayBytes(bd: BigDecimal): Array[Byte] =
-        doubleToArrayBytes(bd.toDouble)
+    doubleToArrayBytes(bd.toDouble)
   implicit val cmsHasherBigDecimal: CMSHasher[BigDecimal] =
-        CMSHasherArrayByte.contramap((bd: BigDecimal) => bigDecimalToArrayBytes(bd))
+    CMSHasherArrayByte.contramap((bd: BigDecimal) => bigDecimalToArrayBytes(bd))
   /** create CMSMonoid
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSMonoid CMSMonoid]]
@@ -757,6 +757,8 @@ package object algebird {
   def sumHLLApproximateSizes(xs: Seq[HLL]): Approximate[Long] = {
     xs.reduce(_ + _).approximateSize
   }
+
+  def buildQTrees[A: QTreeLike](vals: Seq[A])(implicit ev: QTreeLike[A]): Seq[QTree[A]] = vals.map(ev(_))
 
   /** Build a QTree from a Seq
     *

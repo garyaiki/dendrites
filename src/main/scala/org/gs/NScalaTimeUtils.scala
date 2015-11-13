@@ -1,11 +1,12 @@
 /**
   */
-package org.gs.fixtures
+package org.gs
 
 import com.github.nscala_time.time.Imports._
 import org.joda.time.base.BaseSingleFieldPeriod
 import org.joda.time.{ Seconds, Minutes, Hours, Days, Weeks, Months, Years }
-import scala.language.postfixOps
+import scala.math.Pi
+import scala.math.sin
 
 /** @author garystruthers
   *

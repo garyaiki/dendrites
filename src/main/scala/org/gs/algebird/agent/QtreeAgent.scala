@@ -28,9 +28,9 @@ class QTreeAgent[A: QTreeLike : TypeTag](val name: String = "",
                                          level: Int = 16,
                                          xs: Option[Seq[A]] = None)
              (implicit ec: ExecutionContext, sg: QTreeSemigroup[A]) {
-  val zero = sg.underlyingMonoid.zero
+  val zero: QTree[A] = implicitly[QTreeLike[A]].apply(sg.underlyingMonoid.zero)
   val agent = xs match {
-    case None    => Agent(buildQTree[A](Seq[A](zero)))
+    case None    => Agent(zero)
     case Some(xs) => Agent(buildQTree[A](xs))
   }
 
@@ -42,8 +42,8 @@ class QTreeAgent[A: QTreeLike : TypeTag](val name: String = "",
   def update(xs: Seq[A]): Future[QTree[A]] = {
     agent alter (oldState => {
       oldState match {
-        case zero => buildQTree[A](xs)
-        case _ => sg.plus(oldState, buildQTree[A](xs))
+        case `zero` => buildQTree[A](xs)
+        case _ => sg.sumOption(buildQTrees[A](xs) :+ oldState).get
       }
     })
   }

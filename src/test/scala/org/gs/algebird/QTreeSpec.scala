@@ -238,4 +238,9 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
     assert(iqm._1 > 88.6)
     assert(iqm._2 < 97.8)
   }
+  
+  "A Sequence of QTrees" should "be created from a Sequence of BigDecimal" in {
+    val qTrees: Seq[QTree[BigDecimal]] = buildQTrees(bigDecimals)
+    assert(qTrees.size === bigDecimals.size)
+  }
 }
