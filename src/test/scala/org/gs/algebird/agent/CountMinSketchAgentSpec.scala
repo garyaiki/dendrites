@@ -18,7 +18,7 @@ class CountMinSketchAgentSpec extends WordSpecLike with Matchers with TestValues
     "equal total size" in {
       val aa = new CountMinSketchAgent[Long]("test Longs")
       val cms0 = createCountMinSketch(longs)
-      val updateFuture = aa.update(cms0)
+      val updateFuture = aa.alter(cms0)
       whenReady(updateFuture, timeout) { result =>
         result.totalCount should equal(longs.size)
       }

@@ -31,7 +31,7 @@ class CountMinSketchAgent[K: Ordering: CMSHasher](val name: String = "")
     * @param other CMS
     * @return future of combined CMS after this and all pending updates
     */
-  def update(cms: CMS[K]): Future[CMS[K]] = {
+  def alter(cms: CMS[K]): Future[CMS[K]] = {
     agent alter (oldState => oldState ++ cms)
   }
 }

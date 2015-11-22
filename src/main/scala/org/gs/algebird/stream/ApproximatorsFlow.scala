@@ -26,12 +26,12 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher:  TypeTag](
                         in4: QTree[A]) => (in0, in1, in2, in3, in4))
 
   def avgAgflow: Flow[AveragedValue, AveragedValue, Unit] =
-        Flow[AveragedValue].mapAsync(1)(avgAgent.update)
-  def cmsAgflow: Flow[CMS[A], CMS[A], Unit] = Flow[CMS[A]].mapAsync(1)(cmsAgent.update)
+        Flow[AveragedValue].mapAsync(1)(avgAgent.alter)
+  def cmsAgflow: Flow[CMS[A], CMS[A], Unit] = Flow[CMS[A]].mapAsync(1)(cmsAgent.alter)
   def dcaAgFlow: Flow[Seq[(Double, Double)], Seq[DecayedValue], Unit] =
-        Flow[Seq[(Double, Double)]].mapAsync(1)(dcaAgent.update)
-  def hllAgflow: Flow[HLL, HLL, Unit] = Flow[HLL].mapAsync(1)(hllAgent.update)
-  def qtrAgFlow: Flow[Seq[A], QTree[A], Unit] = Flow[Seq[A]].mapAsync(1)(qtrAgent.update)
+        Flow[Seq[(Double, Double)]].mapAsync(1)(dcaAgent.alter)
+  def hllAgflow: Flow[HLL, HLL, Unit] = Flow[HLL].mapAsync(1)(hllAgent.alter)
+  def qtrAgFlow: Flow[Seq[A], QTree[A], Unit] = Flow[Seq[A]].mapAsync(1)(qtrAgent.alter)
   
   import FlowGraph.Implicits._ 
   val approximators = FlowGraph.create() { implicit builder =>

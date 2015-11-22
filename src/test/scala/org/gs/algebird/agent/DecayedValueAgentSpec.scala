@@ -26,18 +26,18 @@ class DecayedValueAgentSpec extends WordSpecLike with TrigUtils {
 
   "A DecayedValueAgent average with halfLife 10.0" should {
     val decayedValues = new DecayedValueAgent("test90", 10.0, None)
-    val updateFuture = decayedValues.update(sinesZip)
+    val updateFuture = decayedValues.alter(sinesZip)
     "exceed the mean at 90º" in {
       whenReady(updateFuture, timeout) { result =>
         result(90).average(10.0) > meanDay90
       }
     }
     "equal the first 90 values" in {
-        val old = decayedValues.getOld(90)
+        val old = decayedValues.agent.get().take(90)
         assert(old(89).average(10.0) > meanDay90)
     }
     "have a lower average after droping first 90" in {
-      val newer = decayedValues.agent.get()
+      val newer = decayedValues.agent.get().drop(90)
       assert(newer(90).average(10.0) < meanDay90)
     }
   }

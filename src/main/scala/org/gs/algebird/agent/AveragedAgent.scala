@@ -25,7 +25,7 @@ class AveragedAgent(val name: String = "", init: AveragedValue = new AveragedVal
     * @param another AveragedValue
     * @return future of new value for this and all pending updates
     */
-  def update(avg: AveragedValue): Future[AveragedValue] = {
+  def alter(avg: AveragedValue): Future[AveragedValue] = {
     agent alter (oldState => {
       AveragedGroup.plus(oldState, avg)
     })

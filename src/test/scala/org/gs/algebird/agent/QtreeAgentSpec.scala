@@ -30,7 +30,7 @@ class QTreeAgentSpec extends WordSpecLike with Matchers with TestValuesBuilder {
     }
     "have the count of first update data" in {
       val qTreeAgent = new QTreeAgent[BigDecimal]("testBD 1st update data")
-      val updateFuture = qTreeAgent.update(bigDecimals)
+      val updateFuture = qTreeAgent.alter(bigDecimals)
       whenReady(updateFuture, timeout) { result =>
         result.count should equal(bigDecimals.size)
       }

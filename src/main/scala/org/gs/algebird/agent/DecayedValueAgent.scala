@@ -33,24 +33,10 @@ class DecayedValueAgent(val name: String = "", halfLife: Double, last: Option[De
     * @param xs Seq tuple of values and times
     * @return future of new value after this and all pending updates
     */
-  def update(xs: Seq[(Double, Double)]): Future[Seq[DecayedValue]] = {
+  def alter(xs: Seq[(Double, Double)]): Future[Seq[DecayedValue]] = {
     agent alter (oldState => {
       val decayed = toDecayedValues(halfLife, Some(oldState.last))(xs)
-      val mustDrop = (oldState.size + xs.size) - Int.MaxValue
-      if (mustDrop > 0) oldState.drop(mustDrop) ++ decayed else oldState ++ decayed
+      oldState ++ decayed
     })
-  }
-
-  /** Get then remove oldest values from agent
-    *
-    * @param length number to remove
-    * @return oldest values Not the latest values
-    */
-  def getOld(length: Int): Seq[DecayedValue] = {
-    val oldest = agent.get().take(length)
-    agent send (oldState => {
-      oldState.drop(length)
-    })
-    oldest
   }
 }

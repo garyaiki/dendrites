@@ -39,7 +39,7 @@ class QTreeAgent[A: QTreeLike : TypeTag](val name: String = "",
     * @param xs Seq of BigDecimal, BigInt, Double, Float, Int or Long
     * @return future of new QTree after this and all pending updates
     */
-  def update(xs: Seq[A]): Future[QTree[A]] = {
+  def alter(xs: Seq[A]): Future[QTree[A]] = {
     agent alter (oldState => {
       oldState match {
         case `zero` => buildQTree[A](xs)
