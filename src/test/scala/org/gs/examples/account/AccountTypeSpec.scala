@@ -11,7 +11,6 @@ import org.gs.examples.fixtures.AccountTypesBuilder
   */
 class AccountTypeSpec extends FlatSpecLike with AccountTypesBuilder {
 
-  
   "An AccountType ProductFilter" should "return all AccBalance elements" in {
     val filtered = accountBalances.filter(isAccBalances)
 
@@ -19,10 +18,10 @@ class AccountTypeSpec extends FlatSpecLike with AccountTypesBuilder {
   }
 
   it should "return all id elements" in {
-    assert(accIds.forall(isLong))
+    assert(accIds.forall(_.isInstanceOf[Long]))
   }
-  
+
   it should "return all value elements" in {
-    assert(accVals.forall(isBigDecimal))
+    assert(accVals.forall(_.isInstanceOf[BigDecimal]))
   }
 }

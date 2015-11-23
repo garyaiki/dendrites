@@ -2,6 +2,8 @@
   */
 package org.gs
 
+import scala.reflect.{ClassTag, classTag}
+
 /** @author garystruthers
   *
   */
@@ -16,8 +18,7 @@ package object filters {
     * @param f filter or predicate function
     * @return matching elements
     */
-  def productFilter[P <: Product](e: P, f: TypeFilter) = {
-    //    println(s"productFilter e:$e")
+  def productFilter[P <: Product](e: P, f: TypeFilter): IndexedSeq[Any] = {
     val iter = e.productIterator
     iter.filter(f).toIndexedSeq
   }
@@ -37,88 +38,30 @@ package object filters {
       e <- xs
       ef <- pf(e, f)
     } yield ef
-    //    println(s"filterProducts l:${l}")
     l
   }
 
-  def isType[A](e: Any): Boolean = e.isInstanceOf[A]
-  def isBigDecimal(e: Any): Boolean = e.isInstanceOf[BigDecimal]
-  def isBigInt(e: Any): Boolean = e.isInstanceOf[BigInt]
-  def isBoolean(e: Any) = e.isInstanceOf[Boolean]
-  def isDouble(e: Any): Boolean = e.isInstanceOf[Double]
-  def isFloat(e: Any): Boolean = e.isInstanceOf[Float]
-  def isInt(e: Any): Boolean = e.isInstanceOf[Int]
-  def isLong(e: Any): Boolean = e.isInstanceOf[Long]
-  def isString(e: Any): Boolean = e.isInstanceOf[String]
-  def isOptionBigDecimal(e: Any): Boolean = e match {
-    case Some(x) => x.isInstanceOf[BigDecimal]
-    case _       => false
+  def isType[A: ClassTag](e: Any): Boolean = {
+    evidence$1.unapply(e) match {
+      case Some(x) => true
+      case None => false
+    }
   }
-  def isOptionBigInt(e: Any): Boolean = e match {
-    case Some(x) => x.isInstanceOf[BigInt]
-    case _       => false
+
+  def isOptionType[A: ClassTag](e: Any): Boolean = e match {
+    case Some(x) => {
+      evidence$2.unapply(e) match {
+        case Some(x) => true
+        case None => false
+      }
+    }
+    case _ => false
   }
-  def isOptionBoolean(e: Any): Boolean = e match {
-    case Some(x) => x.isInstanceOf[Boolean]
-    case _       => false
-  }
-  def isOptionDouble(e: Any): Boolean = e match {
-    case Some(x) => x.isInstanceOf[Double]
-    case _       => false
-  }
-  def isOptionFloat(e: Any): Boolean = e match {
-    case Some(x) => x.isInstanceOf[Float]
-    case _       => false
-  }
-  def isOptionInt(e: Any): Boolean = e match {
-    case Some(x) => x.isInstanceOf[Int]
-    case _       => false
-  }
-  def isOptionLong(e: Any): Boolean = e match {
-    case Some(x) => x.isInstanceOf[Long]
-    case _       => false
-  }
-  def isOptionString(e: Any): Boolean = e match {
-    case Some(x) => x.isInstanceOf[String]
-    case _       => false
-  }
-  def isEitherStringBigDecimal(e: Any): Boolean = e match {
-    case Right(x) => x.isInstanceOf[BigDecimal]
-    case Left(x)  => x.isInstanceOf[String]
-    case _        => false
-  }
-  def isEitherStringBigInt(e: Any): Boolean = e match {
-    case Right(x) => x.isInstanceOf[BigInt]
-    case Left(x)  => x.isInstanceOf[String]
-    case _        => false
-  }
-  def isEitherStringBoolean(e: Any): Boolean = e match {
-    case Right(x) => x.isInstanceOf[Boolean]
-    case Left(x)  => x.isInstanceOf[String]
-    case _        => false
-  }
-  def isEitherStringDouble(e: Any): Boolean = e match {
-    case Right(x) => x.isInstanceOf[Double]
-    case Left(x)  => x.isInstanceOf[String]
-    case _        => false
-  }
-  def isEitherStringFloat(e: Any): Boolean = e match {
-    case Right(x) => x.isInstanceOf[Float]
-    case Left(x)  => x.isInstanceOf[String]
-    case _        => false
-  }
-  def isEitherStringInt(e: Any): Boolean = e match {
-    case Right(x) => x.isInstanceOf[Int]
-    case Left(x)  => x.isInstanceOf[String]
-    case _        => false
-  }
-  def isEitherStringLong(e: Any): Boolean = e match {
-    case Right(x) => x.isInstanceOf[Long]
-    case Left(x)  => x.isInstanceOf[String]
-    case _        => false
-  }
-  def isEitherStringString(e: Any): Boolean = e match {
-    case Right(x) => x.isInstanceOf[String]
+  def isEitherStringRight[A: ClassTag](e: Any): Boolean = e match {
+    case Right(x) => {
+      val clazz = implicitly[ClassTag[A]].runtimeClass
+      clazz.isInstance(x)
+    }
     case Left(x)  => x.isInstanceOf[String]
     case _        => false
   }
@@ -149,9 +92,12 @@ package object filters {
     * @tparam A type of Left element
     * @tparam B type of Right element
     * @param in Either
-    * @return value in Left
+    * @return optional value in Left
     */
-  def extractLeft[A, B](in: Either[A, B]): A = in match { case Left(l) => l }
+  def extractLeft[A, B](in: Either[A, B]): Option[A] = in match {
+    case Left(l) => Some(l)
+    case _ => None
+  }
 
   /** Extract value from Either Right
     * @tparam A type of Left element
@@ -159,7 +105,10 @@ package object filters {
     * @param in Either
     * @return value in Right
     */
-  def extractRight[A, B](in: Either[A, B]): B = in match { case Right(r) => r }
+  def extractRight[A, B](in: Either[A, B]): Option[B] = in match {
+    case Right(r) => Some(r)
+    case _ => None
+  }
 
   /** Extract a specified single element from a sequence of case classes or tuples
     *
@@ -173,7 +122,7 @@ package object filters {
     * @throws ClassCastException if element doesn't match type param
     */
   def extractElementByIndex[A](l: Seq[Product], element: Int): Seq[A] =
-    for (p <- l) yield p.productElement(element).asInstanceOf[A]
+    for {p <- l} yield p.productElement(element).asInstanceOf[A]
 
   /** Extract a Sequence of 2 element Tuples from a sequence of case classes or tuples
     *
@@ -189,7 +138,7 @@ package object filters {
     * @throws ClassCastException if element doesn't match type param
     */
   def extractTuple2ByIndex[A, B](l: Seq[Product], element1: Int, element2: Int): Seq[(A, B)] =
-    for (p <- l) yield {
+    for {p <- l} yield {
       (p.productElement(element1).asInstanceOf[A],
         p.productElement(element2).asInstanceOf[B])
     }
