@@ -9,7 +9,7 @@ import akka.actor.ActorRef
  *  def f = pfPlusSender(originalSender)(_)
  *  val pf = PartialFunction(f)
  *  }}}
- *  
+ *
  * @author garystruthers
  *
  */

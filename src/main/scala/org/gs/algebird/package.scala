@@ -2,7 +2,10 @@
   */
 package org.gs
 
-import com.twitter.algebird._
+import com.twitter.algebird.{Approximate, AveragedValue, AveragedGroup, Averager, BF, BloomFilter,
+  CMS, CMSHasher, CMSMonoid, DecayedValue, DecayedValueMonoid, Field, Functor, Group, HLL,
+  HyperLogLogAggregator, IntRing, LongRing, MaxAggregator, MinAggregator, Monoid, NumericRing,
+  QTree, QTreeSemigroup, Ring, Semigroup}
 import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
 /** Aggregation functions for distributed systems. Simplifies using Twitter Algebird.
   *
@@ -492,12 +495,12 @@ package object algebird {
     * @see http://twitter.github.io/algebird/#com.twitter.algebird.Field
     */
   implicit object IntField extends Field[Int] {
-    def zero = IntRing.zero
-    def one = IntRing.one
-    override def negate(v: Int) = IntRing.negate(v)
-    def plus(l: Int, r: Int) = IntRing.plus(l, r)
-    override def minus(l: Int, r: Int) = IntRing.minus(l, r)
-    def times(l: Int, r: Int) = IntRing.times(l, r)
+    def zero: Int = IntRing.zero
+    def one: Int = IntRing.one
+    override def negate(v: Int): Int = IntRing.negate(v)
+    def plus(l: Int, r: Int): Int = IntRing.plus(l, r)
+    override def minus(l: Int, r: Int): Int = IntRing.minus(l, r)
+    def times(l: Int, r: Int): Int = IntRing.times(l, r)
     override def div(l: Int, r: Int): Int = {
       assertNotZero(r)
       l / r
@@ -514,12 +517,12 @@ package object algebird {
     * @see http://twitter.github.io/algebird/#com.twitter.algebird.Field
     */
   implicit object LongField extends Field[Long] {
-    def zero = LongRing.zero
-    def one = LongRing.one
-    override def negate(v: Long) = LongRing.negate(v)
-    def plus(l: Long, r: Long) = LongRing.plus(l, r)
-    override def minus(l: Long, r: Long) = LongRing.minus(l, r)
-    def times(l: Long, r: Long) = LongRing.times(l, r)
+    def zero: Long = LongRing.zero
+    def one: Long = LongRing.one
+    override def negate(v: Long): Long = LongRing.negate(v)
+    def plus(l: Long, r: Long): Long = LongRing.plus(l, r)
+    override def minus(l: Long, r: Long): Long = LongRing.minus(l, r)
+    def times(l: Long, r: Long): Long = LongRing.times(l, r)
     override def div(l: Long, r: Long): Long = {
       assertNotZero(r)
       l / r
@@ -542,7 +545,7 @@ package object algebird {
     * @return Seq[B]
     */
   implicit object SeqFunctor extends Functor[Seq] {
-    def map[A, B](fa: Seq[A])(f: A => B): Seq[B] = (for (a <- fa) yield f(a))
+    def map[A, B](fa: Seq[A])(f: A => B): Seq[B] = (for {a <- fa} yield f(a))
   }
 
   /** Compose 2 functors map Seq[A] -> Seq[B] -> Seq[C] using Algebird Functor
@@ -673,7 +676,8 @@ package object algebird {
     * @param monoid implicit CMSMonoid for K
     * @return CMS for data
     */
-  def createCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])(implicit monoid: CMSMonoid[K]): CMS[K] = monoid.create(xs)
+  def createCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])(implicit monoid: CMSMonoid[K]):
+      CMS[K] = monoid.create(xs)
 
   /** Sum a Sequence of CMS
     *
@@ -687,7 +691,8 @@ package object algebird {
     * @param monoid
     * @return CMS as the sum of Sequence of CMS
     */
-  def sumCountMinSketch[K: Ordering: CMSHasher](xs: Seq[CMS[K]])(implicit monoid: CMSMonoid[K]): CMS[K] = xs.reduce(monoid.plus(_, _))
+  def sumCountMinSketch[K: Ordering: CMSHasher](xs: Seq[CMS[K]])(implicit monoid: CMSMonoid[K]):
+      CMS[K] = xs.reduce(monoid.plus(_, _))
 
   /** Turn a sequence of value, time tuples into a seq of DecayedValues
     *
@@ -701,7 +706,8 @@ package object algebird {
     * @param monoid implicit DecayedValueMonoid used to scan from initial value
     * @return seq of DecayedValues
     */
-  def toDecayedValues(halfLife: Double, last: Option[DecayedValue] = None)(xs: Seq[(Double, Double)])(implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
+  def toDecayedValues(halfLife: Double, last: Option[DecayedValue] = None)
+      (xs: Seq[(Double, Double)])(implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
     val z = last match {
       case None    => monoid.zero
       case Some(x) => x
@@ -710,8 +716,8 @@ package object algebird {
     def op(previous: DecayedValue, x: (Double, Double)): DecayedValue = {
       val (value, time) = x
       val d = time match {
-        case x if (time < 1.0)      => 1.0
-        case x if (time < halfLife) => time
+        case _ if (time < 1.0)      => 1.0
+        case _ if (time < halfLife) => time
         case _                      => halfLife
       }
       monoid.plus(previous, DecayedValue.build(value, time, d))
@@ -758,7 +764,8 @@ package object algebird {
     xs.reduce(_ + _).approximateSize
   }
 
-  def buildQTrees[A: QTreeLike](vals: Seq[A])(implicit ev: QTreeLike[A]): Seq[QTree[A]] = vals.map(ev(_))
+  def buildQTrees[A: QTreeLike](vals: Seq[A])(implicit ev: QTreeLike[A]): Seq[QTree[A]] =
+    vals.map(ev(_))
 
   /** Build a QTree from a Seq
     *
@@ -773,7 +780,8 @@ package object algebird {
     * @param sg implicit QTreeSemigroup
     * @return
     */
-  def buildQTree[A: QTreeLike](vals: Seq[A])(implicit ev: QTreeLike[A], sg: QTreeSemigroup[A]): QTree[A] = vals.map { ev(_) }.reduce { sg.plus(_, _) }
+  def buildQTree[A: QTreeLike](vals: Seq[A])(implicit ev: QTreeLike[A], sg: QTreeSemigroup[A]):
+      QTree[A] = vals.map { ev(_) }.reduce { sg.plus(_, _) }
 
   /** Sum a Sequence of QTrees
     *
@@ -787,5 +795,6 @@ package object algebird {
     * @param sg
     * @return
     */
-  def sumQTrees[A: QTreeSemigroup](qTrees: Seq[QTree[A]])(implicit sg: QTreeSemigroup[A]): QTree[A] = qTrees.reduce(sg.plus(_, _))
+  def sumQTrees[A: QTreeSemigroup](qTrees: Seq[QTree[A]])(implicit sg: QTreeSemigroup[A]):
+      QTree[A] = qTrees.reduce(sg.plus(_, _))
 }

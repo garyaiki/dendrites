@@ -1,11 +1,12 @@
 package org.gs.algebird.agent
 
-import akka.agent.Agent
-import com.twitter.algebird._
-import org.gs.algebird._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-import scala.reflect.runtime.universe._
+
+import akka.agent.Agent
+import com.twitter.algebird.{DecayedValue, DecayedValueMonoid}
+
+import org.gs.algebird.toDecayedValues
 
 /** Shared state for DecayedValues
   *

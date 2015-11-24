@@ -1,11 +1,9 @@
 package org.gs.algebird.stream
 
 import akka.stream.stage.{Context, PushStage, SyncDirective }
+import com.twitter.algebird.{HLL, HyperLogLogAggregator}
 
-import com.twitter.algebird.HLL
-import com.twitter.algebird.HyperLogLogAggregator
-
-import org.gs.algebird._
+import org.gs.algebird.createHLL
 import org.gs.algebird.AlgebirdConfigurer.hyperLogLogBits
 import org.gs.algebird.typeclasses.HyperLogLogLike
 

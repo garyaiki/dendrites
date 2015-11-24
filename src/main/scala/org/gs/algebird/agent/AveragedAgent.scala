@@ -1,9 +1,11 @@
 package org.gs.algebird.agent
 
-import akka.agent.Agent
-import com.twitter.algebird._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
+
+import akka.agent.Agent
+import com.twitter.algebird.{AveragedGroup, AveragedValue}
+
 
 /** Shared state for AveragedValue
   *

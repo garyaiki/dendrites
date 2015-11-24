@@ -2,7 +2,7 @@
   */
 package org.gs
 
-import scala.reflect.runtime.universe._
+import scala.reflect.runtime.universe.{Type, TypeRef, WeakTypeTag}
 
 /** @author Gary Struthers
   *

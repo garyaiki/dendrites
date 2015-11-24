@@ -2,15 +2,16 @@
   */
 package org.gs.aggregator.actor
 
-import akka.actor.{ Actor, ActorRef, Props }
-import akka.contrib.pattern.Aggregator
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.immutable.Set
-import scala.reflect.runtime.universe._
-import akka.actor.ActorLogging
-import org.gs.reflection._
+
+import akka.actor.{ Actor, ActorLogging, ActorRef, Props }
+import akka.contrib.pattern.Aggregator
+
+import org.gs.reflection.weakParamInfo
+
 /** Pull up Aggregator functions to a higher level
-  * 
+  *
   * @author garystruthers
   *
   */
@@ -27,14 +28,15 @@ trait ResultAggregator extends ActorLogging with Aggregator {
     results.appendAll(ArrayBuffer.fill[Product](types.size)(None))
   }
 
-  /** Create child actor, send request handle response 
+  /** Create child actor, send request handle response
     *
     * @param props to create the actor
     * @param pf PartialFunction used by expectOnce to handle response
     * @param msg request message to created actor
     * @param recipient original sender of request to send response to
     */
-  def fetchResult(props: Props, pf: PartialFunction[Any, Unit], msg: Product, recipient: ActorRef) {
+  def fetchResult(props: Props, pf: PartialFunction[Any, Unit], msg: Product, recipient: ActorRef):
+      Unit = {
     log.debug(s"fetchResult props:$props pf:$pf, msg:$msg, recipient:${recipient.path}")
     this.context.actorOf(props) ! msg
     expectOnce(pf)
@@ -46,17 +48,17 @@ trait ResultAggregator extends ActorLogging with Aggregator {
     * @param p child actor's response
     * @param recipient original sender
     */
-  def addResult(i: Int, p: Product, recipient: ActorRef) = {
+  def addResult(i: Int, p: Product, recipient: ActorRef): Unit = {
     results.update(i, p)
     collectResults(recipient)
   }
 
-  /** If all responses are received send them to the original and stop parent and child actors 
-    * 
+  /** If all responses are received send them to the original and stop parent and child actors
+    *
     * @param recipient original sender
     * @param force if true send incomplete results
     */
-  def collectResults(recipient: ActorRef, force: Boolean = false) {
+  def collectResults(recipient: ActorRef, force: Boolean = false): Unit = {
     val resultCount = results.count(_ != None)
     if ((resultCount == results.size) || force) {
       val result = results.toIndexedSeq // Make sure it's immutable
@@ -65,5 +67,4 @@ trait ResultAggregator extends ActorLogging with Aggregator {
       context.stop(self)
     }
   }
-
 }

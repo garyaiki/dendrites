@@ -2,15 +2,14 @@ package org.gs.algebird.agent
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-import scala.reflect.runtime.universe._
+import scala.reflect.runtime.universe.TypeTag
 
 import akka.agent.Agent
-import com.twitter.algebird._
+import com.twitter.algebird.{QTree, QTreeSemigroup}
 
-import org.gs.algebird._
+import org.gs.algebird.{buildQTree, buildQTrees}
 import org.gs.algebird.AlgebirdConfigurer.qTreeLevel
 import org.gs.algebird.typeclasses.QTreeLike
-
 
 /** Shared state for Qtree
   *
@@ -26,7 +25,7 @@ import org.gs.algebird.typeclasses.QTreeLike
   * @param xs optional initial values
   * @param ec implicit execution context for future
   * @param sg implicit QTreeSemigroup for adding
-  * 
+  *
   */
 class QTreeAgent[A: QTreeLike : TypeTag](val name: String = "",
                                          level: Int = qTreeLevel,

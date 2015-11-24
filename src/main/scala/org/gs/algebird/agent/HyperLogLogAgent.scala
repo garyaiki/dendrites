@@ -1,12 +1,10 @@
 package org.gs.algebird.agent
 
-import akka.agent.Agent
-import com.twitter.algebird._
-import org.gs.algebird._
-import org.gs.algebird.typeclasses.HyperLogLogLike
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-import scala.reflect.runtime.universe._
+
+import akka.agent.Agent
+import com.twitter.algebird.{HLL, HyperLogLogAggregator, HyperLogLogMonoid}
 
 /** Shared state for DecayedValues
   *
@@ -23,7 +21,7 @@ import scala.reflect.runtime.universe._
   * @param ec execution context for future
   * @param monoid HyperLogLogMonoid for zero value and adding HLLs, 12 bits for 1% accuracy
   * @param agg HyperLogLogAggregator to add HLLs, 12 bits for 1% accuracy
-  * 
+  *
   */
 class HyperLogLogAgent(val name: String = "", init: Option[HLL] = None)
           (implicit ec: ExecutionContext, monoid: HyperLogLogMonoid, agg: HyperLogLogAggregator) {

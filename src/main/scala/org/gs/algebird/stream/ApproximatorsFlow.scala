@@ -1,15 +1,17 @@
 package org.gs.algebird.stream
 
+import scala.reflect.runtime.universe.TypeTag
+
 import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
 import akka.stream.{Materializer, FlowShape, UniformFanOutShape}
 import akka.stream.scaladsl.{ Broadcast, Flow, FlowGraph, ZipWith}
+import akka.stream.scaladsl.FlowGraph.Implicits._
 import com.twitter.algebird.{AveragedValue, CMS, CMSHasher, DecayedValue, HLL, QTree}
+
 import org.gs.algebird.agent.{AveragedAgent, CountMinSketchAgent,DecayedValueAgent,HyperLogLogAgent,
   QTreeAgent}
-import org.gs.algebird.stream._
 import org.gs.algebird.typeclasses.HyperLogLogLike
-import scala.reflect.runtime.universe._
 
 class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher:  TypeTag](
         avgAgent: AveragedAgent,
@@ -18,7 +20,7 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher:  TypeTag](
         hllAgent: HyperLogLogAgent,
         qtrAgent: QTreeAgent[A])
         (implicit val system: ActorSystem, logger: LoggingAdapter, val materializer: Materializer) {
-  
+
   def zipper = ZipWith((in0: AveragedValue,
                         in1: CMS[A],
                         in2: Seq[DecayedValue],
@@ -32,8 +34,7 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher:  TypeTag](
         Flow[Seq[(Double, Double)]].mapAsync(1)(dcaAgent.alter)
   def hllAgflow: Flow[HLL, HLL, Unit] = Flow[HLL].mapAsync(1)(hllAgent.alter)
   def qtrAgFlow: Flow[Seq[A], QTree[A], Unit] = Flow[Seq[A]].mapAsync(1)(qtrAgent.alter)
-  
-  import FlowGraph.Implicits._ 
+
   val approximators = FlowGraph.create() { implicit builder =>
     val bcast: UniformFanOutShape[Seq[A], Seq[A]] = builder.add(Broadcast[Seq[A]](5))
     val avg: FlowShape[Seq[A], AveragedValue] = builder.add(avgFlow)
@@ -49,7 +50,7 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher:  TypeTag](
     val hllAg: FlowShape[HLL, HLL] = builder.add(hllAgflow)
     val qtrAg: FlowShape[Seq[A], QTree[A]] = builder.add(qtrAgFlow)
     val zip = builder.add(zipper)
-    
+
     bcast ~> avg ~> avgAg ~> zip.in0
     bcast ~> cms ~> cmsAg ~> zip.in1
     bcast ~> dvt ~> dcaAg ~> zip.in2

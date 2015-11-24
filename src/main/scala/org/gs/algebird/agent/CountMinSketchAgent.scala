@@ -1,12 +1,12 @@
 package org.gs.algebird.agent
 
-import akka.agent.Agent
-import com.twitter.algebird._
-import com.twitter.algebird.CMSHasherImplicits._
-import org.gs.algebird._
-import org.gs.algebird.agent._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
+
+import akka.agent.Agent
+import com.twitter.algebird.{CMS, CMSHasher}
+
+import org.gs.algebird.createCMSMonoid
 
 /** Shared state for CountMinSketch
   *
@@ -14,7 +14,7 @@ import scala.concurrent.Future
   * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSHasher]
   * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering]]
   * @example [[org.gs.algebird.agent.CountMinSketchAgentSpec]]
-  * 
+  *
   * @author garystruthers
   *
   * @tparam K elements which are implicitly Ordering[K] and CMSHasher[K]

@@ -1,7 +1,6 @@
 package org.gs.algebird
 
 import com.typesafe.config.{ Config, ConfigFactory }
-
 import com.twitter.algebird.{DecayedValueMonoid, HyperLogLogAggregator, HyperLogLogMonoid}
 
 object AlgebirdConfigurer {

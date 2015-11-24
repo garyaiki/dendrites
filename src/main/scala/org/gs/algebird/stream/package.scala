@@ -2,10 +2,12 @@
   */
 package org.gs.algebird
 
+import scala.reflect.runtime.universe.TypeTag
+
 import akka.stream.scaladsl.Flow
-import com.twitter.algebird._
+import com.twitter.algebird.{Approximate, AveragedValue, HLL, QTree}
+
 import org.gs.algebird.typeclasses.QTreeLike
-import scala.reflect.runtime.universe._
 
 /** Akka Stream Flows for Algebird hashing and aggregating functions
   *
@@ -92,7 +94,7 @@ package object stream {
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
     * @example [[org.gs.algebird.stream.SumAveragedFlowSpec]]
-    * 
+    *
     * @return AveragedValue
     */
   def sumAvgFlow: Flow[Seq[AveragedValue], AveragedValue, Unit] =
@@ -103,7 +105,7 @@ package object stream {
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
     * @example [[org.gs.algebird.stream.HyperLogLogFlowSpec]]
-    * 
+    *
     * @return estimated size of HLL
     */
   def estSizeFlow: Flow[HLL, Double, Unit] = Flow[HLL].map(x => x.estimatedSize)
@@ -114,7 +116,7 @@ package object stream {
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Approximate Approximate]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
     * @example [[org.gs.algebird.stream.HyperLogLogFlowSpec]]
-    *     
+    *
     * @return Approximate[Long]
     */
   def toApproximate: Flow[HLL, Approximate[Long], Unit] = Flow[HLL].map(x => x.approximateSize)
@@ -125,7 +127,7 @@ package object stream {
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Approximate Approximate]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
     * @example [[org.gs.algebird.stream.HyperLogLogFlowSpec]]
-    *     
+    *
     * @return Approximate[Long]
     */
   def toApproximates: Flow[Seq[HLL], Seq[Approximate[Long]], Unit] =
@@ -147,7 +149,7 @@ package object stream {
     * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
     * @example [[org.gs.algebird.stream.MaxFlowSpec]]
-    *    
+    *
     * @return max
     */
   def maxFlow[A: Ordering]: Flow[Seq[A], A, Unit] = Flow[Seq[A]].map(max[A])
@@ -299,5 +301,4 @@ package object stream {
   def interQuartileMeanLFlow: Flow[QTree[Long], (Double, Double), Unit] = {
     Flow[QTree[Long]].map(_.interQuartileMean)
   }
-
 }
