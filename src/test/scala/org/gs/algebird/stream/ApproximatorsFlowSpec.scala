@@ -2,6 +2,9 @@
   */
 package org.gs.algebird.stream
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.language.postfixOps
+
 import akka.actor.ActorSystem
 import akka.event.{ LoggingAdapter, Logging }
 import akka.stream.ActorMaterializer
@@ -12,6 +15,7 @@ import com.twitter.algebird._
 import org.scalatest.{ WordSpecLike, Matchers }
 import org.scalatest._
 import org.scalatest.Matchers._
+
 import org.gs.aggregator._
 import org.gs.algebird._
 import org.gs.algebird.agent.{ AveragedAgent,
@@ -20,9 +24,7 @@ import org.gs.algebird.agent.{ AveragedAgent,
   HyperLogLogAgent,
   QTreeAgent }
 import org.gs.fixtures.TestValuesBuilder
-import org.gs.stream._
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.language.postfixOps
+
 
 /** @author garystruthers
   *
