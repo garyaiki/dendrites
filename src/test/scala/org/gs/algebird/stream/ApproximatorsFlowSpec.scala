@@ -33,10 +33,11 @@ class ApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
   implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
-  implicit val m = DecayedValueMonoid(0.001)
-  implicit val ag = HyperLogLogAggregator(12)
-  implicit val monoid = new HyperLogLogMonoid(12)
-  val qTreeLevel = 16
+  val halfLife = AlgebirdConfigurer.decayedValueHalfLife
+  implicit val m = AlgebirdConfigurer.decayedValueMonoid
+  implicit val ag = AlgebirdConfigurer.hyperLogLogAgggregator
+  implicit val monoid = AlgebirdConfigurer.hyperLogLogMonoid
+  val qTreeLevel = AlgebirdConfigurer.qTreeLevel
 
   "A BigDecimals ApproximatorsFlow" should {
     "update all agents and return their latest values" in {
@@ -44,7 +45,7 @@ class ApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val bdFlow = new ApproximatorsFlow[BigDecimal](
         new AveragedAgent("test approximators Averaged Value Agent"),
         new CountMinSketchAgent[BigDecimal]("test approximators Count Min Sketch Agent"),
-        new DecayedValueAgent("test approximators DecayedValue Agent", 10.0),
+        new DecayedValueAgent("test approximators DecayedValue Agent", halfLife),
         new HyperLogLogAgent("test approximators HyperLogLog Agent"),
         new QTreeAgent[BigDecimal]("test approximators QTree Agent"))
         
@@ -75,7 +76,7 @@ class ApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val biFlow = new ApproximatorsFlow[BigInt](
         new AveragedAgent("test approximators Averaged Value Agent"),
         new CountMinSketchAgent[BigInt]("test approximators Count Min Sketch Agent"),
-        new DecayedValueAgent("test approximators DecayedValue Agent", 10.0),
+        new DecayedValueAgent("test approximators DecayedValue Agent", halfLife),
         new HyperLogLogAgent("test approximators HyperLogLog Agent"),
         new QTreeAgent[BigInt]("test approximators QTree Agent"))
         
@@ -106,7 +107,7 @@ class ApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val biFlow = new ApproximatorsFlow[Double](
         new AveragedAgent("test approximators Averaged Value Agent"),
         new CountMinSketchAgent[Double]("test approximators Count Min Sketch Agent"),
-        new DecayedValueAgent("test approximators DecayedValue Agent", 10.0),
+        new DecayedValueAgent("test approximators DecayedValue Agent", halfLife),
         new HyperLogLogAgent("test approximators HyperLogLog Agent"),
         new QTreeAgent[Double]("test approximators QTree Agent"))
         
@@ -137,7 +138,7 @@ class ApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val biFlow = new ApproximatorsFlow[Float](
         new AveragedAgent("test approximators Averaged Value Agent"),
         new CountMinSketchAgent[Float]("test approximators Count Min Sketch Agent"),
-        new DecayedValueAgent("test approximators DecayedValue Agent", 10.0),
+        new DecayedValueAgent("test approximators DecayedValue Agent", halfLife),
         new HyperLogLogAgent("test approximators HyperLogLog Agent"),
         new QTreeAgent[Float]("test approximators QTree Agent"))
         
@@ -168,7 +169,7 @@ class ApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val biFlow = new ApproximatorsFlow[Int](
         new AveragedAgent("test approximators Averaged Value Agent"),
         new CountMinSketchAgent[Int]("test approximators Count Min Sketch Agent"),
-        new DecayedValueAgent("test approximators DecayedValue Agent", 10.0),
+        new DecayedValueAgent("test approximators DecayedValue Agent", halfLife),
         new HyperLogLogAgent("test approximators HyperLogLog Agent"),
         new QTreeAgent[Int]("test approximators QTree Agent"))
         
@@ -199,7 +200,7 @@ class ApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val biFlow = new ApproximatorsFlow[Long](
         new AveragedAgent("test approximators Averaged Value Agent"),
         new CountMinSketchAgent[Long]("test approximators Count Min Sketch Agent"),
-        new DecayedValueAgent("test approximators DecayedValue Agent", 10.0),
+        new DecayedValueAgent("test approximators DecayedValue Agent", halfLife),
         new HyperLogLogAgent("test approximators HyperLogLog Agent"),
         new QTreeAgent[Long]("test approximators QTree Agent"))
         
