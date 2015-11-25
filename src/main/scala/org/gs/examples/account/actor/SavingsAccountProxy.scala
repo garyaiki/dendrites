@@ -13,11 +13,11 @@ class SavingsAccountProxy extends Actor with ActorLogging {
     log.debug(s"Starting ${this.toString()}")
   }
   */
-  override def preRestart(reason: Throwable, message: Option[Any]) {
+  override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
     log.error(reason, "Restarting due to [{}] when processing [{}]",
       reason.getMessage, message.getOrElse(""))
   }
-  
+
   def receive = {
     case GetAccountBalances(id: Long) ⇒
       sender() ! SavingsAccountBalances[Int](Some(List((1, 150000), (2, 29000))))
@@ -25,5 +25,5 @@ class SavingsAccountProxy extends Actor with ActorLogging {
 }
 
 object SavingsAccountProxy {
-  def props = Props[SavingsAccountProxy]
+  def props: Props = Props[SavingsAccountProxy]
 }

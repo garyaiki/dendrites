@@ -1,5 +1,8 @@
 package org.gs.examples.account.http
 
+import scala.concurrent.{ ExecutionContextExecutor, Future }
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import akka.actor.ActorSystem
 import akka.event.{ LoggingAdapter, Logging }
 import akka.http.scaladsl.client.RequestBuilding
@@ -8,11 +11,10 @@ import akka.http.scaladsl.model.HttpEntity
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
-import org.gs.examples.account._
-import org.gs.http._
-import scala.concurrent.{ ExecutionContextExecutor, Future }
-import scala.concurrent.ExecutionContext.Implicits.global
 import spray.json.DefaultJsonProtocol
+
+import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances,
+    MoneyMarketAccountBalances, SavingsAccountBalances}
 
 trait BalancesProtocols extends DefaultJsonProtocol {
   implicit val getAccountBalancesFormat = jsonFormat1(GetAccountBalances)
@@ -26,7 +28,7 @@ trait BalancesProtocols extends DefaultJsonProtocol {
   def mapChecking(entity: HttpEntity): Future[Right[String, AnyRef]] = {
     Unmarshal(entity).to[CheckingAccountBalances[BigDecimal]].map(Right(_))
   }
-  
+
   def mapPlain(entity: HttpEntity): Future[Left[String, Nothing]] = {
     Unmarshal(entity).to[String].map(Left(_))
   }
@@ -44,9 +46,6 @@ trait BalancesService extends BalancesProtocols {
   implicit val system: ActorSystem
   implicit def executor: ExecutionContextExecutor
   implicit val materializer: Materializer
-
-  // def config: Config
-  //val logger: LoggingAdapter
 
   def fetchCheckingBalances(id: Long): Either[String, CheckingAccountBalances[BigDecimal]] = {
     checkingBalances.get(id) match {
@@ -99,4 +98,3 @@ trait BalancesService extends BalancesProtocols {
     }
   }
 }
-

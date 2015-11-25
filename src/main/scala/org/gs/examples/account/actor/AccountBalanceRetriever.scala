@@ -1,12 +1,13 @@
 package org.gs.examples.account.actor
+import scala.collection.immutable.Set
+import scala.concurrent.duration._
 
 import akka.actor._
 import akka.contrib.pattern.Aggregator
+
 import org.gs.aggregator.actor.{ CantUnderstand, ResultAggregator, TimedOut }
 import org.gs.examples.account._
 import org.gs.examples.account.actor.AccountBalanceRetriever._
-import scala.collection.immutable.Set
-import scala.concurrent.duration._
 
 /** Sample and test code for the aggregator patter.
   * This is based on Jamie Allen's tutorial at

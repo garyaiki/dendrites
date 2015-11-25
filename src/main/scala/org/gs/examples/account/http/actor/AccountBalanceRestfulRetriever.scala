@@ -1,13 +1,14 @@
 package org.gs.examples.account.http.actor
+import scala.collection.immutable.Set
+import scala.concurrent.duration._
 
 import akka.actor._
 import akka.contrib.pattern.Aggregator
-import org.gs.aggregator.actor.{ CantUnderstand, ResultAggregator, TimedOut }
+import org.gs.aggregator.actor.{ CantUnderstand, ResultAggregator, TimedOut}
+
 import org.gs.examples.account._
 import org.gs.examples.account.actor.AccountBalanceActor
 import org.gs.examples.account.http.actor.AccountBalanceRestfulRetriever._
-import scala.collection.immutable.Set
-import scala.concurrent.duration._
 
 /** Sample and test code for the aggregator patter.
   * This is based on Jamie Allen's tutorial at
@@ -32,7 +33,7 @@ class AccountBalanceRestfulRetriever(actors: Map[AccountType, Props]) extends Ac
       stop(self)
   }
 
-  override val supervisorStrategy = 
+  override val supervisorStrategy =
     OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1.second) {
     case _: ArithmeticException => SupervisorStrategy.Resume
     case _: NullPointerException => SupervisorStrategy.Restart
