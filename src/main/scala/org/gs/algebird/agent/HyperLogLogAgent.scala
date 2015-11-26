@@ -24,7 +24,8 @@ import com.twitter.algebird.{HLL, HyperLogLogAggregator, HyperLogLogMonoid}
   *
   */
 class HyperLogLogAgent(val name: String = "", init: Option[HLL] = None)
-          (implicit ec: ExecutionContext, monoid: HyperLogLogMonoid, agg: HyperLogLogAggregator) {
+  (implicit ec: ExecutionContext, monoid: HyperLogLogMonoid, agg: HyperLogLogAggregator) {
+
   val agent = init match {
     case None    => Agent(monoid.zero)
     case Some(hll) => Agent(hll)

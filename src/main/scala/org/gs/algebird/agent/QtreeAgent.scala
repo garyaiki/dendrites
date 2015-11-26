@@ -27,11 +27,14 @@ import org.gs.algebird.typeclasses.QTreeLike
   * @param sg implicit QTreeSemigroup for adding
   *
   */
-class QTreeAgent[A: QTreeLike : TypeTag](val name: String = "",
-                                         level: Int = qTreeLevel,
-                                         xs: Option[Seq[A]] = None)
-             (implicit ec: ExecutionContext, sg: QTreeSemigroup[A]) {
+class QTreeAgent[A: QTreeLike : TypeTag](
+    val name: String = "",
+    level: Int = qTreeLevel,
+    xs: Option[Seq[A]] = None)
+  (implicit ec: ExecutionContext, sg: QTreeSemigroup[A]) {
+
   val zero: QTree[A] = implicitly[QTreeLike[A]].apply(sg.underlyingMonoid.zero)
+
   val agent = xs match {
     case None    => Agent(zero)
     case Some(xs) => Agent(buildQTree[A](xs))

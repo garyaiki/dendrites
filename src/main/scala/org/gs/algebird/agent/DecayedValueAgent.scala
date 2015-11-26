@@ -23,7 +23,8 @@ import org.gs.algebird.toDecayedValues
   * @param monoid implicit DecayedValueMonoid to scan from initial value
   */
 class DecayedValueAgent(val name: String = "", halfLife: Double, last: Option[DecayedValue] = None)
-        (implicit ec: ExecutionContext, monoid: DecayedValueMonoid) {
+  (implicit ec: ExecutionContext, monoid: DecayedValueMonoid) {
+
   val agent = last match {
     case None    => Agent(Seq(monoid.zero))
     case Some(x) => Agent(Seq(x))

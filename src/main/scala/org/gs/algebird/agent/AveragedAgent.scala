@@ -6,7 +6,6 @@ import scala.concurrent.Future
 import akka.agent.Agent
 import com.twitter.algebird.{AveragedGroup, AveragedValue}
 
-
 /** Shared state for AveragedValue
   *
   * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent]]
@@ -19,7 +18,8 @@ import com.twitter.algebird.{AveragedGroup, AveragedValue}
   * @param ec execution context for future
   */
 class AveragedAgent(val name: String = "", init: AveragedValue = new AveragedValue(0, 0.0))
-        (implicit ec: ExecutionContext) {
+  (implicit ec: ExecutionContext) {
+
   val agent = Agent(init)
 
   /** Update agent with another AveragedValue value

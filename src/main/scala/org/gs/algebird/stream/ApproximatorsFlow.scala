@@ -14,12 +14,12 @@ import org.gs.algebird.agent.{AveragedAgent, CountMinSketchAgent,DecayedValueAge
 import org.gs.algebird.typeclasses.HyperLogLogLike
 
 class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher:  TypeTag](
-        avgAgent: AveragedAgent,
-        cmsAgent: CountMinSketchAgent[A],
-        dcaAgent: DecayedValueAgent,
-        hllAgent: HyperLogLogAgent,
-        qtrAgent: QTreeAgent[A])
-        (implicit val system: ActorSystem, logger: LoggingAdapter, val materializer: Materializer) {
+    avgAgent: AveragedAgent,
+    cmsAgent: CountMinSketchAgent[A],
+    dcaAgent: DecayedValueAgent,
+    hllAgent: HyperLogLogAgent,
+    qtrAgent: QTreeAgent[A])
+  (implicit val system: ActorSystem, logger: LoggingAdapter, val materializer: Materializer) {
 
   def zipper = ZipWith((in0: AveragedValue,
                         in1: CMS[A],
@@ -29,10 +29,14 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher:  TypeTag](
 
   def avgAgflow: Flow[AveragedValue, AveragedValue, Unit] =
         Flow[AveragedValue].mapAsync(1)(avgAgent.alter)
+
   def cmsAgflow: Flow[CMS[A], CMS[A], Unit] = Flow[CMS[A]].mapAsync(1)(cmsAgent.alter)
+
   def dcaAgFlow: Flow[Seq[(Double, Double)], Seq[DecayedValue], Unit] =
         Flow[Seq[(Double, Double)]].mapAsync(1)(dcaAgent.alter)
+
   def hllAgflow: Flow[HLL, HLL, Unit] = Flow[HLL].mapAsync(1)(hllAgent.alter)
+
   def qtrAgFlow: Flow[Seq[A], QTree[A], Unit] = Flow[Seq[A]].mapAsync(1)(qtrAgent.alter)
 
   val approximators = FlowGraph.create() { implicit builder =>

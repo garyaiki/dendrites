@@ -22,7 +22,8 @@ import org.gs.algebird.createCMSMonoid
   * @param ec execution context for future
   */
 class CountMinSketchAgent[K: Ordering: CMSHasher](val name: String = "")
-        (implicit ec: ExecutionContext) {
+  (implicit ec: ExecutionContext) {
+
   implicit val m = createCMSMonoid[K]()
   val agent = Agent(m.zero)
 
