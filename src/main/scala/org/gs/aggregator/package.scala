@@ -20,6 +20,6 @@ package object aggregator {
     case num: Integral[_] =>
       import num._;
       Right(xs.sum / fromInt(xs.size))
-    case x => Left(s"$x is not divisable")
+    case num: Numeric[_] => Left(s"$num is not divisable")
   }
 }

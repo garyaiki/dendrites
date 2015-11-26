@@ -2,11 +2,13 @@
   */
 package org.gs
 
+import scala.math.Pi
+import scala.math.sin
+
 import com.github.nscala_time.time.Imports._
 import org.joda.time.base.BaseSingleFieldPeriod
 import org.joda.time.{ Seconds, Minutes, Hours, Days, Weeks, Months, Years }
-import scala.math.Pi
-import scala.math.sin
+
 
 /** @author garystruthers
   *
@@ -41,8 +43,6 @@ object ScalaTimeApp extends NScalaTimeUtils {
   def main(args: Array[String]): Unit = {
     val days = createPeriodRange(0 until 5, Days.ZERO)
     val longs = toLongs(days)
-    import math.sin
-    import math.Pi
     val dr = 0 to 40
     val twoPi = Pi * 2
     for {
