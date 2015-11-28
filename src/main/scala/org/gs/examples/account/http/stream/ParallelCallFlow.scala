@@ -13,15 +13,19 @@ class ParallelCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
                         in2: Either[String, AnyRef]) => (in0, in1, in2))
 
   val ccf = new CheckingCallFlow
+  val ccfFlow = ccf.flow
   val mmcf = new MoneyMarketCallFlow
+  val mmfFlow = mmcf.flow
   val scf = new SavingsCallFlow
-  
+  val scfFlow = scf.flow
+
   import FlowGraph.Implicits._ 
   val fg = FlowGraph.create() { implicit builder =>
     val bcast: UniformFanOutShape[Product, Product] = builder.add(Broadcast[Product](3))
-    val check: FlowShape[Product,Either[String, AnyRef]] = builder.add(ccf.flow)
-    val mm: FlowShape[Product,Either[String, AnyRef]] = builder.add(mmcf.flow)
-    val savings: FlowShape[Product,Either[String, AnyRef]] = builder.add(scf.flow)
+    
+    val check: FlowShape[Product,Either[String, AnyRef]] = builder.add(ccfFlow)
+    val mm: FlowShape[Product,Either[String, AnyRef]] = builder.add(mmfFlow)
+    val savings: FlowShape[Product,Either[String, AnyRef]] = builder.add(scfFlow)
     val zip = builder.add(zipper)
     
     bcast ~> check ~> zip.in0

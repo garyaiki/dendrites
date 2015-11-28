@@ -27,17 +27,23 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher:  TypeTag](
                         in3: HLL,
                         in4: QTree[A]) => (in0, in1, in2, in3, in4))
 
+  val avgAgentAlter = avgAgent.alter _
+  val cmsAgentAlter = cmsAgent.alter _
+  val dcaAgentAlter = dcaAgent.alter _
+  val hllAgentAlter = hllAgent.alter _
+  val qtrAgentAlter = qtrAgent.alter _
+  
   def avgAgflow: Flow[AveragedValue, AveragedValue, Unit] =
-        Flow[AveragedValue].mapAsync(1)(avgAgent.alter)
+        Flow[AveragedValue].mapAsync(1)(avgAgentAlter)
 
-  def cmsAgflow: Flow[CMS[A], CMS[A], Unit] = Flow[CMS[A]].mapAsync(1)(cmsAgent.alter)
+  def cmsAgflow: Flow[CMS[A], CMS[A], Unit] = Flow[CMS[A]].mapAsync(1)(cmsAgentAlter)
 
   def dcaAgFlow: Flow[Seq[(Double, Double)], Seq[DecayedValue], Unit] =
-        Flow[Seq[(Double, Double)]].mapAsync(1)(dcaAgent.alter)
+        Flow[Seq[(Double, Double)]].mapAsync(1)(dcaAgentAlter)
 
-  def hllAgflow: Flow[HLL, HLL, Unit] = Flow[HLL].mapAsync(1)(hllAgent.alter)
+  def hllAgflow: Flow[HLL, HLL, Unit] = Flow[HLL].mapAsync(1)(hllAgentAlter)
 
-  def qtrAgFlow: Flow[Seq[A], QTree[A], Unit] = Flow[Seq[A]].mapAsync(1)(qtrAgent.alter)
+  def qtrAgFlow: Flow[Seq[A], QTree[A], Unit] = Flow[Seq[A]].mapAsync(1)(qtrAgentAlter)
 
   val approximators = FlowGraph.create() { implicit builder =>
     val bcast: UniformFanOutShape[Seq[A], Seq[A]] = builder.add(Broadcast[Seq[A]](5))
