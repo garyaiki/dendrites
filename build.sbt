@@ -18,7 +18,7 @@ libraryDependencies ++= {
   val akkaV = "2.3.14"
   val scalaTestV = "2.2.5"
   val algebirdV = "0.11.0"
-  val akkaHttpV = "2.0-M1"
+  val akkaHttpV = "2.0-M2"
   Seq("org.scalatest" % "scalatest_2.11" % scalaTestV % "test",
     "junit" % "junit" % "4.11" % "test",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
