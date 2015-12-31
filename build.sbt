@@ -18,7 +18,7 @@ libraryDependencies ++= {
   val akkaV = "2.3.14"
   val scalaTestV = "2.2.5"
   val algebirdV = "0.11.0"
-  val akkaHttpV = "2.0-M2"
+  val akkaHttpV = "2.0.1"
   Seq("org.scalatest" % "scalatest_2.11" % scalaTestV % "test",
     "junit" % "junit" % "4.11" % "test",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
@@ -45,7 +45,8 @@ libraryDependencies ++= {
 	"com.github.nscala-time" %% "nscala-time" % "2.4.0",
 	"joda-time" % "joda-time" % "2.9",
 	"org.joda" % "joda-convert" % "1.8",
-	"com.chuusai" %% "shapeless" % "2.2.5"
+	"com.chuusai" %% "shapeless" % "2.2.5",
+	"org.apache.kafka" % "kafka-clients" % "0.9.0.0"
   )
 }
 

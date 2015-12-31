@@ -3,7 +3,7 @@ package org.gs.examples.account.http.stream
 import akka.actor.ActorSystem
 import akka.event.{ LoggingAdapter, Logging }
 import akka.stream.{Materializer, FlowShape, UniformFanOutShape}
-import akka.stream.scaladsl.{ Broadcast, Flow, FlowGraph, ZipWith}
+import akka.stream.scaladsl.{ Broadcast, Flow, GraphDSL, ZipWith}
 
 class ParallelCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter, 
                 val materializer: Materializer) {
@@ -19,8 +19,8 @@ class ParallelCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
   val scf = new SavingsCallFlow
   val scfFlow = scf.flow
 
-  import FlowGraph.Implicits._ 
-  val fg = FlowGraph.create() { implicit builder =>
+  import GraphDSL.Implicits._ 
+  val fg = GraphDSL.create() { implicit builder =>
     val bcast: UniformFanOutShape[Product, Product] = builder.add(Broadcast[Product](3))
     
     val check: FlowShape[Product,Either[String, AnyRef]] = builder.add(ccfFlow)
@@ -35,12 +35,12 @@ class ParallelCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
   }.named("calls")
   val wrappedFlow = Flow.fromGraph(fg)
   
-  val fgLR = FlowGraph.create() { implicit builder =>
+  val fgLR = GraphDSL.create() { implicit builder =>
     val fgCalls = builder.add(wrappedFlow)
     val fgLR = builder.add(leftRightFlow)
     
     fgCalls ~> fgLR
-    FlowShape(fgCalls.inlet, fgLR.outlet)
+    FlowShape(fgCalls.in, fgLR.outlet)
   }.named("callsLeftRight")
   val wrappedCallsLRFlow = Flow.fromGraph(fgLR)
 

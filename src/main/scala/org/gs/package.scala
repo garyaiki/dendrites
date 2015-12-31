@@ -2,6 +2,8 @@
   */
 package org
 
+import java.util.Properties
+
 /** @author garystruthers
   *
   */
@@ -35,4 +37,17 @@ package object gs {
       case _ => false
     }
   }
+
+  /** Read Properties file
+    *
+    * @param filename must be in src/main/resources
+    * @return Properties object
+    */
+  def loadProperties(filename: StringBuilder): Properties = {
+    val prop = new Properties()
+    filename.insert(0, '/')
+    prop.load(getClass.getResourceAsStream(filename.toString()))
+    prop
+  }
+
 }

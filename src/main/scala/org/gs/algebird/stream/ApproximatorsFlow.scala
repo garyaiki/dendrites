@@ -5,8 +5,8 @@ import scala.reflect.runtime.universe.TypeTag
 import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
 import akka.stream.{Materializer, FlowShape, UniformFanOutShape}
-import akka.stream.scaladsl.{ Broadcast, Flow, FlowGraph, ZipWith}
-import akka.stream.scaladsl.FlowGraph.Implicits._
+import akka.stream.scaladsl.{ Broadcast, Flow, GraphDSL, ZipWith}
+import akka.stream.scaladsl.GraphDSL.Implicits._
 import com.twitter.algebird.{AveragedValue, CMS, CMSHasher, DecayedValue, HLL, QTree}
 
 import org.gs.algebird.agent.{AveragedAgent, CountMinSketchAgent,DecayedValueAgent,HyperLogLogAgent,
@@ -45,7 +45,7 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher:  TypeTag](
 
   def qtrAgFlow: Flow[Seq[A], QTree[A], Unit] = Flow[Seq[A]].mapAsync(1)(qtrAgentAlter)
 
-  val approximators = FlowGraph.create() { implicit builder =>
+  val approximators = GraphDSL.create() { implicit builder =>
     val bcast: UniformFanOutShape[Seq[A], Seq[A]] = builder.add(Broadcast[Seq[A]](5))
     val avg: FlowShape[Seq[A], AveragedValue] = builder.add(avgFlow)
     val avgAg: FlowShape[AveragedValue, AveragedValue] = builder.add(avgAgflow)
