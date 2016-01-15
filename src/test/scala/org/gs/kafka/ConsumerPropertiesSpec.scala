@@ -2,7 +2,7 @@ package org.gs.kafka
 
 import java.util.Properties
 import org.apache.kafka.clients.consumer.KafkaConsumer
-import org.gs._
+import org.gs.loadProperties
 import org.scalatest.WordSpecLike
 import org.scalatest._
 import org.scalatest.Matchers._
@@ -31,10 +31,11 @@ class ConsumerPropertiesSpec extends WordSpecLike {
     }
     "have a value.deserializer" in {
       prop.getProperty("value.deserializer") should equal(
-          "org.apache.kafka.common.serialization.StringDeserializer")
+          "org.apache.kafka.common.serialization.LongDeserializer")
     }
     "create a KafkaConsumer" in {
       val consumer = new KafkaConsumer(prop)
+      consumer.close()
     }
   }
 }

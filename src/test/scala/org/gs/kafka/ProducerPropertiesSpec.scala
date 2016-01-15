@@ -31,10 +31,11 @@ class ProducerPropertiesSpec extends WordSpecLike {
     }
     "have a value.serializer" in {
       prop.getProperty("value.serializer") should equal(
-          "org.apache.kafka.common.serialization.StringSerializer")
+          "org.apache.kafka.common.serialization.LongSerializer")
     }
     "create a KafkaProducer" in {
       val producer = new KafkaProducer(prop)
+      producer.close()
     }
   }
 }

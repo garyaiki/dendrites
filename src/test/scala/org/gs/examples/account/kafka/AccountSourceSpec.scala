@@ -1,0 +1,50 @@
+package org.gs.examples.account.kafka
+
+import akka.actor.ActorSystem
+import akka.event.{ LoggingAdapter, Logging }
+import akka.stream.{ActorMaterializer, Graph, SourceShape}
+import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
+import org.apache.kafka.common.TopicPartition
+import org.scalatest.WordSpecLike
+import org.scalatest._
+import org.scalatest.Matchers._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Await
+import scala.concurrent.duration._
+import org.gs.examples.account.GetAccountBalances
+import org.gs.examples.account.kafka.fixtures.AccountConsumerFixture
+import org.gs.stream.kafka.KafkaSource
+
+class AccountSourceSpec extends WordSpecLike with AccountConsumerFixture {
+  implicit val system = ActorSystem("dendrites")
+  implicit val materializer = ActorMaterializer()
+  "An AccountConsumer" should {
+    "list Kafka partitions for topic" in {
+      val partitionInfos = consumerClient.consumer.partitionsFor(accountConsumer.topic)
+      val pInfo = partitionInfos.get(0)
+      assert(pInfo.partition === 0)
+      assert(pInfo.topic === "account-topic")
+      val leadNode = pInfo.leader()
+      assert(leadNode.host === "localhost")
+      assert(leadNode.id === 0)
+      assert(leadNode.port === 2181)
+      val topicPartition = new TopicPartition(pInfo.topic, pInfo.partition)
+      val position = consumerClient.consumer.position(topicPartition)
+      assert(position === 5)
+    }
+  }
+
+  "An AccountKafkaSource" should {
+    "poll a long from Kafka" in {
+      val sourceGraph = new KafkaSource[GetAccountBalances,String, Long](AccountConsumer)
+      val sourceUnderTest = Source.fromGraph(sourceGraph)
+      val future = sourceUnderTest.grouped(5).runWith(Sink.head)
+      val result = Await.result(future, 1000.millis)
+      assert(result == Seq(GetAccountBalances(1),
+          GetAccountBalances(2),
+          GetAccountBalances(3),
+          GetAccountBalances(4),
+          GetAccountBalances(5)))
+    }
+  }
+}

@@ -1,4 +1,4 @@
-name := "AkkaAlgebird"
+name := "dendrites"
 
 version := "0.0.1"
 
@@ -14,11 +14,13 @@ resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/release
 
 resolvers += "spray repo" at "http://repo.spray.io"
 
+resolvers += "ivy2 cache" at "file://"+Path.userHome+"/.ivy2/cache"
+
 libraryDependencies ++= {
   val akkaV = "2.3.14"
   val scalaTestV = "2.2.5"
   val algebirdV = "0.11.0"
-  val akkaHttpV = "2.0.1"
+  val akkaHttpV = "2.0.1,"
   Seq("org.scalatest" % "scalatest_2.11" % scalaTestV % "test",
     "junit" % "junit" % "4.11" % "test",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
@@ -31,12 +33,12 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-testkit" % akkaV % "test",
     "com.typesafe.akka" %% "akka-contrib" % akkaV,
     "com.typesafe.akka" %% "akka-persistence-experimental" % akkaV,
-    "com.typesafe.akka" %% "akka-stream-experimental" % akkaHttpV,
-    "com.typesafe.akka" %% "akka-stream-testkit-experimental" % akkaHttpV,
-    "com.typesafe.akka" %% "akka-http-core-experimental" % akkaHttpV,
-    "com.typesafe.akka" %% "akka-http-experimental" % akkaHttpV,
-    "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaHttpV,
-    "com.typesafe.akka" %% "akka-http-testkit-experimental" % akkaHttpV,
+    "com.typesafe.akka" % "akka-stream-experimental_2.11" % "2.0.1",
+    "com.typesafe.akka" % "akka-http-core-experimental_2.11" % "2.0.1",
+    "com.typesafe.akka" % "akka-http-experimental_2.11" % "2.0.1",
+    "com.typesafe.akka" % "akka-stream-testkit-experimental_2.11" % "2.0.1",
+    "com.typesafe.akka" % "akka-http-spray-json-experimental_2.11" % "2.0.1",
+    "com.typesafe.akka" % "akka-http-testkit-experimental_2.11" % "2.0.1",
     "com.twitter" % "algebird_2.11" % algebirdV,
     "com.twitter" % "algebird-core_2.11" % algebirdV,
     "com.twitter" % "algebird-test_2.11" % algebirdV,
@@ -46,7 +48,12 @@ libraryDependencies ++= {
 	"joda-time" % "joda-time" % "2.9",
 	"org.joda" % "joda-convert" % "1.8",
 	"com.chuusai" %% "shapeless" % "2.2.5",
-	"org.apache.kafka" % "kafka-clients" % "0.9.0.0"
+	"org.apache.kafka" % "kafka-clients" % "0.9.0.0",
+	"com.datastax.cassandra" % "cassandra-driver-core" % "3.0.0-rc1",
+	"com.datastax.cassandra" % "cassandra-driver-mapping" % "3.0.0-rc1",
+	"com.datastax.cassandra" % "cassandra-driver-extras" % "3.0.0-rc1"
+	
+	
   )
 }
 
