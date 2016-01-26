@@ -2,8 +2,9 @@
   */
 package org.gs.fixtures
 
-import scala.sys.process._
+import scala.io.Source
 import scala.language.postfixOps
+import scala.sys.process._
 
 /** @author garystruthers
   *
@@ -40,7 +41,7 @@ trait SysProcessUtils {
   }
 
   def readWords(name: String): Seq[String] = {
-    val fileLines = io.Source.fromFile(name).getLines.toSeq
+    val fileLines = Source.fromFile(name).getLines.toSeq
     for (line <- fileLines) yield line.trim.toLowerCase
   }
 }

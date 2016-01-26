@@ -3,14 +3,14 @@
 package org.gs.examples.account.kafka.fixtures
 
 import org.scalatest._
-import org.gs.examples.account.kafka.AccountConsumer
+import org.gs.kafka.MockConsumerFacade
 
-/** @author garystruthers
+/** @author Gary Struthers
   *
   */
 
-trait AccountConsumerFixture extends SuiteMixin { this: Suite =>
-  val accountConsumer = AccountConsumer
+trait MockAccountConsumerFixture extends SuiteMixin { this: Suite =>
+  val accountConsumer = MockConsumerFacade
   val consumer = accountConsumer.apply()
 
   abstract override def withFixture(test: NoArgTest): Outcome = {
