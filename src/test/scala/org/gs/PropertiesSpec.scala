@@ -29,7 +29,7 @@ class PropertiesSpec extends WordSpecLike {
     }
     "have a value.serializer" in {
       prop.getProperty("value.serializer") should equal(
-          "org.apache.kafka.common.serialization.StringSerializer")
+          "org.apache.kafka.common.serialization.LongSerializer")
     }
   }
 }

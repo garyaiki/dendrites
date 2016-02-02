@@ -20,7 +20,7 @@ class AccountSourceSpec extends WordSpecLike with AccountConsumerFixture {
   implicit val materializer = ActorMaterializer()
   "An AccountConsumer" should {
     "list Kafka partitions for topic" in {
-      val partitionInfos = consumer.partitionsFor(accountConsumer.topic)
+      val partitionInfos = consumer.partitionsFor(accountConsumerFacade.topic)
       val pInfo = partitionInfos.get(0)
       assert(pInfo.partition === 0)
       assert(pInfo.topic === "account-topic")
@@ -36,7 +36,7 @@ class AccountSourceSpec extends WordSpecLike with AccountConsumerFixture {
 
   "An AccountKafkaSource" should {
     "poll a long from Kafka" in {
-      val sourceGraph = new KafkaSource[String, Long](accountConsumer)
+      val sourceGraph = new KafkaSource[String, Long](accountConsumerFacade)
       val sourceUnderTest = Source.fromGraph(sourceGraph)
       val future = sourceUnderTest.grouped(5).runWith(Sink.head)
       val result = Await.result(future, 1000.millis)

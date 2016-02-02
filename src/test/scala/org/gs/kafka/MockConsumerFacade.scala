@@ -1,8 +1,10 @@
 package org.gs.kafka
 
 import java.lang.{Long => JLong}
+//import java.util.Arrays
 import org.apache.kafka.clients.consumer.{Consumer, MockConsumer}
 import org.apache.kafka.clients.consumer.OffsetResetStrategy
+import org.apache.kafka.clients.consumer.internals.NoOpConsumerRebalanceListener;
 import org.apache.kafka.common.TopicPartition
 import scala.collection.mutable.HashMap
 import scala.collection.JavaConverters._
@@ -16,7 +18,8 @@ object MockConsumerFacade extends ConsumerFacade[String, String] with MockConsum
 
   override def apply(): Consumer[Key, Value] = {
     val mc = new MockConsumer[Key, Value](OffsetResetStrategy.EARLIEST)
-    mc.subscribe(topics)
+    mc.subscribe(topics, new NoOpConsumerRebalanceListener())
+    mc.rebalance(topicPartitions)
     val beginningOffsets = new HashMap[TopicPartition, JLong]()
     beginningOffsets.put(topicPartition0, 0L)
     beginningOffsets.put(topicPartition1, 0L)

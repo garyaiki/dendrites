@@ -11,7 +11,7 @@ class ProducerPropertiesSpec extends WordSpecLike {
   val prop: Properties = loadProperties(new StringBuilder("kafkaProducer.properties"))
   "An Properties" should {
     "have a bootstrap.servers" in {
-      prop.getProperty("bootstrap.servers") should equal("127.0.0.1:2181")
+      prop.getProperty("bootstrap.servers") should equal("localhost:9092")
     }
     "have an acks" in {
       prop.getProperty("acks") should equal("all")

@@ -16,6 +16,9 @@ trait MockConsumerRecords {
   val key = topic + "Key"
   val topicPartition0 = new TopicPartition(topic, 0)
   val topicPartition1 = new TopicPartition(topic, 1)
+  val topicPartitions = new ArrayList[TopicPartition]()
+  topicPartitions.add(topicPartition0)
+  topicPartitions.add(topicPartition1)
   val cRecordList0: JList[ConsumerRecord[String, String]] = new ArrayList[ConsumerRecord[String, String]]()
   cRecordList0.add(new ConsumerRecord[String, String](topic, 0, 0L, key, "0"))
   cRecordList0.add(new ConsumerRecord[String, String](topic, 0, 10L, key, "10"))
@@ -24,7 +27,7 @@ trait MockConsumerRecords {
   cRecordList1.add(new ConsumerRecord[String, String](topic, 1, 0L, key, "5"))
   cRecordList1.add(new ConsumerRecord[String, String](topic, 1, 10L, key, "15"))
   cRecordList1.add(new ConsumerRecord[String, String](topic, 1, 20L, key, "25"))
-  cRecordList1.add(new ConsumerRecord[String, String](topic, 1, 20L, key, "25"))
+  cRecordList1.add(new ConsumerRecord[String, String](topic, 1, 30L, key, "35"))
   val map0 = new HashMap[TopicPartition, JList[ConsumerRecord[String, String]]]()
   map0.put(topicPartition0, cRecordList0)
   val map1 = new HashMap[TopicPartition, JList[ConsumerRecord[String, String]]]()

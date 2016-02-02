@@ -10,7 +10,7 @@ class KafkaSource[K, V](val consumer: ConsumerFacade[K, V])
     extends GraphStage[SourceShape[ConsumerRecords[K, V]]]{
 
   val kafkaConsumer = consumer.apply()
-  val out = Outlet[consumer.OutType]("Account KafkaSource")
+  val out = Outlet[consumer.OutType](s"KafkaSource")
   override val shape = SourceShape(out)
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {

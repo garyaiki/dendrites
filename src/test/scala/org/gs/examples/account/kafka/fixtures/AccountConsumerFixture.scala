@@ -3,15 +3,15 @@
 package org.gs.examples.account.kafka.fixtures
 
 import org.scalatest._
-import org.gs.examples.account.kafka.AccountConsumer
+import org.gs.examples.account.kafka.AccountConsumerFacade
 
 /** @author garystruthers
   *
   */
 
 trait AccountConsumerFixture extends SuiteMixin { this: Suite =>
-  val accountConsumer = AccountConsumer
-  val consumer = accountConsumer.apply()
+  val accountConsumerFacade = AccountConsumerFacade
+  val consumer = accountConsumerFacade.apply()
 
   abstract override def withFixture(test: NoArgTest): Outcome = {
     try super.withFixture(test)

@@ -11,13 +11,13 @@ class ConsumerPropertiesSpec extends WordSpecLike {
   val prop: Properties = loadProperties(new StringBuilder("kafkaConsumer.properties"))
   "An Properties" should {
     "have a bootstrap.servers" in {
-      prop.getProperty("bootstrap.servers") should equal("127.0.0.1:2181")
+      prop.getProperty("bootstrap.servers") should equal("localhost:9092")
     }
     "have a group.id" in {
-      prop.getProperty("group.id") should equal("test")
+      prop.getProperty("group.id") should equal("\"\"")
     }
-    "have a enable.auto.commit" in {
-      prop.getProperty("enable.auto.commit") should equal("true")
+    "have a enable.auto.commit set false" in {
+      prop.getProperty("enable.auto.commit") should equal("false")
     }
     "have a auto.commit.interval.ms" in {
       prop.getProperty("auto.commit.interval.ms") should equal("1000")

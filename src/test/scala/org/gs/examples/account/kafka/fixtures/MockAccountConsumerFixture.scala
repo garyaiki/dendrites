@@ -10,14 +10,14 @@ import org.gs.kafka.MockConsumerFacade
   */
 
 trait MockAccountConsumerFixture extends SuiteMixin { this: Suite =>
-  val accountConsumer = MockConsumerFacade
-  val consumer = accountConsumer.apply()
+  val mockConsumerFacade = MockConsumerFacade
+  val mockConsumer = mockConsumerFacade.apply()
 
   abstract override def withFixture(test: NoArgTest): Outcome = {
     try super.withFixture(test)
     finally {
-      consumer.commitSync() // auto commit would occur before processing
-      consumer.close()
+      mockConsumer.commitSync() // auto commit would occur before processing
+      mockConsumer.close()
     }
   }
 }
