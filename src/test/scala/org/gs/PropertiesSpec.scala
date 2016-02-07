@@ -6,7 +6,7 @@ import org.scalatest._
 import org.scalatest.Matchers._
 
 class PropertiesSpec extends WordSpecLike {
-  val prop: Properties = loadProperties(new StringBuilder("kafkaProducer.properties"))
+  val prop: Properties = loadProperties("kafkaProducer.properties")
   "An Properties" should {
     "have a bootstrap.servers" in {
       prop.getProperty("bootstrap.servers") should equal("localhost:9092")

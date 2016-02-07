@@ -25,8 +25,8 @@ import org.gs.kafka.createProducer
   */
 class ProducerClient[K, V](systemName: String, dispatcherName: String, propsName: String) {
   implicit val system = ActorSystem(systemName)
-  implicit val ec = system.dispatchers.lookup(dispatcherName)
-  val producer = createProducer[K, V](new StringBuilder(propsName))
+  implicit val ec = system.dispatchers.lookup(systemName + "." + dispatcherName)
+  val producer = createProducer[K, V](propsName)
 
   /** Send producer record to Kafka
     *

@@ -40,14 +40,12 @@ package object gs {
 
   /** Read Properties file
     *
-    * @param filename must be in src/main/resources
+    * @param filename must be in classpath, default src/main/resources
     * @return Properties object
     */
-  def loadProperties(filename: StringBuilder): Properties = {
+  def loadProperties(filename: String, path: String = "/"): Properties = {
     val prop = new Properties()
-    filename.insert(0, '/')
-    prop.load(getClass.getResourceAsStream(filename.toString()))
+    prop.load(getClass.getResourceAsStream(path + filename))
     prop
   }
-
 }

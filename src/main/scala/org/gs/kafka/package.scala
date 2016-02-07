@@ -16,7 +16,7 @@ package object kafka {
     * @param filename Kafka consumer properties
     * @return
     */
-  def createConsumer[K, V](filename: StringBuilder): KafkaConsumer[K, V] = {
+  def createConsumer[K, V](filename: String): KafkaConsumer[K, V] = {
     val props = loadProperties(filename)
     new KafkaConsumer[K, V](props)
   }
@@ -30,7 +30,7 @@ package object kafka {
     * @param filename Kafka producer properties
     * @return
     */
-  def createProducer[K, V](filename: StringBuilder): KafkaProducer[K, V] = {
+  def createProducer[K, V](filename: String): KafkaProducer[K, V] = {
     val props = loadProperties(filename)
     new KafkaProducer[K, V](props)
   }

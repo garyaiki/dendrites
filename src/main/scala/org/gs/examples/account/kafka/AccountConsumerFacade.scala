@@ -9,7 +9,7 @@ import org.gs._
 import org.gs.kafka.ConsumerFacade
 
 object AccountConsumerFacade extends ConsumerFacade[String, Long] {
-  val props = loadProperties(new StringBuilder("kafkaConsumer.properties"))
+  val props = loadProperties("kafkaConsumer.properties")
   val config = ConfigFactory.load()
   val topic = config.getString("dendrites.kafka.account.topic")
   val topics = List(topic).asJava
