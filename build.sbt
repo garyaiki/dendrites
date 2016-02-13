@@ -51,8 +51,8 @@ libraryDependencies ++= {
 	"org.apache.kafka" % "kafka-clients" % "0.9.0.0",
 	"com.datastax.cassandra" % "cassandra-driver-core" % "3.0.0-rc1",
 	"com.datastax.cassandra" % "cassandra-driver-mapping" % "3.0.0-rc1",
-	"com.datastax.cassandra" % "cassandra-driver-extras" % "3.0.0-rc1"
-	
+	"com.datastax.cassandra" % "cassandra-driver-extras" % "3.0.0-rc1",
+	"org.apache.avro" % "avro" % "1.8.0"
 	
   )
 }
