@@ -1,10 +1,14 @@
 package org.gs.examples.account.http.actor
 
 import akka.actor._
-import akka.testkit.{ ImplicitSender, TestActorRef, TestKit }
-import org.gs.examples.account.{ AccountType, Checking, CheckingAccountBalances, GetAccountBalances }
+import akka.testkit.{ImplicitSender, TestKit}
+import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances}
 import org.gs.testdriven.StopSystemAfterAll
 import org.scalatest.{ MustMatchers, WordSpecLike }
+import scala.BigDecimal
+import scala.Left
+import scala.Right
+import scala.math.BigDecimal.double2bigDecimal
 
 class CheckingAccountClientSpec extends TestKit(ActorSystem("test"))
   with ImplicitSender

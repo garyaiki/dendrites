@@ -3,7 +3,6 @@
 package org.gs.examples.account.http.actor
 
 import akka.actor._
-import akka.contrib.pattern.Aggregator
 import akka.testkit.{ ImplicitSender, TestKit }
 import org.gs._
 import org.gs.examples.account._
@@ -11,9 +10,7 @@ import org.gs.examples.account.http.actor.AccountBalanceRestfulRetriever._
 import org.scalatest.FunSuiteLike
 import org.scalatest.Matchers
 import scala.concurrent.duration._
-import scala.math.BigDecimal.int2bigDecimal
 import scala.reflect.runtime.universe._
-
 import org.gs.reflection._
 /** Sample and test code for the aggregator patter.
   * This is based on Jamie Allen's tutorial at

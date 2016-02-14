@@ -12,7 +12,6 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Sink, Source }
 import com.typesafe.config.ConfigFactory
 import java.io.IOException
-import org.gs.http.ClientConnectionPool
 import org.gs.examples.account.CheckingAccountBalances
 import org.gs.examples.account.http.BalancesProtocols
 import org.scalatest._

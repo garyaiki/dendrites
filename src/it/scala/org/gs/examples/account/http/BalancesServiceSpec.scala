@@ -3,10 +3,8 @@ package org.gs.examples.account.http
 import akka.event.NoLogging
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.ContentTypes._
-import akka.http.scaladsl.model.{ HttpResponse, HttpRequest }
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import akka.stream.scaladsl.Flow
 import org.scalatest._
 import org.gs.http._
 import org.gs.examples.account.{
@@ -15,6 +13,7 @@ import org.gs.examples.account.{
   MoneyMarketAccountBalances,
   SavingsAccountBalances
 }
+import scala.math.BigDecimal.double2bigDecimal
 
 class BalancesServiceSpec extends FlatSpec with Matchers with ScalatestRouteTest with BalancesService {
   override def testConfigSource = "akka.loglevel = WARNING"

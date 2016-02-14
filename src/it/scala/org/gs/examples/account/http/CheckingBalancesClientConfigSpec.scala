@@ -1,26 +1,20 @@
 package org.gs.examples.account.http
 
 import akka.actor.ActorSystem
-import akka.event.{ LoggingAdapter, Logging }
+import akka.event.Logging
 import akka.stream.ActorMaterializer
 import java.util.concurrent.Executors
-import org.gs.http.ClientConnectionPool
-import org.gs.examples.account.{
-  AccountType,
-  Checking,
-  CheckingAccountBalances,
-  GetAccountBalances,
-  MoneyMarketAccountBalances,
-  SavingsAccountBalances
-}
+import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances}
 import org.gs.http._
-import org.gs.testdriven.StopSystemAfterAll
 import org.scalatest.{ Matchers, WordSpecLike }
 import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
-import scala.util.{ Failure, Success, Try }
+import scala.BigDecimal
+import scala.Left
+import scala.Right
+import scala.math.BigDecimal.double2bigDecimal
 
 class CheckingBalancesClientConfigSpec extends WordSpecLike with Matchers with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")

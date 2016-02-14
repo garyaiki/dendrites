@@ -1,19 +1,17 @@
 package org.gs.examples.account.kafka
 
 import akka.actor.ActorSystem
-import akka.event.{ LoggingAdapter, Logging }
-import akka.stream.{ActorMaterializer, Graph, SourceShape}
-import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
+import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.{Sink, Source}
 import org.apache.kafka.common.TopicPartition
 import org.scalatest.WordSpecLike
 import org.scalatest._
 import org.scalatest.Matchers._
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import org.gs.examples.account.GetAccountBalances
 import org.gs.examples.account.kafka.fixtures.AccountConsumerFixture
-import org.gs.stream.kafka.KafkaSource
+import org.gs.kafka.stream.KafkaSource
 
 class AccountSourceSpec extends WordSpecLike with AccountConsumerFixture {
   implicit val system = ActorSystem("dendrites")
@@ -36,7 +34,7 @@ class AccountSourceSpec extends WordSpecLike with AccountConsumerFixture {
 
   "An AccountKafkaSource" should {
     "poll a long from Kafka" in {
-      val sourceGraph = new KafkaSource[String, Long](accountConsumerFacade)
+      val sourceGraph = new KafkaSource[String, Array[Byte]](accountConsumerFacade)
       val sourceUnderTest = Source.fromGraph(sourceGraph)
       val future = sourceUnderTest.grouped(5).runWith(Sink.head)
       val result = Await.result(future, 1000.millis)
