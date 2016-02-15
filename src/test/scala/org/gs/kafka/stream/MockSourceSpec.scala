@@ -1,4 +1,4 @@
-package org.gs.stream.kafka
+package org.gs.kafka.stream
 
 import akka.actor.ActorSystem
 import akka.event.{ LoggingAdapter, Logging }
@@ -14,6 +14,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import org.gs.examples.account.kafka.fixtures.MockAccountConsumerFixture
 
+/** Test a Kafka MockConsumer in a Source */ 
 class MockSourceSpec extends WordSpecLike with MockAccountConsumerFixture {
   implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()

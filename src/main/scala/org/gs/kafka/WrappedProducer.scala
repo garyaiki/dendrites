@@ -3,11 +3,12 @@ package org.gs.kafka
 import org.apache.kafka.clients.producer.RecordMetadata
 
 /** Abstraction to use KafkaProducer in a Sink
- * @author garystruthers
  *
+ * 
+ * @author Gary Struthers
  * @tparam <A> Type received from stream
  * @tparam <K> Kafka ProducerRecord key
- * @tparam <V> Kafka ProducerRecord type, may be the same or different than A
+ * @tparam <V> Kafka ProducerRecord value, may be the same or different than A
  */
 trait WrappedProducer[A, K, V] {
   type InType = A

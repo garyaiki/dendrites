@@ -1,4 +1,4 @@
-package org.gs.stream.kafka
+package org.gs.kafka.stream
 
 import akka.actor.ActorSystem
 import akka.event.{ LoggingAdapter, Logging }
@@ -6,7 +6,6 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{ Flow, Keep, Sink, Source }
 import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
 import java.util.{ List => JList }
-
 import org.apache.kafka.clients.consumer.{ ConsumerRecord, ConsumerRecords }
 import org.scalatest.{ WordSpecLike, Matchers }
 import org.scalatest._
@@ -16,9 +15,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import org.gs.examples.account.kafka.fixtures.MockAccountConsumerFixture
-import org.gs.stream.kafka._
+import org.gs.kafka.stream._
 import org.gs.kafka.MockConsumerRecords
 
+/** Test a Flow that maps mock ConsumerRecords from a Kafka MockConsumer Source to a queue of
+  * ConsumerRecord
+  *
+  */ 
 class MockSourceConsumerRecordSpec extends WordSpecLike with MockAccountConsumerFixture {
   implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()

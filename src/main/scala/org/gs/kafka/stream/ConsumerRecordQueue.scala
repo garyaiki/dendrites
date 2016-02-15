@@ -1,4 +1,4 @@
-package org.gs.stream.kafka
+package org.gs.kafka.stream
 
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
@@ -18,22 +18,20 @@ class ConsumerRecordQueue[K, V]() extends
       private var q: Queue[ConsumerRecord[K, V]] = null
 
       def doQ(queue: Queue[ConsumerRecord[K, V]]): Unit = {
-          if(q.isEmpty) pull(in) else {
-            val (rec, tail) = queue.dequeue
-            q = tail
-            push(out, rec)
-          }
+        val (rec, tail) = queue.dequeue
+          q = tail
+          push(out, rec)
         }
 
       setHandler(in, new InHandler {
         override def onPush(): Unit = {
-          val inQ = grab(in)
-          if(!q.isEmpty) doQ(inQ)
+          q = grab(in)
+          if(!q.isEmpty) doQ(q)
         }
       })
       setHandler(out, new OutHandler {
         override def onPull(): Unit = {
-          if(q.isEmpty) pull(in) else doQ(q)
+          if(q == null || q.isEmpty) pull(in) else doQ(q)
         }
       })
     }

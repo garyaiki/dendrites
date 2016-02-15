@@ -1,12 +1,12 @@
-package org.gs.examples.account.kafka
+package org.gs.kafka
 
 import akka.actor.ActorSystem
+import com.typesafe.config.ConfigFactory
 import java.util.concurrent.{Future => JFuture}
+import org.apache.kafka.clients.producer.{ProducerRecord, RecordMetadata }
 import scala.concurrent.{ExecutionContext, Future }
 import scala.concurrent.blocking
 import scala.util.{Failure, Success}
-import org.apache.kafka.clients.producer.{ProducerRecord, RecordMetadata }
-import org.gs.kafka.createProducer
 
 
 /** KafkaProducer client
@@ -51,5 +51,21 @@ def send(producerRecord: ProducerRecord[K, V])(implicit ec: ExecutionContext):
       case Failure(e) => rm = Left(e.getMessage)
     }
     rm
+  }
+}
+
+object ProducerClient extends WrappedProducer[Array[Byte],String, Array[Byte]] {
+
+  def apply(): ProducerClient[Key, Value] = {
+    new ProducerClient[Key, Value]("dendrites", "blocking-dispatcher", "kafkaProducer.properties")
+  }
+
+  val client = apply()
+  val config = ConfigFactory.load()
+  val topic = config.getString("dendrites.kafka.account.topic")
+  val key = config.getString("dendrites.kafka.account.key")
+  def send(item: InType): Either[String, RecordMetadata] = {
+    val producerRecord = new ProducerRecord[Key, Value](topic, key, item)
+    client.send(producerRecord)(client.ec)
   }
 }

@@ -1,4 +1,4 @@
-package org.gs.stream.kafka
+package org.gs.kafka.stream
 
 import akka.actor.ActorSystem
 import akka.event.{ LoggingAdapter, Logging }
@@ -12,7 +12,7 @@ import org.scalatest.{ WordSpecLike, Matchers }
 import org.scalatest._
 import org.scalatest.Matchers._
 import scala.collection.immutable.Queue
-import org.gs.stream.kafka._
+import org.gs.kafka.stream._
 import org.gs.kafka.MockConsumerRecords
 
 class ConsumerRecordSpec extends WordSpecLike with MockConsumerRecords {

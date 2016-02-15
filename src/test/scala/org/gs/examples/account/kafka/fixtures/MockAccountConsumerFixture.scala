@@ -5,10 +5,11 @@ package org.gs.examples.account.kafka.fixtures
 import org.scalatest._
 import org.gs.kafka.MockConsumerFacade
 
-/** @author Gary Struthers
+/** Create a MockConsumer for account topic before a test, after test commit processed messages and
+  * close the consumer
   *
+  *  @author Gary Struthers
   */
-
 trait MockAccountConsumerFixture extends SuiteMixin { this: Suite =>
   val mockConsumerFacade = MockConsumerFacade
   val mockConsumer = mockConsumerFacade.apply()

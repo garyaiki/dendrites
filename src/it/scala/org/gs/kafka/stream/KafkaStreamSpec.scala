@@ -19,7 +19,14 @@ import org.gs.examples.account.avro._
 import org.gs.examples.account.kafka.AccountProducer
 import org.gs.examples.account.kafka.fixtures.{AccountConsumerFixture, AccountProducerFixture}
 
-/** @author garystruthers
+/** 2 Akka streams, The first creates a simple Source with an iterable of case classes, then a Flow
+  * serializes them with their avro schema to byte arrays, then a KafkaSink writes them to Kafka.
+  * The second stream has a KafkaSource that reads the serialized case classes from Kafka, then a
+  * Flow maps ConsumerRecords to a queue of ConsumerRecord, then a Flow maps a ConsumerRecord to its
+  * value, then a Flow maps the serialized value back to a case class, then a TestSink compares
+  * deserialized case classes to the originals. The TestSink pulls elements from the stream.
+  *
+  * @author Gary Struthers
   *
   */
 class KafkaStreamSpec extends WordSpecLike with AccountProducerFixture with AccountConsumerFixture {

@@ -1,7 +1,6 @@
 package org.gs.kafka
 
 import java.lang.{Long => JLong}
-//import java.util.Arrays
 import org.apache.kafka.clients.consumer.{Consumer, MockConsumer}
 import org.apache.kafka.clients.consumer.OffsetResetStrategy
 import org.apache.kafka.clients.consumer.internals.NoOpConsumerRebalanceListener;
@@ -10,6 +9,11 @@ import scala.collection.mutable.HashMap
 import scala.collection.JavaConverters._
 import org.gs._
 
+/** Create MockConsumer, initilize with test topics, partitions, and ConsumerRecords. Subscribe to
+  * test topics
+  *
+  * @author Gary Struthers
+ */
 object MockConsumerFacade extends ConsumerFacade[String, String] with MockConsumerRecords {
   val props = null
   val config = null

@@ -3,12 +3,13 @@
 package org.gs.kafka
 
 import java.util.{ArrayList, HashMap, List => JList}
-import org.scalatest._
 import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords}
 import org.apache.kafka.common.TopicPartition
-import java.util.{List => JList}
+import org.scalatest._
 
-/** @author garystruthers
+/** Test topic, partitions, and ConsumerRecords for MockConsumer
+  *
+  * @author Gary Struthers
   *
   */
 trait MockConsumerRecords {

@@ -31,7 +31,7 @@ class ConsumerPropertiesSpec extends WordSpecLike {
     }
     "have a value.deserializer" in {
       prop.getProperty("value.deserializer") should equal(
-          "org.apache.kafka.common.serialization.LongDeserializer")
+          "org.apache.kafka.common.serialization.ByteArrayDeserializer")
     }
     "create a KafkaConsumer" in {
       val consumer = new KafkaConsumer(prop)

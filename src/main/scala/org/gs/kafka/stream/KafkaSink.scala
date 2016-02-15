@@ -1,10 +1,16 @@
-package org.gs.stream.kafka
+package org.gs.kafka.stream
 
 import akka.stream.{Attributes, Inlet, SinkShape}
 import akka.stream.scaladsl.Sink
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler}
 import org.gs.kafka.WrappedProducer
-
+/** Custom Sink that writes to Kafka
+  *  
+  * @author Gary Struthers
+  * @tparam <A> Type received from stream
+  * @tparam <K> Kafka ProducerRecord key
+  * @tparam <V> Kafka ProducerRecord value, may be the same or different than A
+  */
 class KafkaSink[A, K, V](producer: WrappedProducer[A, K, V]) extends GraphStage[SinkShape[A]]{
   val in = Inlet[A](s"KafkaSink")
   override val shape: SinkShape[A] = SinkShape(in)

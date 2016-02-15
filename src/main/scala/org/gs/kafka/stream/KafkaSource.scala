@@ -1,4 +1,4 @@
-package org.gs.stream.kafka
+package org.gs.kafka.stream
 
 import akka.stream.{Attributes, Outlet, SourceShape}
 import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler}
@@ -10,7 +10,7 @@ class KafkaSource[K, V](val consumer: ConsumerFacade[K, V])
     extends GraphStage[SourceShape[ConsumerRecords[K, V]]]{
 
   val kafkaConsumer = consumer.apply()
-  val out = Outlet[consumer.OutType](s"KafkaSource")
+  val out = Outlet[ConsumerRecords[K, V]](s"KafkaSource")
   override val shape = SourceShape(out)
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
