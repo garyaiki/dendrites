@@ -17,6 +17,7 @@ import org.gs.examples.account.kafka.fixtures.MockAccountConsumerFixture
 /** Test a Kafka MockConsumer in a Source */ 
 class MockSourceSpec extends WordSpecLike with MockAccountConsumerFixture {
   implicit val system = ActorSystem("dendrites")
+  implicit val logger = Logging(system, getClass)
   implicit val materializer = ActorMaterializer()
 
   val sourceGraph = new KafkaSource[String, String](mockConsumerFacade)

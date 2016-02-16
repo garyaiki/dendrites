@@ -19,12 +19,14 @@ import org.gs.examples.account.avro._
 import org.gs.examples.account.kafka.AccountProducer
 import org.gs.examples.account.kafka.fixtures.{AccountConsumerFixture, AccountProducerFixture}
 
-/** 2 Akka streams, The first creates a simple Source with an iterable of case classes, then a Flow
+/** 2 Akka streams, The first creates a Source with an iterable of case classes, a Flow
   * serializes them with their avro schema to byte arrays, then a KafkaSink writes them to Kafka.
-  * The second stream has a KafkaSource that reads the serialized case classes from Kafka, then a
-  * Flow maps ConsumerRecords to a queue of ConsumerRecord, then a Flow maps a ConsumerRecord to its
-  * value, then a Flow maps the serialized value back to a case class, then a TestSink compares
-  * deserialized case classes to the originals. The TestSink pulls elements from the stream.
+  * The second stream has a KafkaSource that reads from Kafka, a Flow maps ConsumerRecords to a 
+  * queue of ConsumerRecord, a Flow extracts the value of a ConsumerRecord, a Flow deserializes the
+  * value back to a case class, then a TestSink compares received case classes to the originals.
+  * The TestSink pulls elements from the stream, when consumerRecordQueue is pulled it dequeues 1
+  * ConsumerRecord, when the queue becomes empty a pull request is passed back to the KafkaSource
+  * which commits the messages read in the last poll and then polls again.
   *
   * @author Gary Struthers
   *
@@ -50,16 +52,16 @@ class KafkaStreamSpec extends WordSpecLike with AccountProducerFixture with Acco
     "serialize case classes then write them to Kafka" in {
 
       val serializer = new AvroSerializer("getAccountBalances.avsc", ccToByteArray)
-      val sinkGraph = KafkaSink[Array[Byte],String, Array[Byte]](ap)
-      val sink = Sink.fromGraph(sinkGraph)
-      val consumerRecordQueue = new ConsumerRecordQueue[String, Array[Byte]]()
-      val deserializer = new AvroDeserializer("getAccountBalances.avsc", genericRecordToGetAccountBalances)
+      val sink = KafkaSink[String, Array[Byte]](ap)
       Source[GetAccountBalances](iter)
         .via(serializer)
         .runWith(sink)
 
       val sourceGraph = new KafkaSource[String, Array[Byte]](accountConsumerFacade)
       val source = Source.fromGraph(sourceGraph)
+      val consumerRecordQueue = new ConsumerRecordQueue[String, Array[Byte]]()
+      val deserializer = new AvroDeserializer("getAccountBalances.avsc",
+            genericRecordToGetAccountBalances)
       val sub = source
           .via(consumerRecordsFlow[String, Array[Byte]])
           .via(consumerRecordQueue)

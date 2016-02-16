@@ -7,9 +7,8 @@ import org.gs._
 
 package object kafka {
 
-  /** Create KafkaConsumer consumer is not thread safe
+  /** Create KafkaConsumer Java client configured with its properties, consumer is not thread safe
     *
-    * Call from an object singleton for distinct properties and KV types
     * @see https://kafka.apache.org/090/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html 
     * @tparam K key
     * @tparam V value
@@ -21,9 +20,8 @@ package object kafka {
     new KafkaConsumer[K, V](props)
   }
 
-  /** Create KafkaProducer, producer is thread safe
+  /** Create KafkaProducer Java client configured with its properties, KafkaProducer is thread safe
     *
-    * Call from an object singleton for distinct properties and KV types
     * @see https://kafka.apache.org/090/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html
     * @tparam K key
     * @tparam V value

@@ -6,14 +6,12 @@ import org.apache.kafka.clients.producer.RecordMetadata
  *
  * 
  * @author Gary Struthers
- * @tparam <A> Type received from stream
  * @tparam <K> Kafka ProducerRecord key
- * @tparam <V> Kafka ProducerRecord value, may be the same or different than A
+ * @tparam <V> Kafka ProducerRecord value
  */
-trait WrappedProducer[A, K, V] {
-  type InType = A
+trait WrappedProducer[K, V] {
   type Key = K
   type Value = V
 
-  def send(item: InType): Either[String, RecordMetadata]
+  def send(item: Value): Either[String, RecordMetadata]
 }

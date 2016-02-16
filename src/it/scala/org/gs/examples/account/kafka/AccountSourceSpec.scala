@@ -1,6 +1,7 @@
 package org.gs.examples.account.kafka
 
 import akka.actor.ActorSystem
+import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.apache.kafka.common.TopicPartition
@@ -15,6 +16,7 @@ import org.gs.kafka.stream.KafkaSource
 
 class AccountSourceSpec extends WordSpecLike with AccountConsumerFixture {
   implicit val system = ActorSystem("dendrites")
+  implicit val logger = Logging(system, getClass)
   implicit val materializer = ActorMaterializer()
   "An AccountConsumer" should {
     "list Kafka partitions for topic" in {

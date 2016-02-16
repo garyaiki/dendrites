@@ -8,11 +8,9 @@ import scala.concurrent.{ExecutionContext, Future }
 import scala.concurrent.blocking
 import scala.util.{Failure, Success}
 
-
-/** KafkaProducer client
+/** Scala wrapper for KafkaProducer, Kafka's Java client. The createProducer function constructs a
+ *  KafkaProducer Java client initilized with its properties
   *
-  * This calls Kafka's Java client, its send method returns a Java future that blocks. A Scala
-  * wraps it and uses an execution context that is configured in resource.conf.
   *
   * @author Gary Struthers 
   * @note producer holds a large buffer that should be closed when finished
@@ -28,7 +26,9 @@ class ProducerClient[K, V](systemName: String, dispatcherName: String, propsName
   implicit val ec = system.dispatchers.lookup(systemName + "." + dispatcherName)
   val producer = createProducer[K, V](propsName)
 
-  /** Send producer record to Kafka
+  /** Send producer record to Kafka. The Kafka Java client send method returns a Java future that
+    * blocks. To get around this the Java future is wrapped in a Scala future that has its own
+    * execution context so blocking is in another thread.
     *
     * @see http://kafka.apache.org/090/javadoc/org/apache/kafka/clients/producer/ProducerRecord.html
     * @see http://kafka.apache.org/090/javadoc/org/apache/kafka/clients/producer/RecordMetadata.html
@@ -54,7 +54,7 @@ def send(producerRecord: ProducerRecord[K, V])(implicit ec: ExecutionContext):
   }
 }
 
-object ProducerClient extends WrappedProducer[Array[Byte],String, Array[Byte]] {
+object ProducerClient extends WrappedProducer[String, Array[Byte]] {
 
   def apply(): ProducerClient[Key, Value] = {
     new ProducerClient[Key, Value]("dendrites", "blocking-dispatcher", "kafkaProducer.properties")
@@ -64,7 +64,7 @@ object ProducerClient extends WrappedProducer[Array[Byte],String, Array[Byte]] {
   val config = ConfigFactory.load()
   val topic = config.getString("dendrites.kafka.account.topic")
   val key = config.getString("dendrites.kafka.account.key")
-  def send(item: InType): Either[String, RecordMetadata] = {
+  def send(item: Value): Either[String, RecordMetadata] = {
     val producerRecord = new ProducerRecord[Key, Value](topic, key, item)
     client.send(producerRecord)(client.ec)
   }
