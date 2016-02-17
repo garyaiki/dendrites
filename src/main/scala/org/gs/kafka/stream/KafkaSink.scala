@@ -39,10 +39,12 @@ class KafkaSink[K, V](producer: WrappedProducer[K, V])(implicit logger: LoggingA
   }
 }
 
-/** Create a configured Kafka Sink with wrapped KafkaProducer and its properties configuration */
+/** Create a configured Kafka Sink with wrapped KafkaProducer and its properties configuration
+  * Sink.fromGraph promotes KafkaSink from a SinkShape to a Sink 
+  */
 object KafkaSink {
   def apply[K, V](producer: WrappedProducer[K, V])(implicit logger: LoggingAdapter):
         Sink[V, Unit] = {
-    Sink.fromGraph(new KafkaSink[K, V](producer)(logger))
+    Sink.fromGraph(new KafkaSink[K, V](producer))
   }
 }

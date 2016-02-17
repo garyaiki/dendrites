@@ -16,6 +16,7 @@ class AccountSinkSpec extends WordSpecLike with AccountProducerFixture {
   implicit val system = ActorSystem("dendrites")
   implicit val logger = Logging(system, getClass)
   implicit val materializer = ActorMaterializer()
+
   "An AccountKafkaSink" should {
     "send a long to Kafka" in {
       val sink = KafkaSink[String, Array[Byte]](ap)

@@ -27,11 +27,11 @@ class MockSourceConsumerRecordSpec extends WordSpecLike with MockAccountConsumer
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
 
-  val sourceGraph = new KafkaSource[String, String](mockConsumerFacade)
+  val source = KafkaSource[String, String](mockConsumerFacade)
 
   "ConsumerRecords with 2 TopicPartitions" should {
     "extract a queue of ConsumerRecord" in {
-      val sourceUnderTest = Source.fromGraph(sourceGraph).via(consumerRecordsFlow[String, String])
+      val sourceUnderTest = source.via(consumerRecordsFlow[String, String])
       val result = sourceUnderTest
         .runWith(TestSink.probe[Queue[ConsumerRecord[String, String]]])
         .request(1)

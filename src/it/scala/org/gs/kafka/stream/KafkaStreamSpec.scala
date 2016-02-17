@@ -57,8 +57,7 @@ class KafkaStreamSpec extends WordSpecLike with AccountProducerFixture with Acco
         .via(serializer)
         .runWith(sink)
 
-      val sourceGraph = new KafkaSource[String, Array[Byte]](accountConsumerFacade)
-      val source = Source.fromGraph(sourceGraph)
+      val source = KafkaSource[String, Array[Byte]](accountConsumerFacade)
       val consumerRecordQueue = new ConsumerRecordQueue[String, Array[Byte]]()
       val deserializer = new AvroDeserializer("getAccountBalances.avsc",
             genericRecordToGetAccountBalances)

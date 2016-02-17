@@ -20,12 +20,11 @@ class MockSourceSpec extends WordSpecLike with MockAccountConsumerFixture {
   implicit val logger = Logging(system, getClass)
   implicit val materializer = ActorMaterializer()
 
-  val sourceGraph = new KafkaSource[String, String](mockConsumerFacade)
-  val sourceUnderTest = Source.fromGraph(sourceGraph)
+  val source = KafkaSource[String, String](mockConsumerFacade)
         
   "An MockKafkaSource" should {
     "poll ConsumeRecords from Kafka" in {
-      val future = sourceUnderTest.grouped(1).runWith(Sink.head)
+      val future = source.grouped(1).runWith(Sink.head)
       val result = Await.result(future, 1000.millis)
       var crs: ConsumerRecords[String, String] = null
       result match {

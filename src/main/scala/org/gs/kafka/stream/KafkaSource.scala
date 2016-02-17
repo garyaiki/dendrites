@@ -59,12 +59,20 @@ class KafkaSource[K, V](val consumer: ConsumerFacade[K, V])(implicit logger: Log
         override def onPull(): Unit = {
           if(needCommit) doCommitSync()
           val records = consumer.poll(kafkaConsumer) //blocks
-          if(!records.isEmpty()) { // don't push if no records available
+          if(!records.isEmpty()) { // don't push if no record available
             push(out, records)
             needCommit = true
           }
         }
       })
     }
+  }
+}
+
+/** Create a configured Kafka Source that is subscribed to topics */
+object KafkaSource {
+  def apply[K, V](consumer: ConsumerFacade[K, V])(implicit logger: LoggingAdapter):
+        Source[ConsumerRecords[K, V], Unit] = {
+    Source.fromGraph(new KafkaSource[K, V](consumer))
   }
 }
