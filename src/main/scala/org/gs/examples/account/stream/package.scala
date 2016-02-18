@@ -2,10 +2,8 @@
   */
 package org.gs.examples.account
 
+import akka.NotUsed
 import akka.stream.scaladsl.Flow
-//import com.twitter.algebird._
-//import org.gs.algebird.typeclasses.QTreeLike
-//import scala.reflect.runtime.universe._
 
 /** Akka Stream Flows used in account examples
   *
@@ -22,6 +20,6 @@ package object stream {
     * @tparam A value type in AccBalances
     * @return just the As
     */
-    def extractBalancesFlow[A]: Flow[Seq[AnyRef], Seq[A], Unit] =
+    def extractBalancesFlow[A]: Flow[Seq[AnyRef], Seq[A], NotUsed] =
             Flow[Seq[AnyRef]].map(extractBalancesVals[A])
 }

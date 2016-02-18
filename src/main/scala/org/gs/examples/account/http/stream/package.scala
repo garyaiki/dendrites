@@ -1,5 +1,6 @@
 package org.gs.examples.account.http
 
+import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import scala.collection.immutable.Seq
 import scala.collection.mutable.ArrayBuffer
@@ -27,7 +28,7 @@ package object stream {
   }
  
   def leftRightFlow: Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef]),
-          (Seq[String], Seq[AnyRef]), Unit] =
+          (Seq[String], Seq[AnyRef]), NotUsed] =
     Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef])].
     map(tuple3LeftRight)  
 }

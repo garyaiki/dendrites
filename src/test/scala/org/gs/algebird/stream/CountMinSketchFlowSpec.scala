@@ -2,6 +2,7 @@
   */
 package org.gs.algebird.stream
 
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.{ LoggingAdapter, Logging }
 import akka.stream.ActorMaterializer
@@ -27,10 +28,10 @@ class CountMinSketchFlowSpec extends FlatSpecLike with InetAddressesBuilder {
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
 
-  val addrs: Flow[Range, IndexedSeq[InetAddress], Unit] = Flow[Range].map(inetAddresses)
-  val longZips: Flow[IndexedSeq[InetAddress], IndexedSeq[(Long, Int)], Unit] =
+  val addrs: Flow[Range, IndexedSeq[InetAddress], NotUsed] = Flow[Range].map(inetAddresses)
+  val longZips: Flow[IndexedSeq[InetAddress], IndexedSeq[(Long, Int)], NotUsed] =
     Flow[IndexedSeq[InetAddress]].map(inetToLongZip)
-  val longs: Flow[IndexedSeq[(Long, Int)], IndexedSeq[Long], Unit] =
+  val longs: Flow[IndexedSeq[(Long, Int)], IndexedSeq[Long], NotUsed] =
     Flow[IndexedSeq[(Long, Int)]].map(testLongs)
   val longsFlow = TestSource.probe[Range]
     .via(addrs)
@@ -43,7 +44,7 @@ class CountMinSketchFlowSpec extends FlatSpecLike with InetAddressesBuilder {
   pubLongs.sendComplete()
   subLongs.expectComplete()
   implicit val m = createCMSMonoid[Long]()
-  val cmSketch: Flow[IndexedSeq[Long], CMS[Long], Unit] =
+  val cmSketch: Flow[IndexedSeq[Long], CMS[Long], NotUsed] =
     Flow[IndexedSeq[Long]].map(createCountMinSketch[Long])
   val (pub, sub) = TestSource.probe[IndexedSeq[Long]].via(cmSketch)
     .toMat(TestSink.probe[CMS[Long]])(Keep.both).run()
@@ -70,7 +71,7 @@ class CountMinSketchFlowSpec extends FlatSpecLike with InetAddressesBuilder {
 
   it should "sum total count over a Sequence of them" in {
     val cmss = Vector(cms, cms)
-    val cmsSummer: Flow[Seq[CMS[Long]], CMS[Long], Unit] =
+    val cmsSummer: Flow[Seq[CMS[Long]], CMS[Long], NotUsed] =
       Flow[Seq[CMS[Long]]].map(sumCountMinSketch[Long])
     val (pub, sub) = TestSource.probe[Seq[CMS[Long]]].via(cmsSummer)
       .toMat(TestSink.probe[CMS[Long]])(Keep.both).run()

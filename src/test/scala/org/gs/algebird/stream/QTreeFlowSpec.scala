@@ -82,8 +82,8 @@ class QTreeFlowSpec extends FlatSpecLike with QTreeBuilder {
     val qB = sub.expectNext()
     pub.sendComplete()
     sub.expectComplete()
-    assert(qB._1 >= 119)
-    assert(qB._2 <= 119 + 0.9001)
+    assert(qB._1 >= 121)
+    assert(qB._2 <= 121 + 0.001)
   }
   
   "A QTree[Int] Flow" should "return its third quartile bounds" in {
@@ -96,8 +96,8 @@ class QTreeFlowSpec extends FlatSpecLike with QTreeBuilder {
     val qB = sub.expectNext()
     pub.sendComplete()
     sub.expectComplete()
-    assert(qB._1 >= 115.0)
-    assert(qB._2 <= 115.0 + 0.0001)
+    assert(qB._1 >= 116.0)
+    assert(qB._2 <= 116.0 + 0.0001)
   }
   
   "A QTree[Long] Flow" should "return its inter quartile mean" in {
@@ -110,7 +110,7 @@ class QTreeFlowSpec extends FlatSpecLike with QTreeBuilder {
     val iqm = sub.expectNext()
     pub.sendComplete()
     sub.expectComplete()
-    assert(iqm._1 > 100.0)
-    assert(iqm._2 < 117.93)
+    assert(iqm._1 > 101.2)
+    assert(iqm._2 < 119.93)
   }
 }

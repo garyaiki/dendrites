@@ -1,5 +1,6 @@
 package org.gs.kafka.stream
 
+import akka.NotUsed
 import akka.event.LoggingAdapter
 import akka.stream.{Attributes, Outlet, SourceShape}
 import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler}
@@ -72,7 +73,7 @@ class KafkaSource[K, V](val consumer: ConsumerFacade[K, V])(implicit logger: Log
 /** Create a configured Kafka Source that is subscribed to topics */
 object KafkaSource {
   def apply[K, V](consumer: ConsumerFacade[K, V])(implicit logger: LoggingAdapter):
-        Source[ConsumerRecords[K, V], Unit] = {
+        Source[ConsumerRecords[K, V], NotUsed] = {
     Source.fromGraph(new KafkaSource[K, V](consumer))
   }
 }

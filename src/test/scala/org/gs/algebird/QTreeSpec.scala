@@ -34,7 +34,7 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
     assert(snd._2 <= q2 + 0.0001)
     val trd = qtBD.quantileBounds(0.75)
     assert(trd._1 >= 115.0)
-    assert(trd._2 <= 115.0 + 0.0001)
+    assert(trd._2 <= 115.0 + 1.0001)
     val sum = bigDecimals.sum
     assert(qtBD.rangeSumBounds(lb, ub) === (sum, sum))
     assert(qtBD.rangeCountBounds(lb, ub) === (size, size))
@@ -43,7 +43,7 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
   it should "return InterQuartileMean from BigDecimals" in {
     val iqm = qtBD.interQuartileMean
     assert(iqm._1 > 100.0)
-    assert(iqm._2 < 109.1)
+    assert(iqm._2 < 110.1)
   }
 
   it should "return InterQuartileMean by summing a Sequence of QTree[BigDecimal]" in {
@@ -51,7 +51,7 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
     val sumQTree = sumQTrees(qTrees)
     val iqm = sumQTree.interQuartileMean
     assert(iqm._1 > 88.5)
-    assert(iqm._2 < 93.6)
+    assert(iqm._2 < 94.8)
   }
 
   it should "be created from a Sequence of BigInt" in {
@@ -71,7 +71,7 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
     assert(snd._2 <= q2 + 0.0001)
     val trd = qtBI.quantileBounds(0.75)
     assert(trd._1 >= 115.0)
-    assert(trd._2 <= 115.0 + 0.0001)
+    assert(trd._2 <= 115.0 + 1.0001)
     val sum = bigInts.sum
     assert(qtBI.rangeSumBounds(lb, ub) === (sum, sum))
     assert(qtBI.rangeCountBounds(lb, ub) === (size, size))
@@ -80,7 +80,7 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
   it should "return InterQuartileMean from BigInt" in {
     val iqm = qtBI.interQuartileMean
     assert(iqm._1 > 100.0)
-    assert(iqm._2 < 109.1)
+    assert(iqm._2 < 110.1)
   }
 
   it should "return InterQuartileMean by summing a Sequence of QTree[BigInt]" in {
@@ -88,7 +88,7 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
     val sumQTree = sumQTrees(qTrees)
     val iqm = sumQTree.interQuartileMean
     assert(iqm._1 > 88.5)
-    assert(iqm._2 < 93.6)
+    assert(iqm._2 < 94.8)
   }
   
   it should "be created from a Sequence of Double" in {
@@ -139,13 +139,13 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
     assert(ub >= floats.max.toDouble)
     val fst = qtF.quantileBounds(0.25)
     assert(fst._1 >= 112)
-    assert(fst._2 <= 112 + 0.2001)
+    assert(fst._2 <= 113 + 0.5001)
     val snd = qtF.quantileBounds(0.5)
     assert(snd._1 >= 119)
-    assert(snd._2 <= 119 + 0.9001)
+    assert(snd._2 <= 119 + 2.1001)
     val trd = qtF.quantileBounds(0.75)
     assert(trd._1 >= 126.0)
-    assert(trd._2 <= 126.0 + 0.5001)
+    assert(trd._2 <= 126.0 + 1.7001)
     val sum = floats.sum
     assert(qtF.rangeSumBounds(lb, ub) === (sum, sum))
     assert(qtF.rangeCountBounds(lb, ub) === (size, size))
@@ -154,7 +154,7 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
   it should "return InterQuartileMean from Floats" in {
     val iqm = qtF.interQuartileMean
     assert(iqm._1 > 110.0)
-    assert(iqm._2 < 119.901)
+    assert(iqm._2 < 121.001)
   }
 
   it should "return InterQuartileMean by summing a Sequence of QTree[Float]" in {
@@ -162,7 +162,7 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
     val sumQTree = sumQTrees(qTrees)
     val iqm = sumQTree.interQuartileMean
     assert(iqm._1 > 98.5)
-    assert(iqm._2 < 104.5)
+    assert(iqm._2 < 105.7)
   }
 
   it should "be created from a Sequence of Int" in {
@@ -182,7 +182,7 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
     assert(snd._2 <= q2 + 0.0001)
     val trd = qtI.quantileBounds(0.75)
     assert(trd._1 >= 115.0)
-    assert(trd._2 <= 115.0 + 0.0001)
+    assert(trd._2 <= 115.0 + 1.001)
     val sum = ints.sum
     assert(qtI.rangeSumBounds(lb, ub) === (sum, sum))
     assert(qtI.rangeCountBounds(lb, ub) === (size, size))
@@ -191,7 +191,7 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
   it should "return InterQuartileMean from Ints" in {
     val iqm = qtI.interQuartileMean
     assert(iqm._1 > 100.0)
-    assert(iqm._2 < 109.1)
+    assert(iqm._2 < 110.1)
   }
 
   it should "return InterQuartileMean by summing a Sequence of QTree[Int]" in {
@@ -199,7 +199,7 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
     val sumQTree = sumQTrees(qTrees)
     val iqm = sumQTree.interQuartileMean
     assert(iqm._1 > 88.5)
-    assert(iqm._2 < 93.6)
+    assert(iqm._2 < 94.8)
   }
 
   it should "be created from a Sequence of Long" in {
@@ -213,13 +213,13 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
     assert(ub >= longs.max.toDouble)
     val fst = qtL.quantileBounds(0.25)
     assert(fst._1 >= 102)
-    assert(fst._2 <= 103)
+    assert(fst._2 <= 104.1)
     val snd = qtL.quantileBounds(0.5)
     assert(snd._1 >= q2)
-    assert(snd._2 <= q2 + 1)
+    assert(snd._2 <= q2 + 1.001)
     val trd = qtL.quantileBounds(0.75)
     assert(trd._1 >= 115.0)
-    assert(trd._2 <= 116.0)
+    assert(trd._2 <= 117.0)
     val sum = longs.sum
     assert(qtL.rangeSumBounds(lb, ub) === (sum, sum))
     assert(qtL.rangeCountBounds(lb, ub) === (size, size))
@@ -228,7 +228,7 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
   it should "return InterQuartileMean from Longs" in {
     val iqm = qtL.interQuartileMean
     assert(iqm._1 > 100.0)
-    assert(iqm._2 < 117.93)
+    assert(iqm._2 < 119.13)
   }
   
   it should "return InterQuartileMean by summing a Sequence of QTree[Long]" in {
@@ -236,7 +236,7 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
     val sumQTree = sumQTrees(qTrees)
     val iqm = sumQTree.interQuartileMean
     assert(iqm._1 > 88.6)
-    assert(iqm._2 < 97.8)
+    assert(iqm._2 < 99.1)
   }
   
   "A Sequence of QTrees" should "be created from a Sequence of BigDecimal" in {

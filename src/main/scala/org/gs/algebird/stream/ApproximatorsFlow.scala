@@ -1,14 +1,13 @@
 package org.gs.algebird.stream
 
-import scala.reflect.runtime.universe.TypeTag
-
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
 import akka.stream.{Materializer, FlowShape, UniformFanOutShape}
 import akka.stream.scaladsl.{ Broadcast, Flow, GraphDSL, ZipWith}
 import akka.stream.scaladsl.GraphDSL.Implicits._
 import com.twitter.algebird.{AveragedValue, CMS, CMSHasher, DecayedValue, HLL, QTree}
-
+import scala.reflect.runtime.universe.TypeTag
 import org.gs.algebird.agent.{AveragedAgent, CountMinSketchAgent,DecayedValueAgent,HyperLogLogAgent,
   QTreeAgent}
 import org.gs.algebird.typeclasses.HyperLogLogLike
@@ -33,17 +32,17 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher:  TypeTag](
   val hllAgentAlter = hllAgent.alter _
   val qtrAgentAlter = qtrAgent.alter _
   
-  def avgAgflow: Flow[AveragedValue, AveragedValue, Unit] =
+  def avgAgflow: Flow[AveragedValue, AveragedValue, NotUsed] =
         Flow[AveragedValue].mapAsync(1)(avgAgentAlter)
 
-  def cmsAgflow: Flow[CMS[A], CMS[A], Unit] = Flow[CMS[A]].mapAsync(1)(cmsAgentAlter)
+  def cmsAgflow: Flow[CMS[A], CMS[A], NotUsed] = Flow[CMS[A]].mapAsync(1)(cmsAgentAlter)
 
-  def dcaAgFlow: Flow[Seq[(Double, Double)], Seq[DecayedValue], Unit] =
+  def dcaAgFlow: Flow[Seq[(Double, Double)], Seq[DecayedValue], NotUsed] =
         Flow[Seq[(Double, Double)]].mapAsync(1)(dcaAgentAlter)
 
-  def hllAgflow: Flow[HLL, HLL, Unit] = Flow[HLL].mapAsync(1)(hllAgentAlter)
+  def hllAgflow: Flow[HLL, HLL, NotUsed] = Flow[HLL].mapAsync(1)(hllAgentAlter)
 
-  def qtrAgFlow: Flow[Seq[A], QTree[A], Unit] = Flow[Seq[A]].mapAsync(1)(qtrAgentAlter)
+  def qtrAgFlow: Flow[Seq[A], QTree[A], NotUsed] = Flow[Seq[A]].mapAsync(1)(qtrAgentAlter)
 
   val approximators = GraphDSL.create() { implicit builder =>
     val bcast: UniformFanOutShape[Seq[A], Seq[A]] = builder.add(Broadcast[Seq[A]](5))

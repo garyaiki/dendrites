@@ -47,19 +47,19 @@ class QTreeAgentSpec extends WordSpecLike with Matchers with TestValuesBuilder {
     }
     "have 1st quantile bounds" in {
       val fst = qTree.quantileBounds(0.25)
-      val q1 = 102.0
+      val q1 = 103.0
       assert(fst._1 >= q1)
       assert(fst._2 <= q1 + 0.0001)
     }
     "have 2nd quantile bounds" in {
       val snd = qTree.quantileBounds(0.5)
-      val q2 = 109.0
+      val q2 = 110.0
       assert(snd._1 >= q2)
       assert(snd._2 <= q2 + 0.0001)
     }
     "have 3rd quantile bounds" in {
       val trd = qTree.quantileBounds(0.75)
-      val q3 = 115.0
+      val q3 = 116.0
       assert(trd._1 >= q3)
       assert(trd._2 <= q3 + 0.0001)
     }

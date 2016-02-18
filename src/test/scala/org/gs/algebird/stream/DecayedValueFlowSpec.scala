@@ -2,6 +2,7 @@
   */
 package org.gs.algebird.stream
 
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.{ LoggingAdapter, Logging }
 import akka.stream.ActorMaterializer
@@ -26,7 +27,7 @@ class DecayedValueFlowSpec extends FlatSpecLike with TrigUtils {
   val sines = genSineWave(100, 0 to 360)
   val days = Range.Double(0.0, 361.0, 1.0)
   val sinesZip = sines.zip(days)
-  val decayedValues: Flow[Seq[(Double, Double)], Seq[DecayedValue], Unit] =
+  val decayedValues: Flow[Seq[(Double, Double)], Seq[DecayedValue], NotUsed] =
     Flow[Seq[(Double, Double)]].map(toDecayedValues(10.0) _)
   val (pub, sub) = TestSource.probe[Seq[(Double, Double)]]
     .via(decayedValues)

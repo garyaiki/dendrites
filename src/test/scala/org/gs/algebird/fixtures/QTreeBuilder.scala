@@ -19,8 +19,8 @@ trait QTreeBuilder extends SuiteMixin with TestValuesBuilder { this: Suite =>
   }
 
   val level = 5
-  val q1 = 102.0
-  val q2 = 109.0
+  val q1 = 103.0
+  val q2 = 110.0
   val q3 = 115.0
   implicit val qtBDSemigroup = new QTreeSemigroup[BigDecimal](level)
   val qtBD = buildQTree(bigDecimals)

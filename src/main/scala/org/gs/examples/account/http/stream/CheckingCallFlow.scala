@@ -1,12 +1,10 @@
 package org.gs.examples.account.http.stream
 
-import scala.concurrent.Future
-
+import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.event.{ LoggingAdapter, Logging }
+import akka.event.LoggingAdapter
 import akka.stream.Materializer
 import akka.stream.scaladsl.Flow
-
 import org.gs.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
 import org.gs.http.typedQueryResponse
 
@@ -19,5 +17,5 @@ class CheckingCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
 
   def partial = typedQueryResponse(baseURL, mapPlain, mapChecking) _
 
-  def flow: Flow[Product, Either[String, AnyRef], Unit] = Flow[Product].mapAsync(1)(partial)
+  def flow: Flow[Product, Either[String, AnyRef], NotUsed] = Flow[Product].mapAsync(1)(partial)
 }

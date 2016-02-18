@@ -2,6 +2,7 @@
   */
 package org.gs.algebird.stream
 
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.{ LoggingAdapter, Logging }
 import akka.stream.ActorMaterializer
@@ -23,7 +24,7 @@ class BloomFilterFlowSpec extends FlatSpecLike with BloomFilterBuilder {
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
 
-  val properFilter: Flow[String, String, Unit] =
+  val properFilter: Flow[String, String, NotUsed] =
     Flow[String].filter { x => properBF.contains(x).isTrue }
 
   val properMat = TestSource.probe[String]
@@ -52,7 +53,7 @@ class BloomFilterFlowSpec extends FlatSpecLike with BloomFilterBuilder {
     assert(falsePositives.size <= properNames.size * fpProb)
   }
 
-  val connectivesFilter: Flow[String, String, Unit] =
+  val connectivesFilter: Flow[String, String, NotUsed] =
     Flow[String].filter { x => connectivesBF.contains(x).isTrue }
 
   val connectivesMat = TestSource.probe[String]
@@ -81,7 +82,7 @@ class BloomFilterFlowSpec extends FlatSpecLike with BloomFilterBuilder {
 
   }
 
-  val wordsFilter: Flow[String, String, Unit] =
+  val wordsFilter: Flow[String, String, NotUsed] =
     Flow[String].filter { x => wordsBF.contains(x).isTrue }
 
   val wordsMat = TestSource.probe[String]

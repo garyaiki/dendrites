@@ -2,6 +2,7 @@
   */
 package org.gs.kafka
 
+import akka.NotUsed
 import akka.stream.scaladsl.{Flow, UnzipWith, UnzipWith2, UnzipWithApply}
 import scala.collection.JavaConverters._
 import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords}
@@ -56,7 +57,7 @@ package object stream {
     * @tparam V value type
     * @return a queue of ConsumerRecord
     */
-  def consumerRecordsFlow[K, V]: Flow[ConsumerRecords[K, V], Queue[ConsumerRecord[K, V]], Unit] =
+  def consumerRecordsFlow[K, V]: Flow[ConsumerRecords[K, V], Queue[ConsumerRecord[K, V]], NotUsed] =
           Flow[ConsumerRecords[K, V]].map(extractRecords[K, V])
 
   /** Like extract records but unzips them into 2 queues of ConsumerRecord, separated by partition
@@ -89,6 +90,6 @@ package object stream {
   }
 
   /** Flow to Map a ConsumerRecord to just its value */
-  def consumerRecordValueFlow[K, V]: Flow[ConsumerRecord[K, V], V, Unit] =
+  def consumerRecordValueFlow[K, V]: Flow[ConsumerRecord[K, V], V, NotUsed] =
         Flow[ConsumerRecord[K, V]].map(extractValue[K, V])
 }

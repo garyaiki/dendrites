@@ -14,7 +14,7 @@ class ConsumerPropertiesSpec extends WordSpecLike {
       prop.getProperty("bootstrap.servers") should equal("localhost:9092")
     }
     "have a group.id" in {
-      prop.getProperty("group.id") should equal("\"\"")
+      prop.getProperty("group.id") should equal("dendrites-group")
     }
     "have a enable.auto.commit set false" in {
       prop.getProperty("enable.auto.commit") should equal("false")

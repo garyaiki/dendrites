@@ -1,5 +1,6 @@
 package org.gs.kafka.stream
 
+import akka.NotUsed
 import akka.event.LoggingAdapter
 import akka.stream.{Attributes, Inlet, SinkShape}
 import akka.stream.scaladsl.Sink
@@ -44,7 +45,7 @@ class KafkaSink[K, V](producer: WrappedProducer[K, V])(implicit logger: LoggingA
   */
 object KafkaSink {
   def apply[K, V](producer: WrappedProducer[K, V])(implicit logger: LoggingAdapter):
-        Sink[V, Unit] = {
+        Sink[V, NotUsed] = {
     Sink.fromGraph(new KafkaSink[K, V](producer))
   }
 }

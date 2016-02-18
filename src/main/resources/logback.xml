@@ -14,7 +14,8 @@
       <pattern>%date{ISO8601} %-5level %logger{36} %X{sourceThread} - %msg%n</pattern>
     </encoder>
   </appender>
-  
+  <logger name="org.gs.kafka" level="debug" />
+  <logger name="org.gs.kafka.stream" level="debug" />
   <logger name="org.gs.examples.account.akka" level="debug" />
   <logger name="org.gs.examples.account.http.actor" level="debug" />
 

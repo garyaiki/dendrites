@@ -2,11 +2,10 @@
   */
 package org.gs.algebird
 
-import scala.reflect.runtime.universe.TypeTag
-
+import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.twitter.algebird.{Approximate, AveragedValue, HLL, QTree}
-
+import scala.reflect.runtime.universe.TypeTag
 import org.gs.algebird.typeclasses.QTreeLike
 
 /** Akka Stream Flows for Algebird hashing and aggregating functions
@@ -26,7 +25,7 @@ package object stream {
     * @tparam A can be generic by including TypeTage at runtime & if it's sole Numeric in scope
     * @return AveragedValue
     */
-  def avgFlow[A: TypeTag: Numeric]: Flow[Seq[A], AveragedValue, Unit] = Flow[Seq[A]].map(avg[A])
+  def avgFlow[A: TypeTag: Numeric]: Flow[Seq[A], AveragedValue, NotUsed] = Flow[Seq[A]].map(avg[A])
 
   /** Flow to find average of sequence of BigDecimals
     *
@@ -36,7 +35,7 @@ package object stream {
     *
     * @return AveragedValue
     */
-  def avgBDFlow: Flow[Seq[BigDecimal], AveragedValue, Unit] =
+  def avgBDFlow: Flow[Seq[BigDecimal], AveragedValue, NotUsed] =
     Flow[Seq[BigDecimal]].map(avg[BigDecimal])
 
   /** Flow to find average of sequence of BigInts
@@ -47,7 +46,7 @@ package object stream {
     *
     * @return AveragedValue
     */
-  def avgBIFlow: Flow[Seq[BigInt], AveragedValue, Unit] = Flow[Seq[BigInt]].map(avg[BigInt])
+  def avgBIFlow: Flow[Seq[BigInt], AveragedValue, NotUsed] = Flow[Seq[BigInt]].map(avg[BigInt])
 
   /** Flow to find average of sequence of Doubles
     *
@@ -57,7 +56,7 @@ package object stream {
     *
     * @return AveragedValue
     */
-  def avgDFlow: Flow[Seq[Double], AveragedValue, Unit] = Flow[Seq[Double]].map(avg[Double])
+  def avgDFlow: Flow[Seq[Double], AveragedValue, NotUsed] = Flow[Seq[Double]].map(avg[Double])
 
   /** Flow to find average of sequence of Floats
     *
@@ -67,7 +66,7 @@ package object stream {
     *
     * @return AveragedValue
     */
-  def avgFFlow: Flow[Seq[Float], AveragedValue, Unit] = Flow[Seq[Float]].map(avg[Float])
+  def avgFFlow: Flow[Seq[Float], AveragedValue, NotUsed] = Flow[Seq[Float]].map(avg[Float])
 
   /** Flow to find average of sequence of Ints
     *
@@ -77,7 +76,7 @@ package object stream {
     *
     * @return AveragedValue
     */
-  def avgIFlow: Flow[Seq[Int], AveragedValue, Unit] = Flow[Seq[Int]].map(avg[Int])
+  def avgIFlow: Flow[Seq[Int], AveragedValue, NotUsed] = Flow[Seq[Int]].map(avg[Int])
 
   /** Flow to find average of sequence of Longs
     *
@@ -87,7 +86,7 @@ package object stream {
     *
     * @return AveragedValue
     */
-  def avgLFlow: Flow[Seq[Long], AveragedValue, Unit] = Flow[Seq[Long]].map(avg[Long])
+  def avgLFlow: Flow[Seq[Long], AveragedValue, NotUsed] = Flow[Seq[Long]].map(avg[Long])
 
   /** Flow to sum sequences of AveragedValues to a single AveragedValue
     *
@@ -97,7 +96,7 @@ package object stream {
     *
     * @return AveragedValue
     */
-  def sumAvgFlow: Flow[Seq[AveragedValue], AveragedValue, Unit] =
+  def sumAvgFlow: Flow[Seq[AveragedValue], AveragedValue, NotUsed] =
     Flow[Seq[AveragedValue]].map(sumAverageValues)
 
   /** Flow to estimate size of HLL
@@ -108,7 +107,7 @@ package object stream {
     *
     * @return estimated size of HLL
     */
-  def estSizeFlow: Flow[HLL, Double, Unit] = Flow[HLL].map(x => x.estimatedSize)
+  def estSizeFlow: Flow[HLL, Double, NotUsed] = Flow[HLL].map(x => x.estimatedSize)
 
   /** Flow to map HLL to Approximate[Long]
     *
@@ -119,7 +118,7 @@ package object stream {
     *
     * @return Approximate[Long]
     */
-  def toApproximate: Flow[HLL, Approximate[Long], Unit] = Flow[HLL].map(x => x.approximateSize)
+  def toApproximate: Flow[HLL, Approximate[Long], NotUsed] = Flow[HLL].map(x => x.approximateSize)
 
   /** Flow to map sequence of HLL to sequence of Approximate[Long]
     *
@@ -130,7 +129,7 @@ package object stream {
     *
     * @return Approximate[Long]
     */
-  def toApproximates: Flow[Seq[HLL], Seq[Approximate[Long]], Unit] =
+  def toApproximates: Flow[Seq[HLL], Seq[Approximate[Long]], NotUsed] =
     Flow[Seq[HLL]].map(mapHLL2Approximate)
 
   /** Flow to sum sequence of HLL to an Approximate[Long]
@@ -142,7 +141,7 @@ package object stream {
     *
     * @return Approximate[Long]
     */
-  def sumHLLs: Flow[Seq[HLL], Approximate[Long], Unit] = Flow[Seq[HLL]].map(sumHLLApproximateSizes)
+  def sumHLLs: Flow[Seq[HLL], Approximate[Long], NotUsed] = Flow[Seq[HLL]].map(sumHLLApproximateSizes)
 
   /** Flow to find max value in a sequence
     *
@@ -152,7 +151,7 @@ package object stream {
     *
     * @return max
     */
-  def maxFlow[A: Ordering]: Flow[Seq[A], A, Unit] = Flow[Seq[A]].map(max[A])
+  def maxFlow[A: Ordering]: Flow[Seq[A], A, NotUsed] = Flow[Seq[A]].map(max[A])
 
   /** Flow to find min value in a sequence
     *
@@ -162,7 +161,7 @@ package object stream {
     *
     * @return min
     */
-  def minFlow[A: Ordering]: Flow[Seq[A], A, Unit] = Flow[Seq[A]].map(min[A])
+  def minFlow[A: Ordering]: Flow[Seq[A], A, NotUsed] = Flow[Seq[A]].map(min[A])
 
   /** Flow to find max value in a QTree
     *
@@ -174,7 +173,7 @@ package object stream {
     * @tparam A QTreeLike typeclass that construct QTree[A]
     * @return max
     */
-  def qTreeMaxFlow[A: QTreeLike]: Flow[QTree[A], Double, Unit] = Flow[QTree[A]].map(_.upperBound)
+  def qTreeMaxFlow[A: QTreeLike]: Flow[QTree[A], Double, NotUsed] = Flow[QTree[A]].map(_.upperBound)
 
   /** Flow to find min value in a QTree
     *
@@ -186,7 +185,7 @@ package object stream {
     * @tparam A QTreeLike typeclass that construct QTree[A]
     * @return min
     */
-  def qTreeMinFlow[A: QTreeLike]: Flow[QTree[A], Double, Unit] = Flow[QTree[A]].map(_.lowerBound)
+  def qTreeMinFlow[A: QTreeLike]: Flow[QTree[A], Double, NotUsed] = Flow[QTree[A]].map(_.lowerBound)
 
   /** Flow to find first quartile bounds in a QTree
     *
@@ -198,7 +197,7 @@ package object stream {
     * @tparam A QTreeLike typeclass that construct QTree[A]
     * @return lower, upper bounds
     */
-  def firstQuartileFlow[A: QTreeLike]: Flow[QTree[A], (Double, Double), Unit] = {
+  def firstQuartileFlow[A: QTreeLike]: Flow[QTree[A], (Double, Double), NotUsed] = {
     Flow[QTree[A]].map(_.quantileBounds(0.25))
   }
 
@@ -212,7 +211,7 @@ package object stream {
     * @tparam A QTreeLike typeclass that construct QTree[A]
     * @return lower, upper bounds
     */
-  def secondQuartileFlow[A: QTreeLike]: Flow[QTree[A], (Double, Double), Unit] = {
+  def secondQuartileFlow[A: QTreeLike]: Flow[QTree[A], (Double, Double), NotUsed] = {
     Flow[QTree[A]].map(_.quantileBounds(0.5))
   }
 
@@ -226,7 +225,7 @@ package object stream {
     * @tparam A QTreeLike typeclass that construct QTree[A]
     * @return lower, upper bounds
     */
-  def thirdQuartileFlow[A: QTreeLike]: Flow[QTree[A], (Double, Double), Unit] = {
+  def thirdQuartileFlow[A: QTreeLike]: Flow[QTree[A], (Double, Double), NotUsed] = {
     Flow[QTree[A]].map(_.quantileBounds(0.75))
   }
 
@@ -238,7 +237,7 @@ package object stream {
     *
     * @return mean of middle 50th percentile
     */
-  def interQuartileMeanBDFlow: Flow[QTree[BigDecimal], (Double, Double), Unit] = {
+  def interQuartileMeanBDFlow: Flow[QTree[BigDecimal], (Double, Double), NotUsed] = {
     Flow[QTree[BigDecimal]].map(_.interQuartileMean)
   }
 
@@ -250,7 +249,7 @@ package object stream {
     *
     * @return mean of middle 50th percentile
     */
-  def interQuartileMeanBIFlow: Flow[QTree[BigInt], (Double, Double), Unit] = {
+  def interQuartileMeanBIFlow: Flow[QTree[BigInt], (Double, Double), NotUsed] = {
     Flow[QTree[BigInt]].map(_.interQuartileMean)
   }
 
@@ -262,7 +261,7 @@ package object stream {
     *
     * @return mean of middle 50th percentile
     */
-  def interQuartileMeanDFlow: Flow[QTree[Double], (Double, Double), Unit] = {
+  def interQuartileMeanDFlow: Flow[QTree[Double], (Double, Double), NotUsed] = {
     Flow[QTree[Double]].map(_.interQuartileMean)
   }
 
@@ -274,7 +273,7 @@ package object stream {
     *
     * @return mean of middle 50th percentile
     */
-  def interQuartileMeanFFlow: Flow[QTree[Float], (Double, Double), Unit] = {
+  def interQuartileMeanFFlow: Flow[QTree[Float], (Double, Double), NotUsed] = {
     Flow[QTree[Float]].map(_.interQuartileMean)
   }
 
@@ -286,7 +285,7 @@ package object stream {
     *
     * @return mean of middle 50th percentile
     */
-  def interQuartileMeanIFlow: Flow[QTree[Int], (Double, Double), Unit] = {
+  def interQuartileMeanIFlow: Flow[QTree[Int], (Double, Double), NotUsed] = {
     Flow[QTree[Int]].map(_.interQuartileMean)
   }
 
@@ -298,7 +297,7 @@ package object stream {
     *
     * @return mean of middle 50th percentile
     */
-  def interQuartileMeanLFlow: Flow[QTree[Long], (Double, Double), Unit] = {
+  def interQuartileMeanLFlow: Flow[QTree[Long], (Double, Double), NotUsed] = {
     Flow[QTree[Long]].map(_.interQuartileMean)
   }
 }
