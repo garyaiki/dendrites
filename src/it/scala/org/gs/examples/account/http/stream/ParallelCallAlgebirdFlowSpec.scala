@@ -1,5 +1,6 @@
 package org.gs.examples.account.http.stream
 
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.stream.ActorMaterializer
@@ -17,7 +18,6 @@ import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.reflect.runtime.universe
-//import org.gs.stream.MapPushStage
 
 class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
   implicit val system = ActorSystem("dendrites")
@@ -33,8 +33,8 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
   def sink2 = TestSink.probe[Seq[BigDecimal]]
   var rightResponse: Option[Seq[AnyRef]] = None
   var balancesValues: Option[Seq[BigDecimal]] = None
-//  val ex = new MapPushStage[Seq[AnyRef], Seq[BigDecimal]](extractBalancesVals[BigDecimal])
-  def exf: Flow[Seq[AnyRef], Seq[BigDecimal], Unit] =
+
+  def exf: Flow[Seq[AnyRef], Seq[BigDecimal], NotUsed] =
     Flow[Seq[AnyRef]].map(extractBalancesVals[BigDecimal])
 
   def source3 = TestSource.probe[Seq[BigDecimal]]

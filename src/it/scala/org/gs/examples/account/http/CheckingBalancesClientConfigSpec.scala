@@ -4,7 +4,8 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.stream.ActorMaterializer
 import java.util.concurrent.Executors
-import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances}
+import org.gs.examples.account.CheckingAccountBalances
+import org.gs.examples.account.GetAccountBalances
 import org.gs.http._
 import org.scalatest.{ Matchers, WordSpecLike }
 import org.scalatest._

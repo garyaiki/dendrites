@@ -1,5 +1,6 @@
 package org.gs.examples.account.http.stream
 
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.stream.ActorMaterializer
@@ -96,7 +97,7 @@ class CheckingCallFlowSpec extends WordSpecLike with Matchers with BalancesProto
 
   def badPartial = typedQueryResponse(badBaseURL, mapPlain, mapChecking) _
 
-  def badFlow: Flow[Product, Either[String, AnyRef], Unit] = Flow[Product].mapAsync(1)(badPartial)
+  def badFlow: Flow[Product, Either[String, AnyRef], NotUsed] = Flow[Product].mapAsync(1)(badPartial)
 
   it should {
     "fail bad request URLs" in {
