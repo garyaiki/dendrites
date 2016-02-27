@@ -6,8 +6,9 @@ import akka.stream.{Attributes, Outlet, SourceShape}
 import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler}
 import akka.stream.scaladsl.Source
 import org.apache.kafka.common.errors.WakeupException
-import org.apache.kafka.clients.consumer.{CommitFailedException, ConsumerRecords}
-import org.gs.kafka.ConsumerFacade
+import org.apache.kafka.clients.consumer.{CommitFailedException, Consumer, ConsumerRecords, KafkaConsumer}
+import scala.util.control.NonFatal
+import org.gs.kafka.ConsumerConfig
 
 /** Source that polls Kafka. When it receives a pull from downstream it checks if the previous poll
   * needs to be commited,
@@ -19,17 +20,20 @@ import org.gs.kafka.ConsumerFacade
   * @param consumer a wrapped KafkaConsumer Java client that is configured and subscribed to topics
   * or it wraps a MockConsumer for testing
   */
-class KafkaSource[K, V](val consumer: ConsumerFacade[K, V])(implicit logger: LoggingAdapter)
+class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logger: LoggingAdapter)
     extends GraphStage[SourceShape[ConsumerRecords[K, V]]]{
 
-  val kafkaConsumer = consumer.apply()
+  var kafkaConsumer: Consumer[K, V] = null
+
 
   /** commitSync blocks and fails if session timesout or partitions have been rebalanced,
     * enable.auto.commit must be set false in broker properties
     */
   def doCommitSync() {
     try {
+      logger.debug("KafkaSource before doCommitSync")
       kafkaConsumer.commitSync()
+      logger.debug("KafkaSource after doCommitSync")
     } catch {
        case e: WakeupException => {
          doCommitSync()
@@ -39,6 +43,10 @@ class KafkaSource[K, V](val consumer: ConsumerFacade[K, V])(implicit logger: Log
        case e: CommitFailedException => {
          logger.error(e, e.getMessage)
          throw e         
+       }
+       case NonFatal(e) => {
+         logger.error(e, e.getMessage)
+         throw e          
        }
     }
   }
@@ -55,24 +63,38 @@ class KafkaSource[K, V](val consumer: ConsumerFacade[K, V])(implicit logger: Log
     */
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
+      override def preStart(): Unit = {
+        logger.debug("KafkaSource preStart")
+        kafkaConsumer = consumerConfig.createConsumer()
+      }
+
       private var needCommit = false
       setHandler(out, new OutHandler {
         override def onPull(): Unit = {
+          logger.debug("KafkaSource onPull")
           if(needCommit) doCommitSync()
-          val records = consumer.poll(kafkaConsumer) //blocks
+          val records = kafkaConsumer.poll(consumerConfig.timeout) //blocks
+          logger.debug("KafkaSource records count:${}", records.count())
           if(!records.isEmpty()) { // don't push if no record available
             push(out, records)
             needCommit = true
           }
         }
       })
+      
+      override def postStop(): Unit = {
+        kafkaConsumer.commitSync()
+        kafkaConsumer.close()
+        logger.debug("KafkaSource postStop")
+      }
     }
   }
+
 }
 
 /** Create a configured Kafka Source that is subscribed to topics */
 object KafkaSource {
-  def apply[K, V](consumer: ConsumerFacade[K, V])(implicit logger: LoggingAdapter):
+  def apply[K, V](consumer: ConsumerConfig[K, V])(implicit logger: LoggingAdapter):
         Source[ConsumerRecords[K, V], NotUsed] = {
     Source.fromGraph(new KafkaSource[K, V](consumer))
   }

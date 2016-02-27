@@ -12,13 +12,14 @@ import org.scalatest.Matchers._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import org.gs.examples.account.kafka.fixtures.MockAccountConsumerFixture
+import org.gs.kafka.MockConsumerFacade
 
 /** Test a Kafka MockConsumer in a Source */ 
-class MockSourceSpec extends WordSpecLike with MockAccountConsumerFixture {
+class MockSourceSpec extends WordSpecLike {
   implicit val system = ActorSystem("dendrites")
   implicit val logger = Logging(system, getClass)
   implicit val materializer = ActorMaterializer()
+  val mockConsumerFacade = MockConsumerFacade
 
   val source = KafkaSource[String, String](mockConsumerFacade)
         
