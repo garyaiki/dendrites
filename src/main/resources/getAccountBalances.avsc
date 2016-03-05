@@ -1,0 +1,7 @@
+{"namespace": "org.gs.examples.account",
+ "type": "record",
+ "name": "GetAccountBalances",
+ "fields": [
+     {"name": "id", "type": "long"}
+ ]
+}
