@@ -17,21 +17,21 @@ import org.gs.avro._
 class AvroSerializer[A <: Product, B](filename: String,
     f:(Schema, A) => B)
     extends GraphStage[FlowShape[A, B]] {
-  
+  System.out.println("Avro serializer constructor")
   val in = Inlet[A]("GenericSerializer.in")
   val out = Outlet[B]("GenericSerializer.out")
 
   override val shape = FlowShape.of(in, out)
   val schema = loadSchema(filename)
   override def createLogic(attr: Attributes): GraphStageLogic = 
-    new GraphStageLogic(shape) {
+    new GraphStageLogic(shape) {System.out.println("Avro serializer createLogic")
       setHandler(in, new InHandler {
-        override def onPush(): Unit = {
+        override def onPush(): Unit = {System.out.println("Avro serializer onPush")
           push(out, f(schema, grab(in)))
         }
       })
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
+        override def onPull(): Unit = {System.out.println("Avro serializer onPull")
           pull(in)
         }
       })

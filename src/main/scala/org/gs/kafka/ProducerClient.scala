@@ -3,10 +3,12 @@ package org.gs.kafka
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import java.util.concurrent.{Future => JFuture}
-import org.apache.kafka.clients.producer.{ProducerRecord, RecordMetadata }
-import scala.concurrent.{ExecutionContext, Future }
+import org.apache.kafka.clients.producer.{Callback, MockProducer, ProducerRecord, RecordMetadata }
+import org.apache.kafka.common.serialization.Serializer
+import scala.concurrent.{ExecutionContext }
 import scala.concurrent.blocking
 import scala.util.{Failure, Success}
+import scala.util.control.NonFatal
 
 /** Scala wrapper for KafkaProducer, Kafka's Java client. The createProducer function constructs a
  *  KafkaProducer Java client initilized with its properties
@@ -36,36 +38,35 @@ class ProducerClient[K, V](systemName: String, dispatcherName: String, propsName
  		* @param ec execution context for futures, inner Java future blocks
  		* @return record metadata for success, error message for failure
  */
-def send(producerRecord: ProducerRecord[K, V])(implicit ec: ExecutionContext):
+  def send(producerRecord: ProducerRecord[K, V])(implicit ec: ExecutionContext):
     Either[String, RecordMetadata] = {
-
-    val scalaFuture = Future {
+      var result: Either[String, RecordMetadata] = null
+      System.out.println("before Java send Future")
       blocking {
         val javaFuture: JFuture[RecordMetadata] = producer.send(producerRecord)
-        javaFuture.get
+        try {
+          val recordMetadata = javaFuture.get
+          Right(recordMetadata)
+        } catch {
+          case NonFatal(e) => {System.out.println(s"failed Java send Future ${e.printStackTrace()}")
+            Left(e.getMessage)
+          }
+        }
       }
     }
-    var rm: Either[String, RecordMetadata] = Left("")
-    scalaFuture onComplete {
-      case Success(x) => rm = Right(x)
-      case Failure(e) => rm = Left(e.getMessage)
-    }
-    rm
+
+  def send(producerRecord: ProducerRecord[K, V], callback: Callback): Unit = {
+    producer.send(producerRecord, callback)
   }
 }
 
 object ProducerClient extends WrappedProducer[String, Array[Byte]] {
 
-  def apply(): ProducerClient[Key, Value] = {
-    new ProducerClient[Key, Value]("dendrites", "blocking-dispatcher", "kafkaProducer.properties")
-  }
 
-  val client = apply()
+
+  val producer = null
   val config = ConfigFactory.load()
   val topic = config.getString("dendrites.kafka.account.topic")
   val key = config.getString("dendrites.kafka.account.key")
-  def send(item: Value): Either[String, RecordMetadata] = {
-    val producerRecord = new ProducerRecord[Key, Value](topic, key, item)
-    client.send(producerRecord)(client.ec)
-  }
+
 }

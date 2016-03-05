@@ -30,19 +30,22 @@ class ConsumerRecordQueue[K, V]() extends
       private var q: Queue[ConsumerRecord[K, V]] = null
 
       def doQ(queue: Queue[ConsumerRecord[K, V]]): Unit = {
+        System.out.println("ConsumerRecordQueue doQ")
         val (consumerRecord, tail) = queue.dequeue
-          q = tail
-          push(out, consumerRecord)
-        }
+        q = tail
+        push(out, consumerRecord)
+        System.out.println(s"ConsumerRecordQueue doQ pushed:${consumerRecord.toString()}")
+      }
 
       setHandler(in, new InHandler {
-        override def onPush(): Unit = {
+        override def onPush(): Unit = {System.out.println("ConsumerRecordQueue onPush")
           q = grab(in)
+          if(q != null || !q.isEmpty) doQ(q)
         }
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
+        override def onPull(): Unit = {System.out.println("ConsumerRecordQueue onPull")
           if(q == null || q.isEmpty) pull(in) else doQ(q)
         }
       })

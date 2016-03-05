@@ -15,7 +15,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import org.gs.kafka.stream._
-import org.gs.kafka.{MockConsumerFacade, MockConsumerRecords}
+import org.gs.kafka.{MockConsumerConfig, MockConsumerRecords}
 
 /** Test a Flow that maps mock ConsumerRecords from a Kafka MockConsumer Source to a queue of
   * ConsumerRecord
@@ -25,7 +25,7 @@ class MockSourceConsumerRecordSpec extends WordSpecLike {
   implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
-  val mockConsumerFacade = MockConsumerFacade
+  val mockConsumerFacade = MockConsumerConfig
   val source = KafkaSource[String, String](mockConsumerFacade)
 
   "ConsumerRecords with 2 TopicPartitions" should {

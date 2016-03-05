@@ -15,7 +15,7 @@ import org.gs._
   *
   * @author Gary Struthers
  */
-object MockConsumerFacade extends ConsumerConfig[String, String] with MockConsumerRecords {
+object MockConsumerConfig extends ConsumerConfig[String, String] with MockConsumerRecords {
   val props = null
   val config = null
   val topics = List(topic).asJava

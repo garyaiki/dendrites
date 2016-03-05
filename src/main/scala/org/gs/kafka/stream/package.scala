@@ -43,6 +43,7 @@ package object stream {
     * @return records in a queue
     */
   def extractRecords[K, V](records: ConsumerRecords[K,V]): Queue[ConsumerRecord[K, V]] = {
+    System.out.println(s"Extract records:${records.count()}")
     val it = records.iterator().asScala
     queueRecords[K, V](it)
   }
@@ -86,6 +87,7 @@ package object stream {
 
   /** Map a ConsumerRecord to just its value */
   def extractValue[K, V](record: ConsumerRecord[K,V]): V = {
+    System.out.println(s"Extract value:${record.toString()}")
     record.value()
   }
 

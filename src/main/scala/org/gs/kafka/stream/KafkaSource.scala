@@ -9,6 +9,8 @@ import org.apache.kafka.common.errors.WakeupException
 import org.apache.kafka.clients.consumer.{CommitFailedException, Consumer, ConsumerRecords, KafkaConsumer}
 import scala.util.control.NonFatal
 import org.gs.kafka.ConsumerConfig
+import scala.collection.JavaConversions._
+import org.apache.kafka.common.PartitionInfo
 
 /** Source that polls Kafka. When it receives a pull from downstream it checks if the previous poll
   * needs to be commited,
@@ -36,7 +38,6 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
       logger.debug("KafkaSource after doCommitSync")
     } catch {
        case e: WakeupException => {
-         doCommitSync()
          logger.error(e, e.getMessage)
          throw e
        }
@@ -64,26 +65,39 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
       override def preStart(): Unit = {
-        logger.debug("KafkaSource preStart")
         kafkaConsumer = consumerConfig.createConsumer()
+        logger.debug(s"KafkaSource preStart consumer created $kafkaConsumer")
       }
 
       private var needCommit = false
       setHandler(out, new OutHandler {
         override def onPull(): Unit = {
           logger.debug("KafkaSource onPull")
-          if(needCommit) doCommitSync()
+          if(needCommit) {
+            doCommitSync()
+            needCommit = false
+          }
+          val subscribedTopics = kafkaConsumer.subscription()
+          val it = subscribedTopics.iterator()
+          var subscribedTopic: String = ""
+          while(it.hasNext()) {
+            subscribedTopic = it.next()
+            logger.debug(s"subscribed topic:$subscribedTopic")
+          }
           val records = kafkaConsumer.poll(consumerConfig.timeout) //blocks
           logger.debug("KafkaSource records count:${}", records.count())
           if(!records.isEmpty()) { // don't push if no record available
             push(out, records)
             needCommit = true
+            logger.debug("KafkaSource records pushed")
           }
         }
       })
       
       override def postStop(): Unit = {
-        kafkaConsumer.commitSync()
+        if(needCommit) {
+          kafkaConsumer.commitSync()
+        }
         kafkaConsumer.close()
         logger.debug("KafkaSource postStop")
       }

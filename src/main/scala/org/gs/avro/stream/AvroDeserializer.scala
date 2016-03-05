@@ -31,7 +31,7 @@ class AvroDeserializer[A <: Product](filename: String,
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = 
     new GraphStageLogic(shape) {
       setHandler(in, new InHandler {
-        override def onPush(): Unit = {
+        override def onPush(): Unit = {System.out.println("Avrodeserializer onPull")
           val bytes = grab(in)
           val record = byteArrayToGenericRecord(schema, bytes)
           push(out, f(record))
@@ -39,7 +39,7 @@ class AvroDeserializer[A <: Product](filename: String,
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
+        override def onPull(): Unit = {System.out.println("Avrodeserializer onPull")
           pull(in)
         }
       })

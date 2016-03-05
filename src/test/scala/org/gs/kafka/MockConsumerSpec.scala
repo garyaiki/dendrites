@@ -15,7 +15,7 @@ import scala.concurrent.duration._
 class MockConsumerSpec extends WordSpecLike {
   implicit val system = ActorSystem("dendrites")
   implicit val logger = Logging(system, getClass)
-  val mockConsumerFacade = MockConsumerFacade
+  val mockConsumerFacade = MockConsumerConfig
 
         
   "A MockConsumer" should {

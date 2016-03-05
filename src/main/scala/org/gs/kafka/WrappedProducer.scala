@@ -1,8 +1,8 @@
 package org.gs.kafka
 
-import org.apache.kafka.clients.producer.RecordMetadata
+import org.apache.kafka.clients.producer.Producer
 
-/** Abstraction to use KafkaProducer in a Sink
+/** Abstraction for KafkaProducer
  *
  * 
  * @author Gary Struthers
@@ -13,5 +13,7 @@ trait WrappedProducer[K, V] {
   type Key = K
   type Value = V
 
-  def send(item: Value): Either[String, RecordMetadata]
+  val producer: Producer[K, V]
+  val topic: String
+  val key: Key
 }

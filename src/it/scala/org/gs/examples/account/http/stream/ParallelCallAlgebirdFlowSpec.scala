@@ -87,7 +87,7 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
     "get a HyperLogLog from the Right response" in {
       val (pub2, sub2) = source2
         .via(extractBalancesFlow)
-        .transform(() => new CreateHLLStage[BigDecimal])
+        .via(new CreateHLLStage[BigDecimal])
         .toMat(TestSink.probe[HLL])(Keep.both).run()
       sub2.request(1)
       pub2.sendNext(rightResponse.get)
