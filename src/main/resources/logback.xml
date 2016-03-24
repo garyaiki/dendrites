@@ -14,13 +14,24 @@
       <pattern>%date{ISO8601} %-5level %logger{36} %X{sourceThread} - %msg%n</pattern>
     </encoder>
   </appender>
+
+  <!-- use AsyncAppender for lower latencies -->
+  <appender name="async" class="ch.qos.logback.classic.AsyncAppender">
+    <appender-ref ref="FILE" />
+  </appender>
+
+  <logger name="com.datastax.driver.core.QueryLogger.SLOW" level="TRACE" />
+  <logger name="org.gs.cassandra" level="debug" />
+  <logger name="org.gs.cassandra.scalacass" level="debug" />
+  <logger name="org.gs.examples.cassandra" level="debug" />
   <logger name="org.gs.kafka" level="debug" />
   <logger name="org.gs.kafka.stream" level="debug" />
   <logger name="org.gs.examples.account.akka" level="debug" />
   <logger name="org.gs.examples.account.http.actor" level="debug" />
 
 	<root level="info">
-		<appender-ref ref="FILE" />
+	  <appender-ref ref="async" />
+		<!-- <appender-ref ref="FILE" /> -->
 		<appender-ref ref="STDOUT" />
 	</root>
 
