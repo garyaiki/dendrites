@@ -5,12 +5,9 @@ import akka.event.LoggingAdapter
 import akka.stream.{Attributes, Outlet, SourceShape}
 import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler}
 import akka.stream.scaladsl.Source
-import org.apache.kafka.common.errors.WakeupException
-import org.apache.kafka.clients.consumer.{CommitFailedException, Consumer, ConsumerRecords, KafkaConsumer}
-import scala.util.control.NonFatal
+import org.apache.kafka.clients.consumer.{Consumer, ConsumerRecords, KafkaConsumer}
 import org.gs.kafka.ConsumerConfig
-import scala.collection.JavaConversions._
-import org.apache.kafka.common.PartitionInfo
+
 
 /** KafkaSource calls KafkaConsumer.poll() which reads all available messages into a ConsumerRecords
   * if it's not empty it's pushed to the next stage. KafkaSource receives an onPull when the stream
@@ -58,7 +55,7 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
 
       private var needCommit = false
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
+        override def onPull(): Unit = {System.out.println(s"KafkaSource onPull needCommit:$needCommit")
           if(needCommit) {
             kafkaConsumer.commitSync() //blocks
             needCommit = false
@@ -67,7 +64,8 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
           if(!records.isEmpty()) { // don't push if no record available
             push(out, records)
             needCommit = true
-          }
+            System.out.println(s"KafkaSource pushed records:${records.count()}")
+          } else System.out.println(s"KafkaSource empty records isEmpty:${records.isEmpty()}")
         }
       })
       

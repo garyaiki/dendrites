@@ -1,4 +1,4 @@
-package org.gs.cassandra
+package org.gs.cassandra.stream
 
 import com.datastax.driver.core.{BoundStatement, Cluster, PreparedStatement, ResultSet, Session}
 import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy, RetryPolicy}
@@ -9,7 +9,7 @@ import org.gs.cassandra._
 import org.gs.cassandra.Playlists._
 import org.gs.cassandra.Songs._
 
-class BoundStmtSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
+class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   val myConfig = PlaylistSongConfig
   val schema = myConfig.keySpace
   var cluster: Cluster = null

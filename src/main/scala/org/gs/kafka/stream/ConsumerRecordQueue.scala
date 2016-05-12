@@ -34,7 +34,6 @@ class ConsumerRecordQueue[K, V]() extends
         val (consumerRecord, tail) = queue.dequeue
         q = tail
         push(out, consumerRecord)
-        System.out.println(s"ConsumerRecordQueue doQ pushed:${consumerRecord.toString()}")
       }
 
       setHandler(in, new InHandler {

@@ -17,15 +17,14 @@ import org.gs.kafka.WrappedProducer
   * KafkaSink catches it and retries the write. If a write throws a subclass of KafkaException this
   * test's Decider stops the write stream.
   *
-  * KafkaProducer's send() returns a Java/Guava listenable Future, not a nice Scala Future. Kafka's
-  * listenable Future passes 2 arguments to a callback, a RecordMetadata which is null if an
-  * exception was thrown and an Exception which is null if a non null RecordMetadata was returned?!
-  * I cope with this in the least awful way I found. If a good RecordMetadata was returned it means
-  * success so another callback is called that pulls from upstream. If an exception was returned yet
-  * another callback is called and it deals with 2 types of exceptions. KafkaException is logged and
-  * rethrown and it will be handled by a Supervision.Decider attached to the stream's
-  * ActorMaterializer. RetriableException is when there was a fleeting error that may not happen
-  * next time, so grab the same message and send it again. 
+  * KafkaProducer's send() returns a Java/Guava ListenableFuture, not a nice Scala Future. Kafka's
+  * ListenableFuture passes 2 arguments to a Kafka Producer Callback, a RecordMetadata and an 
+  * Exception. One of these arguments will be null. I cope with this in the least awful way I found.
+  * If a RecordMetadata was returned it means success so an Akka Stream AsynCallback is called that
+  * pulls from upstream. If an exception was returned a different Akka Stream AsynCallback is called
+  * and it deals with 2 types of exceptions, RetriableException and KafkaException. A
+  * RetriableException is when there was a fleeting error that may not recur so resend the message.
+  * A KafkaException is logged and rethrown.  
   *
   * @author Gary Struthers
   * @tparam <K> Kafka ProducerRecord key

@@ -6,7 +6,7 @@ import org.apache.avro.generic.GenericRecord
 import org.apache.avro.Schema
 import org.gs.avro._
 
-/** Map values from Avro GenericRecord to case class
+/** Maps a byteArray first to an Avro GenericRecord, then maps the GenericRecord to a case class
   *
   * @author Gary Struthers
   * @tparam A case class or tuple sublcasses of Product
@@ -39,7 +39,7 @@ class AvroDeserializer[A <: Product](filename: String,
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {System.out.println("Avrodeserializer onPull")
+        override def onPull(): Unit = {System.out.println("AvroDeserializer onPull")
           pull(in)
         }
       })

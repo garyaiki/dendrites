@@ -77,9 +77,9 @@ object Playlists {
     * @param playlst case class
     * @return BoundStatement ready to execute
     */
-  def playlistToBndQuery(query: PreparedStatement, playlst: Playlist): BoundStatement = {
+  def playlistToBndQuery(query: PreparedStatement, playlstId: UUID): BoundStatement = {
     val playlistBndStmt = new BoundStatement(query)
-    playlistBndStmt.bind(playlst.id)
+    playlistBndStmt.bind(playlstId)
   }
 
   /** Map Row to case class. Uses ScalaCass field mapping because song_id in db doesn't match name
@@ -94,5 +94,9 @@ object Playlists {
              row.as[String]("album"),
              row.as[String]("artist"),
              row.as[UUID]("song_id"))
+  }
+
+  def rowsToPlaylists(rows: Seq[Row]): Seq[Playlist] = {
+    rows.map { x => rowToPlaylist(x) }
   }
 }

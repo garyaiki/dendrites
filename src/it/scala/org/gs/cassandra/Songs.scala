@@ -85,9 +85,9 @@ object Songs {
     * @param playlst case class
     * @return BoundStatement ready to execute
     */
-  def songToBndQuery(query: PreparedStatement, song: Song): BoundStatement = {
+  def songToBndQuery(query: PreparedStatement, songId: UUID): BoundStatement = {
     val songBndStmt = new BoundStatement(query)
-    songBndStmt.bind(song.id)
+    songBndStmt.bind(songId)
   }
 
   /** Map Row to case class. Uses ScalaCass object mapping, @FIXME Eclipse reports an error because
@@ -98,5 +98,9 @@ object Songs {
     */
   def rowToSong(row: Row): Song = {
     row.as[Song]
+  }
+
+  def rowsToSongs(rows: Seq[Row]): Seq[Song] = {
+    rows.map { x => rowToSong(x) }
   }
 }

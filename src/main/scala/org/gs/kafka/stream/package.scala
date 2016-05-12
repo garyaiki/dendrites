@@ -43,12 +43,12 @@ package object stream {
     * @return records in a queue
     */
   def extractRecords[K, V](records: ConsumerRecords[K,V]): Queue[ConsumerRecord[K, V]] = {
-    System.out.println(s"Extract records:${records.count()}")
+    System.out.println(s"extractRecords:${records.count()}")
     val it = records.iterator().asScala
     queueRecords[K, V](it)
   }
 
-  /** Flow to map ConsumerRecord to a Queue of ConsumerRecord. This allows Akka Stream to pull
+  /** Flow to map ConsumerRecords to a Queue of ConsumerRecord. This allows a Stream to pull
     * one ConsumerRecord at a time 
     *
     * @see [[org.gs.examples.account]]
@@ -87,7 +87,7 @@ package object stream {
 
   /** Map a ConsumerRecord to just its value */
   def extractValue[K, V](record: ConsumerRecord[K,V]): V = {
-    System.out.println(s"Extract value:${record.toString()}")
+    System.out.println(s"extractValue offset:${record.offset()}")
     record.value()
   }
 
