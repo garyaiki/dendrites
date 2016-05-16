@@ -4,6 +4,7 @@ package org.gs.examples
 
 import scala.collection.immutable.Set
 import scala.reflect.{ClassTag, classTag}
+//import scala.reflect.runtime.universe.TypeTag
 
 /** Functions for AccountType, the case objects that distinguish them and AccountBallances, their
   * optional list of account ids and balances
