@@ -1,14 +1,11 @@
 package org.gs.algebird.agent
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-
 import akka.agent.Agent
 import com.twitter.algebird.{CMS, CMSHasher}
-
+import scala.concurrent.{ExecutionContext, Future}
 import org.gs.algebird.createCMSMonoid
 
-/** Shared state for CountMinSketch
+/** Akka Agent for concurrently updating CountMinSketch
   *
   * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent]]
   * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSHasher]

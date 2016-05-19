@@ -1,12 +1,10 @@
 package org.gs.algebird.agent
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-
 import akka.agent.Agent
 import com.twitter.algebird.{AveragedGroup, AveragedValue}
+import scala.concurrent.{ExecutionContext, Future}
 
-/** Shared state for AveragedValue
+/** Akka Agent for concurrently updating AveragedValue
   *
   * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent]]
   * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue]

@@ -1,12 +1,10 @@
 package org.gs.algebird.agent
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-
 import akka.agent.Agent
 import com.twitter.algebird.{HLL, HyperLogLogAggregator, HyperLogLogMonoid}
+import scala.concurrent.{ExecutionContext, Future}
 
-/** Shared state for DecayedValues
+/** Akka Agent for concurrently updating DecayedValues
   *
   * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent]]
   * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL]
@@ -27,7 +25,7 @@ class HyperLogLogAgent(val name: String = "", init: Option[HLL] = None)
   (implicit ec: ExecutionContext, monoid: HyperLogLogMonoid, agg: HyperLogLogAggregator) {
 
   val agent = init match {
-    case None    => Agent(monoid.zero)
+    case None => Agent(monoid.zero)
     case Some(hll) => Agent(hll)
   }
 

@@ -1,14 +1,11 @@
 package org.gs.algebird.agent
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-
 import akka.agent.Agent
 import com.twitter.algebird.{DecayedValue, DecayedValueMonoid}
-
+import scala.concurrent.{ExecutionContext, Future}
 import org.gs.algebird.toDecayedValues
 
-/** Shared state for DecayedValues
+/** Akka Agent for concurrently updating DecayedValues
   *
   * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent]]
   * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValue]
@@ -26,7 +23,7 @@ class DecayedValueAgent(val name: String = "", halfLife: Double, last: Option[De
   (implicit ec: ExecutionContext, monoid: DecayedValueMonoid) {
 
   val agent = last match {
-    case None    => Agent(Seq(monoid.zero))
+    case None => Agent(Seq(monoid.zero))
     case Some(x) => Agent(Seq(x))
   }
 

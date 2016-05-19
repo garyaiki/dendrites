@@ -1,17 +1,14 @@
 package org.gs.algebird.agent
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-import scala.reflect.runtime.universe.TypeTag
-
 import akka.agent.Agent
 import com.twitter.algebird.{QTree, QTreeSemigroup}
-
+import scala.concurrent.{ExecutionContext, Future}
+import scala.reflect.runtime.universe.TypeTag
 import org.gs.algebird.{buildQTree, buildQTrees}
 import org.gs.algebird.AlgebirdConfigurer.qTreeLevel
 import org.gs.algebird.typeclasses.QTreeLike
 
-/** Shared state for Qtree
+/** Akka Agent for concurrently updating Qtree
   *
   * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent]]
   * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree]
@@ -36,7 +33,7 @@ class QTreeAgent[A: QTreeLike : TypeTag](
   val zero: QTree[A] = implicitly[QTreeLike[A]].apply(sg.underlyingMonoid.zero)
 
   val agent = xs match {
-    case None    => Agent(zero)
+    case None => Agent(zero)
     case Some(xs) => Agent(buildQTree[A](xs))
   }
 
