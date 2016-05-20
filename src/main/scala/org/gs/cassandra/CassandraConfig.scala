@@ -4,7 +4,7 @@ import java.net.InetAddress
 import java.util.{Collection => JCollection, List => JList}
 import scala.collection.JavaConversions._
 
-/** Abstract configuration of Cassandra Java Driver 3.0
+/** Abstract configuration of Cassandra Java Driver 3.0+
   * 
   * @author Gary Struthers
   */

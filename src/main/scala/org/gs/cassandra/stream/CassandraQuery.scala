@@ -9,10 +9,10 @@ import com.datastax.driver.core.{BoundStatement, ResultSet, Session}
   * bound to the statement in the previous stage. BoundStatements can be for different queries.
   *
   * @author Gary Struthers
-  * @session is long lived, it's created sometime before the stream and closed sometime after the
-  * stream and may be used with other clients
-  * @fetchSize used by SELECT queries for page size. Default 0 means use Cassandra default page size
-  * @implicit logger
+  * @param session is long lived, it's created sometime before the stream and closed sometime after
+  * the stream and may be used with other clients
+  * @param fetchSize used by SELECT queries for page size. Default 0 means use Cassandra default
+  * @param implicit logger
   */
 class CassandraQuery(session: Session, fetchSize: Int = 0)(implicit logger: LoggingAdapter)
     extends GraphStage[FlowShape[BoundStatement, ResultSet]]{
@@ -21,7 +21,7 @@ class CassandraQuery(session: Session, fetchSize: Int = 0)(implicit logger: Logg
   val out = Outlet[ResultSet]("CassandraQuery.out")
   override val shape = FlowShape.of(in, out)
 
-  /** When upstream pushes a BoundStatement execute it asychronously and use Cassandra's preferred
+  /** When upstream pushes a BoundStatement execute it asynchronously and use Cassandra's preferred
     * getUniterruptibly method on ResultSetFuture. Then push the ResultSet
     * 
     * @param inheritedAttributes

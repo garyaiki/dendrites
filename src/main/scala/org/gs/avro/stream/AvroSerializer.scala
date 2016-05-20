@@ -14,24 +14,22 @@ import org.gs.avro._
   * @param filename of Avro schema for case class, must be on classpath
   * @param serialization function
   */
-class AvroSerializer[A <: Product, B](filename: String,
-    f:(Schema, A) => B)
+class AvroSerializer[A <: Product, B](filename: String, f:(Schema, A) => B)
     extends GraphStage[FlowShape[A, B]] {
-  System.out.println("Avro serializer constructor")
   val in = Inlet[A]("GenericSerializer.in")
   val out = Outlet[B]("GenericSerializer.out")
 
   override val shape = FlowShape.of(in, out)
   val schema = loadSchema(filename)
   override def createLogic(attr: Attributes): GraphStageLogic = 
-    new GraphStageLogic(shape) {System.out.println("Avro serializer createLogic")
+    new GraphStageLogic(shape) {
       setHandler(in, new InHandler {
-        override def onPush(): Unit = {System.out.println("Avro serializer onPush")
+        override def onPush(): Unit = {
           push(out, f(schema, grab(in)))
         }
       })
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {System.out.println("Avro serializer onPull")
+        override def onPull(): Unit = {
           pull(in)
         }
       })

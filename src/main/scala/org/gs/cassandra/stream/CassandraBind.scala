@@ -9,10 +9,10 @@ import com.datastax.driver.core.{BoundStatement, PreparedStatement}
   * and tuple) 
   *
   * @author Gary Struthers
-  * @stmt PreparedStatement that has been pre-parsed by the database
-  * @f function to create BoundStatement from PreparedStatement and Product which contains values to
-  * bind
-  * @implicit logger
+  * @param stmt PreparedStatement that has been pre-parsed by the database
+  * @param f function to create BoundStatement from PreparedStatement and Product which contains
+  * values to bind
+  * @param implicit logger
   */
 class CassandraBind[A](stmt: PreparedStatement, f:(PreparedStatement, A) => BoundStatement)
         (implicit logger: LoggingAdapter)

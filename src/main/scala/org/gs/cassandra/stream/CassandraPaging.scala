@@ -10,8 +10,8 @@ import scala.collection.mutable.ArrayBuffer
 /** Page specified number of Rows from a ResultSet 
   *
   * @author Gary Struthers
-  * @pageSize number of Rows to send downstream
-  * @implicit logger
+  * @param pageSize number of Rows to send downstream
+  * @param implicit logger
   */
 class CassandraPaging(pageSize: Int)(implicit logger: LoggingAdapter)
     extends GraphStage[FlowShape[ResultSet, Seq[Row]]]{

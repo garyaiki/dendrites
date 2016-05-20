@@ -9,12 +9,11 @@ import org.gs.avro._
 /** Maps a byteArray first to an Avro GenericRecord, then maps the GenericRecord to a case class
   *
   * @author Gary Struthers
-  * @tparam A case class or tuple sublcasses of Product
+  * @tparam A case class or tuple subclass of Product
   * @param filename of Avro schema, must be in classpath
   * @param f user function copies values from Avro GenericRecord to case class
   */
-class AvroDeserializer[A <: Product](filename: String,
-    f:(GenericRecord) => A)
+class AvroDeserializer[A <: Product](filename: String, f:(GenericRecord) => A)
     extends GraphStage[FlowShape[Array[Byte], A]] {
   
   val in = Inlet[Array[Byte]]("GenericSerializer.in")

@@ -3,10 +3,10 @@ package org.gs
 import _root_.akka.actor.ActorSystem
 import _root_.akka.event.Logging
 import com.datastax.driver.core.Cluster
-import com.datastax.driver.core.{BatchStatement, BoundStatement, CloseFuture, Host, Metadata}
-import com.datastax.driver.core.{QueryLogger, PreparedStatement, ResultSet, Row, Session}
-import com.datastax.driver.core.policies.{DCAwareRoundRobinPolicy, LoadBalancingPolicy}
-import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy, RetryPolicy}
+import com.datastax.driver.core.{BatchStatement, BoundStatement, CloseFuture, Cluster, Host}
+import com.datastax.driver.core.{Metadata, QueryLogger, PreparedStatement, ResultSet, Row, Session}
+import com.datastax.driver.core.policies.{DCAwareRoundRobinPolicy, DefaultRetryPolicy}
+import com.datastax.driver.core.policies.{LoadBalancingPolicy, LoggingRetryPolicy, RetryPolicy}
 import com.google.common.util.concurrent.ListenableFuture
 import com.typesafe.config.ConfigFactory
 import java.net.InetAddress
@@ -15,22 +15,19 @@ import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
 import org.gs.concurrent._
-import com.datastax.driver.core.Host
 
 package object cassandra {
   implicit val system = ActorSystem("dendrites")
   implicit val logger = Logging(system, getClass)
 
-  /** Create Cassandra Cluster for development.
+  /** Create Cassandra Cluster (for development).
     *
     * @see http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/Cluster.Builder.html
     * @see http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/Cluster.html
     * @param node Internet address of initial Cassandra node 
     * @return cluster
     */
-  def createCluster(node: String): Cluster = {
-    Cluster.builder().addContactPoint(node).build()
-  }
+  def createCluster(node: String): Cluster = Cluster.builder().addContactPoint(node).build()
   
   /** Create Cluster with multiple host nodes and a RetryPolicy
     *
@@ -149,14 +146,12 @@ package object cassandra {
     * @param resultSet
     * @return Seq[Row]
     */
-  def getAllRows(resultSet: ResultSet): Seq[Row] = {
-    resultSet.all().toSeq
-  }
+  def getAllRows(resultSet: ResultSet): Seq[Row] = resultSet.all().toSeq
 
-  /** drop schema aka keyspace
+  /** drop schema (aka keyspace)
     *
     * @param session
-    * @param schema aks keyspace
+    * @param schema
     */
   def dropSchema(session: Session, schema: String): Unit = {
     session.execute("DROP KEYSPACE IF EXISTS " + schema)

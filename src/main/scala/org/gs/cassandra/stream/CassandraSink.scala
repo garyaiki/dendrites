@@ -11,9 +11,9 @@ import com.datastax.driver.core.{BoundStatement, Session}
   * bound to the statement in the previous stage. BoundStatements can be for different queries.
   *
   * @author Gary Struthers
-  * @session is long lived, it's created sometime before the stream and closed sometime after the
-  * stream and may be used with other clients
-  * @implicit logger
+  * @param session is long lived, it's created sometime before the stream and closed sometime after
+  * the stream and may be used with other clients
+  * @param implicit logger
   */
 class CassandraSink(session: Session)(implicit logger: LoggingAdapter)
     extends GraphStage[SinkShape[BoundStatement]] {
@@ -21,7 +21,7 @@ class CassandraSink(session: Session)(implicit logger: LoggingAdapter)
   val in = Inlet[BoundStatement]("CassandraSink.in")
   override val shape: SinkShape[BoundStatement] = SinkShape(in)
 
-  /** When upstream pushes a BoundStatement execute it asychronously and use Cassandra's preferred
+  /** When upstream pushes a BoundStatement execute it asynchronously and use Cassandra's preferred
     * getUniterruptibly method on ResultSetFuture. Then pull another BoundStatement
     * 
     * @param inheritedAttributes
