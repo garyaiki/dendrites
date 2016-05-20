@@ -13,7 +13,6 @@ import scala.concurrent.{ExecutionContext, Future}
   * @example [[org.gs.algebird.agent.HyperLogLogAgentSpec]]
   * @author garystruthers
   *
-  * @tparam A can only be Int or Long HyperLogLogLike typeclass supports this
   * @param name
   * @param xs optional initial values
   * @param ec execution context for future

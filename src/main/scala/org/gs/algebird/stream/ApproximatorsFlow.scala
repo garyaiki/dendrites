@@ -12,7 +12,15 @@ import org.gs.algebird.agent.{AveragedAgent, CountMinSketchAgent,DecayedValueAge
   QTreeAgent}
 import org.gs.algebird.typeclasses.HyperLogLogLike
 
-class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher:  TypeTag](
+/** Update Algebird approximators concurrently
+  * Input a Seq[A] broadcast it to Agents for Algebird approximaters then zip the latest values of
+  * the agents.
+  *
+  * @author Gary Struthers
+  *
+  * @tparam <A> which are implicitly HyperLogLogLike, Numeric and CMSHasher[A]
+  */
+class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
     avgAgent: AveragedAgent,
     cmsAgent: CountMinSketchAgent[A],
     dcaAgent: DecayedValueAgent,
@@ -20,18 +28,21 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher:  TypeTag](
     qtrAgent: QTreeAgent[A])
   (implicit val system: ActorSystem, logger: LoggingAdapter, val materializer: Materializer) {
 
+  // Zip agent update Futures, waits for all to complete
   def zipper = ZipWith((in0: AveragedValue,
                         in1: CMS[A],
                         in2: Seq[DecayedValue],
                         in3: HLL,
                         in4: QTree[A]) => (in0, in1, in2, in3, in4))
 
+  // Agent update functions, partially applied so they can be passed to mapAsync
   val avgAgentAlter = avgAgent.alter _
   val cmsAgentAlter = cmsAgent.alter _
   val dcaAgentAlter = dcaAgent.alter _
   val hllAgentAlter = hllAgent.alter _
   val qtrAgentAlter = qtrAgent.alter _
-  
+
+  //Asychronous flow stages to update agents 
   def avgAgflow: Flow[AveragedValue, AveragedValue, NotUsed] =
         Flow[AveragedValue].mapAsync(1)(avgAgentAlter)
 
@@ -44,6 +55,7 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher:  TypeTag](
 
   def qtrAgFlow: Flow[Seq[A], QTree[A], NotUsed] = Flow[Seq[A]].mapAsync(1)(qtrAgentAlter)
 
+  // Graph to broadcast to update agent flow stages then zip results then cast to FlowShape
   val approximators = GraphDSL.create() { implicit builder =>
     val bcast: UniformFanOutShape[Seq[A], Seq[A]] = builder.add(Broadcast[Seq[A]](5))
     val avg: FlowShape[Seq[A], AveragedValue] = builder.add(avgFlow)
