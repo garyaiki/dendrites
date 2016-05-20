@@ -18,7 +18,7 @@ import org.gs.algebird.typeclasses.HyperLogLogLike
   *
   * @author Gary Struthers
   *
-  * @tparam <A> which are implicitly HyperLogLogLike, Numeric and CMSHasher[A]
+  * @tparam <A> with implicitl HyperLogLogLike[A], Numeric[A] and CMSHasher[A]
   */
 class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
     avgAgent: AveragedAgent,
@@ -61,13 +61,10 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
     val avg: FlowShape[Seq[A], AveragedValue] = builder.add(avgFlow)
     val avgAg: FlowShape[AveragedValue, AveragedValue] = builder.add(avgAgflow)
     val cms: FlowShape[Seq[A], CMS[A]] = builder.add(new CreateCMSStage)
-           // builder.add(Flow[Seq[A]].transform(() => new CreateCMSStage))
     val cmsAg: FlowShape[CMS[A], CMS[A]] = builder.add(cmsAgflow)
     val dvt: FlowShape[Seq[A], Seq[(Double, Double)]] = builder.add(new ZipTimeStage)
-           // builder.add(Flow[Seq[A]].transform(() => new ZipTimeStage))
     val dcaAg: FlowShape[Seq[(Double, Double)], Seq[DecayedValue]] = builder.add(dcaAgFlow)
     val hll: FlowShape[Seq[A], HLL] = builder.add(new CreateHLLStage[A])
-           // builder.add(Flow[Seq[A]].transform(() => new CreateHLLStage[A]))
     val hllAg: FlowShape[HLL, HLL] = builder.add(hllAgflow)
     val qtrAg: FlowShape[Seq[A], QTree[A]] = builder.add(qtrAgFlow)
     val zip = builder.add(zipper)

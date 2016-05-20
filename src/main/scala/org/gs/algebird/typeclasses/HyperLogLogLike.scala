@@ -3,14 +3,12 @@
 package org.gs.algebird.typeclasses
 
 import annotation.implicitNotFound
-
 import com.twitter.algebird.{HyperLogLog, HyperLogLogAggregator, HLL}
 
-/** Create an HLL from Seq[Int] or Seq[Long]
-  *
+/** Create an HLL from Seq[A]
   *
   * @author garystruthers
-  *
+  * @tparam A convertable to Int or Long
   */
 @implicitNotFound(msg = "HyperLogLogLike type class for ${A} must be convertable to Int or Long")
 trait HyperLogLogLike[A] {
