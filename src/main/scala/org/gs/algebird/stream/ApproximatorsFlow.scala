@@ -19,6 +19,11 @@ import org.gs.algebird.typeclasses.HyperLogLogLike
   * @author Gary Struthers
   *
   * @tparam <A> with implicitl HyperLogLogLike[A], Numeric[A] and CMSHasher[A]
+  * @param avgAgent AveragedAgent
+  * @param cmsAgent: CountMinSketchAgent
+  * @param dcaAgent: DecayedValueAgent
+  * @param hllAgent: HyperLogLogAgent
+  * @param qtrAgent: QTreeAgent
   */
 class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
     avgAgent: AveragedAgent,
@@ -28,7 +33,7 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
     qtrAgent: QTreeAgent[A])
   (implicit val system: ActorSystem, logger: LoggingAdapter, val materializer: Materializer) {
 
-  // Zip agent update Futures, waits for all to complete
+  // Zip input agent update Futures, waits for all to complete
   def zipper = ZipWith((in0: AveragedValue,
                         in1: CMS[A],
                         in2: Seq[DecayedValue],
