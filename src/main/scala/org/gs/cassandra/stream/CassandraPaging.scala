@@ -4,7 +4,7 @@ import akka.event.LoggingAdapter
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet }
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.datastax.driver.core.{ResultSet, Row}
-import java.util.{Iterator => JIterator}
+import scala.collection.JavaConversions.asScalaIterator
 import scala.collection.mutable.ArrayBuffer
 
 /** Page specified number of Rows from a ResultSet 
@@ -20,26 +20,22 @@ class CassandraPaging(pageSize: Int)(implicit logger: LoggingAdapter)
   val out = Outlet[Seq[Row]]("CassandraPaging.out")
   override val shape = FlowShape.of(in, out)
 
-  /** When a ResultSet is pushed from upstream get its Java iterator and push
-    * pageSize number of Rows. When downstream pulls, forward pull upstream if iterator is null. If
-    * iterator exists push pageSize number of Rows. When iterator has no more elements set it null
+  /** When a ResultSet is pushed from upstream get its iterator and push
+    * pageSize number of Rows. When downstream pulls, forward pull upstream if iterator is empty. If
+    * iterator has elements push pageSize number of Rows. When iterator isEmpty set Iterator.empty
     * 
     * @param inheritedAttributes
     */
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
-      var it: JIterator[Row] = null
+      var it: Iterator[Row] = Iterator.empty
       
       def pageRows(): Seq[Row] = {
-        var countDown = pageSize
-        val rowBuf = new ArrayBuffer[Row](countDown)
-        while(countDown > 0 && it.hasNext()) {
-          rowBuf.append(it.next())
-          countDown = countDown -1
-        }
-        if(!it.hasNext()) it = null
-        rowBuf.toSeq
+        val pageIt = it.take(pageSize)
+        if(it.isEmpty) it = Iterator.empty
+        pageIt.toSeq
       }
+
       setHandler(in, new InHandler {
         override def onPush(): Unit = {
           it = grab(in).iterator()
@@ -49,7 +45,7 @@ class CassandraPaging(pageSize: Int)(implicit logger: LoggingAdapter)
       
       setHandler(out, new OutHandler {
         override def onPull(): Unit = {
-          if(it == null) {
+          if(it.isEmpty) {
             pull(in)
           } else {
             push(out, pageRows())
