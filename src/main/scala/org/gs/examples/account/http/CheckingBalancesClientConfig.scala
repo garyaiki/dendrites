@@ -1,12 +1,14 @@
 package org.gs.examples.account.http
 
-import akka.actor.ActorSystem
-import akka.event.Logging
 import akka.util.Timeout
-import com.typesafe.config.{ Config, ConfigFactory }
-import org.gs.http._
 import scala.concurrent.duration.MILLISECONDS
+import org.gs.http._
 
+/** Read config for Checking Balances Client
+  *
+  * @author Gary Struthers
+  *
+  */
 class CheckingBalancesClientConfig() {
 
   val hostConfig = getHostConfig("dendrites.checking-balances.http.interface",

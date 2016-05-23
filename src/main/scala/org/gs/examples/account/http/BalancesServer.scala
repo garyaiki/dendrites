@@ -8,7 +8,9 @@ import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 
-/** @author garystruthers
+/** For testing BalancesService, run this before tests
+  *
+  *  @author garystruthers
   *
   */
 object BalancesServer extends App with BalancesService {

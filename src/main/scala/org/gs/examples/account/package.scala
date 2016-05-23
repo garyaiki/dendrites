@@ -3,8 +3,6 @@
 package org.gs.examples
 
 import scala.collection.immutable.Set
-import scala.reflect.{ClassTag, classTag}
-//import scala.reflect.runtime.universe.TypeTag
 
 /** Functions for AccountType, the case objects that distinguish them and AccountBallances, their
   * optional list of account ids and balances
@@ -40,12 +38,12 @@ package object account {
     * @param accountBalances is a Seq of subTypes of AccountBalances
     * @return Seq[List[Product]] call flatten to get List[A]
     */
-  def extractBalancesLists[A: ClassTag](accountBalances: Seq[AnyRef]): Seq[List[A]] = {
+  def extractBalancesLists[A](accountBalances: Seq[AnyRef]): Seq[List[A]] = {
     for (i <- accountBalances) yield {
       i match {
-        case c: CheckingAccountBalances[BigDecimal]    => extractBalances(c)
-        case m: MoneyMarketAccountBalances[BigDecimal] => extractBalances(m)
-        case s: SavingsAccountBalances[BigDecimal]     => extractBalances(s)
+        case c: CheckingAccountBalances[A]    => extractBalances(c)
+        case m: MoneyMarketAccountBalances[A] => extractBalances(m)
+        case s: SavingsAccountBalances[A]     => extractBalances(s)
       }
     }
   }

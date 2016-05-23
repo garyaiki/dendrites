@@ -2,37 +2,13 @@
   */
 package org.gs.examples.account
 
-import _root_.akka.actor.ActorSystem
-import _root_.akka.event.LoggingAdapter
-import _root_.akka.http.scaladsl.model.HttpEntity
-import _root_.akka.stream.Materializer
-import org.gs._
-import org.gs.http._
-import scala.concurrent.{ ExecutionContextExecutor, Future }
-import scala.concurrent.ExecutionContext.Implicits.global
-
-/** @author garystruthers
+/** Dummy data for testing BalancesService
+  *
+  *  @author Gary Struthers
   *
   */
 package object http {
-/*
-  def callById(baseURL: StringBuilder,
-               mapLeft: (HttpEntity) => Future[Left[String, Nothing]], 
-               mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
-               (cc: Product)
-               (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
-          Future[Either[String, AnyRef]] = {
-    
-    val callFuture = call(cc, baseURL)
-    val fields = ccToMap(cc).filterKeys(_ != "$outer")
-    val id = fields.get("id") match {
-      case Some(x) => x match {
-        case x: Long => x
-      }
-    }
-    byId(id, callFuture, mapLeft, mapRight)
-  }
-*/
+
   val checkingBalances = Map(
     1L -> Some(List(
       (1L, BigDecimal(1000.10)))),

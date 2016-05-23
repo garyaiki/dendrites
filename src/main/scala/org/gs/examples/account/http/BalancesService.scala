@@ -1,8 +1,5 @@
 package org.gs.examples.account.http
 
-import scala.concurrent.{ ExecutionContextExecutor, Future }
-import scala.concurrent.ExecutionContext.Implicits.global
-
 import akka.actor.ActorSystem
 import akka.event.{ LoggingAdapter, Logging }
 import akka.http.scaladsl.client.RequestBuilding
@@ -11,11 +8,17 @@ import akka.http.scaladsl.model.HttpEntity
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
+import scala.concurrent.{ ExecutionContextExecutor, Future }
+import scala.concurrent.ExecutionContext.Implicits.global
 import spray.json.DefaultJsonProtocol
-
 import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances,
     MoneyMarketAccountBalances, SavingsAccountBalances}
 
+/** Map json <=> case classes to Either Right on success, String to Left on failure
+  *
+  * @author Gary Struthers
+  *
+  */
 trait BalancesProtocols extends DefaultJsonProtocol {
   implicit val getAccountBalancesFormat = jsonFormat1(GetAccountBalances)
   implicit val checkingAccountBalancesFormat = jsonFormat1(CheckingAccountBalances[BigDecimal])
@@ -42,6 +45,9 @@ trait BalancesProtocols extends DefaultJsonProtocol {
   }
 }
 
+/** Example Rest/microserver using Akka Http DSL. Valid routes call accessors for dummy data
+  *
+  */ 
 trait BalancesService extends BalancesProtocols {
   implicit val system: ActorSystem
   implicit def executor: ExecutionContextExecutor

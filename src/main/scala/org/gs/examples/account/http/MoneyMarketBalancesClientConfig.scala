@@ -1,9 +1,14 @@
 package org.gs.examples.account.http
 
 import akka.util.Timeout
-import org.gs.http._
 import scala.concurrent.duration.MILLISECONDS
+import org.gs.http._
 
+/** Read config for Money Market Balances Client
+  *
+  * @author Gary Struthers
+  *
+  */
 class MoneyMarketBalancesClientConfig() {
 
   val hostConfig = getHostConfig("dendrites.money-market-balances.http.interface",
