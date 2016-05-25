@@ -26,8 +26,8 @@ class BalancesServiceSpec extends FlatSpec with Matchers with ScalatestRouteTest
   val checkingBalances = CheckingAccountBalances[BigDecimal](Some(List((goodId, 1000.1))))
 
   val checkingPath = "/account/balances/checking/"
-  val balancesQuery = caseClassToGetQuery(balanceQuery)
-  val badBalancesQuery = caseClassToGetQuery(badBalanceQuery)
+  val balancesQuery = caseClassToGetQuery(balanceQuery)()
+  val badBalancesQuery = caseClassToGetQuery(badBalanceQuery)()
   val q = checkingPath ++ balancesQuery
   val badQ = checkingPath ++ badBalancesQuery
   println(q)

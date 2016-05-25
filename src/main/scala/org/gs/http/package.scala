@@ -61,23 +61,24 @@ package object http {
     require(scheme == "http" || scheme == "https", s"scheme:$scheme must be http or https")
     val domainPattern = """[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}""".r
     val ipPattern = """\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}""".r
-    val gd = if (domainPattern.findFirstIn(domain).isDefined ||
+    val goodDomain = if (domainPattern.findFirstIn(domain).isDefined ||
         ipPattern.findFirstIn(domain).isDefined) true else false
-    require(gd, s"domain:$domain looks invalid")
-    val r = 0 to 65536
-    require(r.contains(port), s"port:$port must be ${r.start} to ${r.end}")
+    require(goodDomain, s"domain:$domain looks invalid")
+    val portRange = 0 to 65536
+    require(portRange.contains(port), s"port:$port must be ${portRange.start} to ${portRange.end}")
     val pathPattern = """\/[/.a-zA-Z0-9-]+""".r
     require(pathPattern.findFirstIn(path).isDefined, s"path:path looks invalid")
     new StringBuilder(scheme).append("://").append(domain).append(':').append(port).append(path)
   }
   
-  /** Extract case class elements into http GET query
+  /** Transform case class to http GET query
     *  
-    *  @param cc case class or tuple; Product is supertype 
-    *  @return field names and values as GET query string preceded with ccName? 
+    *  @param cc case class or tuple
+    *  @param requestPath last part of path before '?', default is case class name
+    *  @return field names and values as GET query string preceded with case class name? 
     */
-  def caseClassToGetQuery(cc: Product): StringBuilder = {
-    val sb = new StringBuilder(cc.productPrefix)
+  def caseClassToGetQuery(cc: Product)(requestPath: String = cc.productPrefix): StringBuilder = {
+    val sb = new StringBuilder(requestPath)
     sb.append('?')
     val fields = ccToMap(cc).filterKeys(_ != "$outer")
     fields.foreach{
@@ -100,7 +101,7 @@ package object http {
     */
   def typedQuery(cc: Product, baseURL: StringBuilder)(implicit system: ActorSystem, 
           materializer: Materializer): Future[HttpResponse] = {
-    val balancesQuery = caseClassToGetQuery(cc)
+    val balancesQuery = caseClassToGetQuery(cc)()
     val uriS = (baseURL ++ balancesQuery).mkString
     Http().singleRequest(HttpRequest(uri = uriS))
   }

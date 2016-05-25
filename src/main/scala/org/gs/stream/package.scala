@@ -50,10 +50,10 @@ package object stream {
     case Left(l) => logger.warning(l.toString); false
   }
 
-  /** Zip stage outputs tuples. Map tuple3 Either[String, AnyRef] to tuple2 Seq[String] Seq[AnyRef]
+  /** Map tuple3 from Zip stage to group failure and success results
     *
-    * @param in tuple3
-    * @return tuple2
+    * @param in tuple3 the result from 3 parallel calls
+    * @return tuple2 all error strings and all success results
     */
   def tuple3LeftRight(in: (Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef])):
           (Seq[String], Seq[AnyRef]) = {

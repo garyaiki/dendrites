@@ -7,6 +7,7 @@ import akka.stream.scaladsl.{ Broadcast, Flow, GraphDSL, ZipWith}
 import org.gs.stream.leftRightFlow
 
 /** Create Graph that calls Checking, MoneyMarket, Savings services in parallel, waits for them all
+  * then groups failures and successes
   *
   * @author Gary Struthers
   * @param system implicit ActorSystem
@@ -26,7 +27,7 @@ class ParallelCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
 
   import GraphDSL.Implicits._ 
   // Create Graph in Shape of a Flow
-  val fg = GraphDSL.create() { implicit builder =>
+  val flowGraph = GraphDSL.create() { implicit builder =>
     val bcast: UniformFanOutShape[Product, Product] = builder.add(Broadcast[Product](3))
     val check: FlowShape[Product,Either[String, AnyRef]] = builder.add(ccf.flow)
     val mm: FlowShape[Product,Either[String, AnyRef]] = builder.add(mmcf.flow)
@@ -39,11 +40,11 @@ class ParallelCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
     FlowShape(bcast.in, zip.out)
   }.named("calls")
   // Cast Graph to Flow
-  val wrappedFlow = Flow.fromGraph(fg)
-  // Map tuple3 from fg
+  val asFlow = Flow.fromGraph(flowGraph)
+  // Map tuple3 from flowGraph
   val fgLR = GraphDSL.create() { implicit builder =>
-    val fgCalls = builder.add(wrappedFlow)
-    val fgLR = builder.add(leftRightFlow)
+    val fgCalls = builder.add(asFlow)
+    val fgLR = builder.add(leftRightFlow) // results combiner
     
     fgCalls ~> fgLR
     FlowShape(fgCalls.in, fgLR.outlet)

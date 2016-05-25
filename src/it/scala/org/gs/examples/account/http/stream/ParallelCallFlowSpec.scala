@@ -27,7 +27,7 @@ class ParallelCallFlowSpec extends WordSpecLike with Matchers {
   def source = TestSource.probe[Product]
   def sink = TestSink.probe[(Either[String, AnyRef],Either[String, AnyRef],Either[String, AnyRef])]
   val pcf = new ParallelCallFlow
-  val wrappedFlow = pcf.wrappedFlow
+  val wrappedFlow = pcf.asFlow
   
   "A ParallelCallFlowClient" should {
     "get balances for id 1" in {
