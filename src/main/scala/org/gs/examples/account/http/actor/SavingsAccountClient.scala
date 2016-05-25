@@ -6,7 +6,6 @@ import akka.event.{ LoggingAdapter, Logging }
 import akka.pattern.pipe
 import akka.stream.ActorMaterializer
 import com.typesafe.config.Config
-
 import org.gs.aggregator.actor.ResultAggregator
 import org.gs.examples.account.{ Savings, SavingsAccountBalances, GetAccountBalances }
 import org.gs.examples.account.http.{ BalancesProtocols, SavingsBalancesClientConfig }

@@ -7,7 +7,6 @@ import akka.pattern.pipe
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import com.typesafe.config.Config
-
 import org.gs.aggregator.actor.ResultAggregator
 import org.gs.examples.account.{ Checking, CheckingAccountBalances, GetAccountBalances }
 import org.gs.examples.account.http.{ BalancesProtocols, CheckingBalancesClientConfig }

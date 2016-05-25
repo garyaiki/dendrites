@@ -6,7 +6,6 @@ import akka.event.{ LoggingAdapter, Logging }
 import akka.pattern.pipe
 import akka.stream.ActorMaterializer
 import com.typesafe.config.Config
-
 import org.gs.aggregator.actor.ResultAggregator
 import org.gs.examples.account.{ MoneyMarket, MoneyMarketAccountBalances, GetAccountBalances }
 import org.gs.examples.account.http.{ BalancesProtocols, MoneyMarketBalancesClientConfig }
@@ -41,7 +40,8 @@ class MoneyMarketAccountClient(clientConfig: MoneyMarketBalancesClientConfig) ex
 
 object MoneyMarketAccountClient {
   val clientConfig = new MoneyMarketBalancesClientConfig()
-  def props(clientConfig: MoneyMarketBalancesClientConfig): Props = Props(new MoneyMarketAccountClient(clientConfig))
+  def props(clientConfig: MoneyMarketBalancesClientConfig): Props =
+    Props(new MoneyMarketAccountClient(clientConfig))
 }
 
 trait MoneyMarketAccountCaller {

@@ -1,11 +1,10 @@
 package org.gs.examples.account.http.actor
-import scala.collection.immutable.Set
-import scala.concurrent.duration._
 
 import akka.actor._
 import akka.contrib.pattern.Aggregator
+import scala.collection.immutable.Set
+import scala.concurrent.duration._
 import org.gs.aggregator.actor.{ CantUnderstand, ResultAggregator, TimedOut}
-
 import org.gs.examples.account._
 import org.gs.examples.account.actor.AccountBalanceActor
 import org.gs.examples.account.http.actor.AccountBalanceRestfulRetriever._
