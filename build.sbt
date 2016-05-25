@@ -4,7 +4,7 @@ lazy val commonSettings = Seq(
 	version := "0.1.0",
 	scalaVersion := "2.11.8"
 )
-lazy val akkaV = "2.4.5"
+lazy val akkaV = "2.4.6"
 lazy val scalaTestV = "2.2.6"
 lazy val algebirdV = "0.12.0"
 lazy val root = (project in file(".")).
@@ -17,21 +17,21 @@ lazy val root = (project in file(".")).
 			"org.scalatest" % "scalatest_2.11" % scalaTestV % "it,test",
 		   "junit" % "junit" % "4.11" % "it,test",
 		   "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
-		   "com.typesafe.akka" %% "akka-actor" % "2.4.5",
+		   "com.typesafe.akka" %% "akka-actor" % "2.4.6",
 		   "ch.qos.logback" % "logback-classic" % "1.1.3",
-  	   "com.typesafe.akka" %% "akka-slf4j" % "2.4.5",
-	     "com.typesafe.akka" %% "akka-remote" % "2.4.5",
-		   "com.typesafe.akka" %% "akka-cluster" % "2.4.5",
-		   "com.typesafe.akka" %% "akka-agent" % "2.4.5", 
-		   "com.typesafe.akka" %% "akka-testkit" % "2.4.5" % "it,test",
-		   "com.typesafe.akka" %% "akka-contrib" % "2.4.5",
-		   "com.typesafe.akka" %% "akka-persistence" % "2.4.5",
-			 "com.typesafe.akka" % "akka-stream_2.11" % "2.4.5",
-			 "com.typesafe.akka" % "akka-http-core_2.11" % "2.4.5",
-       "com.typesafe.akka" % "akka-http-experimental_2.11" % "2.4.5",
-			 "com.typesafe.akka" % "akka-stream-testkit_2.11" % "2.4.5",
-       "com.typesafe.akka" % "akka-http-spray-json-experimental_2.11" % "2.4.5",
-			 "com.typesafe.akka" % "akka-http-testkit_2.11" % "2.4.5",
+  	   "com.typesafe.akka" %% "akka-slf4j" % "2.4.6",
+	     "com.typesafe.akka" %% "akka-remote" % "2.4.6",
+		   "com.typesafe.akka" %% "akka-cluster" % "2.4.6",
+		   "com.typesafe.akka" %% "akka-agent" % "2.4.6", 
+		   "com.typesafe.akka" %% "akka-testkit" % "2.4.6" % "it,test",
+		   "com.typesafe.akka" %% "akka-contrib" % "2.4.6",
+		   "com.typesafe.akka" %% "akka-persistence" % "2.4.6",
+			 "com.typesafe.akka" % "akka-stream_2.11" % "2.4.6",
+			 "com.typesafe.akka" % "akka-http-core_2.11" % "2.4.6",
+       "com.typesafe.akka" % "akka-http-experimental_2.11" % "2.4.6",
+			 "com.typesafe.akka" % "akka-stream-testkit_2.11" % "2.4.6",
+       "com.typesafe.akka" % "akka-http-spray-json-experimental_2.11" % "2.4.6",
+			 "com.typesafe.akka" % "akka-http-testkit_2.11" % "2.4.6",
 		   "com.twitter" % "algebird_2.11" % algebirdV,
 		   "com.twitter" % "algebird-core_2.11" % algebirdV,
 		   "com.twitter" % "algebird-test_2.11" % algebirdV,
