@@ -1,11 +1,11 @@
-/** @see http://www.scala-lang.org/api/current/index.html#scala.Product
-  */
+
 package org.gs
 
 import scala.reflect.runtime.universe.{Type, TypeRef, WeakTypeTag}
 
-/** @author Gary Struthers
+/** reflection aids for logging and debugging
   *
+  * @author Gary Struthers
   */
 package object reflection {
 
@@ -13,8 +13,8 @@ package object reflection {
     *
     * to use, import scala.reflect.runtime.universe._
     * Warning Not thread safe, should be fine for logging and debugging though
-    * @see http://docs.scala-lang.org/overviews/reflection/thread-safety.html
-    * @see http://docs.scala-lang.org/overviews/reflection/overview.html
+    * @see [[http://docs.scala-lang.org/overviews/reflection/thread-safety.html "reflection thread-safety"]]
+    * @see [[http://docs.scala-lang.org/overviews/reflection/overview.html "reflection overview"]]
     *
     * @param implicit WeakTypeTag
     * @return type information of element

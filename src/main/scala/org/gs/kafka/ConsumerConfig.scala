@@ -1,7 +1,7 @@
 package org.gs.kafka
 
 import java.util.{ List => JList, Properties }
-import org.apache.kafka.clients.consumer.{ Consumer, ConsumerRecords, KafkaConsumer }
+import org.apache.kafka.clients.consumer.Consumer
 
 /** Abstract configuration of KafkaConsumer
   * 

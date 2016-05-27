@@ -2,18 +2,18 @@
   */
 package org.gs.http
 
-import scala.util.Try
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl._
 import akka.http.scaladsl.HttpExt
 import akka.http.scaladsl.Http.HostConnectionPool
-import akka.http.scaladsl.model.{ HttpResponse, HttpRequest }
+import akka.http.scaladsl.model.{ HttpRequest, HttpResponse}
 import com.typesafe.config.ConfigFactory
+import scala.util.Try
 
-/** Akka Http connection pool common behavior
+/** Factory for HostConnectionPool
   *
-  * @author garystruthers
+  * @author Gary Struthers
   *
   */
 object ClientConnectionPool {

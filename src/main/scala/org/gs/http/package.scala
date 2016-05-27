@@ -10,18 +10,19 @@ import _root_.akka.http.scaladsl.model.StatusCodes._
 import _root_.akka.http.scaladsl.unmarshalling.Unmarshal
 import _root_.akka.stream.Materializer
 import com.typesafe.config.{ Config, ConfigFactory }
-import org.gs._
 import scala.concurrent.{ ExecutionContextExecutor, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
 
-/** @author garystruthers
+/** Provides Class to create an HostConnectionPool. Also functions to create requests and handle
+  * response
   *
+  * @see [[http://typesafehub.github.io/config/latest/api/ "Config API"]]
+  * @author Gary Struthers
   */
 package object http {
 
   /** Get host URL config from a Config
 		*
-		* @see [[http://typesafehub.github.io/config/latest/api/]]
 		* @param ipPath config key
     * @param portPath config key
     * @param config
@@ -36,7 +37,6 @@ package object http {
 
   /** Get path from Config append to host URL
 		*
-		* @see [[http://typesafehub.github.io/config/latest/api/]]
 		* @param pathPath config key
     * @param hostConfig config plus ip address and port number
     * @return URL string for host/path 
@@ -90,7 +90,7 @@ package object http {
 
   /** Call server with GET query, case class is turned into Get query, appended to baseURL
 		*
-		* @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.http.javadsl.Http]]
+		* @see [[http://doc.akka.io/api/akka/2.4.6/#akka.http.scaladsl.Http$ "Http"]]
 		* @example [[org.gs.examples.account.http.actor.CheckingAccountClient]]
 		* 
     * @param cc case class 
@@ -108,8 +108,8 @@ package object http {
   
   /**	Map response to a Future Either Left for error, Right for good result
 		*
-	  * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.http.scaladsl.model.HttpResponse]]
-	  * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.http.scaladsl.unmarshalling.Unmarshal]]
+	  * @see [[http://doc.akka.io/api/akka/2.4.6/#akka.http.scaladsl.model.HttpResponse "HttpResponse"]]
+	  * @see [[http://doc.akka.io/api/akka/2.4.6/#akka.http.scaladsl.unmarshalling.Unmarshal "Unmarshal"]]
 		* @example [[org.gs.examples.account.http.actor.CheckingAccountClient]]
 	  * 
 	  * @param caller future returned by query

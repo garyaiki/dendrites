@@ -10,11 +10,12 @@ import org.apache.kafka.common.TopicPartition
 import scala.collection.immutable.Queue
 import scala.collection.mutable.ArrayBuffer
 
-/** Akka Stream Flows for Kafka
+/** Classes for KafkaSource, KafkaSink, ConsumerRecord queue stages. Also Flows and functions for
+  * Kafka
   *
   * @author Gary Struthers
-  * @see [[http://kafka.apache.org/090/javadoc/org/apache/kafka/clients/consumer/ConsumerRecords.html]]
-  * @see [[http://kafka.apache.org/090/javadoc/org/apache/kafka/clients/consumer/ConsumerRecord.html]]
+  * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/ConsumerRecords.html "ConsumerRecords"]]
+  * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/ConsumerRecord.html "ConsumerRecord"]]
   */
 package object stream {
 

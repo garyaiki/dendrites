@@ -1,32 +1,34 @@
 package org.gs
 
-import java.util.Properties
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
-import org.gs._
 
+/** Provides Classes to add fields to KafkaConsumer and KafkaProducer. Also Factories for
+  * KafkaConsumer, KafkaProducer from their Properties files
+  *
+  * @see [[http://typesafehub.github.io/config/latest/api/ "Config API"]]
+  * @author Gary Struthers
+  */
 package object kafka {
 
-  /** Create KafkaConsumer Java client configured with its properties, consumer is not thread safe
+  /** Create KafkaConsumer Java client configured with its properties, consumer is NOT thread safe
     *
-    * @see https://kafka.apache.org/090/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html 
-    * @tparam K key
-    * @tparam V value
+    * @tparam K Kafka ConsumerRecord key
+    * @tparam V Kafka ConsumerRecord value
     * @param filename Kafka consumer properties
-    * @return
+    * @return consumer
     */
   def createConsumer[K, V](filename: String): KafkaConsumer[K, V] = {
     val props = loadProperties(filename)
     new KafkaConsumer[K, V](props)
   }
 
-  /** Create KafkaProducer Java client configured with its properties, KafkaProducer is thread safe
+  /** Create KafkaProducer Java client configured with its properties, KafkaProducer IS thread safe
     *
-    * @see https://kafka.apache.org/090/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html
-    * @tparam K key
-    * @tparam V value
+    * @tparam K Kafka ProducerRecord key
+    * @tparam V Kafka ProducerRecord value
     * @param filename Kafka producer properties
-    * @return
+    * @return producer
     */
   def createProducer[K, V](filename: String): KafkaProducer[K, V] = {
     val props = loadProperties(filename)

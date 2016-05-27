@@ -2,16 +2,17 @@ package org.gs.kafka.stream
 
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
-//import akka.stream.scaladsl.Source
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import scala.collection.immutable.Queue
 
-/** Flow that uses a queue to send Kafka messages one at a time. A Queue[ConsumerRecord] is pushed
- *  from upstream, when downstream pulls 1 ConsumerRecord is dequeued and pushed downstream
+/** Flow that takes a Queue of ConsumerRecord and deques one on pull
+  *
+  * Flow that uses a queue to send Kafka messages one at a time. A Queue[ConsumerRecord] is pushed
+  * from upstream, when downstream pulls 1 ConsumerRecord is dequeued and pushed downstream
   * 
   * @author Gary Struthers
-  * @tparam <K> Kafka ConsumerRecord key
-  * @tparam <V> Kafka ConsumerRecord value
+  * @tparam K Kafka ConsumerRecord key
+  * @tparam V Kafka ConsumerRecord value
   */
 class ConsumerRecordQueue[K, V]() extends
     GraphStage[FlowShape[Queue[ConsumerRecord[K, V]], ConsumerRecord[K, V]]] {

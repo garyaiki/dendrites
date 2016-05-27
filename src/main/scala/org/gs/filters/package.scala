@@ -2,10 +2,11 @@
   */
 package org.gs
 
-import scala.reflect.{ClassTag, classTag}
+import scala.reflect.ClassTag
 
-/** @author garystruthers
+/** filters and extractor functions for sequences, Either, Option, tuples and case classes
   *
+  *  @author Gary Struthers
   */
 package object filters {
 
@@ -18,7 +19,7 @@ package object filters {
     * @param f filter or predicate function
     * @return matching elements
     */
-  def productFilter[P <: Product](e: P, f: TypeFilter): IndexedSeq[Any] = {
+  def fieldFilter[P <: Product](e: P, f: TypeFilter): IndexedSeq[Any] = {
     val iter = e.productIterator
     iter.filter(f).toIndexedSeq
   }
@@ -27,20 +28,24 @@ package object filters {
 
   /** Returns only matching elements of an indexed seq of mixed case class or tuple types
     *
-    *
     * @param xs Indexed Sequence of heterogeneous types of case classes or tuples
     * @param pf function returns only elements of case class or tuple matching predicate
     * @param f predicate or filter function(common types below)
     * @return IndexedSeq of matching elements
     */
   def filterProducts[P <: Product](xs: Seq[P], pf: ProductFilter[P], f: TypeFilter): Seq[Any] = {
-    val l = for {
+    for {
       e <- xs
       ef <- pf(e, f)
     } yield ef
-    l
   }
 
+  /** true if arg e:A false if not A
+    *
+    * @tparam A type e should be
+    * @param e
+    * @return true if e:A false if not A
+    */
   def isType[A: ClassTag](e: Any): Boolean = {
     evidence$1.unapply(e) match {
       case Some(x) => true
@@ -48,6 +53,12 @@ package object filters {
     }
   }
 
+  /** true if arg e: Option[A] false if None or not A
+    *
+    * @tparam A type of Some
+    * @param e
+    * @return true if e is Some(x) type A
+    */
   def isOptionType[A: ClassTag](e: Any): Boolean = e match {
     case Some(x) => {
       evidence$2.unapply(e) match {
@@ -57,6 +68,13 @@ package object filters {
     }
     case _ => false
   }
+
+  /** true if Either Left is a String OR if Right is type A
+    *
+    * @tparam A type of Right element
+    * @param e Either Left or Right
+    * @return true if Left is a String OR if Right is type A
+    */
   def isEitherStringRight[A: ClassTag](e: Any): Boolean = e match {
     case Right(x) => {
       val clazz = implicitly[ClassTag[A]].runtimeClass
@@ -66,7 +84,8 @@ package object filters {
     case _        => false
   }
 
-  /** Accept Either Left
+  /** true if Either is Left
+    *
     * @tparam A type of Left element
     * @tparam B type of Right element
     * @param in Either
@@ -77,7 +96,8 @@ package object filters {
     case _       => false
   }
 
-  /** Accept Either Right
+  /** true if Either is Right
+    *
     * @tparam A type of Left element
     * @tparam B type of Right element
     * @param in Either
@@ -89,6 +109,7 @@ package object filters {
   }
 
   /** Extract value from Either Left
+    *
     * @tparam A type of Left element
     * @tparam B type of Right element
     * @param in Either
@@ -100,6 +121,7 @@ package object filters {
   }
 
   /** Extract value from Either Right
+    *
     * @tparam A type of Left element
     * @tparam B type of Right element
     * @param in Either
@@ -122,7 +144,7 @@ package object filters {
     * @throws ClassCastException if element doesn't match type param
     */
   def extractElementByIndex[A](l: Seq[Product], element: Int): Seq[A] =
-    for {p <- l} yield p.productElement(element).asInstanceOf[A]
+    for(p <- l) yield p.productElement(element).asInstanceOf[A]
 
   /** Extract a Sequence of 2 element Tuples from a sequence of case classes or tuples
     *
@@ -138,18 +160,17 @@ package object filters {
     * @throws ClassCastException if element doesn't match type param
     */
   def extractTuple2ByIndex[A, B](l: Seq[Product], element1: Int, element2: Int): Seq[(A, B)] =
-    for {p <- l} yield {
-      (p.productElement(element1).asInstanceOf[A],
-        p.productElement(element2).asInstanceOf[B])
+    for(p <- l) yield {
+      (p.productElement(element1).asInstanceOf[A], p.productElement(element2).asInstanceOf[B])
     }
 
   /** Extract Seq of values from Either Right
+    *
     * @tparam A type of Left element
     * @tparam B type of Right element
     * @param in Seq of Either
     * @return Seq of values in Right
     */
   def filterRight[A, B](in: Seq[Either[A, B]]): Seq[B] = in.collect { case Right(r) => r }
-
 }
 
