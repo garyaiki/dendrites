@@ -1,9 +1,9 @@
-/**
-  */
+
 package org.gs
 
-/** @author garystruthers
+/** aggregate functions
   *
+  * @author Gary Struthers
   */
 package object aggregator {
 

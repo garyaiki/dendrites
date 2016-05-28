@@ -1,5 +1,4 @@
-/**
-  */
+
 package org.gs
 
 import com.twitter.algebird.{Approximate, AveragedValue, AveragedGroup, Averager, BF, BloomFilter,
@@ -7,6 +6,7 @@ import com.twitter.algebird.{Approximate, AveragedValue, AveragedGroup, Averager
   HyperLogLogAggregator, IntRing, LongRing, MaxAggregator, MinAggregator, Monoid, NumericRing,
   QTree, QTreeSemigroup, Ring, Semigroup}
 import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
+
 /** Aggregation functions for distributed systems. Simplifies using Twitter Algebird.
   *
   * Algebird provides implicit implementations of common types which are imported here. Class
@@ -18,7 +18,7 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * @author Gary Struthers
   *
   * ==AveragedValue find local average then sum them to global average==
-  * @see org.gs.algebird.AveragedSpec.scala
+  * @see[[org.gs.algebird.AveragedSpec]]
   *
   * Average a Sequence of values
   * {{{
@@ -341,7 +341,7 @@ package object algebird {
   /** Sums sequence elements
     *
     * Implicit Algebird Semigroup
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Semigroup Semigroup]]
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Semigroup "Semigroup"]]
     * @example [[org.gs.algebird.SemigroupSpec]]
     *
     * @tparam A: Semigroup, element
@@ -353,7 +353,7 @@ package object algebird {
   /** Sums sequence elements
     *
     * Implicit Algebird Monoid
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Monoid Monoid]]
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Monoid "Monoid"]]
     * @example [[org.gs.algebird.MonoidSpec]]
     *
     * @tparam A: Monoid, element

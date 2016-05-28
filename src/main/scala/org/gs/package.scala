@@ -1,10 +1,11 @@
-/**
-  */
+
 package org
 
 import java.util.Properties
 
-/** @author garystruthers
+/** utility functions for case classes and Properties files 
+  *
+  * @author Gary Struthers
   *
   */
 package object gs {
@@ -18,7 +19,7 @@ package object gs {
     */
   def ccToMap(cc: Product) = cc.getClass.getDeclaredFields.foldLeft(Map[String, Any]()) {
     (a, f) =>
-      f.setAccessible(true) // to get private fields
+      f setAccessible(true) // to get private fields
       a + (f.getName -> f.get(cc))
   }
 
@@ -45,7 +46,7 @@ package object gs {
     */
   def loadProperties(filename: String, path: String = "/"): Properties = {
     val prop = new Properties()
-    prop.load(getClass.getResourceAsStream(path + filename))
+    prop load(getClass.getResourceAsStream(path + filename))
     prop
   }
 }

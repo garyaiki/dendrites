@@ -3,6 +3,11 @@ package org.gs.algebird
 import com.typesafe.config.{ Config, ConfigFactory }
 import com.twitter.algebird.{DecayedValueMonoid, HyperLogLogAggregator, HyperLogLogMonoid}
 
+/** Factory for Algebird configured constants
+  *
+  * @author Gary Struthers
+  *
+  */
 object AlgebirdConfigurer {
   val config = ConfigFactory.load()
   val countMinSketchDelta = config.getNumber("dendrites.algebird.countMinSketch.delta")
