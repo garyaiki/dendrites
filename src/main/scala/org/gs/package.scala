@@ -3,10 +3,15 @@ package org
 
 import java.util.Properties
 
-/** utility functions for case classes and Properties files 
+/** Utility functions for case classes and Properties files 
   *
   * @author Gary Struthers
   *
+  * ==Load Properties file from classpath==
+  * {{{
+  *   val prop: Properties = loadProperties("kafkaProducer.properties")
+  * }}}
+  * 
   */
 package object gs {
 
