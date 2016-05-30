@@ -48,7 +48,6 @@ class AccountBalanceRetrieverSpec extends TestKit(ActorSystem("test")) with Impl
       }
       case result ⇒ assert(false, s"Expect 3 AccountTypes, got $result")
     }
-    //system.shutdown()
   }
 }
 

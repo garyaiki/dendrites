@@ -8,11 +8,10 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
 import org.scalatest.{ FlatSpecLike, Matchers }
-import org.gs.algebird._
 import org.gs.fixtures.TestValuesBuilder
-import org.gs.stream._
+import org.gs.stream.{collectRightFlow, flattenFlow}
 
-/** @author garystruthers
+/** @author Gary Struthers
   *
   */
 class MaxFlowSpec extends FlatSpecLike with TestValuesBuilder {

@@ -10,13 +10,12 @@ import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.clients.consumer.{ConsumerRecord, KafkaConsumer}
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord, RecordMetadata}
 import org.scalatest.{BeforeAndAfterAll, WordSpecLike}
-import scala.io.Source._
 import scala.collection.immutable.{Iterable, Seq}
 import scala.concurrent.duration.MILLISECONDS
-import org.gs._
-import org.gs.avro._
+import scala.io.Source._
+import org.gs.avro.{byteArrayToGenericRecord, ccToByteArray, loadSchema}
 import org.gs.examples.account.GetAccountBalances
-import org.gs.examples.account.avro._
+import org.gs.examples.account.avro.genericRecordToGetAccountBalances
 
 /** 
   *

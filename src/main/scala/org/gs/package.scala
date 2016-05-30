@@ -5,19 +5,37 @@ import java.util.Properties
 
 /** Utility functions for case classes and Properties files 
   *
-  * @author Gary Struthers
+  * Case class fields to map of field names and values
+  * {{{
+  * val kvMap = ccToMap(cc)
+  *  kvMap foreach {
+  *   case (key, value) => gRecord.put(key, value)
+  * }
+  * }}}
   *
-  * ==Load Properties file from classpath==
+  * Is case class field at index a specified type
+  * {{{
+  * system.actorOf(props) ! GetCustomerAccountBalances(2, Set(Checking, Savings, MoneyMarket))
+  *   receiveOne(2.seconds) match {
+  *    case result: IndexedSeq[Product] ⇒ {
+  *     assert(isElementEqual(result(0), 0, Checking))
+  *     assert(isElementEqual(result(1), 0, Savings))
+  *     assert(isElementEqual(result(2), 0, MoneyMarket))
+  *    }
+  *    case result ⇒ assert(false, s"Expect 3 AccountTypes, got $result")
+  *   }
+  * }}} 
+  * Load Properties file from classpath
   * {{{
   *   val prop: Properties = loadProperties("kafkaProducer.properties")
   * }}}
-  * 
+  * @author Gary Struthers
   */
 package object gs {
 
   /** Extract case class elements into a Map
     *
-    * @example [[org.gs.http.caseClassToGetQuery]]
+    * [[org.gs.http.caseClassToGetQuery]]
     *
     * @param cc case class (Product is supertype)
     * @return map of field names and values
@@ -30,7 +48,7 @@ package object gs {
 
   /** Does the indexed case class field have desired type?
     *
-    * @example [[org.gs.examples.account.actor.AccountBalanceRetrieverSpec]]
+    * org.gs.examples.account.actor.AccountBalanceRetrieverSpec
     *
     * @param case class (Product is supertype)
     * @param ele field element

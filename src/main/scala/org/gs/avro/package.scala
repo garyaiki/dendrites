@@ -7,7 +7,30 @@ import org.apache.avro.io.{ Decoder, DecoderFactory, Encoder, EncoderFactory }
 import scala.io.Source
 import scala.io.Source._
 
-
+/** Avro serializer/deserializer functions
+  *
+  * Load Avro Schema from file
+  * {{{
+  * val schema = loadSchema(filename)
+  * }}}
+  * With schema, serialize case class to bytearray
+  * {{{
+  * val bytes = ccToByteArray(schema, GetAccountBalances(1L))
+  * val record = new ProducerRecord[String, Array[Byte]](topic, key, bytes)
+  * val rm: RecordMetadata = producer.send(record).get()
+  * }}}
+  * Map a bytearray to an Avro GenericRecord
+  * {{{
+  * new GraphStageLogic(shape) {
+  *  setHandler(in, new InHandler {
+  *    override def onPush(): Unit = {
+  *      val bytes = grab(in)
+  *      val record = byteArrayToGenericRecord(schema, bytes)
+  *      push(out, f(record)) // then map GenericRecord to case class f:(GenericRecord) => A
+       }
+  *  })
+  * }}}
+  */
 package object avro {
 
   /** Load Avro Schema from file
@@ -36,7 +59,7 @@ package object avro {
     toByteArray(writer)(record)
   }
 
-  /** Copy case class values that are only simple types to GenericRecord
+  /** Map case class values that are only simple types to GenericRecord
     *
     * @param GenericData.Record initialized with schema for case class
     * @param cc a case class (or tuple)

@@ -11,12 +11,11 @@ import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
 import com.twitter.algebird._
 import org.scalatest.FlatSpecLike
 import org.scalatest.Matchers._
-import org.gs.aggregator._
-import org.gs.algebird._
-import org.gs.fixtures.TrigUtils
 import scala.collection.immutable.Range
+import org.gs.algebird.toDecayedValues
+import org.gs.fixtures.TrigUtils
 
-/** @author garystruthers
+/** @author Gary Struthers
   *
   */
 class DecayedValueFlowSpec extends FlatSpecLike with TrigUtils {

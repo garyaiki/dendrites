@@ -7,15 +7,14 @@ import akka.event.{ LoggingAdapter, Logging }
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{ Flow, Keep}
 import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
+import com.twitter.algebird._
 import org.scalatest.FlatSpecLike
 import org.scalatest.Matchers._
-import org.gs.aggregator._
-import org.gs.algebird._
+import org.gs.algebird.createHLL
 import org.gs.algebird.typeclasses.HyperLogLogLike
 import org.gs.fixtures.TestValuesBuilder
-import com.twitter.algebird._
 
-/** @author garystruthers
+/** @author Gary Struthers
   *
   */
 class HyperLogLogFlowSpec extends FlatSpecLike with TestValuesBuilder {

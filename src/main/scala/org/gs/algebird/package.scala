@@ -14,7 +14,7 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * When the extracted field is an already supported type, you don't have to write custom Algebird
   * classes.
   *
-  * == AveragedValue find local average then sum them to global average ==
+  * == AveragedValue ==
   *
   * Average a Sequence of values `org.gs.algebird.AveragedSpec`
   * {{{
@@ -29,8 +29,8 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * val avgSum = sumAverageValues(avgs)
   * }}}
   *
-  * == BloomFilter fast find if a word is in a dictionary ==
-  * 
+  * == BloomFilter ==
+  * Fast find if a word is in a dictionary
   * OSX has dictionaries you can use to create BloomFilters
   * `org.gs.fixtures.SysProcessUtils` for Paths to properNames, connectives, and words and
   * functions to read their words
@@ -43,14 +43,12 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * val words = readWords(wordsPath)
   * val wordsBF = createBF(words, fpProb)
   * }}}
-  *
   * Is word in BloomFilter
   * {{{
   * val falsePositivepProb: Double = 0.01
   * val word = "path"
   * val inDict = wordsBF.contains(word).isTrue
   * }}}
-  *
   * Is false positive rate acceptable
   * {{{
   * val falsePositivepProb: Double = 0.01
@@ -61,17 +59,14 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * } yield i
   * val acceptable = falsePositives.size < words.size * fpProb
   * }}}
-  *
   * == CountMinSketch ==
   * 
   * Test data is IP addresses repeated a random number of times `org.gs.algebird.CountMinSketchSpec`
-  *
   * Estimate total number of elements seen so far `org.gs.fixtures.InetAddressesBuilder`
   * {{{
   * val addrs = inetAddresses(ipRange)
   * val longZips = inetToLongZip(addrs)
   * val longs = testLongs(longZips)
-  *
   * implicit val m = createCMSMonoid[Long]()
   * val cms = createCountMinSketch(longs)
   * val estimatedCount = cms.totalCount
@@ -105,7 +100,6 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * val sines = genSineWave(100, 0 to 360)
   * val days = Range.Double(0.0, 361.0, 1.0)
   * val sinesZip = sines.zip(days)
-  *
   * val decayedValues = toDecayedValues(sinesZip, 10.0, None)
   * val avgAt90 = decayedValues(90).average(10.0)
   * }}}
@@ -175,7 +169,7 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * val qTrees = Vector(qtBD, qtBD2)
   * val sumQTree = sumQTrees(qTrees)
   * }}}
-  * == Functor, map, andThen for Sequence types ==
+  * == Functor ==
   *
   * Map elements of a sequence.
   * {{{
@@ -193,8 +187,8 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * val invertedNegBigDecimals = andThen[BigDecimal, BigDecimal, BigDecimal](ap)( inverse)( negate)
   * }}}
   *
-  * == Max Min for Sequence types that have a Semigroup, Monoid and Ordering ==
-  * 
+  * == Max Min ==
+  * For Sequence types that have a Semigroup, Monoid and Ordering
   * Get Max element of a sequence. `org.gs.algebird.MaxSpec`
   * {{{
   * val iqm = qtBD.interQuartileMean
@@ -217,9 +211,9 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * val min3 = min(filterRight(eithBigInts)
   * }}}
   *
-  * == Semigroup, plus function obeys associtive law in asychronous system ==
-  * 
-  * Sum elements of a sequence that may be empty. `org.gs.algebird.SemigroupSpec`
+  * == Semigroup ==
+  * Plus function obeys associative law `org.gs.algebird.SemigroupSpec`
+  * Sum elements of a sequence that may be empty.
   * {{{
   * val bigDecimals: Seq[BigDecimal]
   * val opt = sumOption(bigDecimals)
@@ -229,9 +223,9 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * val sum2 = eith.right.get
   * }}}
   *
-  * == Monoid extends Semigroup with zero element ==
-  * 
-  * Sum sequence elements for a type that has a zero under addition. `org.gs.algebird.MonoidSpec`
+  * == Monoid ==
+  * Extends Semigroup with a zero element `org.gs.algebird.MonoidSpec` 
+  * Sum sequence elements for a type that has a zero under addition.
   * {{{
   * val doubles: Seq[Double]
   * val sum = sum(doubles)
@@ -241,9 +235,9 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * val sum3 = sum(eithFloats).right.get
   * }}}
   *
-  * == Group extends Monoid with minus, negate ==
-  * 
-  * Negate a value `org.gs.algebird.GroupSpec`
+  * == Group ==
+  * Extends Monoid with minus, negate operators `org.gs.algebird.GroupSpec`
+  * Negate a value
   * {{{
   * val float = 3131.7f
   * val neg = negate(float)
@@ -263,8 +257,8 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * val diff3 = minus(eithLong.right.get, 47L)
   * }}}
   *
-  * == Ring extends Group with times, product and one identity under multiplication ==
-  * 
+  * == Ring ==
+  * Extends Group with times, product and one identity under multiplication
   * Multiply a value by another `org.gs.algebird.RingSpec`
   * {{{
   * val float = 3131.7f
@@ -275,7 +269,7 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * val prod3 = times(eithLong.right.get, 47L)
   * }}}
   *
-  * Multiply elements of a sequence `(((xs[0] * xs[1]) * xs[2]) * xs[3])` for a type that has a one.
+  * Multiply elements of a sequence `(((xs[0] * xs[1]) * xs[2]) * xs[3])` for a type with identity.
   * {{{
   * val doubles: Seq[Double]
   * val prod = product(doubles)
@@ -285,9 +279,9 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * val prod3 = product(eithFloats).right.get
   * }}}
   *
-  * == Field extends Ring with inverse, div ==
-  * 
-  * Invert a value a -> 1/a `org.gs.algebird.FieldSpec`
+  * == Field ==
+  * Extends Ring with inverse, div  `org.gs.algebird.FieldSpec`
+  * Invert a value a -> 1/a
   * {{{
   * val float = 3131.7f
   * val recip = inverse(float)
@@ -301,7 +295,7 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * val recip = inverse(eithInt.right.get)
   * }}}
   *
-  * Divide a value by another
+  * Divide a value
   * {{{
   * val float = 3131.7f
   * val quotient = div(float, 1.7f)

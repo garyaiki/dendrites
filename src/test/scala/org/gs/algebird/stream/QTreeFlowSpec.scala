@@ -1,6 +1,4 @@
-/** @see http://en.wikipedia.org/wiki/Interquartile_mean
-  * @see http://en.wikipedia.org/wiki/Interquartile_range
-  */
+
 package org.gs.algebird.stream
 
 import akka.actor.ActorSystem
@@ -10,11 +8,12 @@ import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
 import com.twitter.algebird._
 import org.scalatest.{ FlatSpecLike, Matchers }
-import org.gs.algebird._
 import org.gs.algebird.fixtures.QTreeBuilder
 
-/** @author garystruthers
-  *
+/**
+  * @see [[http://en.wikipedia.org/wiki/Interquartile_mean Interquartile_mean]]
+  * @see [[http://en.wikipedia.org/wiki/Interquartile_range Interquartile_range]]
+  * @author Gary Struthers
   */
 class QTreeFlowSpec extends FlatSpecLike with QTreeBuilder {
   implicit val system = ActorSystem("dendrites")
@@ -30,7 +29,6 @@ class QTreeFlowSpec extends FlatSpecLike with QTreeBuilder {
 
   def sinkD = TestSink.probe[Double]
   def sinkDD = TestSink.probe[(Double, Double)]
-
 
   "A QTree[BigDecimal] Flow" should "return its minimum" in {
     val (pub, sub) = sourceBD

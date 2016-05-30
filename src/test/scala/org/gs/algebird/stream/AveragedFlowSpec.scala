@@ -10,8 +10,7 @@ import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
 import com.twitter.algebird._
 import org.scalatest.FlatSpecLike
 import org.scalatest.Matchers._
-import org.gs.aggregator._
-import org.gs.algebird._
+import org.gs.aggregator.mean
 import org.gs.fixtures.TestValuesBuilder
 
 /** @author garystruthers
@@ -107,5 +106,4 @@ class AveragedFlowSpec extends FlatSpecLike with TestValuesBuilder {
     assert(avL.count === ints.size)
     assert(avL.value === (mL.right.get.toDouble +- 0.5))
   }
-
 }

@@ -10,7 +10,128 @@ import org.gs.algebird.typeclasses.QTreeLike
 
 /** Akka Stream Flows for Algebird hashing and aggregating functions
   *
-  * @author garystruthers
+  * ApproximatorsFlow class broadcasts to parallel Akka Agents that contain Algebird aggregators and
+  * a Zip stage waits form them to complete
+  *
+  * CreateCMSStage class initializes a CMS monoid then creates Count Mean Sketch for value
+  *
+  * CreateHLLStage class initializes a HyperLogLogAggregator then HyperLogLog for value
+  *
+  * ZipTimeStage class creates a tuple of received value and current time in milliseconds
+  * DecayedValue uses these value/time pairs
+  *
+  * == AveragedValue ==
+  * Average sequence of Numerics Flow `org.gs.algebird.stream.AveragedFlowSpec`
+  * {{{
+  * val avg: FlowShape[Seq[A], AveragedValue] = builder.add(avgFlow)
+  * }}}
+  * Sum AveragedValues sequences to AveragedValue `org.gs.algebird.stream.SumAveragedFlowSpec`
+  * {{{
+  * val (pub, sub) = TestSource.probe[Seq[BigDecimal]]
+  *  .via(avgBDFlow.grouped(2))
+  *  .via(sumAvgFlow)
+  *  .toMat(TestSink.probe[AveragedValue])(Keep.both)
+  *  .run()
+  * }}}
+  * == Hyper Log Log == `org.gs.algebird.stream.HyperLogLogFlowSpec`
+  * Estimate size of Hyper Log Log
+  * {{{
+  * val (pub, sub) = TestSource.probe[HLL]
+  *  .via(estSizeFlow)
+  *  .toMat(TestSink.probe[Double])(Keep.both)
+  *  .run()
+  * }}}
+  * Map Hyper Log Log to Approximate[Long]
+  * {{{
+  * val (pub, sub) = TestSource.probe[HLL]
+  *  .via(toApproximate)
+  *  .toMat(TestSink.probe[Approximate[Long]])(Keep.both)
+  *  .run()
+  * }}}
+  * Map Hyper Log Log sequence to Approximate[Long] sequence
+  * {{{
+  * val (pub, sub) = TestSource.probe[Seq[HLL]]
+  * .via(toApproximates)
+  * .toMat(TestSink.probe[Seq[Approximate[Long]]])(Keep.both)
+  * .run()
+  * }}}
+  * Sum Hyper Log Log sequence to Approximate[Long]
+  * {{{
+  * val (pub, sub) = TestSource.probe[Seq[HLL]]
+  *  .via(sumHLLs)
+  *  .toMat(TestSink.probe[Approximate[Long]])(Keep.both)
+  *  .run()
+  * }}}
+  * == Max value in a sequence == `org.gs.algebird.stream.MaxFlowSpec`
+  * {{{
+  * val (pub, sub) = TestSource.probe[Seq[BigDecimal]]
+  *  .via(maxFlow)
+  *  .toMat(TestSink.probe[BigDecimal])(Keep.both)
+  *  .run()
+  }}}
+  * == Min value in a sequence == `org.gs.algebird.stream.MinFlowSpec`
+  * {{{
+  * val (pub, sub) = TestSource.probe[Seq[BigInt]]
+  *  .via(minFlow)
+  *  .toMat(TestSink.probe[BigInt])(Keep.both)
+  *  .run()
+  * }}}
+  * == QTree == `org.gs.algebird.stream.QTreeFlowSpec`
+  * Find max value in a QTree 
+  * {{{
+  * def sourceBI = TestSource.probe[QTree[BigInt]]
+  * def sinkD = TestSink.probe[Double]
+  * val (pub, sub) = sourceBI
+  *  .via(qTreeMaxFlow)
+  *  .toMat(sinkD)(Keep.both)
+  *  .run()
+  * }}}
+  * Find min value in a QTree
+  * {{{
+  * def sourceBD = TestSource.probe[QTree[BigDecimal]]
+  * def sinkD = TestSink.probe[Double]
+  * val (pub, sub) = sourceBD
+  *  .via(qTreeMinFlow)
+  *  .toMat(sinkD)(Keep.both)
+  *  .run()
+  * }}}
+  * Find first quartile bounds in a QTree
+  * {{{
+  * def sourceD = TestSource.probe[QTree[Double]]
+  * def sinkDD = TestSink.probe[(Double, Double)]
+  * val (pub, sub) = sourceD
+  *  .via(firstQuartileFlow)
+  *  .toMat(sinkDD)(Keep.both)
+  *  .run()
+  * }}}
+  * Find second quartile bounds in a QTree
+  * {{{
+  * def sourceF = TestSource.probe[QTree[Float]]
+  * def sinkDD = TestSink.probe[(Double, Double)]
+  * val (pub, sub) = sourceF
+  *  .via(secondQuartileFlow)
+  *  .toMat(sinkDD)(Keep.both)
+  *  .run()
+  * }}}
+  * Find third quartile bounds in a QTree
+  * {{{
+  * def sourceI = TestSource.probe[QTree[Int]]
+  * def sinkDD = TestSink.probe[(Double, Double)]
+  * val (pub, sub) = sourceI
+  *  .via(thirdQuartileFlow)
+  *  .toMat(sinkDD)(Keep.both)
+  *  .run()
+  * }}}
+  * Find inter quartile mean in a QTree[Long]
+  * {{{
+  * def sourceL = TestSource.probe[QTree[Long]]
+  * def sinkDD = TestSink.probe[(Double, Double)]
+  * val (pub, sub) = sourceL
+  *  .via(interQuartileMeanLFlow)
+  *  .toMat(sinkDD)(Keep.both)
+  *  .run()
+  * }}}
+  * @author Gary Struthers
   * @see [[org.gs.algebird]] package object for the functions these Flows wrap
   */
 package object stream {
@@ -20,8 +141,6 @@ package object stream {
     * @see [[http://www.scala-lang.org/api/2.11.7/scala-reflect/#scala.reflect.api.TypeTags]]
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.AveragedFlowSpec]]
-    *
     * @tparam A can be generic by including TypeTage at runtime & if it's sole Numeric in scope
     * @return AveragedValue
     */
@@ -31,8 +150,6 @@ package object stream {
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.SumAveragedFlowSpec]]
-    *
     * @return AveragedValue
     */
   def avgBDFlow: Flow[Seq[BigDecimal], AveragedValue, NotUsed] =
@@ -42,8 +159,6 @@ package object stream {
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.SumAveragedFlowSpec]]
-    *
     * @return AveragedValue
     */
   def avgBIFlow: Flow[Seq[BigInt], AveragedValue, NotUsed] = Flow[Seq[BigInt]].map(avg[BigInt])
@@ -52,8 +167,6 @@ package object stream {
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.SumAveragedFlowSpec]]
-    *
     * @return AveragedValue
     */
   def avgDFlow: Flow[Seq[Double], AveragedValue, NotUsed] = Flow[Seq[Double]].map(avg[Double])
@@ -62,8 +175,6 @@ package object stream {
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.SumAveragedFlowSpec]]
-    *
     * @return AveragedValue
     */
   def avgFFlow: Flow[Seq[Float], AveragedValue, NotUsed] = Flow[Seq[Float]].map(avg[Float])
@@ -72,8 +183,6 @@ package object stream {
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.SumAveragedFlowSpec]]
-    *
     * @return AveragedValue
     */
   def avgIFlow: Flow[Seq[Int], AveragedValue, NotUsed] = Flow[Seq[Int]].map(avg[Int])
@@ -82,8 +191,6 @@ package object stream {
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.SumAveragedFlowSpec]]
-    *
     * @return AveragedValue
     */
   def avgLFlow: Flow[Seq[Long], AveragedValue, NotUsed] = Flow[Seq[Long]].map(avg[Long])
@@ -92,8 +199,6 @@ package object stream {
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.SumAveragedFlowSpec]]
-    *
     * @return AveragedValue
     */
   def sumAvgFlow: Flow[Seq[AveragedValue], AveragedValue, NotUsed] =
@@ -103,19 +208,15 @@ package object stream {
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.HyperLogLogFlowSpec]]
-    *
     * @return estimated size of HLL
     */
   def estSizeFlow: Flow[HLL, Double, NotUsed] = Flow[HLL].map(x => x.estimatedSize)
 
-  /** Flow to map HLL to Approximate[Long]
+  /** Flow to map Hyper Log Log to Approximate[Long]
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Approximate Approximate]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.HyperLogLogFlowSpec]]
-    *
     * @return Approximate[Long]
     */
   def toApproximate: Flow[HLL, Approximate[Long], NotUsed] = Flow[HLL].map(x => x.approximateSize)
@@ -125,8 +226,6 @@ package object stream {
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Approximate Approximate]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.HyperLogLogFlowSpec]]
-    *
     * @return Approximate[Long]
     */
   def toApproximates: Flow[Seq[HLL], Seq[Approximate[Long]], NotUsed] =
@@ -137,8 +236,6 @@ package object stream {
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Approximate Approximate]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.HyperLogLogFlowSpec]]
-    *
     * @return Approximate[Long]
     */
   def sumHLLs: Flow[Seq[HLL], Approximate[Long], NotUsed] = Flow[Seq[HLL]].map(sumHLLApproximateSizes)
@@ -147,8 +244,6 @@ package object stream {
     *
     * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.MaxFlowSpec]]
-    *
     * @return max
     */
   def maxFlow[A: Ordering]: Flow[Seq[A], A, NotUsed] = Flow[Seq[A]].map(max[A])
@@ -157,8 +252,6 @@ package object stream {
     *
     * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.MinFlowSpec]]
-    *
     * @return min
     */
   def minFlow[A: Ordering]: Flow[Seq[A], A, NotUsed] = Flow[Seq[A]].map(min[A])
@@ -168,8 +261,6 @@ package object stream {
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
     * @see [[org.gs.algebird.typeclasses.QTreeLike]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.QTreeFlowSpec]]
-    *
     * @tparam A QTreeLike typeclass that construct QTree[A]
     * @return max
     */
@@ -192,8 +283,6 @@ package object stream {
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
     * @see [[org.gs.algebird.typeclasses.QTreeLike]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.QTreeFlowSpec]]
-    *
     * @tparam A QTreeLike typeclass that construct QTree[A]
     * @return lower, upper bounds
     */
@@ -206,8 +295,6 @@ package object stream {
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
     * @see [[org.gs.algebird.typeclasses.QTreeLike]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.QTreeFlowSpec]]
-    *
     * @tparam A QTreeLike typeclass that construct QTree[A]
     * @return lower, upper bounds
     */
@@ -220,8 +307,6 @@ package object stream {
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
     * @see [[org.gs.algebird.typeclasses.QTreeLike]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.QTreeFlowSpec]]
-    *
     * @tparam A QTreeLike typeclass that construct QTree[A]
     * @return lower, upper bounds
     */
@@ -233,8 +318,6 @@ package object stream {
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.QTreeFlowSpec]]
-    *
     * @return mean of middle 50th percentile
     */
   def interQuartileMeanBDFlow: Flow[QTree[BigDecimal], (Double, Double), NotUsed] = {
@@ -245,8 +328,6 @@ package object stream {
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.QTreeFlowSpec]]
-    *
     * @return mean of middle 50th percentile
     */
   def interQuartileMeanBIFlow: Flow[QTree[BigInt], (Double, Double), NotUsed] = {
@@ -257,8 +338,6 @@ package object stream {
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.QTreeFlowSpec]]
-    *
     * @return mean of middle 50th percentile
     */
   def interQuartileMeanDFlow: Flow[QTree[Double], (Double, Double), NotUsed] = {
@@ -269,8 +348,6 @@ package object stream {
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.QTreeFlowSpec]]
-    *
     * @return mean of middle 50th percentile
     */
   def interQuartileMeanFFlow: Flow[QTree[Float], (Double, Double), NotUsed] = {
@@ -281,8 +358,6 @@ package object stream {
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.QTreeFlowSpec]]
-    *
     * @return mean of middle 50th percentile
     */
   def interQuartileMeanIFlow: Flow[QTree[Int], (Double, Double), NotUsed] = {
@@ -293,8 +368,6 @@ package object stream {
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
     * @see [[http://doc.akka.io/api/akka-stream-and-http-experimental/1.0/#akka.stream.scaladsl.Flow]]
-    * @example [[org.gs.algebird.stream.QTreeFlowSpec]]
-    *
     * @return mean of middle 50th percentile
     */
   def interQuartileMeanLFlow: Flow[QTree[Long], (Double, Double), NotUsed] = {

@@ -8,13 +8,11 @@ import akka.event.{ LoggingAdapter, Logging }
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{ Flow, Keep }
 import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
+import com.twitter.algebird._
+import scala.concurrent.duration._
 import org.scalatest.FlatSpecLike
 import org.scalatest.Matchers._
 import org.gs.algebird.fixtures.BloomFilterBuilder
-import org.gs.algebird._
-import org.gs._
-import com.twitter.algebird._
-import scala.concurrent.duration._
 
 /** @author garystruthers
   *

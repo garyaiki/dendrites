@@ -14,13 +14,12 @@ import java.net.InetAddress
 import language.postfixOps
 import org.scalatest.FlatSpecLike
 import org.scalatest.Matchers._
-import org.gs.aggregator._
-import org.gs.algebird._
-import org.gs.fixtures.InetAddressesBuilder
 import scala.collection.immutable.Range
 import util.Random
+import org.gs.algebird.{createCMSMonoid, createCountMinSketch, sumCountMinSketch}
+import org.gs.fixtures.InetAddressesBuilder
 
-/** @author garystruthers
+/** @author Gary Struthers
   *
   */
 class CountMinSketchFlowSpec extends FlatSpecLike with InetAddressesBuilder {
@@ -82,5 +81,4 @@ class CountMinSketchFlowSpec extends FlatSpecLike with InetAddressesBuilder {
     sub.expectComplete()
     assert(cms2.totalCount === (cms.totalCount * 2))
   }
-
 }
