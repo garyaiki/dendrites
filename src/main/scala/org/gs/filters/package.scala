@@ -4,8 +4,34 @@ package org.gs
 
 import scala.reflect.ClassTag
 
-/** filters and extractor functions for sequences, Either, Option, tuples and case classes
+/** Filter and extractor functions for sequences, Either, Option, tuples and case classes
   *
+  * Filter Sequence of different types of case classes
+  * {{{
+  * val mixCaseClasses = keyBigDecimal ++ keyBigInt ++ keyBoolean ++ keyDouble ++ keyFloat
+  * val filtered = filterProducts(mixCaseClasses, fieldFilter, isType[BigDecimal])
+  * }}}
+  * Filter by type
+  * {{{
+  * assert(filtered.forall(isType[BigDecimal]))
+  * }}}
+  * Filter by Option[type]
+  * {{{
+  * val filtered = filterProducts(mixCaseClasses, fieldFilter, isOptionType[Int])
+  * }}}
+  * Filter by Either where Left is a String or Right is the type
+  * {{{
+  * val filtered = filterProducts(mixCaseClasses, fieldFilter, isEitherStringRight[BigInt])
+  * }}}
+  * Extract a case class field by index
+  * {{{
+  * val eithBigDecs = extractElementByIndex[Either[String, BigDecimal]](keyEithBigDec, 1)
+  * }}}
+  * Filter Right values of Either
+  * {{{
+  * def collectRightFlow[A, B]: Flow[Seq[Either[A, B]], Seq[B], NotUsed] =
+  *       Flow[Seq[Either[A, B]]].collect(PartialFunction(filterRight))
+  * }}}       
   *  @author Gary Struthers
   */
 package object filters {
@@ -60,12 +86,7 @@ package object filters {
     * @return true if e is Some(x) type A
     */
   def isOptionType[A: ClassTag](e: Any): Boolean = e match {
-    case Some(x) => {
-      evidence$2.unapply(e) match {
-        case Some(x) => true
-        case None => false
-      }
-    }
+    case Some(x) => isType(x)
     case _ => false
   }
 
@@ -76,10 +97,7 @@ package object filters {
     * @return true if Left is a String OR if Right is type A
     */
   def isEitherStringRight[A: ClassTag](e: Any): Boolean = e match {
-    case Right(x) => {
-      val clazz = implicitly[ClassTag[A]].runtimeClass
-      clazz.isInstance(x)
-    }
+    case Right(x) => isType(x)
     case Left(x)  => x.isInstanceOf[String]
     case _        => false
   }

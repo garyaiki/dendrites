@@ -3,6 +3,11 @@ package org.gs
 
 /** aggregate functions
   *
+  * Mean of sequence of Numeric
+  * {{{
+  * val doubles = List(1.0, 2.1, 3.2)
+  * val m: Either[String,Double] = mean(doubles)
+  * }}}
   * @author Gary Struthers
   */
 package object aggregator {

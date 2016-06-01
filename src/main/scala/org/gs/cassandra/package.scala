@@ -14,16 +14,78 @@ import java.util.{Collection => JCollection, Date => JDate, HashSet => JHashSet,
 import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
-import org.gs.concurrent._
+import org.gs.concurrent.listenableFutureToScala
 
+/** CassandraConfig configuration trait for Cassandra Java Driver
+  *
+  * Create Cassandra Cluster (for development).
+  * {{{
+  * val config = ConfigFactory.load()
+  * val ipAddress = config.getString("dendrites.cassandra.ipAddress")
+  * val cluster = createCluster(ipAddress)
+  * }}}
+  * Create Cluster with multiple host nodes and a RetryPolicy
+  * {{{
+  * val addresses = myConfig.getInetAddresses()
+  * val retryPolicy = new LoggingRetryPolicy(DefaultRetryPolicy.INSTANCE)
+  * cluster = createCluster(addresses, retryPolicy)
+  * }}}
+  * Log cluster's metadata.
+  * {{{
+  * logMetadata(cluster)
+  * }}}
+  * Bind Cassandra's QueryLogger to cluster
+  * {{{
+  * registerQueryLogger(cluster)
+  * }}}
+  * Create a simple LoadBalancing policy
+  * {{{
+  * val myConfig = PlaylistSongConfig
+  * val lbp = createLoadBalancingPolicy(myConfig.localDataCenter)
+  * }}}
+  * Initialize LoadBalancingPolicy
+  * {{{
+  * initLoadBalancingPolicy(cluster, lbp)
+  * }}}
+  * Connect to Cassandra. Return a Session which is thread safe and may last app's lifetime
+  * {{{
+  * session = connect(cluster)
+  * }}}
+  * Create a Keyspace
+  * {{{
+  * val schema = myConfig.keySpace
+  * val strategy = myConfig.replicationStrategy
+  * val createSchemaRS = createSchema(session, schema, strategy, 3)
+  * }}}
+  * Create a PreparedStatement to return all rows of a table
+  * {{{
+  * val plPreStmt = selectAll(session, schema, Playlists.table)
+  * }}}
+  * Asychronously execute a BoundStatement
+  * {{{
+  * val selAllRS = executeBoundStmt(session, new BoundStatement(plPreStmt))
+  * }}}
+  * Get every row in a result set
+  * {{{
+  * val allRows = getAllRows(selAllRS)
+  * }}}
+  * Drop schema
+  * {{{
+  * dropSchema(session, schema)
+  * }}}
+  * Asynchronously close Session and Cluster. Turns Cassandra's Java Futures into Scala Futures
+  * {{{
+  * close(session, cluster)
+  * }}}
+  */  
 package object cassandra {
   implicit val system = ActorSystem("dendrites")
   implicit val logger = Logging(system, getClass)
 
   /** Create Cassandra Cluster (for development).
     *
-    * @see http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/Cluster.Builder.html
-    * @see http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/Cluster.html
+    * @see [[http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/Cluster.Builder.html Builder]]
+    * @see [[http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/Cluster.html Cluster]]
     * @param node Internet address of initial Cassandra node 
     * @return cluster
     */
@@ -31,8 +93,8 @@ package object cassandra {
   
   /** Create Cluster with multiple host nodes and a RetryPolicy
     *
-    * @see https://docs.oracle.com/javase/8/docs/api/index.html?java/net/InetAddress.html
-    * @see http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/policies/RetryPolicy.html
+    * @see [[https://docs.oracle.com/javase/8/docs/api/index.html?java/net/InetAddress.html InetAddress]]
+    * @see [[http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/policies/RetryPolicy.html RetryPolicy]]
     * @param nodes Cassandra nodes
     * @param policy RetryPolicy
     * @return Cluster
@@ -43,7 +105,7 @@ package object cassandra {
 
   /** Log cluster's metadata.
     *
-    * @see http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/Metadata.html
+    * @see [[http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/Metadata.html Metadata]]
     * @param cluster
     */
   def logMetadata(cluster: Cluster): Unit = {
@@ -59,7 +121,7 @@ package object cassandra {
 
   /** Enable logging of RegularStatement, BoundStatement, BatchStatement queries
     *
-    * @see http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/QueryLogger.html
+    * @see [[http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/QueryLogger.html QueryLogger]]
     * @param cluster
     */
   def registerQueryLogger(cluster: Cluster): Unit = {
@@ -73,7 +135,7 @@ package object cassandra {
 
   /** Create a simple LoadBalancing policy
     *
-    * @see http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/policies/LoadBalancingPolicy.html
+    * @see [[http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/policies/LoadBalancingPolicy.html LoadBalancingPolicy]]
     * @param localDc Local Datacenter name
     * @return
     */
@@ -93,7 +155,7 @@ package object cassandra {
 
   /** Connect to Cassandra. Return a Session which is thread safe and may last app's lifetime
     *
-    * @see http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/Session.html
+    * @see [[http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/Session.html Session]]
     * @param cluster
     * @param keyspace Specify only if keyspace exists 
     * @return Session
@@ -157,10 +219,10 @@ package object cassandra {
     session.execute("DROP KEYSPACE IF EXISTS " + schema)
   }
 
-  /** Asynchronously close Session and Cluster. Turns Cassandra CloseFuture into a Scala Future
+  /** Asynchronously close Session and Cluster. Turns Cassandra's Java Futures into Scala Futures
     *
-    * @see http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/CloseFuture.html
-    * @see http://google.github.io/guava/releases/19.0/api/docs/com/google/common/util/concurrent/ListenableFuture.html
+    * @see [[http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/CloseFuture.html CloseFuture]]
+    * @see [[http://google.github.io/guava/releases/19.0/api/docs/com/google/common/util/concurrent/ListenableFuture.html ListenableFuture]]
     * @param session
     * @param cluster
     * @param force hurry up flag

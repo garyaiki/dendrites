@@ -1,5 +1,4 @@
-/**
-  */
+
 package org.gs
 
 import _root_.akka.actor.ActorSystem
@@ -16,7 +15,41 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /** Provides Class to create an HostConnectionPool. Also functions to create requests and handle
   * response
   *
-  * @see [[http://typesafehub.github.io/config/latest/api/ "Config API"]]
+  * Get Config, ip address, port as tuple3
+  * {{{
+  * val hostConfig = getHostConfig("dendrites.checking-balances.http.interface","my.http.port")
+  * }}}
+  * Append path to host URL
+  * {{{
+  * val baseURL = configBaseUrl("my.http.path", hostConfig)
+  * }}}
+  * Create StringBuilder with URL including path 
+  * {{{
+  * val url = createUrl(scheme, ipDomain, port, path)
+  * }}}
+  * Create StringBuilder with request path i.e. "?", "key=value" for all fields in case class
+  * {{{
+  * val balanceQuery = GetAccountBalances(goodId)
+  * val checkingPath = "/account/balances/checking/"
+  * val balancesQuery = caseClassToGetQuery(balanceQuery)()
+  * val q = checkingPath ++ balancesQuery
+  * }}}
+  * Construct GET request, call server using connection pool with typedQuery
+  * typedResponse maps future to error message or case class
+  * {{{
+  * def receive = {
+  *  case GetAccountBalances(id: Long) ⇒ {
+  *    val callFuture = typedQuery(GetAccountBalances(id), clientConfig.baseURL)
+  *    typedResponse(callFuture, mapPlain, mapChecking) pipeTo sender
+  * }
+  * }}}
+  * typedQueryResponse wraps typedQuery and typedResponse. It has 2 argument lists, the first can be
+  * curried. Then it can be used in a flow which receives the case class for the 2nd argument list
+  * {{{
+  * def partial = typedQueryResponse(baseURL, mapPlain, mapChecking) _ // curried
+  * def flow: Flow[Product, Either[String, AnyRef], NotUsed] = Flow[Product].mapAsync(1)(partial)
+  * }}}
+  * @see [[http://typesafehub.github.io/config/latest/api/ Config API]]
   * @author Gary Struthers
   */
 package object http {
@@ -39,14 +72,16 @@ package object http {
 		*
 		* @param pathPath config key
     * @param hostConfig config plus ip address and port number
+    * @param scheme "http" (default) or "https"
     * @return URL string for host/path 
     */
-  def configBaseUrl(pathPath: String, hostConfig: (Config, String, Int)): StringBuilder = {
+  def configBaseUrl(pathPath: String, hostConfig: (Config, String, Int), scheme: String = "http"):
+          StringBuilder = {
     val config = hostConfig._1
     val ip = hostConfig._2
     val port = hostConfig._3
     val path = config.getString(pathPath)
-    createUrl("http", ip, port, path)
+    createUrl(scheme, ip, port, path)
   }
 
   /** Create URL string from components

@@ -10,7 +10,7 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
 /** Aggregation functions for Twitter Algebird.
   *
   * Algebird provides implicit implementations of common types which are imported here. Class
-  * extraction methods in org.gs can be used to extract a field from your case classes and tuples.
+  * extraction methods in `org.gs` can be used to extract a field from your case classes and tuples.
   * When the extracted field is an already supported type, you don't have to write custom Algebird
   * classes.
   *

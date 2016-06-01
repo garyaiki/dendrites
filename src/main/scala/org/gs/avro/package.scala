@@ -13,20 +13,20 @@ import scala.io.Source._
   * {{{
   * val schema = loadSchema(filename)
   * }}}
-  * With schema, serialize case class to bytearray
+  * Serialize case class to bytearray
   * {{{
   * val bytes = ccToByteArray(schema, GetAccountBalances(1L))
   * val record = new ProducerRecord[String, Array[Byte]](topic, key, bytes)
   * val rm: RecordMetadata = producer.send(record).get()
   * }}}
-  * Map a bytearray to an Avro GenericRecord
+  * Map bytearray to Avro GenericRecord
   * {{{
   * new GraphStageLogic(shape) {
   *  setHandler(in, new InHandler {
   *    override def onPush(): Unit = {
   *      val bytes = grab(in)
   *      val record = byteArrayToGenericRecord(schema, bytes)
-  *      push(out, f(record)) // then map GenericRecord to case class f:(GenericRecord) => A
+  *      push(out, f(record)) // f:(GenericRecord) => A maps GenericRecord to case class 
        }
   *  })
   * }}}

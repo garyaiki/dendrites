@@ -3,10 +3,34 @@
 package org.gs.examples
 
 import scala.collection.immutable.Set
+import scala.reflect.runtime.universe._
 
 /** Functions for AccountType, the case objects that distinguish them and AccountBallances, their
   * optional list of account ids and balances
   *
+  * Filter for AccountType
+  * {{{
+  * assert(isAccountType(MoneyMarket) === true)
+  * }}}
+  * Filter for desired balances types
+  * {{{
+  * val cb = CheckingAccountBalances[BigDecimal](Some(List((3,3000.3), (33,3300.33), (333,3.33))))
+  * assert(isAccountBalances(cb) === true)
+  * }}}
+  * Filter for desired types in an Option[List[(Long, A)]]
+  * {{{
+  * val filtered = accountBalances.filter(isAccBalances)
+  * }}}
+  * Extract the 'A' balance values from Option[List[(Long, A)]]
+  * {{{
+  * def extractBalancesFlow[A]: Flow[Seq[AnyRef], Seq[A], NotUsed] =
+  *     Flow[Seq[AnyRef]].map(extractBalancesVals[A])
+  * }}}
+  * Extract balances from Seq[AccountBalances]
+  * {{{
+  * def exf: Flow[Seq[AnyRef], Seq[BigDecimal], NotUsed] =
+  *     Flow[Seq[AnyRef]].map(extractBalancesVals[BigDecimal])
+  * }}}
   * @author Gary Struthers
   */
 package object account {
@@ -17,7 +41,10 @@ package object account {
 
   def isAccountBalances(e: Any): Boolean = e.isInstanceOf[AccountBalances]
 
-  def isAccBalances[A](e: Any): Boolean = e.isInstanceOf[AccBalances[A]]
+  def isAccBalances[A: TypeTag](e: Any): Boolean = typeOf[AccBalances[A]] match {
+    case t if t =:= typeOf[AccBalances[A]] => true
+    case _ => false
+  }
 
   def isAccountType(e: Any): Boolean = e.isInstanceOf[AccountType]
 
@@ -39,15 +66,18 @@ package object account {
     * @return Seq[List[Product]] call flatten to get List[A]
     */
   def extractBalancesLists[A](accountBalances: Seq[AnyRef]): Seq[List[A]] = {
-    for (i <- accountBalances) yield {
+    val filtered = accountBalances.filter(isAccBalances)
+    for (i <- filtered) yield {
       i match {
-        case c: CheckingAccountBalances[A]    => extractBalances(c)
-        case m: MoneyMarketAccountBalances[A] => extractBalances(m)
-        case s: SavingsAccountBalances[A]     => extractBalances(s)
+        case p: Product => extractBalances(p)
       }
     }
   }
 
+  /** Extract balances from Seq[AccountBalances]
+    * @param accountBalances is a Seq of subTypes of AccountBalances
+    * @return Seq[Product]
+    */
   def extractBalancesVals[A](accountBalances: Seq[AnyRef]): Seq[A] = {
     val l = extractBalancesLists(accountBalances)
     l.flatten

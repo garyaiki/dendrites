@@ -12,16 +12,40 @@ import org.gs.algebird.typeclasses.QTreeLike
 
 /** Akka Stream Flows
   *
-  * @see [[http://doc.akka.io/api/akka/2.4.6/#akka.stream.scaladsl.Flow "Flow"]]
+  * Map sequence of Option to sequence of values
+  * {{{
+  * val (pub, sub) = TestSource.probe[Seq[Option[BigInt]]]
+  *   .via(flattenFlow)
+  *   .via(maxFlow)
+  *   .toMat(TestSink.probe[BigInt])(Keep.both)
+  *   .run()
+  * }}}
+  * Map sequence of Either to sequence of values
+  * {{{
+  * val (pub, sub) = TestSource.probe[Seq[Either[String, Double]]]
+  *   .via(collectRightFlow)
+  *   .via(maxFlow)
+  *   .toMat(TestSink.probe[Double])(Keep.both)
+  *   .run()
+  * }}}
+  * Flow accepts tuple3 from zip stage, wraps tuple3LeftRight which maps 3 Eithers to Sequence of
+  * Lefts and a Sequence of Rights
+  * {{{
+  * def zipper = ZipWith((in0: Either[String, AnyRef],
+  *   in1: Either[String, AnyRef],
+  *   in2: Either[String, AnyRef]) => (in0, in1, in2))
+  * val flowGraph = GraphDSL.create() { implicit builder =>
+  *   val zip = builder.add(zipper)
+  *   val fgLR = builder.add(leftRightFlow)
+  * }}}
+  * @see [[http://doc.akka.io/api/akka/2.4.6/#akka.stream.scaladsl.Flow Flow]]
   * @author Gary Struthers
   */
 package object stream {
 
   /** Flow to flatten a sequence of Options
     *
-    * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering "Ordering"]]
-    * @example [[org.gs.algebird.stream.MaxFlowSpec]]
-    * 
+    * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     * @tparam A elements that extend Ordering
     * @return values
     */
@@ -31,9 +55,6 @@ package object stream {
   /** Flow to collect the Right side value from a sequence of Either
     *
     * filterRight is converted to a Partial Function then passed to collect
-    * 
-    * @example [[org.gs.algebird.stream.MaxFlowSpec]]
-    *
     * @tparam A Left
     * @tparam B Right
     * @return value contained in Right

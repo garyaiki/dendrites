@@ -66,100 +66,94 @@ class ProductFilterSpec extends FlatSpecLike with TestValuesBuilder {
     assert(keyString.size * 25 === filtered.size)
     assert(filtered.forall(isType[String]))
   }
-/*
-  it should "return all Option BigDecimal fields from a sequence of case classes" in {
-    val filtered = filterProducts(mixCaseClasses, productFilter, isOptionType[BigDecimal])
-    assert(keyOptBigDec.size === filtered.size)
-    assert(filtered.forall(isOptionType[BigDecimal]))
-  }
 
   it should "return all Option BigInt fields from a sequence of case classes" in {
-    val filtered = filterProducts(mixCaseClasses, productFilter, isOptionType[BigInt])
+    val filtered = filterProducts(mixCaseClasses, fieldFilter, isOptionType[BigInt])
     assert(keyOptBigInt.size === filtered.size)
     assert(filtered.forall(isOptionType[BigInt]))
   }
 
   it should "return all Option Boolean fields from a sequence of case classes" in {
-    val filtered = filterProducts(mixCaseClasses, productFilter, isOptionType[Boolean])
+    val filtered = filterProducts(mixCaseClasses, fieldFilter, isOptionType[Boolean])
     assert(keyOptBool.size === filtered.size)
     assert(filtered.forall(isOptionType[Boolean]))
   }
 
   it should "return all Option Double fields from a sequence of case classes" in {
-    val filtered = filterProducts(mixCaseClasses, productFilter, isOptionType[Double])
+    val filtered = filterProducts(mixCaseClasses, fieldFilter, isOptionType[Double])
     assert(keyOptDouble.size === filtered.size)
     assert(filtered.forall(isOptionType[Double]))
   }
 
   it should "return all Option Float fields from a sequence of case classes" in {
-    val filtered = filterProducts(mixCaseClasses, productFilter, isOptionType[Float])
+    val filtered = filterProducts(mixCaseClasses, fieldFilter, isOptionType[Float])
     assert(keyOptFloat.size === filtered.size)
     assert(filtered.forall(isOptionType[Float]))
   }
 
   it should "return all Option Int fields from a sequence of case classes" in {
-    val filtered = filterProducts(mixCaseClasses, productFilter, isOptionType[Int])
+    val filtered = filterProducts(mixCaseClasses, fieldFilter, isOptionType[Int])
     assert(keyOptInt.size === filtered.size)
     assert(filtered.forall(isOptionType[Int]))
   }
 
   it should "return all Option Long fields from a sequence of case classes" in {
-    val filtered = filterProducts(mixCaseClasses, productFilter, isOptionType[Long])
+    val filtered = filterProducts(mixCaseClasses, fieldFilter, isOptionType[Long])
     assert(keyOptLong.size === filtered.size)
     assert(filtered.forall(isOptionType[Long]))
   }
 
   it should "return all Option String fields from a sequence of case classes" in {
-    val filtered = filterProducts(mixCaseClasses, productFilter, isOptionType[String])
+    val filtered = filterProducts(mixCaseClasses, fieldFilter, isOptionType[String])
     assert(keyOptStr.size === filtered.size)
     assert(filtered.forall(isOptionType[String]))
   }
 
   it should "return all Either BigDecimal fields from a sequence of case classes" in {
-    val filtered = filterProducts(mixCaseClasses, productFilter, isEitherStringRight[BigDecimal])
+    val filtered = filterProducts(mixCaseClasses, fieldFilter, isEitherStringRight[BigDecimal])
     assert(keyEithBigDec.size === filtered.size)
     assert(filtered.forall(isEitherStringRight[BigDecimal]))
   }
 
   it should "return all Either BigInt fields from a sequence of case classes" in {
-    val filtered = filterProducts(mixCaseClasses, productFilter, isEitherStringRight[BigInt])
+    val filtered = filterProducts(mixCaseClasses, fieldFilter, isEitherStringRight[BigInt])
     assert(keyEithBigInt.size === filtered.size)
     assert(filtered.forall(isEitherStringRight[BigInt]))
   }
 
-  it should "return all Either Boolean fields from a sequence of case classes" in {
-    val filtered = filterProducts(mixCaseClasses, productFilter, isEitherStringRight[Boolean])
-    assert(keyEithBool.size === filtered.size)
-    assert(filtered.forall(isEitherStringRight[Boolean]))
+  it should "return all Either String fields from a sequence of case classes" in {
+    val filtered = filterProducts(mixCaseClasses, fieldFilter, isEitherStringRight[String])
+    assert(keyEithStr.size === filtered.size)
+    assert(filtered.forall(isEitherStringRight[String]))
+  }
+
+  it should "return all Either Long fields from a sequence of case classes" in {
+    val filtered = filterProducts(mixCaseClasses, fieldFilter, isEitherStringRight[Long])
+    assert(keyEithLong.size === filtered.size)
+    assert(filtered.forall(isEitherStringRight[Long]))
   }
 
   it should "return all Either Double fields from a sequence of case classes" in {
-    val filtered = filterProducts(mixCaseClasses, productFilter, isEitherStringRight[Double])
+    val filtered = filterProducts(mixCaseClasses, fieldFilter, isEitherStringRight[Double])
     assert(keyEithDouble.size === filtered.size)
     assert(filtered.forall(isEitherStringRight[Double]))
   }
 
+  it should "return all Either Boolean fields from a sequence of case classes" in {
+    val filtered = filterProducts(mixCaseClasses, fieldFilter, isEitherStringRight[Boolean])
+    assert(keyEithBool.size === filtered.size)
+    assert(filtered.forall(isEitherStringRight[Boolean]))
+  }
+
   it should "return all Either Float fields from a sequence of case classes" in {
-    val filtered = filterProducts(mixCaseClasses, productFilter, isEitherStringRight[Float])
+    val filtered = filterProducts(mixCaseClasses, fieldFilter, isEitherStringRight[Float])
     assert(keyEithFloat.size === filtered.size)
     assert(filtered.forall(isEitherStringRight[Float]))
   }
 
   it should "return all Either Int fields from a sequence of case classes" in {
-    val filtered = filterProducts(mixCaseClasses, productFilter, isEitherStringRight[Int])
+    val filtered = filterProducts(mixCaseClasses, fieldFilter, isEitherStringRight[Int])
     assert(keyEithInt.size === filtered.size)
     assert(filtered.forall(isEitherStringRight[Int]))
   }
-
-  it should "return all Either Long fields from a sequence of case classes" in {
-    val filtered = filterProducts(mixCaseClasses, productFilter, isEitherStringRight[Long])
-    assert(keyEithLong.size === filtered.size)
-    assert(filtered.forall(isEitherStringRight[Long]))
-  }
-
-  it should "return all Either String fields from a sequence of case classes" in {
-    val filtered = filterProducts(mixCaseClasses, productFilter, isEitherStringRight[String])
-    assert(keyEithStr.size === filtered.size)
-    assert(filtered.forall(isEitherStringRight[String]))
-  }*/
 }

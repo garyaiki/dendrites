@@ -1,10 +1,22 @@
-/**
-  */
+
 package org.gs.examples.account
 
-/** Dummy data for testing BalancesService
+/** Classes to configure Account services, an example server using Akka HTTP high level DSL,
+ *  Json <=> case class mappings, an object to run server
   *
-  *  @author Gary Struthers
+  * Mock functions called by BalancesService
+  *
+  * Get dummy CheckingBalances
+  * {{{
+  * def fetchCheckingBalances(id: Long): Either[String, CheckingAccountBalances[BigDecimal]] = {
+  *   checkingBalances.get(id) match {
+  *     case Some(x) => Right(CheckingAccountBalances(x))
+  *     case None    => Left(s"Checking account $id not found")
+  *     case _       => Left(s"Error looking up checking account $id")
+  *   }
+  * }
+  * }}}
+  * @author Gary Struthers
   *
   */
 package object http {

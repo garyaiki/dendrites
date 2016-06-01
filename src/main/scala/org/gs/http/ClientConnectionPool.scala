@@ -1,5 +1,4 @@
-/**
-  */
+
 package org.gs.http
 
 import akka.actor.ActorSystem
