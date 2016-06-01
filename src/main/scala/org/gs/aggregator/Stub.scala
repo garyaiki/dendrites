@@ -1,5 +1,4 @@
 package org.gs.aggregator
 
-trait Stub {
-  
+trait Stub { 
 }

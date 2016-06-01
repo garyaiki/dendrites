@@ -1,5 +1,4 @@
 package org.gs.reflection
 
-trait Stub {
-  
+trait Stub { 
 }

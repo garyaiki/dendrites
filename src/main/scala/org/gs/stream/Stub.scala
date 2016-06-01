@@ -1,5 +1,4 @@
 package org.gs.stream
 
-trait Stub {
-  
+trait Stub {  
 }
