@@ -10,12 +10,11 @@ import org.gs.algebird.typeclasses.QTreeLike
 
 /** Akka Agent for concurrently updating Qtree
   *
-  * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent]]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTreeSemigroup]]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.SeqMonoid]]
-  * @example [[org.gs.algebird.agent.QTreeAgentSpec]]
-  * @author garystruthers
+  * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]
+  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]
+  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTreeSemigroup QTreeSemigroup]]
+  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.SeqMonoid SeqMonoid]]
+  * @author Gary sStruthers
   *
   * @tparam A: QTreeLike either BigDecimal, BigInt, Double, Float, Int or Long
   * @param name

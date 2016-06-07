@@ -6,7 +6,15 @@ import org.apache.kafka.clients.producer.KafkaProducer
 /** Provides Classes to add fields to KafkaConsumer and KafkaProducer. Also Factories for
   * KafkaConsumer, KafkaProducer from their Properties files
   *
-  * @see [[http://typesafehub.github.io/config/latest/api/ "Config API"]]
+  * Create KafkaConsumer with properties
+  * {{{
+  * val consumer = createConsumer[Key, Value]("kafkaConsumer.properties")
+  * }}}
+  * Create KafkaProducer with properties
+  * {{{
+  * val producer = createProducer[Key, Value]("kafkaProducer.properties")
+  * }}}
+  * @see [[http://typesafehub.github.io/config/latest/api/ Config API]]
   * @author Gary Struthers
   */
 package object kafka {

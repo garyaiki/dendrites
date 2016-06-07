@@ -10,12 +10,35 @@ import org.apache.kafka.common.TopicPartition
 import scala.collection.immutable.Queue
 import scala.collection.mutable.ArrayBuffer
 
-/** Classes for KafkaSource, KafkaSink, ConsumerRecord queue stages. Also Flows and functions for
-  * Kafka
+/** Stream classes for KafkaSource, KafkaSink, ConsumerRecord queue stages.
+  * Flows functions for Kafka
   *
+  * Kafka ConsumerRecords is a Java class with an iterator. `queueRecords` maps the iterator to a
+  * Scala Queue of ConsumerRecord. A Queue allows each ConsumerRecord to be pulled one at a time in
+  * an Akka Stream.
+  * {{{
+  * def extractRecords[K, V](records: ConsumerRecords[K,V]): Queue[ConsumerRecord[K, V]] = {
+  *   val it = records.iterator().asScala
+  *   queueRecords[K, V](it)
+  * }
+  * }}}
+  * Stream that polls Kafka, maps ConsumerRecords to Queue, dequeues one record at a time, extracts
+  * value from ConsumerRecord, deserializes value from Avro byteArray to case class
+  * {{{
+  * val kafkaSource = KafkaSource[String, Array[Byte]](accountConsumerConfig)
+  * val consumerRecordQueue = new ConsumerRecordQueue[String, Array[Byte]]()
+  * val deserializer = new AvroDeserializer("getAccountBalances.avsc",
+  *         genericRecordToGetAccountBalances)
+  * val streamFuture = kafkaSource
+  *     .via(consumerRecordsFlow[String, Array[Byte]])
+  *     .via(consumerRecordQueue)
+  *     .via(consumerRecordValueFlow)
+  *     .via(deserializer)
+  *     .runWith(Sink.fold(0){(sum, _) => sum + 1})
+  * }}}
   * @author Gary Struthers
-  * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/ConsumerRecords.html "ConsumerRecords"]]
-  * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/ConsumerRecord.html "ConsumerRecord"]]
+  * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/ConsumerRecords.html ConsumerRecords]]
+  * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/ConsumerRecord.html ConsumerRecord]]
   */
 package object stream {
 
