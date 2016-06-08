@@ -65,7 +65,7 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
     val bcast: UniformFanOutShape[Seq[A], Seq[A]] = builder.add(Broadcast[Seq[A]](5))
     val avg: FlowShape[Seq[A], AveragedValue] = builder.add(avgFlow)
     val avgAg: FlowShape[AveragedValue, AveragedValue] = builder.add(avgAgflow)
-    val cms: FlowShape[Seq[A], CMS[A]] = builder.add(new CreateCMSStage)
+    val cms: FlowShape[Seq[A], CMS[A]] = builder.add(new CreateCMSFlow)
     val cmsAg: FlowShape[CMS[A], CMS[A]] = builder.add(cmsAgflow)
     val dvt: FlowShape[Seq[A], Seq[(Double, Double)]] = builder.add(new ZipTimeStage)
     val dcaAg: FlowShape[Seq[(Double, Double)], Seq[DecayedValue]] = builder.add(dcaAgFlow)

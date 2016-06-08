@@ -13,9 +13,9 @@ import org.gs.algebird.typeclasses.QTreeLike
   * ApproximatorsFlow class broadcasts to parallel Akka Agents that contain Algebird aggregators and
   * a Zip stage waits form them to complete
   *
-  * CreateCMSStage class initializes a CMS monoid then creates Count Mean Sketch for value
+  * CreateCMSFlow class initializes a CMS monoid then creates Count Mean Sketch for value
   *
-  * CreateHLLStage class initializes a HyperLogLogAggregator then HyperLogLog for value
+  * CreateHLLFLow class initializes a HyperLogLogAggregator then HyperLogLog for value
   *
   * ZipTimeStage class creates a tuple of received value and current time in milliseconds
   * DecayedValue uses these value/time pairs

@@ -3,13 +3,17 @@ package org.gs.algebird.stream
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.twitter.algebird.{CMS, CMSHasher, CMSMonoid}
-
 import org.gs.algebird.{createCMSMonoid, createCountMinSketch}
 
-class CreateCMSStage[K: Ordering: CMSHasher] extends GraphStage[FlowShape[Seq[K], CMS[K]]] {
+/** Flow to create CMS
+  *
+  * @author Gary Struthers
+  * @tparam K with Ordering and CMSHasher
+  */
+class CreateCMSFlow[K: Ordering: CMSHasher] extends GraphStage[FlowShape[Seq[K], CMS[K]]] {
 
-  val in = Inlet[Seq[K]]("CMS Stage in")
-  val out = Outlet[CMS[K]]("CMS Stage out")
+  val in = Inlet[Seq[K]]("K => CMS in")
+  val out = Outlet[CMS[K]]("CMS out")
   override val shape = FlowShape.of(in, out)
 
   implicit val monoid: CMSMonoid[K] = createCMSMonoid[K]()
@@ -30,8 +34,4 @@ class CreateCMSStage[K: Ordering: CMSHasher] extends GraphStage[FlowShape[Seq[K]
       })
     }
   }
-  /*
-  override def onPush(elem: Seq[K], ctx: Context[CMS[K]]): SyncDirective =
-          ctx.push(createCountMinSketch(elem))
-          */
 }
