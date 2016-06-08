@@ -13,7 +13,8 @@ import org.scalatest.Matchers._
 import org.gs.aggregator.mean
 import org.gs.fixtures.TestValuesBuilder
 
-/** @author garystruthers
+/**
+  * @author Gary Struthers
   *
   */
 class AveragedFlowSpec extends FlatSpecLike with TestValuesBuilder {

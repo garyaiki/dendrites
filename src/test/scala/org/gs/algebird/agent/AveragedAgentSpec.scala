@@ -13,7 +13,9 @@ import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-/** @author garystruthers
+/**
+  *
+  * @author Gary Struthers
   *
   */
 class AveragedAgentSpec extends WordSpecLike with Matchers with TestValuesBuilder {
