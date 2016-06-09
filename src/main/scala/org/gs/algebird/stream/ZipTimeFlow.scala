@@ -4,10 +4,10 @@ import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import java.time.Instant
 
-class ZipTimeStage[A: Numeric] extends GraphStage[FlowShape[Seq[A], Seq[(Double, Double)]]] {
+class ZipTimeFlow[A: Numeric] extends GraphStage[FlowShape[Seq[A], Seq[(Double, Double)]]] {
 
-  val in = Inlet[Seq[A]]("ZipTimeStage in")
-  val out = Outlet[Seq[(Double, Double)]]("ZipTimeStage out")
+  val in = Inlet[Seq[A]]("ZipTimeFlow in")
+  val out = Outlet[Seq[(Double, Double)]]("ZipTimeFlow out")
   override val shape = FlowShape.of(in, out)
 
   def toZipTime(xs: Seq[A]): Seq[(Double, Double)] =

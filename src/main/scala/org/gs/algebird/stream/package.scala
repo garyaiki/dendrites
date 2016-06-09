@@ -17,7 +17,7 @@ import org.gs.algebird.typeclasses.QTreeLike
   *
   * CreateHLLFLow class initializes a HyperLogLogAggregator then HyperLogLog for value
   *
-  * ZipTimeStage class creates a tuple of received value and current time in milliseconds
+  * ZipTimeFlow class creates a tuple of received value and current time in milliseconds
   * DecayedValue uses these value/time pairs
   *
   * == AveragedValue ==

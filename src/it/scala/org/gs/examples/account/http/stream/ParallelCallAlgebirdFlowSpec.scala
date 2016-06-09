@@ -13,8 +13,8 @@ import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.reflect.runtime.universe
-import org.gs.algebird.stream.CreateHLLStage
-import org.gs.algebird.stream._
+import org.gs.algebird.stream.CreateHLLFlow
+import org.gs.algebird.stream.{avgFlow, maxFlow, minFlow}
 import org.gs.examples.account.GetAccountBalances
 import org.gs.examples.account._
 import org.gs.examples.account.stream._
@@ -88,7 +88,7 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
     "get a HyperLogLog from the Right response" in {
       val (pub2, sub2) = source2
         .via(extractBalancesFlow)
-        .via(new CreateHLLStage[BigDecimal])
+        .via(new CreateHLLFlow[BigDecimal])
         .toMat(TestSink.probe[HLL])(Keep.both).run()
       sub2.request(1)
       pub2.sendNext(rightResponse.get)
