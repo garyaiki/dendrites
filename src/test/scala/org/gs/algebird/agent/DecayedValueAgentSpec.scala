@@ -5,7 +5,7 @@ package org.gs.algebird.agent
 import com.twitter.algebird._
 import org.gs._
 import org.gs.algebird._
-import org.gs.fixtures.{ TestValuesBuilder, TrigUtils }
+import org.gs.fixtures.TrigUtils
 import org.scalatest.WordSpecLike
 import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
@@ -32,10 +32,12 @@ class DecayedValueAgentSpec extends WordSpecLike with TrigUtils {
         result(90).average(10.0) > meanDay90
       }
     }
+
     "equal the first 90 values" in {
         val old = decayedValues.agent.get().take(90)
         assert(old(89).average(10.0) > meanDay90)
     }
+
     "have a lower average after droping first 90" in {
       val newer = decayedValues.agent.get().drop(90)
       assert(newer(90).average(10.0) < meanDay90)

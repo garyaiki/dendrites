@@ -10,18 +10,20 @@ import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
 import com.twitter.algebird._
 import org.scalatest.FlatSpecLike
 import org.scalatest.Matchers._
-import org.gs.algebird.createHLL
+import org.gs.algebird.{AlgebirdConfigurer, createHLL}
 import org.gs.algebird.typeclasses.HyperLogLogLike
 import org.gs.fixtures.TestValuesBuilder
 
-/** @author Gary Struthers
+/**
+  *
+  * @author Gary Struthers
   *
   */
 class HyperLogLogFlowSpec extends FlatSpecLike with TestValuesBuilder {
   implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
-  implicit val ag = HyperLogLogAggregator(12)
+  implicit val ag = AlgebirdConfigurer.hyperLogLogAgggregator
   val hll = createHLL(ints)
   val hll2 = createHLL(ints2)
   val hllV = Vector(hll, hll2)

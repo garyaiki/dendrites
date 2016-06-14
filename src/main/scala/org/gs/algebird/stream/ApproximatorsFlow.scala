@@ -59,7 +59,9 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
   def hllAgflow: Flow[HLL, HLL, NotUsed] = Flow[HLL].mapAsync(1)(hllAgentAlter)
 
   def qtrAgFlow: Flow[Seq[A], QTree[A], NotUsed] = Flow[Seq[A]].mapAsync(1)(qtrAgentAlter)
-
+  val days = Range.Double(0.0, 361.0, 1.0)
+  def nextTime[T](it: Iterator[Double])(x: T): Double = it.next
+  val curriedNextTime = nextTime[A](days.iterator) _
   // Graph to broadcast to update agent flow stages then zip results then cast to FlowShape
   val approximators = GraphDSL.create() { implicit builder =>
     val bcast: UniformFanOutShape[Seq[A], Seq[A]] = builder.add(Broadcast[Seq[A]](5))
@@ -67,7 +69,7 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
     val avgAg: FlowShape[AveragedValue, AveragedValue] = builder.add(avgAgflow)
     val cms: FlowShape[Seq[A], CMS[A]] = builder.add(new CreateCMSFlow)
     val cmsAg: FlowShape[CMS[A], CMS[A]] = builder.add(cmsAgflow)
-    val dvt: FlowShape[Seq[A], Seq[(Double, Double)]] = builder.add(new ZipTimeFlow)
+    val dvt: FlowShape[Seq[A], Seq[(Double, Double)]] = builder.add(new ZipTimeFlow(curriedNextTime))
     val dcaAg: FlowShape[Seq[(Double, Double)], Seq[DecayedValue]] = builder.add(dcaAgFlow)
     val hll: FlowShape[Seq[A], HLL] = builder.add(new CreateHLLFlow[A])
     val hllAg: FlowShape[HLL, HLL] = builder.add(hllAgflow)

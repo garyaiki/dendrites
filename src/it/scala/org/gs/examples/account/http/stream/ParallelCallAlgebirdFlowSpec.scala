@@ -6,18 +6,16 @@ import akka.event.Logging
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{ Flow, Keep }
 import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
-import com.twitter.algebird._
+import com.twitter.algebird.{AveragedValue, HLL }
 import org.scalatest.{ Matchers, WordSpecLike }
 import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.reflect.runtime.universe
-import org.gs.algebird.stream.CreateHLLFlow
-import org.gs.algebird.stream.{avgFlow, maxFlow, minFlow}
-import org.gs.examples.account.GetAccountBalances
-import org.gs.examples.account._
-import org.gs.examples.account.stream._
+import org.gs.algebird.stream.{avgFlow, CreateHLLFlow, maxFlow, minFlow}
+import org.gs.examples.account.{extractBalancesVals, GetAccountBalances }
+import org.gs.examples.account.stream.extractBalancesFlow
 
 class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
   implicit val system = ActorSystem("dendrites")

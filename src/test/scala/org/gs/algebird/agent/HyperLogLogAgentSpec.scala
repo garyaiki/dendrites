@@ -2,23 +2,24 @@
   */
 package org.gs.algebird.agent
 
-import com.twitter.algebird._
-import org.gs.aggregator._
-import org.gs.algebird._
-import org.gs.fixtures.TestValuesBuilder
+import com.twitter.algebird.{HyperLogLogAggregator, HyperLogLogMonoid}
 import org.scalatest.{ Matchers, WordSpecLike }
 import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext.Implicits.global
+import org.gs.algebird.{AlgebirdConfigurer, createHLL}
+import org.gs.fixtures.TestValuesBuilder
 
-/** @author garystruthers
+/**
+  *
+  * @author Gary Struthers
   *
   */
 class HyperLogLogAgentSpec extends WordSpecLike with Matchers with TestValuesBuilder {
-  implicit val ag = HyperLogLogAggregator(12)
-  implicit val monoid = new HyperLogLogMonoid(12)
+  implicit val ag = AlgebirdConfigurer.hyperLogLogAgggregator
+  implicit val monoid = AlgebirdConfigurer.hyperLogLogMonoid
 
   val timeout = Timeout(3000 millis)
   
