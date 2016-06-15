@@ -3,26 +3,28 @@
 package org.gs.algebird.agent
 
 import com.twitter.algebird._
-import org.gs._
-import org.gs.algebird._
-import org.gs.algebird.typeclasses.QTreeLike
-import org.gs.fixtures.TestValuesBuilder
 import org.scalatest.{ Matchers, WordSpecLike }
 import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext.Implicits.global
+import org.gs._
+import org.gs.algebird.{AlgebirdConfigurer, BigDecimalField}
+import org.gs.fixtures.TestValuesBuilder
+import org.gs.algebird.typeclasses.QTreeLike
 
-/** @author garystruthers
+/**
+  *
+  * @author Gary Struthers
   *
   */
 class QTreeAgentSpec extends WordSpecLike with Matchers with TestValuesBuilder {
   val timeout = Timeout(3000 millis)
-  val level = 16
+  val level = AlgebirdConfigurer.qTreeLevel
+  implicit val qtBDSemigroup = new QTreeSemigroup[BigDecimal](level)
 
   "A QTreeAgent of BigDecimal" should {
-    implicit val qtBDSemigroup = new QTreeSemigroup[BigDecimal](level)
     "have count of 1 when initialized without data" in {
       val qTreeAgent = new QTreeAgent[BigDecimal]("testBD zero")
       val a = qTreeAgent.agent.get()
