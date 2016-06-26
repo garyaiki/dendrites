@@ -3,8 +3,6 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.stream.ActorMaterializer
 import java.util.concurrent.Executors
-import org.gs.examples.account.{GetAccountBalances, MoneyMarketAccountBalances}
-import org.gs.http._
 import org.scalatest.{ Matchers, WordSpecLike }
 import org.scalatest._
 import org.scalatest.matchers.ShouldMatchers._
@@ -12,11 +10,14 @@ import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import org.gs.examples.account.http.actor.CheckingAccountClient._
-import scala.BigDecimal
-import scala.Left
-import scala.Right
 import scala.math.BigDecimal.double2bigDecimal
+import org.gs.examples.account.{GetAccountBalances, MoneyMarketAccountBalances}
+import org.gs.http.{typedQuery, typedResponse}
 
+/**
+  *
+  * @author Gary Struthers
+  */ 
 class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   override implicit val materializer = ActorMaterializer()
@@ -25,7 +26,6 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
   val clientConfig = new MoneyMarketBalancesClientConfig()
   val hostConfig = clientConfig.hostConfig
   val config = hostConfig._1
-  //val flow = ClientConnectionPool(hostConfig._2, hostConfig._3)
   val baseURL = clientConfig.baseURL
   val badBaseURL = baseURL.dropRight(1)
 

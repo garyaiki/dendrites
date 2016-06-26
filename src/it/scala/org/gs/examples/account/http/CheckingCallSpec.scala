@@ -4,18 +4,19 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.stream.ActorMaterializer
 import java.util.concurrent.Executors
-import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances}
-import org.gs.http._
 import org.scalatest.{ Matchers, WordSpecLike }
 import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
-import scala.BigDecimal
-import scala.Left
-import scala.Right
 import scala.math.BigDecimal.double2bigDecimal
+import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances}
+import org.gs.http.typedQueryResponse
 
+/**
+  *
+  * @author Gary Struthers
+  */
 class CheckingCallSpec extends WordSpecLike with Matchers with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   override implicit val materializer = ActorMaterializer()

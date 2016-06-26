@@ -9,14 +9,14 @@ import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
-import scala.BigDecimal
-import scala.Left
-import scala.Right
 import scala.math.BigDecimal.double2bigDecimal
-import org.gs.examples.account.CheckingAccountBalances
-import org.gs.examples.account.GetAccountBalances
-import org.gs.http._
+import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances}
+import org.gs.http.{typedQuery, typedResponse}
 
+/**
+  *
+  * @author Gary Struthers
+  */
 class CheckingBalancesClientConfigSpec extends WordSpecLike with Matchers with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   override implicit val materializer = ActorMaterializer()

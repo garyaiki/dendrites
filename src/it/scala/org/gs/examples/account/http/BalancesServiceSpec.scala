@@ -7,13 +7,16 @@ import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import org.scalatest._
 import scala.math.BigDecimal.double2bigDecimal
-import org.gs.http._
-import org.gs.examples.account.MoneyMarketAccountBalances
-import org.gs.examples.account.GetAccountBalances
-import org.gs.examples.account.SavingsAccountBalances
-import org.gs.examples.account.CheckingAccountBalances
+import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances,
+  MoneyMarketAccountBalances, SavingsAccountBalances}
+import org.gs.http.caseClassToGetQuery
 
-class BalancesServiceSpec extends FlatSpec with Matchers with ScalatestRouteTest with BalancesService {
+/**
+  *
+  * @author Gary Struthers
+  */
+class BalancesServiceSpec extends FlatSpec
+        with Matchers with ScalatestRouteTest with BalancesService {
   override def testConfigSource = "akka.loglevel = WARNING"
   def config = testConfig
   val logger = NoLogging
