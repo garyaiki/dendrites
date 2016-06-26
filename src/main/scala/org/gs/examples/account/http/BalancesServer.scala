@@ -10,7 +10,7 @@ import com.typesafe.config.ConfigFactory
 
 /** For testing BalancesService, run this before tests
   *
-  *  @author garystruthers
+  *  @author Gary Struthers
   *
   */
 object BalancesServer extends App with BalancesService {

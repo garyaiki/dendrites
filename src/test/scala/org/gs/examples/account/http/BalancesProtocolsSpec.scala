@@ -7,7 +7,10 @@ import org.scalatest._
 import org.scalatest.Matchers._
 import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances,
     MoneyMarketAccountBalances, SavingsAccountBalances}
-
+/**
+  *
+  * @author Gary Struthers
+  */
 class BalancesProtocolsSpec extends BalancesProtocols with WordSpecLike{
   implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()
