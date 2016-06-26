@@ -5,8 +5,8 @@ import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
 import akka.stream.Materializer
 import akka.stream.scaladsl.Flow
-import org.gs.examples.account.http._
-import org.gs.http._
+import org.gs.examples.account.http.{BalancesProtocols, MoneyMarketBalancesClientConfig}
+import org.gs.http.typedQueryResponse
 
 /** Call Money Market Balances service. typedQueryResponse builds a GET request, calls the server,
   * mapPlain maps a failure, mapMoneyMarket maps good result. typedQueryResponse is a curried

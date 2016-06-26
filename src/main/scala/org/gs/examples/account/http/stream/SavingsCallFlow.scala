@@ -5,8 +5,8 @@ import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
 import akka.stream.Materializer
 import akka.stream.scaladsl.Flow
-import org.gs.examples.account.http._
-import org.gs.http._
+import org.gs.examples.account.http.{BalancesProtocols, SavingsBalancesClientConfig}
+import org.gs.http.typedQueryResponse
 
 /** Call Savings Balances service. typedQueryResponse builds a GET request, calls the server,
   * mapPlain maps a failure, mapSavings maps good result. typedQueryResponse is a curried function,
