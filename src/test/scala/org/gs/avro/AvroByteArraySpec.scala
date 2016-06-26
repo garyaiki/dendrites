@@ -1,5 +1,4 @@
-/**
-  */
+
 package org.gs.avro
 
 import org.apache.avro.generic.{GenericDatumReader, GenericRecord}
@@ -9,7 +8,9 @@ import org.gs._
 import org.gs.avro._
 import org.gs.examples.account.GetAccountBalances
 
-/** @author garystruthers
+/**
+  *
+  * @author Gary Struthers
   *
   */
 class AvroByteArraySpec extends WordSpecLike {

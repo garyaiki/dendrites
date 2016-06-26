@@ -1,5 +1,4 @@
-/**
-  */
+
 package org.gs.avro.stream
 
 import akka.actor.ActorSystem
@@ -14,7 +13,9 @@ import org.gs._
 import org.gs.avro._
 import org.gs.examples.account.GetAccountBalances
 
-/** @author garystruthers
+/**
+  *
+  * @author Gary Struthers
   *
   */
 class AvroSerializerSpec extends WordSpecLike {

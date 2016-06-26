@@ -15,7 +15,9 @@ import org.gs.avro._
 import org.gs.examples.account.GetAccountBalances
 import org.gs.examples.account.avro._
 
-/** @author garystruthers
+/**
+  *
+  * @author Gary Struthers
   *
   */
 class AvroDeserializerSpec extends WordSpecLike {
