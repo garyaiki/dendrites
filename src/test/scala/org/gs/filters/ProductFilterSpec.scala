@@ -7,7 +7,9 @@ import org.scalatest.FlatSpecLike
 import org.scalatest.Matchers._
 import org.gs.fixtures.TestValuesBuilder
 
-/** @author garystruthers
+/**
+  *
+  * @author Gary Struthers
   *
   */
 class ProductFilterSpec extends FlatSpecLike with TestValuesBuilder {
