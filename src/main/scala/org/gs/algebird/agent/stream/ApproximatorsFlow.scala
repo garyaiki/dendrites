@@ -1,4 +1,4 @@
-package org.gs.algebird.stream
+package org.gs.algebird.agent.stream
 
 import akka.NotUsed
 import akka.actor.ActorSystem
@@ -7,10 +7,15 @@ import akka.stream.{Materializer, FlowShape, UniformFanOutShape}
 import akka.stream.scaladsl.{ Broadcast, Flow, GraphDSL, ZipWith}
 import akka.stream.scaladsl.GraphDSL.Implicits._
 import com.twitter.algebird.{AveragedValue, CMS, CMSHasher, DecayedValue, HLL, QTree}
+import scala.Range
 import scala.reflect.runtime.universe.TypeTag
 import org.gs.algebird.agent.{AveragedAgent, CountMinSketchAgent,DecayedValueAgent,HyperLogLogAgent,
   QTreeAgent}
+import org.gs.algebird.stream.{CreateCMSFlow, CreateHLLFlow, ZipTimeFlow}
+import org.gs.algebird.stream.avgFlow
 import org.gs.algebird.typeclasses.HyperLogLogLike
+
+
 
 /** Update Algebird approximators concurrently
   * Input a Seq[A] broadcast it to Agents for Algebird approximaters then zip the latest values of
