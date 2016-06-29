@@ -134,7 +134,7 @@ package object http {
     * @param materializer implicit Materializer
     * @return Future[HttpResponse]
     */
-  def typedQuery(cc: Product, baseURL: StringBuilder)(implicit system: ActorSystem, 
+  def typedQuery(baseURL: StringBuilder)(cc: Product)(implicit system: ActorSystem, 
           materializer: Materializer): Future[HttpResponse] = {
     val balancesQuery = caseClassToGetQuery(cc)()
     val uriS = (baseURL ++ balancesQuery).mkString
@@ -202,7 +202,7 @@ def typedResponse(caller: Future[HttpResponse],
               (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer): 
                Future[Either[String, AnyRef]] = {
     
-    val callFuture = typedQuery(cc, baseURL)
+    val callFuture = typedQuery(baseURL)(cc)
     typedResponse(callFuture, mapLeft, mapRight)
   }
 }

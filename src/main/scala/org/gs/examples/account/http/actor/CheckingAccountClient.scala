@@ -33,7 +33,7 @@ class CheckingAccountClient(clientConfig: CheckingBalancesClientConfig) extends 
 
   def receive = {
     case GetAccountBalances(id: Long) ⇒ {
-      val callFuture = typedQuery(GetAccountBalances(id), clientConfig.baseURL)
+      val callFuture = typedQuery(clientConfig.baseURL)(GetAccountBalances(id))
       typedResponse(callFuture, mapPlain, mapChecking) pipeTo sender
     }
   }

@@ -33,7 +33,7 @@ class CheckingBalancesClientConfigSpec extends WordSpecLike with Matchers with B
   "A CheckingBalancesClient" should {
     "get balances for id 1" in {
       val id = 1L
-      val callFuture = typedQuery(GetAccountBalances(id), baseURL)
+      val callFuture = typedQuery(baseURL)(GetAccountBalances(id))
       val responseFuture = typedResponse(callFuture, mapPlain, mapChecking)
 
       whenReady(responseFuture, timeout) { result =>
@@ -45,7 +45,7 @@ class CheckingBalancesClientConfigSpec extends WordSpecLike with Matchers with B
   it should {
     "get balances for id 2" in {
       val id = 2L
-      val callFuture = typedQuery(GetAccountBalances(id), baseURL)
+      val callFuture = typedQuery(baseURL)(GetAccountBalances(id))
       val responseFuture = typedResponse(callFuture, mapPlain, mapChecking)
       whenReady(responseFuture, timeout) { result =>
         result should equal(Right(CheckingAccountBalances(Some(List((2L, BigDecimal(2000.20)),
@@ -57,7 +57,7 @@ class CheckingBalancesClientConfigSpec extends WordSpecLike with Matchers with B
   it should {
     "get balances for id 3" in {
       val id = 3L
-      val callFuture = typedQuery(GetAccountBalances(id), baseURL)
+      val callFuture = typedQuery(baseURL)(GetAccountBalances(id))
       val responseFuture = typedResponse(callFuture, mapPlain, mapChecking)
       whenReady(responseFuture, timeout) { result =>
         result should equal(Right(CheckingAccountBalances(Some(List((3L, BigDecimal(3000.30)),
@@ -70,7 +70,7 @@ class CheckingBalancesClientConfigSpec extends WordSpecLike with Matchers with B
   it should {
     "not find bad ids" in {
       val id = 4L
-      val callFuture = typedQuery(GetAccountBalances(id), baseURL)
+      val callFuture = typedQuery(baseURL)(GetAccountBalances(id))
       val responseFuture = typedResponse(callFuture, mapPlain, mapChecking)
       whenReady(responseFuture, timeout) { result =>
         result should equal(Left("Checking account 4 not found"))
@@ -81,7 +81,7 @@ class CheckingBalancesClientConfigSpec extends WordSpecLike with Matchers with B
   it should {
     "fail bad request URLs" in {
       val id = 1L
-      val callFuture = typedQuery(GetAccountBalances(id), badBaseURL)
+      val callFuture = typedQuery(badBaseURL)(GetAccountBalances(id))
       val responseFuture = typedResponse(callFuture, mapPlain, mapChecking)
       whenReady(responseFuture, timeout) { result =>
         result should equal(Left(
