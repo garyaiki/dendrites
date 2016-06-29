@@ -32,7 +32,7 @@ class MoneyMarketAccountClient(clientConfig: MoneyMarketBalancesClientConfig) ex
   def receive = {
     case GetAccountBalances(id: Long) ⇒ {
       val callFuture = typedQuery(clientConfig.baseURL)(GetAccountBalances(id))
-      val responseFuture = typedResponse(callFuture, mapPlain, mapMoneyMarket)
+      val responseFuture = typedResponse(mapPlain, mapMoneyMarket)(callFuture)
       responseFuture pipeTo sender
     }
   }

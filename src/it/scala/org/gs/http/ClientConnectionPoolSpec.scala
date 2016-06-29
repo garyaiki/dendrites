@@ -7,22 +7,24 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.{ HttpMethod, HttpRequest, HttpResponse, RequestEntity }
 import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.model.StatusCodes._
+import akka.http.scaladsl.model.Uri.apply
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Sink, Source }
 import com.typesafe.config.ConfigFactory
 import java.io.IOException
-import org.gs.examples.account.CheckingAccountBalances
-import org.gs.examples.account.http.BalancesProtocols
 import org.scalatest._
 import org.scalatest.concurrent.{ PatienceConfiguration, ScalaFutures }
 import org.scalatest.time.{ Seconds, Span }
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Try
-import akka.http.scaladsl.model.Uri.apply
-import scala.Right
+import org.gs.examples.account.CheckingAccountBalances
+import org.gs.examples.account.http.BalancesProtocols
 
-
+/**
+  *
+  * @author Gary Struthers
+  */
 class ClientConnectionPoolSpec extends FlatSpec
                                with Matchers
                                with ScalaFutures
@@ -37,6 +39,7 @@ class ClientConnectionPoolSpec extends FlatSpec
   val flow = ClientConnectionPool(config.getString("http.interface"), config.getInt("http.port"))
 
   type ReqFlow = Flow[(HttpRequest, Long), (Try[HttpResponse], Long), HostConnectionPool]
+
   def simpleRequest(uriStr: String, correlationId: Long, flow: ReqFlow):
           Future[(Try[HttpResponse], Long)] =
     Source.single(HttpRequest(uri = uriStr) -> correlationId)
@@ -59,7 +62,7 @@ class ClientConnectionPoolSpec extends FlatSpec
       .runWith(Sink.head)
 
   "A ClientConnectionPool" should "receive a response to a root request" in {
-    val responseFuture = simpleRequest("/", 42L, flow)
+    val responseFuture = simpleRequest("/ip", 42L, flow)
 
     whenReady(responseFuture, patience) { result =>
       result._2 should equal(42)

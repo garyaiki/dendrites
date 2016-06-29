@@ -32,7 +32,7 @@ class SavingsAccountClient(clientConfig: SavingsBalancesClientConfig) extends Ac
   def receive = {
     case GetAccountBalances(id: Long) ⇒ {
       val callFuture = typedQuery(clientConfig.baseURL)(GetAccountBalances(id))
-      typedResponse(callFuture, mapPlain, mapSavings) pipeTo sender
+      typedResponse(mapPlain, mapSavings)(callFuture) pipeTo sender
     }
   }
 }

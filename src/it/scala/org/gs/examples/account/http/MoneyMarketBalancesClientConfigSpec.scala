@@ -35,7 +35,7 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
     "get balances for id 1" in {
       val id = 1L
       val callFuture = typedQuery(baseURL)(GetAccountBalances(id))
-      val responseFuture = typedResponse(callFuture, mapPlain, mapMoneyMarket)
+      val responseFuture = typedResponse(mapPlain, mapMoneyMarket)(callFuture)
 
       whenReady(responseFuture, timeout) { result =>
         result should equal(Right(MoneyMarketAccountBalances[BigDecimal](Some(List((1, 11000.1))))))
@@ -47,7 +47,7 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
     "get balances for id 2" in {
       val id = 2L
       val callFuture = typedQuery(baseURL)(GetAccountBalances(id))
-      val responseFuture = typedResponse(callFuture, mapPlain, mapMoneyMarket)
+      val responseFuture = typedResponse(mapPlain, mapMoneyMarket)(callFuture)
       whenReady(responseFuture, timeout) { result =>
         result should equal(Right(MoneyMarketAccountBalances(Some(List((2L, BigDecimal(22000.20)),
           (22L, BigDecimal(22200.22)))))))
@@ -59,7 +59,7 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
     "get balances for id 3" in {
       val id = 3L
       val callFuture = typedQuery(baseURL)(GetAccountBalances(id))
-      val responseFuture = typedResponse(callFuture, mapPlain, mapMoneyMarket)
+      val responseFuture = typedResponse(mapPlain, mapMoneyMarket)(callFuture)
       whenReady(responseFuture, timeout) { result =>
         result should equal(Right(MoneyMarketAccountBalances(Some(List((3L, BigDecimal(33000.30)),
           (33L, BigDecimal(33300.33)),
@@ -72,7 +72,7 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
     "not find bad ids" in {
       val id = 4L
       val callFuture = typedQuery(baseURL)(GetAccountBalances(id))
-      val responseFuture = typedResponse(callFuture, mapPlain, mapMoneyMarket)
+      val responseFuture = typedResponse(mapPlain, mapMoneyMarket)(callFuture)
       whenReady(responseFuture, timeout) { result =>
         result should equal(Left("Money Market account 4 not found"))
       }
@@ -83,7 +83,7 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
     "fail bad request URLs" in {
       val id = 1L
       val callFuture = typedQuery(badBaseURL)(GetAccountBalances(id))
-      val responseFuture = typedResponse(callFuture, mapPlain, mapMoneyMarket)
+      val responseFuture = typedResponse(mapPlain, mapMoneyMarket)(callFuture)
       whenReady(responseFuture, timeout) { result =>
         result should equal(Left(
           "FAIL 404 Not Found The requested resource could not be found."))

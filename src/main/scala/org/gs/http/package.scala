@@ -125,11 +125,11 @@ package object http {
 
   /** Call server with GET query, case class is turned into Get query, appended to baseURL
 		*
-		* @see [[http://doc.akka.io/api/akka/2.4.6/#akka.http.scaladsl.Http$ "Http"]]
+		* @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.Http$ "Http"]]
 		* @example [[org.gs.examples.account.http.actor.CheckingAccountClient]]
 		* 
-    * @param cc case class 
     * @param baseURL
+    * @param cc case class 
     * @param system implicit ActorSystem
     * @param materializer implicit Materializer
     * @return Future[HttpResponse]
@@ -143,8 +143,8 @@ package object http {
   
   /**	Map response to a Future Either Left for error, Right for good result
 		*
-	  * @see [[http://doc.akka.io/api/akka/2.4.6/#akka.http.scaladsl.model.HttpResponse "HttpResponse"]]
-	  * @see [[http://doc.akka.io/api/akka/2.4.6/#akka.http.scaladsl.unmarshalling.Unmarshal "Unmarshal"]]
+	  * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.model.HttpResponse "HttpResponse"]]
+	  * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.unmarshalling.Unmarshal "Unmarshal"]]
 		* @example [[org.gs.examples.account.http.actor.CheckingAccountClient]]
 	  * 
 	  * @param caller future returned by query
@@ -155,9 +155,9 @@ package object http {
     * @param materializer implicit Materializer
     * @return Future[Either[String, AnyRef]]
     */
-def typedResponse(caller: Future[HttpResponse], 
-                  mapLeft: (HttpEntity) => Future[Left[String, Nothing]], 
+def typedResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]], 
                   mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
+                 (caller: Future[HttpResponse])
                  (implicit system: ActorSystem, logger: LoggingAdapter, 
                   materializer: Materializer): Future[Either[String, AnyRef]] = {
 
@@ -184,7 +184,6 @@ def typedResponse(caller: Future[HttpResponse],
     *
     * Create a Partial Function by initializing first parameter list
     *
-    * @example [[org.gs.examples.account.http.CheckingCallSpec]]
     *   
     * @param baseURL
     * @param mapLeft plain text response to Left
@@ -203,6 +202,6 @@ def typedResponse(caller: Future[HttpResponse],
                Future[Either[String, AnyRef]] = {
     
     val callFuture = typedQuery(baseURL)(cc)
-    typedResponse(callFuture, mapLeft, mapRight)
+    typedResponse(mapLeft, mapRight)(callFuture)
   }
 }
