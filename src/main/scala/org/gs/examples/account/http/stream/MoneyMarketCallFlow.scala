@@ -6,7 +6,7 @@ import akka.event.LoggingAdapter
 import akka.stream.Materializer
 import akka.stream.scaladsl.Flow
 import org.gs.examples.account.http.{BalancesProtocols, MoneyMarketBalancesClientConfig}
-import org.gs.http.typedQueryResponse
+import org.gs.http.{caseClassToGetQuery, typedQueryResponse }
 
 /** Call Money Market Balances service. typedQueryResponse builds a GET request, calls the server,
   * mapPlain maps a failure, mapMoneyMarket maps good result. typedQueryResponse is a curried
@@ -24,7 +24,8 @@ class MoneyMarketCallFlow(implicit val system: ActorSystem, logger: LoggingAdapt
   val baseURL = clientConfig.baseURL
   val requestPath = clientConfig.requestPath
 
-  def partial = typedQueryResponse(baseURL, requestPath, mapPlain, mapMoneyMarket) _ // curried
+  def partial = typedQueryResponse(
+          baseURL, requestPath, caseClassToGetQuery, mapPlain, mapMoneyMarket) _ // curried
   
   def flow: Flow[Product, Either[String, AnyRef], NotUsed] = Flow[Product].mapAsync(1)(partial)
 }

@@ -15,7 +15,7 @@ import scala.math.BigDecimal.double2bigDecimal
 import org.gs.examples.account.{ CheckingAccountBalances, GetAccountBalances}
 import org.gs.examples.account.http._
 import org.gs.examples.account.http.stream._
-import org.gs.http.typedQueryResponse
+import org.gs.http.{caseClassToGetQuery, typedQueryResponse }
 
 class CheckingCallFlowSpec extends WordSpecLike with Matchers with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
@@ -92,7 +92,8 @@ class CheckingCallFlowSpec extends WordSpecLike with Matchers with BalancesProto
   val clientConfig = new CheckingBalancesClientConfig()
   val badBaseURL = clientConfig.baseURL.dropRight(1)
 
-  def badPartial = typedQueryResponse(badBaseURL, "GetAccountBalances", mapPlain, mapChecking) _
+  def badPartial = typedQueryResponse(
+          badBaseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
 
   def badFlow: Flow[Product, Either[String, AnyRef], NotUsed] = Flow[Product].mapAsync(1)(badPartial)
 

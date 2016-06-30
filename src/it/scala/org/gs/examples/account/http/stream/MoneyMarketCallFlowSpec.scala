@@ -14,7 +14,7 @@ import org.scalatest.time.SpanSugar._
 import scala.math.BigDecimal.double2bigDecimal
 import org.gs.examples.account.{ GetAccountBalances, MoneyMarketAccountBalances}
 import org.gs.examples.account.http._
-import org.gs.http.typedQueryResponse
+import org.gs.http.{caseClassToGetQuery, typedQueryResponse }
 
 class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
@@ -89,7 +89,8 @@ class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesPr
 
   val clientConfig = new MoneyMarketBalancesClientConfig()
   val badBaseURL = clientConfig.baseURL.dropRight(1)
-  def badPartial = typedQueryResponse(badBaseURL, "GetAccountBalances", mapPlain, mapMoneyMarket) _
+  def badPartial = typedQueryResponse(
+          badBaseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapMoneyMarket) _
   def badFlow: Flow[Product, Either[String, AnyRef], NotUsed] = Flow[Product].mapAsync(1)(badPartial)
 
   it should {

@@ -6,7 +6,7 @@ import akka.event.LoggingAdapter
 import akka.stream.Materializer
 import akka.stream.scaladsl.Flow
 import org.gs.examples.account.http.{BalancesProtocols, SavingsBalancesClientConfig}
-import org.gs.http.typedQueryResponse
+import org.gs.http.{caseClassToGetQuery, typedQueryResponse }
 
 /** Call Savings Balances service. typedQueryResponse builds a GET request, calls the server,
   * mapPlain maps a failure, mapSavings maps good result. typedQueryResponse is a curried function,
@@ -24,7 +24,8 @@ class SavingsCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
   val baseURL = clientConfig.baseURL
   val requestPath = clientConfig.requestPath
 
-  def partial = typedQueryResponse(baseURL, requestPath, mapPlain, mapSavings) _ // curried
+  def partial = typedQueryResponse(
+          baseURL, requestPath, caseClassToGetQuery, mapPlain, mapSavings) _ // curried
   
   def flow: Flow[Product, Either[String, AnyRef], NotUsed] = Flow[Product].mapAsync(1)(partial)
 }

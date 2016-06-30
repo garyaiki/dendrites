@@ -11,7 +11,7 @@ import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.math.BigDecimal.double2bigDecimal
 import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances}
-import org.gs.http.typedQueryResponse
+import org.gs.http.{caseClassToGetQuery, typedQueryResponse }
 
 /**
   *
@@ -30,8 +30,10 @@ class CheckingCallSpec extends WordSpecLike with Matchers with BalancesProtocols
 
   val timeout = Timeout(3000 millis)
 
-  def partial = typedQueryResponse(baseURL, "GetAccountBalances", mapPlain, mapChecking) _
-  def badPartial = typedQueryResponse(badBaseURL, "GetAccountBalances", mapPlain, mapChecking) _
+  def partial = typedQueryResponse(
+          baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
+  def badPartial = typedQueryResponse(
+          badBaseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
   
   "A CheckingCallClient" should {
     "get balances for id 1" in {

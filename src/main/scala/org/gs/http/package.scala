@@ -144,7 +144,8 @@ package object http {
     * @return Future[HttpResponse]
     */
   def typedQuery(baseURL: StringBuilder,
-                 requestPath: String, ccToGet:(Product, String) => StringBuilder)
+                 requestPath: String,
+                 ccToGet:(Product, String) => StringBuilder)
                 (cc: Product)
                 (implicit system: ActorSystem, materializer: Materializer): Future[HttpResponse] = {
     val balancesQuery = ccToGet(cc, requestPath)
@@ -191,12 +192,35 @@ def typedResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
     }
   }
 
+  def typedResponse2(mapLeft: (HttpEntity) => Future[Left[String, Nothing]], 
+                  mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
+                 (response: HttpResponse)
+                 (implicit system: ActorSystem, logger: LoggingAdapter, 
+                  materializer: Materializer): Future[Either[String, AnyRef]] = {
+
+      response.status match {
+        case OK => {
+          val st = response.entity.contentType.mediaType.subType
+          st match {
+            case "json"  => mapRight(response.entity)
+            case "plain" => mapLeft(response.entity)
+          }
+        }
+        case BadRequest => Future.successful(Left(s"FAIL bad request:${response.status}"))
+        case _ => Unmarshal(response.entity).to[String].flatMap { entity =>
+          val error = s"FAIL ${response.status} $entity"
+          logger.error(error)
+          Unmarshal(error).to[String].map(Left(_))
+        }
+      }
+  }
   /** Query server, map response
     *
     * Create a Partial Function by initializing first parameter list
     *
     * @param baseURL
     * @param requestPath
+    * @param ccToGet function to map case class to requestPath and Get request
     * @param mapLeft plain text response to Left
     * @param mapRight json response to Right
     * @param cc case class mapped to GET query in 2nd arg list for currying
@@ -207,12 +231,13 @@ def typedResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
     */
   def typedQueryResponse(baseURL: StringBuilder,
                requestPath: String,
+               ccToGet:(Product, String) => StringBuilder,
                mapLeft: (HttpEntity) => Future[Left[String, Nothing]], 
                mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
               (cc: Product)
               (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer): 
                Future[Either[String, AnyRef]] = {
-    val callFuture = typedQuery(baseURL, requestPath, caseClassToGetQuery)(cc)
+    val callFuture = typedQuery(baseURL, requestPath, ccToGet)(cc)
     typedResponse(mapLeft, mapRight)(callFuture)
   }
 }
