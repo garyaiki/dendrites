@@ -210,23 +210,7 @@ def typedFutureResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
       (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
                     Future[Either[String, AnyRef]] = {
 
-    caller.flatMap { response =>
-      response.status match {
-        case OK => {
-          val st = response.entity.contentType.mediaType.subType
-          st match {
-            case "json"  => mapRight(response.entity)
-            case "plain" => mapLeft(response.entity)
-          }
-        }
-        case BadRequest => Future.successful(Left(s"FAIL bad request:${response.status}"))
-        case _ => Unmarshal(response.entity).to[String].flatMap { entity =>
-          val error = s"FAIL ${response.status} $entity"
-          logger.error(error)
-          Unmarshal(error).to[String].map(Left(_))
-        }
-      }
-    }
+    caller.flatMap { response => typedResponse(mapLeft, mapRight)(response) }
   }
 
   /** Query server, map response
