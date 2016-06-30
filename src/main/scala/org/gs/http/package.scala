@@ -152,8 +152,45 @@ package object http {
     val uriS = (baseURL ++ balancesQuery).mkString
     Http().singleRequest(HttpRequest(uri = uriS))
   }
-  
-  /**	Map response to a Future Either Left for error, Right for good result
+
+  /**	Map HttpResponse to a Future[Either] Left for error, Right for good result
+		*
+	  * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.model.HttpResponse "HttpResponse"]]
+	  * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.unmarshalling.Unmarshal "Unmarshal"]]
+		* @example [[org.gs.examples.account.http.actor.CheckingAccountClient]]
+	  * 
+    * @param mapLeft plain text response to Left
+    * @param mapRight json response to Right
+	  * @param caller future returned by query in 2nd arg list so it can be curried
+    * @param system implicit ActorSystem
+    * @param logger implicit LoggingAdapter
+    * @param materializer implicit Materializer
+    * @return Future[Either[String, AnyRef]]
+    */
+  def typedResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]], 
+                    mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
+        (response: HttpResponse)
+        (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer): 
+                   Future[Either[String, AnyRef]] = {
+
+      response.status match {
+        case OK => {
+          val st = response.entity.contentType.mediaType.subType
+          st match {
+            case "json"  => mapRight(response.entity)
+            case "plain" => mapLeft(response.entity)
+          }
+        }
+        case BadRequest => Future.successful(Left(s"FAIL bad request:${response.status}"))
+        case _ => Unmarshal(response.entity).to[String].flatMap { entity =>
+          val error = s"FAIL ${response.status} $entity"
+          logger.error(error)
+          Unmarshal(error).to[String].map(Left(_))
+        }
+      }
+  }
+
+  /**	Map Future[HttpResponse} to a Future[Either] Left for error, Right for good result
 		*
 	  * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.model.HttpResponse "HttpResponse"]]
 	  * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.unmarshalling.Unmarshal "Unmarshal"]]
@@ -168,9 +205,9 @@ package object http {
     * @return Future[Either[String, AnyRef]]
     */
 def typedFutureResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]], 
-                        mapRight: (HttpEntity) => Future[Right[String, AnyRef]])(
-                        caller: Future[HttpResponse])
-                (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
+                        mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
+      (caller: Future[HttpResponse])
+      (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
                     Future[Either[String, AnyRef]] = {
 
     caller.flatMap { response =>
@@ -192,28 +229,6 @@ def typedFutureResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
     }
   }
 
-  def typedResponse2(mapLeft: (HttpEntity) => Future[Left[String, Nothing]], 
-                  mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
-                 (response: HttpResponse)
-                 (implicit system: ActorSystem, logger: LoggingAdapter, 
-                  materializer: Materializer): Future[Either[String, AnyRef]] = {
-
-      response.status match {
-        case OK => {
-          val st = response.entity.contentType.mediaType.subType
-          st match {
-            case "json"  => mapRight(response.entity)
-            case "plain" => mapLeft(response.entity)
-          }
-        }
-        case BadRequest => Future.successful(Left(s"FAIL bad request:${response.status}"))
-        case _ => Unmarshal(response.entity).to[String].flatMap { entity =>
-          val error = s"FAIL ${response.status} $entity"
-          logger.error(error)
-          Unmarshal(error).to[String].map(Left(_))
-        }
-      }
-  }
   /** Query server, map response
     *
     * Create a Partial Function by initializing first parameter list
