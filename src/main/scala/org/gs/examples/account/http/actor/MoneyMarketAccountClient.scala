@@ -9,7 +9,7 @@ import com.typesafe.config.Config
 import org.gs.aggregator.actor.ResultAggregator
 import org.gs.examples.account.{ MoneyMarket, MoneyMarketAccountBalances, GetAccountBalances }
 import org.gs.examples.account.http.{ BalancesProtocols, MoneyMarketBalancesClientConfig }
-import org.gs.http.{caseClassToGetQuery, typedQuery, typedResponse}
+import org.gs.http.{caseClassToGetQuery, typedQuery, typedFutureResponse}
 
 class MoneyMarketAccountClient(clientConfig: MoneyMarketBalancesClientConfig) extends Actor with
   BalancesProtocols with ActorLogging {
@@ -33,7 +33,7 @@ class MoneyMarketAccountClient(clientConfig: MoneyMarketBalancesClientConfig) ex
     case GetAccountBalances(id: Long) ⇒ {
       val cc = GetAccountBalances(id)
       val callFuture = typedQuery(clientConfig.baseURL, cc.productPrefix, caseClassToGetQuery)(cc)
-      val responseFuture = typedResponse(mapPlain, mapMoneyMarket)(callFuture)
+      val responseFuture = typedFutureResponse(mapPlain, mapMoneyMarket)(callFuture)
       responseFuture pipeTo sender
     }
   }

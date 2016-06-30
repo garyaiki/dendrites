@@ -167,11 +167,11 @@ package object http {
     * @param materializer implicit Materializer
     * @return Future[Either[String, AnyRef]]
     */
-def typedResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]], 
-                  mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
-                 (caller: Future[HttpResponse])
-                 (implicit system: ActorSystem, logger: LoggingAdapter, 
-                  materializer: Materializer): Future[Either[String, AnyRef]] = {
+def typedFutureResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]], 
+                        mapRight: (HttpEntity) => Future[Right[String, AnyRef]])(
+                        caller: Future[HttpResponse])
+                (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
+                    Future[Either[String, AnyRef]] = {
 
     caller.flatMap { response =>
       response.status match {
@@ -238,6 +238,6 @@ def typedResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
               (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer): 
                Future[Either[String, AnyRef]] = {
     val callFuture = typedQuery(baseURL, requestPath, ccToGet)(cc)
-    typedResponse(mapLeft, mapRight)(callFuture)
+    typedFutureResponse(mapLeft, mapRight)(callFuture)
   }
 }

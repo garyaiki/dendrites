@@ -12,7 +12,7 @@ import org.scalatest.time.SpanSugar._
 import org.gs.examples.account.http.actor.CheckingAccountClient._
 import scala.math.BigDecimal.double2bigDecimal
 import org.gs.examples.account.{GetAccountBalances, MoneyMarketAccountBalances}
-import org.gs.http.{caseClassToGetQuery, typedQuery, typedResponse}
+import org.gs.http.{caseClassToGetQuery, typedQuery, typedFutureResponse}
 
 /**
   *
@@ -36,7 +36,7 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
       val id = 1L
       val cc = GetAccountBalances(id)
       val callFuture = typedQuery(baseURL, cc.productPrefix, caseClassToGetQuery)(cc)
-      val responseFuture = typedResponse(mapPlain, mapMoneyMarket)(callFuture)
+      val responseFuture = typedFutureResponse(mapPlain, mapMoneyMarket)(callFuture)
 
       whenReady(responseFuture, timeout) { result =>
         result should equal(Right(MoneyMarketAccountBalances[BigDecimal](Some(List((1, 11000.1))))))
@@ -49,7 +49,7 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
       val id = 2L
       val cc = GetAccountBalances(id)
       val callFuture = typedQuery(baseURL, cc.productPrefix, caseClassToGetQuery)(cc)
-      val responseFuture = typedResponse(mapPlain, mapMoneyMarket)(callFuture)
+      val responseFuture = typedFutureResponse(mapPlain, mapMoneyMarket)(callFuture)
 
       whenReady(responseFuture, timeout) { result =>
         result should equal(Right(MoneyMarketAccountBalances(Some(List((2L, BigDecimal(22000.20)),
@@ -63,7 +63,7 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
       val id = 3L
       val cc = GetAccountBalances(id)
       val callFuture = typedQuery(baseURL, cc.productPrefix, caseClassToGetQuery)(cc)
-      val responseFuture = typedResponse(mapPlain, mapMoneyMarket)(callFuture)
+      val responseFuture = typedFutureResponse(mapPlain, mapMoneyMarket)(callFuture)
 
       whenReady(responseFuture, timeout) { result =>
         result should equal(Right(MoneyMarketAccountBalances(Some(List((3L, BigDecimal(33000.30)),
@@ -78,7 +78,7 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
       val id = 4L
       val cc = GetAccountBalances(id)
       val callFuture = typedQuery(baseURL, cc.productPrefix, caseClassToGetQuery)(cc)
-      val responseFuture = typedResponse(mapPlain, mapMoneyMarket)(callFuture)
+      val responseFuture = typedFutureResponse(mapPlain, mapMoneyMarket)(callFuture)
 
       whenReady(responseFuture, timeout) { result =>
         result should equal(Left("Money Market account 4 not found"))
@@ -91,7 +91,7 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
       val id = 1L
       val cc = GetAccountBalances(id)
       val callFuture = typedQuery(badBaseURL, cc.productPrefix, caseClassToGetQuery)(cc)
-      val responseFuture = typedResponse(mapPlain, mapMoneyMarket)(callFuture)
+      val responseFuture = typedFutureResponse(mapPlain, mapMoneyMarket)(callFuture)
 
       whenReady(responseFuture, timeout) { result =>
         result should equal(Left(

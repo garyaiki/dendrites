@@ -12,7 +12,7 @@ import org.scalatest.matchers.ShouldMatchers._
 import org.scalatest.time.SpanSugar._
 import scala.math.BigDecimal.double2bigDecimal
 import org.gs.examples.account.{GetAccountBalances, SavingsAccountBalances}
-import org.gs.http.{caseClassToGetQuery, typedQuery, typedResponse}
+import org.gs.http.{caseClassToGetQuery, typedQuery, typedFutureResponse}
 
 /**
   *
@@ -35,7 +35,7 @@ class SavingsBalancesClientConfigSpec extends WordSpecLike with Matchers with Ba
       val id = 1L
       val cc = GetAccountBalances(id)
       val callFuture = typedQuery(baseURL, cc.productPrefix, caseClassToGetQuery)(cc)
-      val responseFuture = typedResponse(mapPlain, mapSavings)(callFuture)
+      val responseFuture = typedFutureResponse(mapPlain, mapSavings)(callFuture)
 
       whenReady(responseFuture, timeout) { result =>
         result should equal(Right(SavingsAccountBalances[BigDecimal](Some(List((1, 111000.1))))))
@@ -48,7 +48,7 @@ class SavingsBalancesClientConfigSpec extends WordSpecLike with Matchers with Ba
       val id = 2L
       val cc = GetAccountBalances(id)
       val callFuture = typedQuery(baseURL, cc.productPrefix, caseClassToGetQuery)(cc)
-      val responseFuture = typedResponse(mapPlain, mapSavings)(callFuture)
+      val responseFuture = typedFutureResponse(mapPlain, mapSavings)(callFuture)
 
       whenReady(responseFuture, timeout) { result =>
         result should equal(Right(SavingsAccountBalances(Some(List((2L, BigDecimal(222000.20)),
@@ -62,7 +62,7 @@ class SavingsBalancesClientConfigSpec extends WordSpecLike with Matchers with Ba
       val id = 3L
       val cc = GetAccountBalances(id)
       val callFuture = typedQuery(baseURL, cc.productPrefix, caseClassToGetQuery)(cc)
-      val responseFuture = typedResponse(mapPlain, mapSavings)(callFuture)
+      val responseFuture = typedFutureResponse(mapPlain, mapSavings)(callFuture)
 
       whenReady(responseFuture, timeout) { result =>
         result should equal(Right(SavingsAccountBalances(Some(List((3L, BigDecimal(333000.30)),
@@ -77,7 +77,7 @@ class SavingsBalancesClientConfigSpec extends WordSpecLike with Matchers with Ba
       val id = 4L
       val cc = GetAccountBalances(id)
       val callFuture = typedQuery(baseURL, cc.productPrefix, caseClassToGetQuery)(cc)
-      val responseFuture = typedResponse(mapPlain, mapSavings)(callFuture)
+      val responseFuture = typedFutureResponse(mapPlain, mapSavings)(callFuture)
 
       whenReady(responseFuture, timeout) { result =>
         result should equal(Left("Savings account 4 not found"))
@@ -90,7 +90,7 @@ class SavingsBalancesClientConfigSpec extends WordSpecLike with Matchers with Ba
       val id = 1L
       val cc = GetAccountBalances(id)
       val callFuture = typedQuery(badBaseURL, cc.productPrefix, caseClassToGetQuery)(cc)
-      val responseFuture = typedResponse(mapPlain, mapSavings)(callFuture)
+      val responseFuture = typedFutureResponse(mapPlain, mapSavings)(callFuture)
 
       whenReady(responseFuture, timeout) { result =>
         result should equal(Left(
