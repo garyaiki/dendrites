@@ -25,7 +25,8 @@ object ClientConnectionPool {
     * @param port
     * @return connection pool
     */
-  def apply(host: String, port: Int): Flow[(HttpRequest, Long), (Try[HttpResponse], Long), HostConnectionPool] = {
+  def apply(host: String, port: Int):
+          Flow[(HttpRequest, Long), (Try[HttpResponse], Long), HostConnectionPool] = {
     val httpExt = new HttpExt(ConfigFactory.load())
     httpExt.cachedHostConnectionPool[Long](host, port)
   }

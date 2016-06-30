@@ -30,8 +30,8 @@ class CheckingCallSpec extends WordSpecLike with Matchers with BalancesProtocols
 
   val timeout = Timeout(3000 millis)
 
-  def partial = typedQueryResponse(baseURL, mapPlain, mapChecking) _
-  def badPartial = typedQueryResponse(badBaseURL, mapPlain, mapChecking) _
+  def partial = typedQueryResponse(baseURL, "GetAccountBalances", mapPlain, mapChecking) _
+  def badPartial = typedQueryResponse(badBaseURL, "GetAccountBalances", mapPlain, mapChecking) _
   
   "A CheckingCallClient" should {
     "get balances for id 1" in {

@@ -7,17 +7,14 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Flow}
 import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
 import java.util.concurrent.Executors
-import org.gs.examples.account.{ GetAccountBalances, MoneyMarketAccountBalances}
-import org.gs.examples.account.http._
-import org.gs.http._
 import org.scalatest.{ Matchers, WordSpecLike }
 import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.time.SpanSugar._
-import scala.BigDecimal
-import scala.Left
-import scala.Right
 import scala.math.BigDecimal.double2bigDecimal
+import org.gs.examples.account.{ GetAccountBalances, MoneyMarketAccountBalances}
+import org.gs.examples.account.http._
+import org.gs.http.typedQueryResponse
 
 class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
@@ -92,7 +89,7 @@ class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesPr
 
   val clientConfig = new MoneyMarketBalancesClientConfig()
   val badBaseURL = clientConfig.baseURL.dropRight(1)
-  def badPartial = typedQueryResponse(badBaseURL, mapPlain, mapMoneyMarket) _
+  def badPartial = typedQueryResponse(badBaseURL, "GetAccountBalances", mapPlain, mapMoneyMarket) _
   def badFlow: Flow[Product, Either[String, AnyRef], NotUsed] = Flow[Product].mapAsync(1)(badPartial)
 
   it should {

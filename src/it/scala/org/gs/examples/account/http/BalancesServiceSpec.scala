@@ -29,8 +29,8 @@ class BalancesServiceSpec extends FlatSpec
   val checkingBalances = CheckingAccountBalances[BigDecimal](Some(List((goodId, 1000.1))))
 
   val checkingPath = "/account/balances/checking/"
-  val balancesQuery = caseClassToGetQuery(balanceQuery)()
-  val badBalancesQuery = caseClassToGetQuery(badBalanceQuery)()
+  val balancesQuery = caseClassToGetQuery(balanceQuery, balanceQuery.productPrefix)
+  val badBalancesQuery = caseClassToGetQuery(badBalanceQuery, badBalanceQuery.productPrefix)
   val q = checkingPath ++ balancesQuery
   val badQ = checkingPath ++ badBalancesQuery
   println(q)
@@ -50,7 +50,6 @@ class BalancesServiceSpec extends FlatSpec
   }
 
   it should "return Error message for non-existing Checking Account Balances" in {
-    val badId = 4L
     Get(badQ) ~> routes ~> check {
       status shouldBe OK
       contentType shouldBe `text/plain(UTF-8)`

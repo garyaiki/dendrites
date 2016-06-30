@@ -22,8 +22,9 @@ class CheckingCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
   val clientConfig = new CheckingBalancesClientConfig()
   val hostConfig = clientConfig.hostConfig
   val baseURL = clientConfig.baseURL
+  val requestPath = clientConfig.requestPath
 
-  def partial = typedQueryResponse(baseURL, mapPlain, mapChecking) _ // curried
+  def partial = typedQueryResponse(baseURL, requestPath, mapPlain, mapChecking) _ // curried
 
   def flow: Flow[Product, Either[String, AnyRef], NotUsed] = Flow[Product].mapAsync(1)(partial)
 }

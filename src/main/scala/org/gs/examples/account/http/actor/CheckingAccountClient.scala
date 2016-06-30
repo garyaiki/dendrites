@@ -10,7 +10,7 @@ import com.typesafe.config.Config
 import org.gs.aggregator.actor.ResultAggregator
 import org.gs.examples.account.{ Checking, CheckingAccountBalances, GetAccountBalances }
 import org.gs.examples.account.http.{ BalancesProtocols, CheckingBalancesClientConfig }
-import org.gs.http.{typedQuery, typedResponse}
+import org.gs.http.{caseClassToGetQuery, typedQuery, typedResponse}
 
 class CheckingAccountClient(clientConfig: CheckingBalancesClientConfig) extends Actor with
   BalancesProtocols with ActorLogging {
@@ -33,7 +33,8 @@ class CheckingAccountClient(clientConfig: CheckingBalancesClientConfig) extends 
 
   def receive = {
     case GetAccountBalances(id: Long) ⇒ {
-      val callFuture = typedQuery(clientConfig.baseURL)(GetAccountBalances(id))
+      val cc = GetAccountBalances(id)
+      val callFuture = typedQuery(clientConfig.baseURL, cc.productPrefix, caseClassToGetQuery)(cc)
       typedResponse(mapPlain, mapChecking)(callFuture) pipeTo sender
     }
   }

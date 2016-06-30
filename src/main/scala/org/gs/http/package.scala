@@ -105,14 +105,22 @@ package object http {
     require(pathPattern.findFirstIn(path).isDefined, s"path:path looks invalid")
     new StringBuilder(scheme).append("://").append(domain).append(':').append(port).append(path)
   }
-  
+
+    /** Get path from Config append to host URL
+		*
+		* @param pathPath requestPath config key
+    * @param config
+    * @return requestPath 
+    */
+  def configRequestPath(pathPath: String, config: Config): String = config.getString(pathPath)
+
   /** Transform case class to http GET query
     *  
-    *  @param cc case class or tuple
-    *  @param requestPath last part of path before '?', default is case class name
-    *  @return field names and values as GET query string preceded with case class name? 
+    * @param cc case class or tuple
+    * @param requestPath last part of path before '?'
+    * @return field names and values as GET query string preceded with request path? 
     */
-  def caseClassToGetQuery(cc: Product)(requestPath: String = cc.productPrefix): StringBuilder = {
+  def caseClassToGetQuery(cc: Product, requestPath: String): StringBuilder = {
     val sb = new StringBuilder(requestPath)
     sb.append('?')
     val fields = ccToMap(cc).filterKeys(_ != "$outer")
@@ -126,17 +134,20 @@ package object http {
   /** Call server with GET query, case class is turned into Get query, appended to baseURL
 		*
 		* @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.Http$ "Http"]]
-		* @example [[org.gs.examples.account.http.actor.CheckingAccountClient]]
 		* 
     * @param baseURL
-    * @param cc case class 
+    * @param requestPath
+    * @param ccToGet function to map case class to requestPath and Get request
+    * @param cc case class, in 2nd argument list so it can be curried
     * @param system implicit ActorSystem
     * @param materializer implicit Materializer
     * @return Future[HttpResponse]
     */
-  def typedQuery(baseURL: StringBuilder)(cc: Product)(implicit system: ActorSystem, 
-          materializer: Materializer): Future[HttpResponse] = {
-    val balancesQuery = caseClassToGetQuery(cc)()
+  def typedQuery(baseURL: StringBuilder,
+                 requestPath: String, ccToGet:(Product, String) => StringBuilder)
+                (cc: Product)
+                (implicit system: ActorSystem, materializer: Materializer): Future[HttpResponse] = {
+    val balancesQuery = ccToGet(cc, requestPath)
     val uriS = (baseURL ++ balancesQuery).mkString
     Http().singleRequest(HttpRequest(uri = uriS))
   }
@@ -147,9 +158,9 @@ package object http {
 	  * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.unmarshalling.Unmarshal "Unmarshal"]]
 		* @example [[org.gs.examples.account.http.actor.CheckingAccountClient]]
 	  * 
-	  * @param caller future returned by query
     * @param mapLeft plain text response to Left
     * @param mapRight json response to Right
+	  * @param caller future returned by query in 2nd arg list so it can be curried
     * @param system implicit ActorSystem
     * @param logger implicit LoggingAdapter
     * @param materializer implicit Materializer
@@ -184,24 +195,24 @@ def typedResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
     *
     * Create a Partial Function by initializing first parameter list
     *
-    *   
     * @param baseURL
+    * @param requestPath
     * @param mapLeft plain text response to Left
     * @param mapRight json response to Right
-    * @param cc case class mapped to GET query
+    * @param cc case class mapped to GET query in 2nd arg list for currying
     * @param system implicit ActorSystem
     * @param logger implicit LoggingAdapter
     * @param materializer implicit Materializer
     * @return Future[Either[String, AnyRef]]
     */
-  def typedQueryResponse(baseURL: StringBuilder, 
+  def typedQueryResponse(baseURL: StringBuilder,
+               requestPath: String,
                mapLeft: (HttpEntity) => Future[Left[String, Nothing]], 
                mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
               (cc: Product)
               (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer): 
                Future[Either[String, AnyRef]] = {
-    
-    val callFuture = typedQuery(baseURL)(cc)
+    val callFuture = typedQuery(baseURL, requestPath, caseClassToGetQuery)(cc)
     typedResponse(mapLeft, mapRight)(callFuture)
   }
 }

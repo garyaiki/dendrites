@@ -22,8 +22,9 @@ class MoneyMarketCallFlow(implicit val system: ActorSystem, logger: LoggingAdapt
   val clientConfig = new MoneyMarketBalancesClientConfig()
   val hostConfig = clientConfig.hostConfig
   val baseURL = clientConfig.baseURL
+  val requestPath = clientConfig.requestPath
 
-  def partial = typedQueryResponse(baseURL, mapPlain, mapMoneyMarket) _ // curried
+  def partial = typedQueryResponse(baseURL, requestPath, mapPlain, mapMoneyMarket) _ // curried
   
   def flow: Flow[Product, Either[String, AnyRef], NotUsed] = Flow[Product].mapAsync(1)(partial)
 }
