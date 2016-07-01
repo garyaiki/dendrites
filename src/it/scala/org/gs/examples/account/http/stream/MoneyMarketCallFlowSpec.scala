@@ -5,17 +5,21 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Flow}
-import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
+import akka.stream.testkit.scaladsl.{ TestSink, TestSource}
 import java.util.concurrent.Executors
-import org.scalatest.{ Matchers, WordSpecLike }
+import org.scalatest.{ Matchers, WordSpecLike}
 import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.time.SpanSugar._
 import scala.math.BigDecimal.double2bigDecimal
 import org.gs.examples.account.{ GetAccountBalances, MoneyMarketAccountBalances}
-import org.gs.examples.account.http._
-import org.gs.http.{caseClassToGetQuery, typedQueryResponse }
+import org.gs.examples.account.http.{BalancesProtocols, MoneyMarketBalancesClientConfig}
+import org.gs.http.{caseClassToGetQuery, typedQueryResponse}
 
+/**
+  *
+  * @author Gary Struthers
+  */
 class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   override implicit val materializer = ActorMaterializer()
@@ -91,7 +95,8 @@ class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesPr
   val badBaseURL = clientConfig.baseURL.dropRight(1)
   def badPartial = typedQueryResponse(
           badBaseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapMoneyMarket) _
-  def badFlow: Flow[Product, Either[String, AnyRef], NotUsed] = Flow[Product].mapAsync(1)(badPartial)
+  def badFlow: Flow[Product, Either[String, AnyRef], NotUsed] =
+          Flow[Product].mapAsync(1)(badPartial)
 
   it should {
     "fail bad request URLs" in {
@@ -102,6 +107,7 @@ class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesPr
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
       val response = sub.expectNext()
+
       response should equal(Left("FAIL 404 Not Found The requested resource could not be found."))
     }
   }

@@ -13,10 +13,13 @@ import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.time.SpanSugar._
 import scala.math.BigDecimal.double2bigDecimal
 import org.gs.examples.account.{ CheckingAccountBalances, GetAccountBalances}
-import org.gs.examples.account.http._
-import org.gs.examples.account.http.stream._
-import org.gs.http.{caseClassToGetQuery, typedQueryResponse }
+import org.gs.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
+import org.gs.http.{caseClassToGetQuery, typedQueryResponse}
 
+/**
+  *
+  * @author Gary Struthers
+  */
 class TypedQueryResponseFlowSpec extends WordSpecLike with Matchers with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   override implicit val materializer = ActorMaterializer()
@@ -49,7 +52,6 @@ class TypedQueryResponseFlowSpec extends WordSpecLike with Matchers with Balance
       response should equal(Right(CheckingAccountBalances[BigDecimal](Some(List((1, 1000.1))))))
     }
   }
-
 
   it should {
     "get balances for id 2" in {

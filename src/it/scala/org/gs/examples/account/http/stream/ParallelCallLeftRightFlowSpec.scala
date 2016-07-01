@@ -5,17 +5,21 @@ import akka.event.Logging
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
-import org.gs.examples.account.{CheckingAccountBalances,
-                                GetAccountBalances,
-                                MoneyMarketAccountBalances,
-                                SavingsAccountBalances}
 import org.scalatest.{ Matchers, WordSpecLike }
 import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.math.BigDecimal.double2bigDecimal
+import org.gs.examples.account.{CheckingAccountBalances,
+                                GetAccountBalances,
+                                MoneyMarketAccountBalances,
+                                SavingsAccountBalances}
 
+/**
+  *
+  * @author Gary Struthers
+  */
 class ParallelCallLeftRightFlowSpec extends WordSpecLike with Matchers {
   implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()
@@ -100,7 +104,6 @@ class ParallelCallLeftRightFlowSpec extends WordSpecLike with Matchers {
       response._1 should equal(List("Checking account 4 not found",
           "Money Market account 4 not found",
           "Savings account 4 not found"))
-
     }
   }
 }

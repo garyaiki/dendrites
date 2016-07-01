@@ -13,10 +13,13 @@ import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.time.SpanSugar._
 import scala.math.BigDecimal.double2bigDecimal
 import org.gs.examples.account.{ CheckingAccountBalances, GetAccountBalances}
-import org.gs.examples.account.http._
-import org.gs.examples.account.http.stream._
-import org.gs.http.{caseClassToGetQuery, typedQueryResponse }
+import org.gs.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
+import org.gs.http.{caseClassToGetQuery, typedQueryResponse}
 
+/**
+  *
+  * @author Gary Struthers
+  */
 class CheckingCallFlowSpec extends WordSpecLike with Matchers with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   override implicit val materializer = ActorMaterializer()
@@ -42,7 +45,6 @@ class CheckingCallFlowSpec extends WordSpecLike with Matchers with BalancesProto
       response should equal(Right(CheckingAccountBalances[BigDecimal](Some(List((1, 1000.1))))))
     }
   }
-
 
   it should {
     "get balances for id 2" in {
@@ -95,7 +97,8 @@ class CheckingCallFlowSpec extends WordSpecLike with Matchers with BalancesProto
   def badPartial = typedQueryResponse(
           badBaseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
 
-  def badFlow: Flow[Product, Either[String, AnyRef], NotUsed] = Flow[Product].mapAsync(1)(badPartial)
+  def badFlow: Flow[Product, Either[String, AnyRef], NotUsed] =
+            Flow[Product].mapAsync(1)(badPartial)
 
   it should {
     "fail bad request URLs" in {
@@ -106,6 +109,7 @@ class CheckingCallFlowSpec extends WordSpecLike with Matchers with BalancesProto
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
       val response = sub.expectNext()
+
       response should equal(Left("FAIL 404 Not Found The requested resource could not be found."))
     }
   }

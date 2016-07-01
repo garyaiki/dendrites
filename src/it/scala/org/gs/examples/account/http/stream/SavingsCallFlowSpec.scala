@@ -14,9 +14,13 @@ import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.math.BigDecimal.double2bigDecimal
 import org.gs.examples.account.{GetAccountBalances, SavingsAccountBalances}
-import org.gs.examples.account.http._
-import org.gs.http.{caseClassToGetQuery, typedQueryResponse }
+import org.gs.examples.account.http.{BalancesProtocols, SavingsBalancesClientConfig}
+import org.gs.http.{caseClassToGetQuery, typedQueryResponse}
 
+/**
+  *
+  * @author Gary Struthers
+  */
 class SavingsCallFlowSpec extends WordSpecLike with Matchers with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   override implicit val materializer = ActorMaterializer()

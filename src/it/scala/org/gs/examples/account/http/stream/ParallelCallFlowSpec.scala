@@ -5,19 +5,20 @@ import akka.event.Logging
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
-import org.gs.examples.account.{CheckingAccountBalances,
-                                GetAccountBalances,
-                                MoneyMarketAccountBalances,
-                                SavingsAccountBalances}
 import org.scalatest.{ Matchers, WordSpecLike }
 import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
-import scala.Left
-import scala.Right
 import scala.math.BigDecimal.double2bigDecimal
-
+import org.gs.examples.account.{CheckingAccountBalances,
+                                GetAccountBalances,
+                                MoneyMarketAccountBalances,
+                                SavingsAccountBalances}
+/**
+  *
+  * @author Gary Struthers
+  */
 class ParallelCallFlowSpec extends WordSpecLike with Matchers {
   implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()
@@ -78,13 +79,12 @@ class ParallelCallFlowSpec extends WordSpecLike with Matchers {
       pub.sendComplete()
       sub.expectComplete()
 
-      response should equal(
-          Right(CheckingAccountBalances[BigDecimal](
-              Some(List((3,3000.3), (33,3300.33), (333,3330.33))))),
-          Right(MoneyMarketAccountBalances[BigDecimal](
-              Some(List((3,33000.3), (33,33300.33), (333,33330.33))))),
-          Right(SavingsAccountBalances[BigDecimal](
-              Some(List((3,333000.3), (33,333300.33), (333,333330.33))))))
+      response should equal(Right(CheckingAccountBalances[BigDecimal](
+                                Some(List((3,3000.3), (33,3300.33), (333,3330.33))))),
+                            Right(MoneyMarketAccountBalances[BigDecimal](
+                                Some(List((3,33000.3), (33,33300.33), (333,33330.33))))),
+                            Right(SavingsAccountBalances[BigDecimal](
+                                Some(List((3,333000.3), (33,333300.33), (333,333330.33))))))
     }
   }
 
@@ -100,11 +100,9 @@ class ParallelCallFlowSpec extends WordSpecLike with Matchers {
       pub.sendComplete()
       sub.expectComplete()
 
-      response should equal(
-          Left("Checking account 4 not found"),
-          Left("Money Market account 4 not found"),
-          Left("Savings account 4 not found")
-          )
+      response should equal(Left("Checking account 4 not found"),
+                            Left("Money Market account 4 not found"),
+                            Left("Savings account 4 not found"))
     }
   }
 }

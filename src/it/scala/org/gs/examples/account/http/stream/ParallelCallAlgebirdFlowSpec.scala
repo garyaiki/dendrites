@@ -17,6 +17,10 @@ import org.gs.algebird.stream.{avgFlow, CreateHLLFlow, maxFlow, minFlow}
 import org.gs.examples.account.{extractBalancesVals, GetAccountBalances }
 import org.gs.examples.account.stream.extractBalancesFlow
 
+/**
+  *
+  * @author Gary Struthers
+  */
 class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
   implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()
@@ -28,14 +32,7 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
   val pcf = new ParallelCallFlow
   val wrappedFlow = pcf.wrappedCallsLRFlow
   var rightResponse: Option[Seq[AnyRef]] = None
-/*
-  def exf: Flow[Seq[AnyRef], Seq[BigDecimal], NotUsed] =
-    Flow[Seq[AnyRef]].map(extractBalancesVals[BigDecimal])
 
-  def source3 = TestSource.probe[Seq[BigDecimal]]
-
-  val sink3 = TestSink.probe[AveragedValue]
-*/
   "A ParallelCallAlgebirdFlowClient" should {
     "get balances for id 1" in {
       val id = 1L
@@ -48,14 +45,16 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
       pub.sendComplete()
       sub.expectComplete()
       val balancesLists = extractBalancesVals(response._2)
+
       balancesLists should equal(List(1000.1, 11000.1, 111000.1))
-      //println(s"response2:$response2")
       rightResponse = Some(response._2)
     }
 
   def source2 = TestSource.probe[Seq[AnyRef]]
   def sink2 = TestSink.probe[Seq[BigDecimal]]
+
   var balancesValues: Option[Seq[BigDecimal]] = None
+
     "extract balances from the Right response" in {
       val (pub2, sub2) = source2
         .via(extractBalancesFlow)
@@ -65,6 +64,7 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
       val response2 = sub2.expectNext
       pub2.sendComplete()
       sub2.expectComplete()
+
       response2 should equal(List(1000.1, 11000.1, 111000.1))
       balancesValues = Some(response2)
     }
@@ -77,9 +77,9 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
       sub2.request(1)
       pub2.sendNext(rightResponse.get)
       val response3 = sub2.expectNext
-      println(s"avg:$response3")
       pub2.sendComplete()
       sub2.expectComplete()
+
       response3 should equal(AveragedValue(3, 41000.1))
     }
 
@@ -91,9 +91,9 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
       sub2.request(1)
       pub2.sendNext(rightResponse.get)
       val response3 = sub2.expectNext
-      println(s"avg:$response3")
       pub2.sendComplete()
       sub2.expectComplete()
+
       response3.estimatedSize should equal(balancesValues.get.distinct.size.toDouble +- 0.09)
     }
 
@@ -105,9 +105,9 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
       sub2.request(1)
       pub2.sendNext(rightResponse.get)
       val response3 = sub2.expectNext
-      println(s"avg:$response3")
       pub2.sendComplete()
       sub2.expectComplete()
+
       response3 should equal(111000.1)
     }
 
@@ -119,9 +119,9 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
       sub2.request(1)
       pub2.sendNext(rightResponse.get)
       val response3 = sub2.expectNext
-      println(s"avg:$response3")
       pub2.sendComplete()
       sub2.expectComplete()
+
       response3 should equal(1000.1)
     }
   }
@@ -138,6 +138,7 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
       pub.sendComplete()
       sub.expectComplete()
       val balancesLists = extractBalancesVals(response._2)
+
       balancesLists should equal(List(2000.2, 2200.22, 22000.2, 22200.22, 222000.2, 222200.22))
     }
   }
@@ -154,6 +155,7 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
       pub.sendComplete()
       sub.expectComplete()
       val balancesLists = extractBalancesVals(response._2)
+
       balancesLists should equal(
         List(3000.3, 3300.33, 3330.33, 33000.3, 33300.33, 33330.33, 333000.3, 333300.33, 333330.33))
     }

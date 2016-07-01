@@ -6,7 +6,7 @@ import akka.event.LoggingAdapter
 import akka.http.scaladsl.model.HttpResponse
 import akka.stream.Materializer
 import akka.stream.scaladsl.Flow
-import org.gs.http.{caseClassToGetQuery, typedQuery}
+import org.gs.http.typedQuery
 
 /** Send query to Http service. typedQuery builds a GET request and calls the server,
   * typedQuery is a curried function, only its initial argument list is passed here, the stream

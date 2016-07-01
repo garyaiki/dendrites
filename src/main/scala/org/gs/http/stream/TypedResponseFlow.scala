@@ -9,7 +9,7 @@ import akka.stream.scaladsl.Flow
 import scala.concurrent.Future
 import org.gs.http.typedResponse
 
-/** Map Future[HttpResponse] to Either Left for errors, Right case class for good result
+/** Map HttpResponse to Future[Either] Left for errors, Right case class for good result
   *
   * typedResponse is a curried function, only its initial argument list is passed here, the stream 
   * passes the rest. Flow mapAsync calls curried typedResponse and passes 1 Future, the Either

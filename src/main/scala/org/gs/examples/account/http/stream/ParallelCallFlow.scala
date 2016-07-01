@@ -9,10 +9,10 @@ import org.gs.stream.leftRightFlow
 /** Create Graph that calls Checking, MoneyMarket, Savings services in parallel, waits for them all
   * then groups failures and successes
   *
-  * @author Gary Struthers
   * @param system implicit ActorSystem
   * @param logger implicit logger
   * @param materializer implicit Materializer
+  * @author Gary Struthers
   */
 class ParallelCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter, 
                 val materializer: Materializer) {
