@@ -4,16 +4,16 @@ import akka.actor._
 import akka.contrib.pattern.Aggregator
 import scala.collection.immutable.Set
 import scala.concurrent.duration._
-import org.gs.aggregator.actor.{ CantUnderstand, ResultAggregator, TimedOut}
-import org.gs.examples.account._
+import org.gs.aggregator.actor.{CantUnderstand, ResultAggregator, TimedOut}
+import org.gs.examples.account.{AccountType, GetCustomerAccountBalances}
 import org.gs.examples.account.actor.AccountBalanceActor
-import org.gs.examples.account.http.actor.AccountBalanceRestfulRetriever._
 
 /** Sample and test code for the aggregator patter.
   * This is based on Jamie Allen's tutorial at
-  * http://jaxenter.com/tutorial-asynchronous-programming-with-akka-actors-46220.html
+  * [[http://jaxenter.com/tutorial-asynchronous-programming-with-akka-actors-46220.html]]
+  *
+  * @author Gary Struthers
   */
-
 class AccountBalanceRestfulRetriever(actors: Map[AccountType, Props]) extends AccountBalanceActor
   with AccountRestfulPartialFunctions {
 

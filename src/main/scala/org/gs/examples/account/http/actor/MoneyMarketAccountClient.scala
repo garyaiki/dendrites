@@ -1,16 +1,20 @@
 package org.gs.examples.account.http.actor
 
-import akka.actor.{ Actor, ActorContext, ActorLogging, ActorRef, ActorSystem, Props }
+import akka.actor.{Actor, ActorContext, ActorLogging, ActorRef, ActorSystem, Props}
 import akka.contrib.pattern.Aggregator
-import akka.event.{ LoggingAdapter, Logging }
+import akka.event.{LoggingAdapter, Logging}
 import akka.pattern.pipe
 import akka.stream.ActorMaterializer
 import com.typesafe.config.Config
 import org.gs.aggregator.actor.ResultAggregator
-import org.gs.examples.account.{ MoneyMarket, MoneyMarketAccountBalances, GetAccountBalances }
-import org.gs.examples.account.http.{ BalancesProtocols, MoneyMarketBalancesClientConfig }
+import org.gs.examples.account.{MoneyMarket, MoneyMarketAccountBalances, GetAccountBalances}
+import org.gs.examples.account.http.{BalancesProtocols, MoneyMarketBalancesClientConfig}
 import org.gs.http.{caseClassToGetQuery, typedQuery, typedFutureResponse}
 
+/**
+  *
+  * @author Gary Struthers
+  */
 class MoneyMarketAccountClient(clientConfig: MoneyMarketBalancesClientConfig) extends Actor with
   BalancesProtocols with ActorLogging {
   import context._

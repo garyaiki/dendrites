@@ -3,24 +3,16 @@
 package org.gs.examples.account.http.actor
 
 import akka.actor._
-import akka.testkit.{ ImplicitSender, TestKit }
-import org.gs._
-import org.gs.examples.account._
-import org.gs.examples.account.http.actor.AccountBalanceRestfulRetriever._
-import org.scalatest.FunSuiteLike
-import org.scalatest.Matchers
+import akka.testkit.{ImplicitSender, TestKit}
+import org.scalatest.{FunSuiteLike, Matchers}
 import scala.concurrent.duration._
 import scala.reflect.runtime.universe._
-import org.gs.reflection._
+import org.gs.examples.account.{Checking, GetCustomerAccountBalances, MoneyMarket, Savings}
+
 /** Sample and test code for the aggregator patter.
   * This is based on Jamie Allen's tutorial at
-  * http://jaxenter.com/tutorial-asynchronous-programming-with-akka-actors-46220.html
+  * [[http://jaxenter.com/tutorial-asynchronous-programming-with-akka-actors-46220.html Actor prog]]
   */
-
-//#demo-code
-
-//#chain-sample
-
 class AccountBalanceRestfulRetrieverSpec extends TestKit(ActorSystem("test")) with ImplicitSender with FunSuiteLike with Matchers {
   val clientConfig = CheckingAccountClient.clientConfig
   val mmClientConfig = MoneyMarketAccountClient.clientConfig

@@ -5,21 +5,21 @@ package org.gs.examples.account.actor
 import akka.actor._
 import akka.contrib.pattern.Aggregator
 import akka.testkit.{ ImplicitSender, TestKit }
-import org.gs._
-import org.gs.examples.account._
-import org.gs.reflection._
 import org.scalatest.FunSuiteLike
 import org.scalatest.Matchers
 import scala.concurrent.duration._
 import scala.math.BigDecimal.int2bigDecimal
 import scala.reflect.runtime.universe._
+import org.gs.isElementEqual
+import org.gs.examples.account.{Checking, GetCustomerAccountBalances, MoneyMarket, Savings}
+import org.gs.reflection._
 
 /** Sample and test code for the aggregator patter.
   * This is based on Jamie Allen's tutorial at
-  * http://jaxenter.com/tutorial-asynchronous-programming-with-akka-actors-46220.html
+  * [[http://jaxenter.com/tutorial-asynchronous-programming-with-akka-actors-46220.html Actor prog]]
   */
-
-class AccountBalanceRetrieverSpec extends TestKit(ActorSystem("test")) with ImplicitSender with FunSuiteLike with Matchers {
+class AccountBalanceRetrieverSpec extends TestKit(ActorSystem("test")) with ImplicitSender
+        with FunSuiteLike with Matchers {
 
   test("Test request 1 account type") {
     val actors = Map(Checking -> Props[CheckingAccountProxy],

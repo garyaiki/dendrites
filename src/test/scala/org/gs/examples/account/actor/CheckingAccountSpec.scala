@@ -1,20 +1,16 @@
 package org.gs.examples.account.actor
 
 import akka.actor._
-import akka.testkit.{ ImplicitSender, TestKit }
-
-import org.scalatest.WordSpecLike
-import org.scalatest.MustMatchers
+import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
+import org.scalatest.{MustMatchers, WordSpecLike}
+import scala.collection.mutable.ArrayBuffer
+import org.gs.examples.account.{AccountType, Checking, CheckingAccountBalances, GetAccountBalances}
 import org.gs.testdriven.StopSystemAfterAll
 
-import scala.collection.mutable.ArrayBuffer
-
-import org.gs.examples.account.AccountType
-import org.gs.examples.account.Checking
-
-import akka.testkit.TestActorRef
-import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances}
-
+/**
+  *
+  * @author Gary Struthers
+  */
 class CheckingAccountSpec extends TestKit(ActorSystem("test"))
     with ImplicitSender
     with WordSpecLike
@@ -35,6 +31,7 @@ class CheckingAccountSpec extends TestKit(ActorSystem("test"))
       
       val proxy = system.actorOf(CheckingAccountProxy.props, "Checking") 
       proxy ! GetAccountBalances(1L)
+
       expectMsg(CheckingAccountBalances[Int](Some(List((3, 15000)))))
     }
   }

@@ -1,6 +1,6 @@
 package org.gs.examples.account.http.actor
 
-import akka.actor.{ Actor, ActorLogging, ActorRef }
+import akka.actor.{Actor, ActorLogging, ActorRef}
 import org.gs.aggregator.actor.{PartialFunctionPlusSender, ResultAggregator}
 import org.gs.examples.account.{ Checking, CheckingAccountBalances, MoneyMarket,
                                  MoneyMarketAccountBalances, Savings, SavingsAccountBalances }
@@ -13,7 +13,7 @@ import org.gs.examples.account.{ Checking, CheckingAccountBalances, MoneyMarket,
  *  val pf = PartialFunction(f)
  *  }}}
  *  
- * @author garystruthers
+ * @author Gary Struthers
  *
  */
 trait AccountRestfulPartialFunctions extends PartialFunctionPlusSender {
