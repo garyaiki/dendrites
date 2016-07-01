@@ -7,12 +7,12 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Flow}
 import akka.stream.testkit.scaladsl.{ TestSink, TestSource}
 import java.util.concurrent.Executors
-import org.scalatest.{ Matchers, WordSpecLike}
+import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.time.SpanSugar._
 import scala.math.BigDecimal.double2bigDecimal
-import org.gs.examples.account.{ GetAccountBalances, MoneyMarketAccountBalances}
+import org.gs.examples.account.{GetAccountBalances, MoneyMarketAccountBalances}
 import org.gs.examples.account.http.{BalancesProtocols, MoneyMarketBalancesClientConfig}
 import org.gs.http.{caseClassToGetQuery, typedQueryResponse}
 

@@ -4,8 +4,8 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
-import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
-import org.scalatest.{ Matchers, WordSpecLike }
+import akka.stream.testkit.scaladsl.{TestSink, TestSource}
+import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._

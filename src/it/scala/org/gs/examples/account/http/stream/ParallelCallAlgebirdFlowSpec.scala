@@ -4,17 +4,17 @@ import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{ Flow, Keep }
-import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
-import com.twitter.algebird.{AveragedValue, HLL }
-import org.scalatest.{ Matchers, WordSpecLike }
+import akka.stream.scaladsl.{Flow, Keep}
+import akka.stream.testkit.scaladsl.{TestSink, TestSource}
+import com.twitter.algebird.{AveragedValue, HLL}
+import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.reflect.runtime.universe
 import org.gs.algebird.stream.{avgFlow, CreateHLLFlow, maxFlow, minFlow}
-import org.gs.examples.account.{extractBalancesVals, GetAccountBalances }
+import org.gs.examples.account.{extractBalancesVals, GetAccountBalances}
 import org.gs.examples.account.stream.extractBalancesFlow
 
 /**

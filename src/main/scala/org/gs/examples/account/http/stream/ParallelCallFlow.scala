@@ -1,7 +1,7 @@
 package org.gs.examples.account.http.stream
 
 import akka.actor.ActorSystem
-import akka.event.{ LoggingAdapter, Logging }
+import akka.event.{LoggingAdapter, Logging}
 import akka.stream.{Materializer, FlowShape, UniformFanOutShape}
 import akka.stream.scaladsl.{ Broadcast, Flow, GraphDSL, ZipWith}
 import org.gs.stream.leftRightFlow
