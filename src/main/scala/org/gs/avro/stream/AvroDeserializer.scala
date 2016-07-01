@@ -4,7 +4,7 @@ import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import org.apache.avro.generic.GenericRecord
 import org.apache.avro.Schema
-import org.gs.avro._
+import org.gs.avro.{byteArrayToGenericRecord, loadSchema}
 
 /** Maps a byteArray first to an Avro GenericRecord, then maps the GenericRecord to a case class
   *
@@ -30,7 +30,7 @@ class AvroDeserializer[A <: Product](filename: String, f:(GenericRecord) => A)
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = 
     new GraphStageLogic(shape) {
       setHandler(in, new InHandler {
-        override def onPush(): Unit = {System.out.println("Avrodeserializer onPull")
+        override def onPush(): Unit = {
           val bytes = grab(in)
           val record = byteArrayToGenericRecord(schema, bytes)
           push(out, f(record))
@@ -38,7 +38,7 @@ class AvroDeserializer[A <: Product](filename: String, f:(GenericRecord) => A)
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {System.out.println("AvroDeserializer onPull")
+        override def onPull(): Unit = {
           pull(in)
         }
       })

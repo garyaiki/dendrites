@@ -29,7 +29,8 @@ class AvroDeserializerSpec extends WordSpecLike {
     "deserialize a case class from a schema and deserialize it back" in {
 
       val serializer = new AvroSerializer("getAccountBalances.avsc", ccToByteArray)
-      val deserializer = new AvroDeserializer("getAccountBalances.avsc", genericRecordToGetAccountBalances)
+      val deserializer = new AvroDeserializer("getAccountBalances.avsc",
+              genericRecordToGetAccountBalances)
       val (pub, sub) = TestSource.probe[GetAccountBalances]
         .via(serializer)
         .via(deserializer)
@@ -41,6 +42,7 @@ class AvroDeserializerSpec extends WordSpecLike {
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
+
       assert(response === gab)
     }
   }

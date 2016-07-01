@@ -3,16 +3,16 @@ package org.gs.avro.stream
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import org.apache.avro.Schema
-import org.gs.avro._
+import org.gs.avro.loadSchema
 
 /** Flow serializes a case class. Read Avro schema, pass it and a case class to f, push serialized
   * object 
   * 
-  * @author Gary Struthers
   * @tparam A case classes and tuples are subtypes of Produce
   * @tparam B type of serialized object, i.e. Array[Byte]
   * @param filename of Avro schema for case class, must be on classpath
   * @param serialization function
+  * @author Gary Struthers
   */
 class AvroSerializer[A <: Product, B](filename: String, f:(Schema, A) => B)
     extends GraphStage[FlowShape[A, B]] {

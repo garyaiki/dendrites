@@ -2,15 +2,14 @@
 package org.gs.avro.stream
 
 import akka.actor.ActorSystem
-import akka.event.{ LoggingAdapter, Logging }
+import akka.event.{LoggingAdapter, Logging}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
-import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
+import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import org.apache.avro.generic.{GenericDatumReader, GenericRecord}
 import org.scalatest.WordSpecLike
 import scala.io.Source._
-import org.gs._
-import org.gs.avro._
+import org.gs.avro.{byteArrayToGenericRecord, ccToByteArray, loadSchema}
 import org.gs.examples.account.GetAccountBalances
 
 /**
@@ -37,14 +36,17 @@ class AvroSerializerSpec extends WordSpecLike {
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
+
       assert(response.length === 1)
       assert(response(0).toString() === "2") // zigzag encoding
+
       val schema = loadSchema("getAccountBalances.avsc")
 
       def record = byteArrayToGenericRecord(schema, response)
       val obj = record.get("id")
       val l:Long = obj.asInstanceOf[Number].longValue
       val gab2 = GetAccountBalances(l)
+
       assert(gab2 === gab)
     }
   }
