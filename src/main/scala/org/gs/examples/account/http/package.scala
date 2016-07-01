@@ -1,10 +1,7 @@
 
 package org.gs.examples.account
 
-/** Classes to configure Account services, an example server using Akka HTTP high level DSL,
- *  Json <=> case class mappings, an object to run server
-  *
-  * Mock functions called by BalancesService
+/** Mock functions called by BalancesService
   *
   * Get dummy CheckingBalances
   * {{{

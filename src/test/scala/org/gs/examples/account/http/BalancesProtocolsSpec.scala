@@ -33,7 +33,8 @@ class BalancesProtocolsSpec extends BalancesProtocols with WordSpecLike{
   "A MoneyMarketAccountBalancesFormat" should {
     "produce the expected Json" in {
       val jsVal = this.moneyMarketAccountBalancesFormat.write(
-        MoneyMarketAccountBalances[BigDecimal](Some(List((3,33000.3), (33,33300.33), (333,33330.33)))))
+        MoneyMarketAccountBalances[BigDecimal](
+            Some(List((3,33000.3), (33,33300.33), (333,33330.33)))))
       jsVal.toString() should equal("""{"balances":[[3,33000.3],[33,33300.33],[333,33330.33]]}""")
     }
   }
@@ -41,7 +42,8 @@ class BalancesProtocolsSpec extends BalancesProtocols with WordSpecLike{
   "A SavingsAccountBalancesFormat" should {
     "produce the expected Json" in {
       val jsVal = this.savingsAccountBalancesFormat.write(
-        SavingsAccountBalances[BigDecimal](Some(List((3,333000.3), (33,333300.33), (333,333330.33)))))
+        SavingsAccountBalances[BigDecimal](
+            Some(List((3,333000.3), (33,333300.33), (333,333330.33)))))
       jsVal.toString() should equal("""{"balances":[[3,333000.3],[33,333300.33],[333,333330.33]]}""")
     }
   }

@@ -8,7 +8,7 @@ import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 
-/** For testing BalancesService, run this before tests
+/** Server for testing BalancesService, run this before tests
   *
   *  @author Gary Struthers
   *

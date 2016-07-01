@@ -33,7 +33,6 @@ class BalancesServiceSpec extends FlatSpec
   val badBalancesQuery = caseClassToGetQuery(badBalanceQuery, badBalanceQuery.productPrefix)
   val q = checkingPath ++ balancesQuery
   val badQ = checkingPath ++ badBalancesQuery
-  println(q)
 
   "BalancesService" should "respond handled = false for single slash query" in {
     Get(s"/") ~> routes ~> check {
