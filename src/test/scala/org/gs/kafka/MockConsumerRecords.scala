@@ -5,7 +5,6 @@ package org.gs.kafka
 import java.util.{ArrayList, HashMap, List => JList}
 import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords}
 import org.apache.kafka.common.TopicPartition
-import org.scalatest._
 
 /** Test topic, partitions, and ConsumerRecords for MockConsumer
   *
@@ -36,5 +35,4 @@ trait MockConsumerRecords {
   map1.put(topicPartition1, cRecordList1)
   val cRecords0 = new ConsumerRecords(map0)
   val cRecords1 = new ConsumerRecords(map1)
-
 }

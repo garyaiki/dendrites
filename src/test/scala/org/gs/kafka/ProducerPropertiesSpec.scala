@@ -4,7 +4,6 @@ import java.util.Properties
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.gs._
 import org.scalatest.WordSpecLike
-import org.scalatest._
 import org.scalatest.Matchers._
 
 class ProducerPropertiesSpec extends WordSpecLike {
@@ -35,6 +34,7 @@ class ProducerPropertiesSpec extends WordSpecLike {
     }
     "create a KafkaProducer" in {
       val producer = new KafkaProducer(prop)
+      producer should not be (null)
       producer.close()
     }
   }

@@ -2,11 +2,14 @@ package org.gs.kafka
 
 import java.util.Properties
 import org.apache.kafka.clients.consumer.KafkaConsumer
-import org.gs.loadProperties
 import org.scalatest.WordSpecLike
-import org.scalatest._
 import org.scalatest.Matchers._
+import org.gs.loadProperties
 
+/**
+  *
+  * @author Gary Struthers
+  */
 class ConsumerPropertiesSpec extends WordSpecLike {
   val prop: Properties = loadProperties("kafkaConsumer.properties")
   "An Properties" should {
@@ -35,6 +38,7 @@ class ConsumerPropertiesSpec extends WordSpecLike {
     }
     "create a KafkaConsumer" in {
       val consumer = new KafkaConsumer(prop)
+      consumer should not be (null)
       consumer.close()
     }
   }
