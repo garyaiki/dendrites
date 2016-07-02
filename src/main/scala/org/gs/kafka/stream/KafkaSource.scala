@@ -55,7 +55,7 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
 
       private var needCommit = false
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {System.out.println(s"KafkaSource onPull needCommit:$needCommit")
+        override def onPull(): Unit = {
           if(needCommit) {
             kafkaConsumer commitSync() //blocks
             needCommit = false
@@ -64,8 +64,7 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
           if(!records.isEmpty()) { // don't push if no record available
             push(out, records)
             needCommit = true
-            System.out.println(s"KafkaSource pushed records:${records.count()}")
-          } else System.out.println(s"KafkaSource empty records isEmpty:${records.isEmpty()}")
+          } else logger.debug("KafkaSource records isEmpty {}", records.isEmpty())
         }
       })
       
