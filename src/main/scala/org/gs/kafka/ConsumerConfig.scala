@@ -3,7 +3,7 @@ package org.gs.kafka
 import java.util.{List => JList, Properties}
 import org.apache.kafka.clients.consumer.Consumer
 
-/** abstract KafkaConsumer factory
+/** Abstract KafkaConsumer configuration and factory
   * 
   * @tparam <K> Kafka ConsumerRecord key
   * @tparam <V> Kafka ConsumerRecord value

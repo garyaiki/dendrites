@@ -2,14 +2,16 @@ package org.gs.kafka
 
 import org.apache.kafka.clients.producer.Producer
 
-/** Abstraction for KafkaProducer
+/** Abstract KafkaProducer configuration
  *
  * 
- * @author Gary Struthers
  * @tparam <K> Kafka ProducerRecord key
  * @tparam <V> Kafka ProducerRecord value
+ *
+ * @author Gary Struthers
+ * 
  */
-trait WrappedProducer[K, V] {
+trait ProducerConfig[K, V] {
   type Key = K
   type Value = V
 

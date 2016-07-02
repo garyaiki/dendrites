@@ -8,7 +8,7 @@ import akka.stream.stage.{ AsyncCallback, GraphStage, GraphStageLogic, InHandler
 import org.apache.kafka.clients.producer.{ Callback, ProducerRecord, RecordMetadata }
 import org.apache.kafka.common.KafkaException
 import org.apache.kafka.common.errors.RetriableException
-import org.gs.kafka.WrappedProducer
+import org.gs.kafka.ProducerConfig
 
 /** Sink stage that writes to Kafka
   *
@@ -32,7 +32,7 @@ import org.gs.kafka.WrappedProducer
   * @tparam V Type of serialized object received from stream and Kafka ProducerRecord value
   * @param wProd extends KafkaProducer with key, value, and topic fields
   */
-class KafkaSink[K, V](wProd: WrappedProducer[K, V])(implicit logger: LoggingAdapter)
+class KafkaSink[K, V](wProd: ProducerConfig[K, V])(implicit logger: LoggingAdapter)
     extends GraphStage[SinkShape[V]] {
 
   val producer = wProd.producer
@@ -88,7 +88,7 @@ class KafkaSink[K, V](wProd: WrappedProducer[K, V])(implicit logger: LoggingAdap
   * Sink.fromGraph promotes KafkaSink from a SinkShape to a Sink
   */
 object KafkaSink {
-  def apply[K, V](producer: WrappedProducer[K, V])(implicit logger: LoggingAdapter):
+  def apply[K, V](producer: ProducerConfig[K, V])(implicit logger: LoggingAdapter):
           Sink[V, NotUsed] = {
     Sink.fromGraph(new KafkaSink[K, V](producer))
   }
