@@ -3,7 +3,7 @@
 package org.gs.kafka.stream
 
 import akka.actor.ActorSystem
-import akka.event.{ LoggingAdapter, Logging }
+import akka.event.{LoggingAdapter, Logging}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import com.typesafe.config.ConfigFactory
@@ -11,12 +11,11 @@ import org.scalatest._
 import org.scalatest.{BeforeAndAfterAll, WordSpecLike}
 import scala.collection.immutable.Iterable
 import scala.concurrent.duration._
-import org.gs._
-import org.gs.avro._
+import org.gs.avro.ccToByteArray
 import org.gs.avro.stream.{AvroDeserializer, AvroSerializer}
 import org.gs.examples.account.GetAccountBalances
-import org.gs.examples.account.avro._
-import org.gs.examples.account.kafka.{AccountConsumerConfig, AccountProducer}
+import org.gs.examples.account.avro.genericRecordToGetAccountBalances
+import org.gs.examples.account.kafka.{AccountConsumer, AccountProducer}
 
 /** Test integration of Kafka with Akka Streams. There are 2 multi-stage flows. The first stream
   * serializes case classes to Avro byteArrays then writes them to Kafka. The second stream reads
@@ -67,7 +66,7 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
   val config = ConfigFactory.load()
   val timeout = config.getLong("dendrites.kafka.account.close-timeout")
   val ap = AccountProducer
-  val accountConsumerConfig = AccountConsumerConfig
+  val accountConsumerConfig = AccountConsumer
   override def beforeAll() {
     
   }

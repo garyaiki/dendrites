@@ -1,13 +1,14 @@
 package org.gs.kafka
 
-import java.util.{ List => JList, Properties }
+import java.util.{List => JList, Properties}
 import org.apache.kafka.clients.consumer.Consumer
 
-/** Abstract configuration of KafkaConsumer
+/** abstract KafkaConsumer factory
   * 
-  * @author Gary Struthers
   * @tparam <K> Kafka ConsumerRecord key
   * @tparam <V> Kafka ConsumerRecord value
+  *
+  * @author Gary Struthers
   */
 trait ConsumerConfig[K, V] {
   type Key = K

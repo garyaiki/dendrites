@@ -1,16 +1,16 @@
 package org.gs.examples.account.kafka
 
 import com.typesafe.config.ConfigFactory
-import org.apache.kafka.clients.consumer.{ Consumer, KafkaConsumer}
+import org.apache.kafka.clients.consumer.{Consumer, KafkaConsumer}
 import scala.collection.JavaConverters._
 import org.gs.loadProperties
 import org.gs.kafka.ConsumerConfig
 
-/** KafkaConsumer specific to account topic
+/** Configure and create KafkaConsumer, subscribe to account topic
   *
   * @author Gary Struthers
   */
-object AccountConsumerConfig extends ConsumerConfig[String, Array[Byte]] {
+object AccountConsumer extends ConsumerConfig[String, Array[Byte]] {
   val props = loadProperties("kafkaConsumer.properties")
   val config = ConfigFactory.load()
   val topic = config getString("dendrites.kafka.account.topic")
