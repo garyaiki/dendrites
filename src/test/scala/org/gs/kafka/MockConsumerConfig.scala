@@ -21,7 +21,7 @@ object MockConsumerConfig extends ConsumerConfig[String, String] with MockConsum
   val topics = List(topic).asJava
   val timeout = 1000L
 
-  def createConsumer(): Consumer[Key, Value] = {
+  def createAndSubscribe(): Consumer[Key, Value] = {
     val mc = new MockConsumer[Key, Value](OffsetResetStrategy.EARLIEST)
     mc.subscribe(topics, new NoOpConsumerRebalanceListener())
     mc.rebalance(topicPartitions)

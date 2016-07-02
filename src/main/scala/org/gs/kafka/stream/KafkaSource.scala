@@ -50,7 +50,7 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
       var kafkaConsumer: Consumer[K, V] = null
 
       override def preStart(): Unit = {
-        kafkaConsumer = consumerConfig createConsumer()
+        kafkaConsumer = consumerConfig.createAndSubscribe()
       }
 
       private var needCommit = false

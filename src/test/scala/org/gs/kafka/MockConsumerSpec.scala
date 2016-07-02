@@ -20,7 +20,7 @@ class MockConsumerSpec extends WordSpecLike {
         
   "A MockConsumer" should {
     "have valid properties" in {
-      val mc = mockConsumerFacade.createConsumer()
+      val mc = mockConsumerFacade.createAndSubscribe()
       val subscription = mc.subscription()
       assert(subscription.contains("akkaKafka"))
       val comsumerRecords = mc.poll(mockConsumerFacade.timeout)
