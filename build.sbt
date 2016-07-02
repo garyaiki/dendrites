@@ -38,7 +38,7 @@ lazy val root = (project in file(".")).
 		   "io.spray" %%  "spray-json" % "1.3.2",
 		   "commons-io" % "commons-io" % "2.5" % "it,test",
 			 "com.chuusai" %% "shapeless" % "2.3.0",
-			 "org.apache.kafka" % "kafka-clients" % "0.9.0.1",
+			 "org.apache.kafka" % "kafka-clients" % "0.10.0.0",
 			 "com.datastax.cassandra" % "cassandra-driver-core" % "3.0.1",
 			 "com.datastax.cassandra" % "cassandra-driver-mapping" % "3.0.1",
 			 "com.datastax.cassandra" % "cassandra-driver-extras" % "3.0.1",

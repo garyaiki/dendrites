@@ -29,7 +29,7 @@ object MockConsumerConfig extends ConsumerConfig[String, String] with MockConsum
     beginningOffsets.put(topicPartition0, 0L)
     beginningOffsets.put(topicPartition1, 0L)
     mc.updateBeginningOffsets(beginningOffsets.asJava)
-    mc.seekToBeginning(topicPartition0, topicPartition1)
+    mc.seekToBeginning(topicPartitions)
     val it0 = cRecordList0.iterator()
     while (it0.hasNext()) mc.addRecord(it0.next())
     val it1 = cRecordList1.iterator()
