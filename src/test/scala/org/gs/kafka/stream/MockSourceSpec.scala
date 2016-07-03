@@ -1,16 +1,15 @@
 package org.gs.kafka.stream
 
 import akka.actor.ActorSystem
-import akka.event.{ LoggingAdapter, Logging }
+import akka.event.{LoggingAdapter, Logging}
 import akka.stream.{ActorMaterializer, Graph, SourceShape}
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords}
 import org.apache.kafka.common.TopicPartition
 import org.scalatest.WordSpecLike
-import org.scalatest._
 import org.scalatest.Matchers._
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import org.gs.kafka.MockConsumerConfig
 
