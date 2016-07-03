@@ -42,10 +42,9 @@ lazy val root = (project in file(".")).
 			 "com.datastax.cassandra" % "cassandra-driver-core" % "3.0.1",
 			 "com.datastax.cassandra" % "cassandra-driver-mapping" % "3.0.1",
 			 "com.datastax.cassandra" % "cassandra-driver-extras" % "3.0.1",
-			 "com.datastax.spark" %% "spark-cassandra-connector" % "1.6.0-M2",
 			 "org.apache.avro" % "avro" % "1.8.0",
 			 "com.google.guava" % "guava" % "19.0",
-			 "com.github.thurstonsand" %% "scalacass" % "0.1"
+			 "com.github.thurstonsand" %% "scalacass" % "0.3.3"
 		),
 		javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
 		scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-feature"),
