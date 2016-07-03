@@ -24,13 +24,18 @@ import org.gs.kafka.ProducerConfig
   * If a RecordMetadata was returned it means success so an AsynCallback is called that pulls a
   * record from upstream. If an exception was returned a different AsynCallback is called that
   * deals with 2 types of exceptions, RetriableException and KafkaException.
+  *
   * RetriableException is when there was a fleeting error that may not recur so resend the message.
+  * This will keep retrying indefinitely until stream or other container times out.
+  *
   * A KafkaException is logged and rethrown.  
   *
-  * @author Gary Struthers
   * @tparam K Kafka ProducerRecord key
   * @tparam V Type of serialized object received from stream and Kafka ProducerRecord value
   * @param wProd extends KafkaProducer with key, value, and topic fields
+  *
+  * @author Gary Struthers
+  * 
   */
 class KafkaSink[K, V](wProd: ProducerConfig[K, V])(implicit logger: LoggingAdapter)
     extends GraphStage[SinkShape[V]] {
@@ -50,7 +55,7 @@ class KafkaSink[K, V](wProd: ProducerConfig[K, V])(implicit logger: LoggingAdapt
       def asyncExceptions(pRecord: ProducerRecord[K, V], callback: Callback)(e: Exception): Unit = {
         e match {
           case e: RetriableException => {
-            logger warning("Kafka send retryable exception, attempt retry {}", e.getMessage)
+            logger debug("Kafka send retryable exception, attempt retry {}", e.getMessage)
               producer send(pRecord, callback)          
           }
           case e: KafkaException => {

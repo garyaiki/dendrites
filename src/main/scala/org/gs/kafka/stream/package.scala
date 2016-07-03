@@ -4,10 +4,10 @@ package org.gs.kafka
 
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, UnzipWith, UnzipWith2, UnzipWithApply}
-import scala.collection.JavaConverters._
 import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords}
 import org.apache.kafka.common.TopicPartition
 import scala.collection.immutable.Queue
+import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 
 /** Stream classes for KafkaSource, KafkaSink, ConsumerRecord queue stages.
@@ -67,7 +67,6 @@ package object stream {
     * @return records in a queue
     */
   def extractRecords[K, V](records: ConsumerRecords[K,V]): Queue[ConsumerRecord[K, V]] = {
-    System.out.println(s"extractRecords:${records.count()}")
     val it = records.iterator().asScala
     queueRecords[K, V](it)
   }
@@ -76,7 +75,6 @@ package object stream {
     * one ConsumerRecord at a time 
     *
     * @see [[org.gs.examples.account]]
-    * @example [[org.gs.kafka.stream.ConsumerRecordsFlowSpec]]
     *
     * @tparam K key type
     * @tparam V value type
@@ -111,7 +109,6 @@ package object stream {
 
   /** Map a ConsumerRecord to just its value */
   def extractValue[K, V](record: ConsumerRecord[K,V]): V = {
-    System.out.println(s"extractValue offset:${record.offset()}")
     record.value()
   }
 

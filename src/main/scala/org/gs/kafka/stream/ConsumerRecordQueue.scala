@@ -10,9 +10,10 @@ import scala.collection.immutable.Queue
   * Flow that uses a queue to send Kafka messages one at a time. A Queue[ConsumerRecord] is pushed
   * from upstream, when downstream pulls 1 ConsumerRecord is dequeued and pushed downstream
   * 
-  * @author Gary Struthers
   * @tparam K Kafka ConsumerRecord key
   * @tparam V Kafka ConsumerRecord value
+  *
+  * @author Gary Struthers
   */
 class ConsumerRecordQueue[K, V]() extends
     GraphStage[FlowShape[Queue[ConsumerRecord[K, V]], ConsumerRecord[K, V]]] {
@@ -31,21 +32,20 @@ class ConsumerRecordQueue[K, V]() extends
       private var q: Queue[ConsumerRecord[K, V]] = null
 
       def doQ(queue: Queue[ConsumerRecord[K, V]]): Unit = {
-        System.out.println("ConsumerRecordQueue doQ")
         val (consumerRecord, tail) = queue.dequeue
         q = tail
         push(out, consumerRecord)
       }
 
       setHandler(in, new InHandler {
-        override def onPush(): Unit = {System.out.println("ConsumerRecordQueue onPush")
+        override def onPush(): Unit = {
           q = grab(in)
           if(q != null || !q.isEmpty) doQ(q)
         }
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {System.out.println("ConsumerRecordQueue onPull")
+        override def onPull(): Unit = {
           if(q == null || q.isEmpty) pull(in) else doQ(q)
         }
       })

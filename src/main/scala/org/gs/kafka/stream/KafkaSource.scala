@@ -10,11 +10,12 @@ import org.gs.kafka.ConsumerConfig
 
 /** Source stage that reads from Kafka
   *
-  *  KafkaSource calls KafkaConsumer.poll() which reads all available messages into a ConsumerRecords
+  * KafkaSource calls KafkaConsumer.poll() which reads all available messages into a ConsumerRecords
   * if it's not empty it's pushed to the next stage. KafkaSource receives an onPull when the stream
   * starts and when all messages in the last poll() have been processed. This uses KafkaConsumer's
   * commitSync after all messages from the last poll() have been processed.
-  * Kafka commitSync was meant to confirme that messages have been read. But in an Akka Stream it
+  *
+  * Kafka commitSync was meant to confirm that messages have been read. But in an Akka Stream it
   * can confirm all messages have been processed. If there is a thrown exception or a timeout
   * commitSync won't be called. So messages that weren't committed will be retried.
   * 
@@ -26,11 +27,10 @@ import org.gs.kafka.ConsumerConfig
   * KafkaConsumer is single threaded and is created and closed with the stream, as opposed to
   * KafkaProducer which should be reused by other streams and processes.
   *
-  * @author Gary Struthers
-  *
   * @tparam K Kafka key
   * @tparam V Kafka value
   * @param consumerConfig a consumer,or mock consumer, factory with properties, topics, timeout
+  * @author Gary Struthers
   */
 class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logger: LoggingAdapter)
     extends GraphStage[SourceShape[ConsumerRecords[K, V]]]{
