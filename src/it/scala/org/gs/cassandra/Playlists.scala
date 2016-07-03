@@ -1,6 +1,6 @@
 package org.gs.cassandra
 
-import com.datastax.driver.core.{ BoundStatement, PreparedStatement, ResultSet, Row, Session }
+import com.datastax.driver.core.{BoundStatement, PreparedStatement, ResultSet, Row, Session}
 import com.weather.scalacass._
 import com.weather.scalacass.ScalaCass._
 import java.util.UUID
@@ -10,8 +10,8 @@ import scala.collection.JavaConverters._
   * a table, an insert PreparedStatement, a Query PreparedStatement, a case class, an insert
   * BoundStatement, a Query BoundStatement, and a ScalaCass Row to case class conversion
   *
-  * @see http://docs.datastax.com/en/latest-pdf-java-driver?permalinkv1
-  * @see https://github.com/thurstonsand/scala-cass
+  * @see [[http://docs.datastax.com/en/latest-pdf-java-driver?permalinkv1 java-driver]]
+  * @see [[https://github.com/thurstonsand/scala-cass scala-cass]]
   * @author Gary Struthers
   *
   */
@@ -19,7 +19,7 @@ object Playlists {
 
   val table = "playlists"
 
-  /** Create Playlist table asychronously. executeAsync returns a ResultSetFuture which extends
+  /** Create Playlist table asynchronously. executeAsync returns a ResultSetFuture which extends
     * Guava ListenableFuture. getUninterruptibly is the preferred way to complete the future
     * @param session
     * @param schema

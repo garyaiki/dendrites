@@ -3,11 +3,13 @@ package org.gs.cassandra.stream
 import com.datastax.driver.core.{BoundStatement, Cluster, PreparedStatement, ResultSet, Session}
 import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy, RetryPolicy}
 import java.util.{HashSet => JHashSet, UUID}
-import org.scalatest._
-import org.scalatest.{BeforeAndAfterAll, WordSpecLike}
-import org.gs.cassandra._
+import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import org.gs.cassandra.{Playlists, PlaylistSongConfig, Songs}
 import org.gs.cassandra.Playlists._
 import org.gs.cassandra.Songs._
+import org.gs.cassandra.{close, connect, createCluster, createLoadBalancingPolicy, createSchema}
+import org.gs.cassandra.{dropSchema, executeBoundStmt, initLoadBalancingPolicy, logMetadata}
+import org.gs.cassandra.registerQueryLogger
 
 class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   val myConfig = PlaylistSongConfig
@@ -36,11 +38,13 @@ class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   "A Cassandra client" should {
     "create a Song table" in {
       val songTRS = Songs.createTable(session, schema)
+
       songTRS shouldBe a [ResultSet]
     }
 
     "create a Playlist table" in {
       val playlistTRS = Playlists.createTable(session, schema)
+
       playlistTRS shouldBe a [ResultSet]
     }
   }
@@ -49,6 +53,7 @@ class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
       val prepStmt = Songs.songsPrepInsert(session, schema)
       val bndStmt = songToBndInsert(prepStmt, song)
       val rs = executeBoundStmt(session, bndStmt)
+
       rs shouldBe a [ResultSet]
   }
 
@@ -56,6 +61,7 @@ class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
       val prepStmt = Playlists.playlistsPrepInsert(session, schema)
       val bndStmt = playlistToBndInsert(prepStmt, playlist)
       val rs = executeBoundStmt(session, bndStmt)
+
       rs shouldBe a [ResultSet]
   }
 
@@ -64,6 +70,7 @@ class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
       val bndStmt = songToBndQuery(prepStmt, song.id)
       val rs = executeBoundStmt(session, bndStmt)
       val row = rs.one()
+
       assert(rowToSong(row) === song)
   }
 
@@ -72,6 +79,7 @@ class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
       val bndStmt = playlistToBndQuery(prepStmt, plId)
       val rs = executeBoundStmt(session, bndStmt)
       val row = rs.one()
+
       assert(rowToPlaylist(row) === playlist)
   }
 
@@ -79,5 +87,4 @@ class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
     dropSchema(session, schema)
     close(session, cluster)
   }
-
 }

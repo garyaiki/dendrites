@@ -1,17 +1,17 @@
 package org.gs.cassandra.stream
 
 import akka.event.LoggingAdapter
-import akka.stream.{Attributes, FlowShape, Inlet, Outlet }
+import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.datastax.driver.core.{ResultSet, Row}
 import scala.collection.JavaConversions.asScalaIterator
 import scala.collection.mutable.ArrayBuffer
 
-/** Page specified number of Rows from a ResultSet 
+/** Send a Page of specified number of Rows from a ResultSet 
   *
-  * @author Gary Struthers
   * @param pageSize number of Rows to send downstream
   * @param implicit logger
+  * @author Gary Struthers
   */
 class CassandraPaging(pageSize: Int)(implicit logger: LoggingAdapter)
     extends GraphStage[FlowShape[ResultSet, Seq[Row]]]{

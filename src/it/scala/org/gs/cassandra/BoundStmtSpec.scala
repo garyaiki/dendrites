@@ -3,9 +3,7 @@ package org.gs.cassandra
 import com.datastax.driver.core.{BoundStatement, Cluster, PreparedStatement, ResultSet, Session}
 import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy, RetryPolicy}
 import java.util.{HashSet => JHashSet, UUID}
-import org.scalatest._
-import org.scalatest.{BeforeAndAfterAll, WordSpecLike}
-import org.gs.cassandra._
+import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import org.gs.cassandra.Playlists._
 import org.gs.cassandra.Songs._
 
@@ -79,5 +77,4 @@ class BoundStmtSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
     dropSchema(session, schema)
     close(session, cluster)
   }
-
 }

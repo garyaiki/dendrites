@@ -1,18 +1,18 @@
 package org.gs.cassandra.stream
 
 import akka.event.LoggingAdapter
-import akka.stream.{Attributes, FlowShape, Inlet, Outlet }
+import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.datastax.driver.core.{BoundStatement, PreparedStatement}
 
-/** Create Cassandra BoundStatement from a PreparedStatement and a Product (superclass of case class
+/** Create BoundStatement from a PreparedStatement and a Product (superclass of case class
   * and tuple) 
   *
-  * @author Gary Struthers
   * @param stmt PreparedStatement that has been pre-parsed by the database
   * @param f function to create BoundStatement from PreparedStatement and Product which contains
   * values to bind
   * @param implicit logger
+  * @author Gary Struthers
   */
 class CassandraBind[A](stmt: PreparedStatement, f:(PreparedStatement, A) => BoundStatement)
         (implicit logger: LoggingAdapter)

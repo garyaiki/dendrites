@@ -2,6 +2,7 @@ package org.gs.cassandra
 
 import com.typesafe.config.ConfigFactory
 
+/** Example configuration for testing */
 object PlaylistSongConfig extends CassandraConfig {
   val config = ConfigFactory.load()
   val ipAddress = config.getString("dendrites.cassandra.ipAddress")

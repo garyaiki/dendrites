@@ -2,18 +2,18 @@ package org.gs.cassandra.stream
 
 import akka.NotUsed
 import akka.event.LoggingAdapter
-import akka.stream.{ Attributes, Inlet, SinkShape }
+import akka.stream.{Attributes, Inlet, SinkShape}
 import akka.stream.scaladsl.Sink
-import akka.stream.stage.{ GraphStage, GraphStageLogic, InHandler }
+import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler}
 import com.datastax.driver.core.{BoundStatement, Session}
 
 /** Execute Cassandra BoundStatements that don't return Rows (Insert, Update, Delete). Values are
   * bound to the statement in the previous stage. BoundStatements can be for different queries.
   *
-  * @author Gary Struthers
   * @param session is long lived, it's created sometime before the stream and closed sometime after
   * the stream and may be used with other clients
   * @param implicit logger
+  * @author Gary Struthers
   */
 class CassandraSink(session: Session)(implicit logger: LoggingAdapter)
     extends GraphStage[SinkShape[BoundStatement]] {

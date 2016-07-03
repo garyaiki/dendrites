@@ -2,7 +2,6 @@ package org.gs
 
 import _root_.akka.actor.ActorSystem
 import _root_.akka.event.Logging
-import com.datastax.driver.core.Cluster
 import com.datastax.driver.core.{BatchStatement, BoundStatement, CloseFuture, Cluster, Host}
 import com.datastax.driver.core.{Metadata, QueryLogger, PreparedStatement, ResultSet, Row, Session}
 import com.datastax.driver.core.policies.{DCAwareRoundRobinPolicy, DefaultRetryPolicy}
@@ -16,9 +15,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
 import org.gs.concurrent.listenableFutureToScala
 
-/** CassandraConfig configuration trait for Cassandra Java Driver
+/** Common functions for Cassandra Java Driver
   *
-  * Create Cassandra Cluster (for development).
+  * Create single node Cassandra Cluster.
   * {{{
   * val config = ConfigFactory.load()
   * val ipAddress = config.getString("dendrites.cassandra.ipAddress")
@@ -61,7 +60,7 @@ import org.gs.concurrent.listenableFutureToScala
   * {{{
   * val plPreStmt = selectAll(session, schema, Playlists.table)
   * }}}
-  * Asychronously execute a BoundStatement
+  * Asynchronously execute a BoundStatement
   * {{{
   * val selAllRS = executeBoundStmt(session, new BoundStatement(plPreStmt))
   * }}}
@@ -82,7 +81,7 @@ package object cassandra {
   implicit val system = ActorSystem("dendrites")
   implicit val logger = Logging(system, getClass)
 
-  /** Create Cassandra Cluster (for development).
+  /** Create single node Cassandra Cluster.
     *
     * @see [[http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/Cluster.Builder.html Builder]]
     * @see [[http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/Cluster.html Cluster]]
@@ -192,7 +191,7 @@ package object cassandra {
       session.prepare("SELECT * FROM " + schema + "." + table + ";")
   }
 
-  /** Asychronously execute a BoundStatement
+  /** Asynchronously execute a BoundStatement
     *
     * @param session
     * @param bndStmt with values previously bound

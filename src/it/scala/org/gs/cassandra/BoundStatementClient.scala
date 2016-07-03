@@ -2,8 +2,8 @@ package org.gs.cassandra
 
 import akka.actor.ActorSystem
 import akka.event.Logging
-import com.typesafe.config.ConfigFactory
 import com.datastax.driver.core.{BoundStatement, PreparedStatement, Session}
+import com.typesafe.config.ConfigFactory
 import java.util.{HashSet => JHashSet, UUID}
 
 class BoundStatementClient() {
