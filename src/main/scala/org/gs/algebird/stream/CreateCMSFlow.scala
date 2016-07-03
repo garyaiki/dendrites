@@ -26,7 +26,7 @@ class CreateCMSFlow[K: Ordering: CMSHasher] extends GraphStage[FlowShape[Seq[K],
           push(out, createCountMinSketch(elem))
         }
       })
-  
+
       setHandler(out, new OutHandler {
         override def onPull(): Unit = {
           pull(in)

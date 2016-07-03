@@ -1,14 +1,15 @@
 package org.gs.examples.account
 
 import org.apache.avro.generic.GenericRecord
+
 /** Avro functions for account examples
   *
   * Map Avro GenericRecord to GetAccountBalances
   * {{{
   * val deserializer = new AvroDeserializer("getAccountBalances.avsc",
   *         genericRecordToGetAccountBalances)
-  * }}} 
-  */ 
+  * }}}
+  */
 package object avro {
 
     def genericRecordToGetAccountBalances(record: GenericRecord): GetAccountBalances = {

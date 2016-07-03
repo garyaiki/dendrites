@@ -1,11 +1,9 @@
 package org.gs.examples.account.actor
 
-import akka.actor.{Actor, ActorContext, ActorLogging }
-import akka.actor._
+import akka.actor.{Actor, ActorContext, ActorLogging, Props }
 import akka.contrib.pattern.Aggregator
 import org.gs.aggregator.actor.ResultAggregator
 import org.gs.examples.account.{Checking, CheckingAccountBalances, GetAccountBalances}
-import CheckingAccountProxy._
 
 class CheckingAccountProxy extends Actor with ActorLogging {
   /*

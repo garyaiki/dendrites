@@ -1,10 +1,8 @@
 package org.gs.examples.account.actor
 
+import akka.actor.{Actor, ActorRef, Props}
 import scala.collection.immutable.Set
 import scala.concurrent.duration._
-
-import akka.actor.{Actor, ActorRef, Props}
-
 import org.gs.aggregator.actor.{ PartialFunctionPlusSender, ResultAggregator, TimedOut}
 import org.gs.examples.account.{AccountType, Checking, GetAccountBalances, MoneyMarket, Savings}
 
@@ -36,7 +34,7 @@ trait AccountBalanceActor extends Actor
         case MoneyMarket ⇒ fetchResult(actors.get(MoneyMarket).get, pf, msg, originalSender)
       }
     else collectResults(originalSender)
-    
+
     system.scheduler.scheduleOnce(3.second, self, TimedOut)
     expect {
       case TimedOut ⇒ collectResults(originalSender, force = true)

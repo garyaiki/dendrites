@@ -23,7 +23,7 @@ class CassandraSink(session: Session)(implicit logger: LoggingAdapter)
 
   /** When upstream pushes a BoundStatement execute it asynchronously and use Cassandra's preferred
     * getUniterruptibly method on ResultSetFuture. Then pull another BoundStatement
-    * 
+    *
     * @param inheritedAttributes
     */
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {

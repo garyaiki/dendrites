@@ -1,4 +1,3 @@
 package org.gs.avro
 
-trait Stub { 
-}
+trait Stub

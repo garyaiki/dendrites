@@ -1,11 +1,9 @@
 package org.gs.examples.account.actor
 
-import akka.actor.{ Actor, ActorContext, ActorLogging }
-import akka.actor._
+import akka.actor.{Actor, ActorContext, ActorLogging, Props}
 import akka.contrib.pattern.Aggregator
 import org.gs.aggregator.actor.ResultAggregator
-import org.gs.examples.account.{ GetAccountBalances, Savings, SavingsAccountBalances }
-import SavingsAccountProxy._
+import org.gs.examples.account.{GetAccountBalances, Savings, SavingsAccountBalances}
 
 class SavingsAccountProxy extends Actor with ActorLogging {
   /*

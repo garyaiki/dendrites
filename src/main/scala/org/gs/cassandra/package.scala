@@ -76,7 +76,7 @@ import org.gs.concurrent.listenableFutureToScala
   * {{{
   * close(session, cluster)
   * }}}
-  */  
+  */
 package object cassandra {
   implicit val system = ActorSystem("dendrites")
   implicit val logger = Logging(system, getClass)
@@ -85,11 +85,11 @@ package object cassandra {
     *
     * @see [[http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/Cluster.Builder.html Builder]]
     * @see [[http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/Cluster.html Cluster]]
-    * @param node Internet address of initial Cassandra node 
+    * @param node Internet address of initial Cassandra node
     * @return cluster
     */
   def createCluster(node: String): Cluster = Cluster.builder().addContactPoint(node).build()
-  
+
   /** Create Cluster with multiple host nodes and a RetryPolicy
     *
     * @see [[https://docs.oracle.com/javase/8/docs/api/index.html?java/net/InetAddress.html InetAddress]]
@@ -114,8 +114,8 @@ package object cassandra {
     val it = hosts.iterator()
     while(it.hasNext()) {
       val h = it.next()
-      logger.debug(s"Datacenter:${h.getDatacenter()} host:${h.getAddress} rack:${h.getRack()}") 
-    }    
+      logger.debug(s"Datacenter:${h.getDatacenter()} host:${h.getAddress} rack:${h.getRack()}")
+    }
   }
 
   /** Enable logging of RegularStatement, BoundStatement, BatchStatement queries
@@ -156,9 +156,9 @@ package object cassandra {
     *
     * @see [[http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/Session.html Session]]
     * @param cluster
-    * @param keyspace Specify only if keyspace exists 
+    * @param keyspace Specify only if keyspace exists
     * @return Session
-  */
+		*/
   def connect(cluster: Cluster, keyspace: Option[String] = None): Session = {
     keyspace match {
       case Some(x) => cluster.connect(x)
@@ -177,9 +177,9 @@ package object cassandra {
   def createSchema(session: Session, schema: String, strategy: String, repCount: Int): ResultSet = {
     val rsf = session.executeAsync("CREATE KEYSPACE IF NOT EXISTS " + schema + " WITH replication"
         + "= {'class': '" + strategy + "', 'replication_factor':" + repCount + "};")
-    rsf.getUninterruptibly() 
+    rsf.getUninterruptibly()
   }
-  
+
   /** Create a PreparedStatement to return all rows of a table
     *
     * @param session

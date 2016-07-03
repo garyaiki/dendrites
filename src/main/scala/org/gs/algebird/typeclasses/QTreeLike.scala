@@ -4,15 +4,14 @@ package org.gs.algebird.typeclasses
 
 import annotation.implicitNotFound
 import com.twitter.algebird.QTree
-import org.gs.algebird._
 
 /** Provide 1 argument QTree factory so other QTree types can be created while traversing a Sequence
   *
   * QTree provides 1 arg apply for Double and Long.
   * These sum the original types
   *
-  * @author garystruthers
   * @tparam A convertable to Double or Long
+  * @author Gary Struthers
   */
 @implicitNotFound(msg = "Cannot find QTreeLike type class for ${A}")
 trait QTreeLike[A] {

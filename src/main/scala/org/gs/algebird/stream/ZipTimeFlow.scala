@@ -2,14 +2,12 @@ package org.gs.algebird.stream
 
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
-//import java.time.Instant
 
 /** Flow that generates elem/time tuples from elem. Meant for DecayedValues
   *
-  * @author Gary Struthers
-  *
   * @tparam A Numeric
-  * @param f produces time, arg:A is ignorable
+  * @param f produces time, arg:A is ignoreable
+  * @author Gary Struthers
   */
 class ZipTimeFlow[A: Numeric](f: A => Double)
         extends GraphStage[FlowShape[Seq[A], Seq[(Double, Double)]]] {
@@ -19,7 +17,7 @@ class ZipTimeFlow[A: Numeric](f: A => Double)
   override val shape = FlowShape.of(in, out)
 
   def toZipTime(xs: Seq[A]): Seq[(Double, Double)] =
-    xs.map(x => (x.asInstanceOf[Number].doubleValue(), f(x)))//Instant.now.toEpochMilli.toDouble))
+    xs.map(x => (x.asInstanceOf[Number].doubleValue(), f(x)))// Instant.now.toEpochMilli.toDouble))
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
@@ -29,7 +27,7 @@ class ZipTimeFlow[A: Numeric](f: A => Double)
           push(out, toZipTime(elem))
         }
       })
-  
+
       setHandler(out, new OutHandler {
         override def onPull(): Unit = {
           pull(in)

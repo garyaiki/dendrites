@@ -23,7 +23,7 @@ package object concurrent {
     *
     * @see [[https://github.com/google/guava/wiki/ListenableFutureExplained ListenableFutureExplained]]
     * @param lf ListenableFuture
-    * @return completed Scala Future  
+    * @return completed Scala Future
     */
   def listenableFutureToScala[T](lf: ListenableFuture[T]): Future[T] = {
     val p = Promise[T]()
@@ -32,5 +32,5 @@ package object concurrent {
       def onSuccess(result: T): Unit    = p success result
     })
     p.future
-  }  
+  }
 }

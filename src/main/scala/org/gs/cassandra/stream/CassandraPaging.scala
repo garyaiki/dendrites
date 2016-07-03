@@ -7,7 +7,7 @@ import com.datastax.driver.core.{ResultSet, Row}
 import scala.collection.JavaConversions.asScalaIterator
 import scala.collection.mutable.ArrayBuffer
 
-/** Send a Page of specified number of Rows from a ResultSet 
+/** Send a Page of specified number of Rows from a ResultSet
   *
   * @param pageSize number of Rows to send downstream
   * @param implicit logger
@@ -23,13 +23,13 @@ class CassandraPaging(pageSize: Int)(implicit logger: LoggingAdapter)
   /** When a ResultSet is pushed from upstream get its iterator and push
     * pageSize number of Rows. When downstream pulls, forward pull upstream if iterator is empty. If
     * iterator has elements push pageSize number of Rows. When iterator isEmpty set Iterator.empty
-    * 
+    *
     * @param inheritedAttributes
     */
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
       var it: Iterator[Row] = Iterator.empty
-      
+
       def pageRows(): Seq[Row] = {
         val pageIt = it.take(pageSize)
         if(it.isEmpty) it = Iterator.empty
@@ -42,7 +42,7 @@ class CassandraPaging(pageSize: Int)(implicit logger: LoggingAdapter)
           push(out, pageRows())
         }
       })
-      
+
       setHandler(out, new OutHandler {
         override def onPull(): Unit = {
           if(it.isEmpty) {

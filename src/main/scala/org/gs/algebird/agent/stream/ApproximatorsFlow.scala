@@ -15,8 +15,6 @@ import org.gs.algebird.stream.{CreateCMSFlow, CreateHLLFlow, ZipTimeFlow}
 import org.gs.algebird.stream.avgFlow
 import org.gs.algebird.typeclasses.HyperLogLogLike
 
-
-
 /** Update Algebird approximators concurrently
   * Input a Seq[A] broadcast it to Agents for Algebird approximaters then zip the latest values of
   * the agents.
@@ -52,7 +50,7 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
   val hllAgentAlter = hllAgent.alter _
   val qtrAgentAlter = qtrAgent.alter _
 
-  //Asychronous flow stages to update agents 
+  // Asynchronous flow stages to update agents
   def avgAgflow: Flow[AveragedValue, AveragedValue, NotUsed] =
         Flow[AveragedValue].mapAsync(1)(avgAgentAlter)
 

@@ -77,7 +77,7 @@ import org.gs.algebird.typeclasses.QTreeLike
   *  .run()
   * }}}
   * == QTree == `org.gs.algebird.stream.QTreeFlowSpec`
-  * Find max value in a QTree 
+  * Find max value in a QTree
   * {{{
   * def sourceBI = TestSource.probe[QTree[BigInt]]
   * def sinkD = TestSink.probe[Double]

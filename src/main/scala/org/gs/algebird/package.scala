@@ -60,7 +60,7 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * val acceptable = falsePositives.size < words.size * fpProb
   * }}}
   * == CountMinSketch ==
-  * 
+  *
   * Test data is IP addresses repeated a random number of times `org.gs.algebird.CountMinSketchSpec`
   * Estimate total number of elements seen so far `org.gs.fixtures.InetAddressesBuilder`
   * {{{
@@ -91,7 +91,7 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * }}}
   *
   * == DecayedValue ==
-  * 
+  *
   * Test data is a sine wave with a value for each of 360 degrees with a corresponding time value
   * The idea is a rising and falling value over a year `org.gs.fixtures.TrigUtils`
   *
@@ -151,7 +151,7 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * }}}
   *
   * == QTree ==
-  * 
+  *
   * Build QTree from a Sequence `org.gs.algebird.fixtures.QTreeBuilder`
   * {{{
   * val level = 5
@@ -224,7 +224,7 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   * }}}
   *
   * == Monoid ==
-  * Extends Semigroup with a zero element `org.gs.algebird.MonoidSpec` 
+  * Extends Semigroup with a zero element `org.gs.algebird.MonoidSpec`
   * Sum sequence elements for a type that has a zero under addition.
   * {{{
   * val doubles: Seq[Double]
@@ -595,6 +595,7 @@ package object algebird {
     val l: Long = java.lang.Double.doubleToLongBits(d)
     java.nio.ByteBuffer.allocate(8).putLong(l).array()
   }
+
   implicit val cmsHasherDouble: CMSHasher[Double] =
     CMSHasherArrayByte.contramap((d: Double) => doubleToArrayBytes(d))
 

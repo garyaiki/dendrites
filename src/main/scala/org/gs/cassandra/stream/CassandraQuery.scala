@@ -23,12 +23,12 @@ class CassandraQuery(session: Session, fetchSize: Int = 0)(implicit logger: Logg
 
   /** When upstream pushes a BoundStatement execute it asynchronously and use Cassandra's preferred
     * getUniterruptibly method on ResultSetFuture. Then push the ResultSet
-    * 
+    *
     * @param inheritedAttributes
     */
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
-  
+
       setHandler(in, new InHandler {
         override def onPush(): Unit = {
           val boundStatement = grab(in)
@@ -39,7 +39,7 @@ class CassandraQuery(session: Session, fetchSize: Int = 0)(implicit logger: Logg
           push(out, rs)
         }
       })
-      
+
       setHandler(out, new OutHandler {
         override def onPull(): Unit = {
           pull(in)

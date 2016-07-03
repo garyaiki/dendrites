@@ -3,7 +3,7 @@ package org.gs
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import org.apache.avro.Schema
 import org.apache.avro.generic.{GenericData, GenericDatumReader, GenericDatumWriter, GenericRecord}
-import org.apache.avro.io.{ Decoder, DecoderFactory, Encoder, EncoderFactory }
+import org.apache.avro.io.{Decoder, DecoderFactory, Encoder, EncoderFactory}
 import scala.io.Source
 import scala.io.Source._
 
@@ -26,8 +26,8 @@ import scala.io.Source._
   *    override def onPush(): Unit = {
   *      val bytes = grab(in)
   *      val record = byteArrayToGenericRecord(schema, bytes)
-  *      push(out, f(record)) // f:(GenericRecord) => A maps GenericRecord to case class 
-       }
+  *      push(out, f(record)) 
+  *    }
   *  })
   * }}}
   */
@@ -36,7 +36,7 @@ package object avro {
   /** Load Avro Schema from file
     *
     * @param filename must be in classpath
-    * @param filepath, / for default src/main/resources
+    * @param filepath, '/' for default src/main/resources
     * @return Schema
     */
   def loadSchema(filename: String, path: String = "/"): Schema = {
