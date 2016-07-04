@@ -65,7 +65,8 @@ package object gs {
 
   /** Read Properties file
     *
-    * @param filename must be in classpath, default src/main/resources
+    * @param filename, must be in classpath,
+    * @param path, default src/main/resources
     * @return Properties object
     */
   def loadProperties(filename: String, path: String = "/"): Properties = {
