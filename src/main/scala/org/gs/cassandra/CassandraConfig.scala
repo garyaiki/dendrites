@@ -17,8 +17,8 @@ trait CassandraConfig {
 
   /** Get cluster's node addresses
     * @see [[https://docs.oracle.com/javase/8/docs/api/index.html?java/net/InetAddress.html InetAddress]]
-		* @return Java Collection of node addresses
-		*/
+    * @return Java Collection of node addresses
+    */
   def getInetAddresses(): JCollection[InetAddress] = {
     val list = for {
       a <- ipAddresses

@@ -158,7 +158,7 @@ package object cassandra {
     * @param cluster
     * @param keyspace Specify only if keyspace exists
     * @return Session
-		*/
+    */
   def connect(cluster: Cluster, keyspace: Option[String] = None): Session = {
     keyspace match {
       case Some(x) => cluster.connect(x)

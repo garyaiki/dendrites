@@ -14,13 +14,13 @@ import akka.stream.scaladsl.Flow
   *   val (pub2, sub2) = source2
   *    .via(extractBalancesFlow)
   *    .toMat(sink2)(Keep.both).run()
-  * }}}    
-  * @author Gary Struthers
+  * }}}
   * @see [[org.gs.examples.account]] package object for the functions these Flows wrap
+  * @author Gary Struthers
   */
 package object stream {
 
-  /** Flow to extract a list of balances 
+  /** Flow to extract a list of balances
     *
     * @see [[org.gs.examples.account]]
     *

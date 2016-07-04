@@ -2,10 +2,10 @@ package org.gs.kafka.stream
 
 import akka.NotUsed
 import akka.event.LoggingAdapter
-import akka.stream.{ Attributes, Inlet, SinkShape }
+import akka.stream.{Attributes, Inlet, SinkShape}
 import akka.stream.scaladsl.Sink
-import akka.stream.stage.{ AsyncCallback, GraphStage, GraphStageLogic, InHandler }
-import org.apache.kafka.clients.producer.{ Callback, ProducerRecord, RecordMetadata }
+import akka.stream.stage.{AsyncCallback, GraphStage, GraphStageLogic, InHandler}
+import org.apache.kafka.clients.producer.{Callback, ProducerRecord, RecordMetadata}
 import org.apache.kafka.common.KafkaException
 import org.apache.kafka.common.errors.RetriableException
 import org.gs.kafka.ProducerConfig
@@ -14,12 +14,12 @@ import org.gs.kafka.ProducerConfig
   *
   * KafkaSink is initialized with a wrapped KafkaProducer. It includes topic, key, and Key, Value
   * types specific to the topic. KafkaProducer is heavy weight, multi-threaded, usually serves other
-  * topics and is long lived. If a Kafka RetryableException is thrown while writing, KafkaSink 
+  * topics and is long lived. If a Kafka RetryableException is thrown while writing, KafkaSink
   * catches it and retries the write. If a write throws a subclass of KafkaException this
   * test's Decider stops the write stream.
   *
   * KafkaProducer's send() returns a Java/Guava ListenableFuture, not a nice Scala Future. Kafka's
-  * ListenableFuture passes 2 arguments to a Kafka Producer Callback, a RecordMetadata and an 
+  * ListenableFuture passes 2 arguments to a Kafka Producer Callback, a RecordMetadata and an
   * Exception. One of these arguments will be null. I cope with this in the least awful way I found.
   * If a RecordMetadata was returned it means success so an AsynCallback is called that pulls a
   * record from upstream. If an exception was returned a different AsynCallback is called that
@@ -28,14 +28,14 @@ import org.gs.kafka.ProducerConfig
   * RetriableException is when there was a fleeting error that may not recur so resend the message.
   * This will keep retrying indefinitely until stream or other container times out.
   *
-  * A KafkaException is logged and rethrown.  
+  * A KafkaException is logged and rethrown.
   *
   * @tparam K Kafka ProducerRecord key
   * @tparam V Type of serialized object received from stream and Kafka ProducerRecord value
   * @param wProd extends KafkaProducer with key, value, and topic fields
   *
   * @author Gary Struthers
-  * 
+  *
   */
 class KafkaSink[K, V](wProd: ProducerConfig[K, V])(implicit logger: LoggingAdapter)
     extends GraphStage[SinkShape[V]] {
@@ -56,7 +56,7 @@ class KafkaSink[K, V](wProd: ProducerConfig[K, V])(implicit logger: LoggingAdapt
         e match {
           case e: RetriableException => {
             logger debug("Kafka send retryable exception, attempt retry {}", e.getMessage)
-              producer send(pRecord, callback)          
+              producer send(pRecord, callback)
           }
           case e: KafkaException => {
             logger error(e, "Kafka send un-retryable exception,  {}", e.getMessage)
@@ -84,7 +84,6 @@ class KafkaSink[K, V](wProd: ProducerConfig[K, V])(implicit logger: LoggingAdapt
           producer send(producerRecord, kafkaCallback)
         }
       })
-
     }
   }
 }

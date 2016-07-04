@@ -5,7 +5,6 @@ package org.gs
 import _root_.akka.NotUsed
 import _root_.akka.event.LoggingAdapter
 import _root_.akka.stream.scaladsl.Flow
-import com.twitter.algebird._
 import scala.collection.mutable.ArrayBuffer
 import org.gs.filters.filterRight
 import org.gs.algebird.typeclasses.QTreeLike

@@ -18,9 +18,9 @@ import org.gs.kafka.ConsumerConfig
   * Kafka commitSync was meant to confirm that messages have been read. But in an Akka Stream it
   * can confirm all messages have been processed. If there is a thrown exception or a timeout
   * commitSync won't be called. So messages that weren't committed will be retried.
-  * 
+  *
   * To use commitSync() this way, in Kafka server.properties enable.auto.commit=false
-  *  
+  *
   * Do Not add a consumer to a consumer group while uncommitted messages are being processed. This
   * can cause a rebalancing defeating this trick.
   *
@@ -41,7 +41,7 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
   /** On downstream pull check if messages from last poll need to be committed, commitSync() blocks.
     * Then poll Kafka, this also blocks. If poll returns an empty ConsumerRecords do nothing, if it
     * contains records, push ConsumerRecords to the next stage
-    * 
+    *
     * @param inheritedAttributes
     */
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
@@ -57,20 +57,20 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
       setHandler(out, new OutHandler {
         override def onPull(): Unit = {
           if(needCommit) {
-            kafkaConsumer commitSync() //blocks
+            kafkaConsumer commitSync() // blocking
             needCommit = false
           }
-          val records = kafkaConsumer poll(consumerConfig.timeout) //blocks
+          val records = kafkaConsumer poll(consumerConfig.timeout) // blocking
           if(!records.isEmpty()) { // don't push if no record available
             push(out, records)
             needCommit = true
           } else logger.debug("KafkaSource records isEmpty {}", records.isEmpty())
         }
       })
-      
+
       override def postStop(): Unit = {
         if(needCommit) {
-          kafkaConsumer commitSync() //blocks
+          kafkaConsumer commitSync() // blocking
         }
         kafkaConsumer close()
       }

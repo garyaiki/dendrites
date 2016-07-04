@@ -54,7 +54,7 @@ package object stream {
     while(it.hasNext) {
       queue += it.next()
     }
-    queue.result()      
+    queue.result()
   }
 
   /** KafkaConsumer poll returns ConsumerRecords, extract each ConsumerRecord and queue them. The
@@ -72,7 +72,7 @@ package object stream {
   }
 
   /** Flow to map ConsumerRecords to a Queue of ConsumerRecord. This allows a Stream to pull
-    * one ConsumerRecord at a time 
+    * one ConsumerRecord at a time
     *
     * @see [[org.gs.examples.account]]
     *
@@ -101,7 +101,7 @@ package object stream {
       buff += it.next()
     }
     val l0 = records.records(buff(0))
-    val ab0 = l0.asScala    
+    val ab0 = l0.asScala
     val l1 = records.records(buff(1))
     val ab1 = l1.asScala
     (queueRecords(ab0.iterator), queueRecords(ab0.iterator))

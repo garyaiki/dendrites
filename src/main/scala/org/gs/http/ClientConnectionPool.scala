@@ -3,10 +3,10 @@ package org.gs.http
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.Flow
 import akka.http.scaladsl.HttpExt
 import akka.http.scaladsl.Http.HostConnectionPool
-import akka.http.scaladsl.model.{ HttpRequest, HttpResponse}
+import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 import com.typesafe.config.ConfigFactory
 import scala.util.Try
 

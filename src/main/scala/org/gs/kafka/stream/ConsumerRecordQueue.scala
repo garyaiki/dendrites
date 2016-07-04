@@ -9,7 +9,7 @@ import scala.collection.immutable.Queue
   *
   * Flow that uses a queue to send Kafka messages one at a time. A Queue[ConsumerRecord] is pushed
   * from upstream, when downstream pulls 1 ConsumerRecord is dequeued and pushed downstream
-  * 
+  *
   * @tparam K Kafka ConsumerRecord key
   * @tparam V Kafka ConsumerRecord value
   *
@@ -24,7 +24,7 @@ class ConsumerRecordQueue[K, V]() extends
 
   /** When downstream pulls check if queue exists or is empty, pull a queue if it is. When the queue
     * has a ConsumerRecord, dequeue 1 and push it downstream
-    * 
+    *
     * @param inheritedAttributes
     */
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {

@@ -1,4 +1,3 @@
 package org.gs.filters
 
-trait Stub { 
-}
+trait Stub

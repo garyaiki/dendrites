@@ -3,7 +3,7 @@ package org
 
 import java.util.Properties
 
-/** Utility functions for case classes and Properties files 
+/** Utility functions for case classes and Properties files
   *
   * Case class fields to map of field names and values
   * {{{
@@ -24,7 +24,7 @@ import java.util.Properties
   *    }
   *    case result ⇒ assert(false, s"Expect 3 AccountTypes, got $result")
   *   }
-  * }}} 
+  * }}}
   * Load Properties file from classpath
   * {{{
   *   val prop: Properties = loadProperties("kafkaProducer.properties")
@@ -37,12 +37,13 @@ package object gs {
     *
     * [[org.gs.http.caseClassToGetQuery]]
     *
-    * @param cc case class (Product is supertype)
+    * @param cc case class (Product is super type)
     * @return map of field names and values
     */
-  def ccToMap(cc: Product) = cc.getClass.getDeclaredFields.foldLeft(Map[String, Any]()) {
+  def ccToMap(cc: Product): Map[String, Any] =
+            cc.getClass.getDeclaredFields.foldLeft(Map[String, Any]()) {
     (a, f) =>
-      f setAccessible(true) // to get private fields
+      f setAccessible(true) // to get product's private fields
       a + (f.getName -> f.get(cc))
   }
 

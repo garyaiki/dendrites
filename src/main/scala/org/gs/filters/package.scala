@@ -31,7 +31,7 @@ import scala.reflect.ClassTag
   * {{{
   * def collectRightFlow[A, B]: Flow[Seq[Either[A, B]], Seq[B], NotUsed] =
   *       Flow[Seq[Either[A, B]]].collect(PartialFunction(filterRight))
-  * }}}       
+  * }}}
   *  @author Gary Struthers
   */
 package object filters {

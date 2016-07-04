@@ -1,4 +1,3 @@
 package org.gs
 
-trait Stub {
-}
+trait Stub
