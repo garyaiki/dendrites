@@ -26,7 +26,7 @@ import scala.io.Source._
   *    override def onPush(): Unit = {
   *      val bytes = grab(in)
   *      val record = byteArrayToGenericRecord(schema, bytes)
-  *      push(out, f(record)) 
+  *      push(out, f(record))
   *    }
   *  })
   * }}}
@@ -51,7 +51,7 @@ package object avro {
     * @param schema for type A
     * @param case class or tuple that only has simple types
     * @return byte array of values
-    */  
+    */
   def ccToByteArray[A <: Product](schema: Schema, cc: A): Array[Byte] = {
     val record = new GenericData.Record(schema)
     val writer = new GenericDatumWriter[GenericRecord](schema)
@@ -63,7 +63,7 @@ package object avro {
     *
     * @param GenericData.Record initialized with schema for case class
     * @param cc a case class (or tuple)
-    */  
+    */
   def ccToGenericRecord[A <: Product](gRecord: GenericData.Record)(cc: A): Unit = {
     val kvMap = ccToMap(cc)
     kvMap foreach {
@@ -99,9 +99,9 @@ package object avro {
     * @return GenericRecord
     */
   def byteArrayToGenericRecord(schema: Schema, bytes: Array[Byte]): GenericRecord = {
-    val reader = new GenericDatumReader[GenericRecord](schema)    
+    val reader = new GenericDatumReader[GenericRecord](schema)
     val in = new ByteArrayInputStream(bytes)
     val decoder = DecoderFactory.get().binaryDecoder(in, null)
-    reader.read(null, decoder)    
+    reader.read(null, decoder)
   }
 }

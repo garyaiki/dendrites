@@ -15,7 +15,7 @@ import org.gs.avro.{byteArrayToGenericRecord, loadSchema}
   */
 class AvroDeserializer[A <: Product](filename: String, f:(GenericRecord) => A)
     extends GraphStage[FlowShape[Array[Byte], A]] {
-  
+
   val in = Inlet[Array[Byte]]("GenericSerializer.in")
   val out = Outlet[A]("GenericSerializer.out")
 
@@ -24,10 +24,10 @@ class AvroDeserializer[A <: Product](filename: String, f:(GenericRecord) => A)
 
   /** Deserialize bytearray to Avro GenericRecord on push
     *
-    * @param inheritedAttributes 
+    * @param inheritedAttributes
     * @return GenericRecord
     */
-  override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = 
+  override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
     new GraphStageLogic(shape) {
       setHandler(in, new InHandler {
         override def onPush(): Unit = {

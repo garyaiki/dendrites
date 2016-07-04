@@ -6,8 +6,8 @@ import org.apache.avro.Schema
 import org.gs.avro.loadSchema
 
 /** Flow serializes a case class. Read Avro schema, pass it and a case class to f, push serialized
-  * object 
-  * 
+  * object
+  *
   * @tparam A case classes and tuples are subtypes of Produce
   * @tparam B type of serialized object, i.e. Array[Byte]
   * @param filename of Avro schema for case class, must be on classpath
@@ -21,7 +21,7 @@ class AvroSerializer[A <: Product, B](filename: String, f:(Schema, A) => B)
 
   override val shape = FlowShape.of(in, out)
   val schema = loadSchema(filename)
-  override def createLogic(attr: Attributes): GraphStageLogic = 
+  override def createLogic(attr: Attributes): GraphStageLogic =
     new GraphStageLogic(shape) {
       setHandler(in, new InHandler {
         override def onPush(): Unit = {
