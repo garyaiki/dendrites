@@ -54,7 +54,7 @@ trait MoneyMarketAccountCaller {
 
   val clientConfig = new MoneyMarketBalancesClientConfig()
 
-  def fetchMoneyMarketAccountsBalance(context: ActorContext, id: Long, recipient: ActorRef) {
+  def fetchMoneyMarketAccountsBalance(context: ActorContext, id: Long, recipient: ActorRef):Unit = {
     context.actorOf(MoneyMarketAccountClient.props(clientConfig)) ! GetAccountBalances(id)
     expectOnce {
       case MoneyMarketAccountBalances(balances) ⇒

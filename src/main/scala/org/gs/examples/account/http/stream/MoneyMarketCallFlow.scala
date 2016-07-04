@@ -15,7 +15,7 @@ import org.gs.http.stream.{TypedQueryFlow, TypedQueryResponseFlow, TypedResponse
   * @author Gary Struthers
   *
   */
-class MoneyMarketCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter, 
+class MoneyMarketCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
                 val materializer: Materializer) extends BalancesProtocols {
 
   val clientConfig = new MoneyMarketBalancesClientConfig()

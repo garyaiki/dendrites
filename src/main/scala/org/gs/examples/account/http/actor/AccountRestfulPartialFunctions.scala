@@ -12,12 +12,13 @@ import org.gs.examples.account.{ Checking, CheckingAccountBalances, MoneyMarket,
  *  def f = pfPlusSender(originalSender)(_)
  *  val pf = PartialFunction(f)
  *  }}}
- *  
+ *
  * @author Gary Struthers
  *
  */
 trait AccountRestfulPartialFunctions extends PartialFunctionPlusSender {
   this: Actor with ResultAggregator ⇒
+
   def pfPlusSender(originalSender: ActorRef)(a: Any) = a match {
     case Right(CheckingAccountBalances(balances)) =>
         addResult(0, (Checking -> balances), originalSender)

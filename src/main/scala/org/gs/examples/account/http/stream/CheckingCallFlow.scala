@@ -15,7 +15,7 @@ import org.gs.http.stream.{TypedQueryFlow, TypedQueryResponseFlow, TypedResponse
   * @author Gary Struthers
   *
   */
-class CheckingCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter, 
+class CheckingCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
   val materializer: Materializer) extends BalancesProtocols {
 
   val clientConfig = new CheckingBalancesClientConfig()

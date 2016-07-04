@@ -53,7 +53,7 @@ trait SavingsAccountCaller {
 
   val clientConfig = new SavingsBalancesClientConfig()
 
-  def fetchSavingsAccountsBalance(context: ActorContext, id: Long, recipient: ActorRef) {
+  def fetchSavingsAccountsBalance(context: ActorContext, id: Long, recipient: ActorRef): Unit = {
     context.actorOf(SavingsAccountClient.props(clientConfig)) ! GetAccountBalances(id)
     expectOnce {
       case SavingsAccountBalances(balances) ⇒

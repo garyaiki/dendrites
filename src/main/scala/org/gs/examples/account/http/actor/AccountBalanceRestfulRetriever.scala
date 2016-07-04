@@ -1,9 +1,9 @@
 package org.gs.examples.account.http.actor
 
-import akka.actor._
+import akka.actor.{OneForOneStrategy, Props, SupervisorStrategy}
 import akka.contrib.pattern.Aggregator
-import scala.collection.immutable.Set
 import scala.concurrent.duration._
+import scala.collection.immutable.Set
 import org.gs.aggregator.actor.{CantUnderstand, ResultAggregator, TimedOut}
 import org.gs.examples.account.{AccountType, GetCustomerAccountBalances}
 import org.gs.examples.account.actor.AccountBalanceActor

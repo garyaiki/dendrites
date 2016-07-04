@@ -14,9 +14,9 @@ import org.gs.stream.leftRightFlow
   * @param materializer implicit Materializer
   * @author Gary Struthers
   */
-class ParallelCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter, 
+class ParallelCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
                 val materializer: Materializer) {
-  
+
   def zipper = ZipWith((in0: Either[String, AnyRef],
                         in1: Either[String, AnyRef],
                         in2: Either[String, AnyRef]) => (in0, in1, in2))
@@ -25,7 +25,7 @@ class ParallelCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
   val mmcf = new MoneyMarketCallFlow
   val scf = new SavingsCallFlow
 
-  import GraphDSL.Implicits._ 
+  import GraphDSL.Implicits._
   // Create Graph in Shape of a Flow
   val flowGraph = GraphDSL.create() { implicit builder =>
     val bcast: UniformFanOutShape[Product, Product] = builder.add(Broadcast[Product](3))
@@ -33,7 +33,7 @@ class ParallelCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
     val mm: FlowShape[Product,Either[String, AnyRef]] = builder.add(mmcf.flow)
     val savings: FlowShape[Product,Either[String, AnyRef]] = builder.add(scf.flow)
     val zip = builder.add(zipper)
-    
+
     bcast ~> check ~> zip.in0
     bcast ~> mm ~> zip.in1
     bcast ~> savings ~> zip.in2
@@ -45,7 +45,7 @@ class ParallelCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
   val fgLR = GraphDSL.create() { implicit builder =>
     val fgCalls = builder.add(asFlow)
     val fgLR = builder.add(leftRightFlow) // results combiner
-    
+
     fgCalls ~> fgLR
     FlowShape(fgCalls.in, fgLR.outlet)
   }.named("callsLeftRight")

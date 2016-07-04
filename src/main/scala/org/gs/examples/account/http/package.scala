@@ -39,7 +39,6 @@ package object http {
       (3L, BigDecimal(33000.30)),
       (33L, BigDecimal(33300.33)),
       (333L, BigDecimal(33330.33)))))
-      
 
   val savingsBalances = Map(
     1L -> Some(List(

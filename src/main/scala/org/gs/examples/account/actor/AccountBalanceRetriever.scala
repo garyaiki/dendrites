@@ -1,6 +1,6 @@
 package org.gs.examples.account.actor
 
-import akka.actor._
+import akka.actor.{OneForOneStrategy, Props, SupervisorStrategy}
 import akka.contrib.pattern.Aggregator
 import scala.collection.immutable.Set
 import scala.concurrent.duration._
