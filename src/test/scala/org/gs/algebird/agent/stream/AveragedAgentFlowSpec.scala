@@ -1,12 +1,24 @@
-/**
-  */
+/** Copyright 2016 Gary Struthers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs.algebird.agent.stream
 
 import akka.actor.ActorSystem
-import akka.event.{ LoggingAdapter, Logging }
+import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{ Flow, Keep }
-import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
+import akka.stream.scaladsl.{Keep, Source}
+import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.twitter.algebird.AveragedValue
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
@@ -94,6 +106,43 @@ class AveragedAgentFlowSpec extends WordSpecLike with TestValuesBuilder {
       whenReady(updateFuture, timeout) { result =>
         result should equal(avg(floats))
         assert(result.value === (mF.right.get.toDouble +- 0.005))
+      }
+    }
+  }
+
+  "A composite AveragedAgentFlow of BigDecimals" should {
+    "update its AveragedValue" in {
+      val avgAgent = new AveragedAgent("test BigDecimals")
+      val composite = AveragedAgentFlow.compositeFlow[BigDecimal](avgAgent)
+      val (pub, sub) = TestSource.probe[Seq[BigDecimal]]
+        .via(composite)
+        .toMat(TestSink.probe[Future[AveragedValue]])(Keep.both)
+        .run()
+      sub.request(1)
+      pub.sendNext(bigDecimals)
+      val updateFuture = sub.expectNext()
+      pub.sendComplete()
+      sub.expectComplete()
+      val mBD = mean(bigDecimals)
+      whenReady(updateFuture, timeout) { result =>
+          result should equal(avg(bigDecimals))
+          assert(result.value === (mBD.right.get.toDouble +- 0.005))
+      }
+    }
+  }
+
+  "A composite sink of AveragedAgentFlow of Doubles" should {
+    "update its AveragedValue" in {
+      val source = Source.single(doubles)
+      val avgAgent = new AveragedAgent("test Doubles")
+      val composite = AveragedAgentFlow.compositeSink[Double](avgAgent)
+
+      source.runWith(composite)
+      val updateFuture = avgAgent.agent.future()
+      val mD = mean(doubles)
+      whenReady(updateFuture, timeout) { result =>
+        result should equal(avg(doubles))
+        assert(result.value === (mD.right.get +- 0.005))
       }
     }
   }
