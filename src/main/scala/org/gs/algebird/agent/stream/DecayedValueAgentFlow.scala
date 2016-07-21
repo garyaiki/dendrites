@@ -1,10 +1,29 @@
+/** Copyright 2016 Gary Struthers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs.algebird.agent.stream
 
+import akka.NotUsed
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
+import akka.stream.scaladsl.{Flow, Sink}
 import com.twitter.algebird.DecayedValue
+import java.time.Instant
 import scala.concurrent.Future
+import scala.reflect.runtime.universe.TypeTag
 import org.gs.algebird.agent.DecayedValueAgent
+import org.gs.algebird.stream.ZipTimeFlow
 
 /** Flow to update DecayedValue Agent
   *
@@ -21,18 +40,56 @@ class DecayedValueAgentFlow(dvAgent: DecayedValueAgent)
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
       setHandler(in, new InHandler {
-        override def onPush(): Unit = {
+        override def onPush(): Unit = { System.out.println("onPush")
           val elem = grab(in)
-          System.out.print(s"elem:$elem")
           push(out, dvAgent.alter(elem))
         }
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
+        override def onPull(): Unit = { System.out.println("onPull")
           pull(in)
         }
       })
     }
+  }
+}
+
+object DecayedValueAgentFlow {
+
+  /** Generate a time value as a Double
+    *
+  	* @param ignore is same numeric type passed to flow, this function ignores it
+  	* @return Now as a Double
+  	*/
+  def nowMillis[A: Numeric : TypeTag](ignore: A = null): Double = Instant.now.toEpochMilli.toDouble
+
+  /** Compose ZipTimeFlow & dvFlow & DecayedValueAgentFlow
+    *
+  	*	@tparam A Numeric that has implicit conversions to Double with a TypeTag
+  	* @param dvAgent Akka Agent accumulates DecayedValues
+  	* @param time function that adds time value, needed by DecayedValue
+  	* @return Future for Agents updated value
+  	*/
+  def compositeFlow[A: TypeTag : Numeric](dvAgent: DecayedValueAgent, time:A => Double):
+          Flow[Seq[A], Future[Seq[DecayedValue]], NotUsed] = {
+
+    
+    val zt = new ZipTimeFlow[A](time)
+    val ffg = Flow.fromGraph(zt)
+    val dvAgtFlow = new DecayedValueAgentFlow(dvAgent)
+    ffg.via(dvAgtFlow).named("SeqToDVAgent")
+  }
+
+  /** Compose ZipTimeFlow & dvFlow & DecayedValueAgentFlow & Sink
+    *
+  	*	@tparam A Numeric that has implicit conversions to Double with a TypeTag
+  	* @param dvAgent Akka Agent accumulates DecayedValues
+  	* @param time function that adds time value, needed by DecayedValue
+  	* @return Sink that accepts Seq[A]
+  	*/  
+  def compositeSink[A: TypeTag: Numeric](dvAgent: DecayedValueAgent,
+              time:A => Double): Sink[Seq[A], NotUsed] = {
+    compositeFlow(dvAgent, time).to(Sink.ignore)
   }
 }

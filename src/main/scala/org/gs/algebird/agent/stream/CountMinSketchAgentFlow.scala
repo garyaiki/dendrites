@@ -44,14 +44,14 @@ class CountMinSketchAgentFlow[K: Ordering: CMSHasher](cmsAgent: CountMinSketchAg
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
       setHandler(in, new InHandler {
-        override def onPush(): Unit = {
+        override def onPush(): Unit = { System.out.println("onPush")
           val elem = grab(in)
           push(out, cmsAgent.alter(elem))
         }
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
+        override def onPull(): Unit = { System.out.println("onPull")
           pull(in)
         }
       })
@@ -81,7 +81,8 @@ object CountMinSketchAgentFlow {
   	* @param cmsAgt Akka Agent accumulates CountMinSketch
   	* @return Sink that accepts Seq[A]
   	*/  
-  def compositeSink[A: TypeTag: Numeric: CMSHasher](cmsAgt: CountMinSketchAgent[A]): Sink[Seq[A], NotUsed] = {
+  def compositeSink[A: TypeTag: Numeric: CMSHasher](cmsAgt: CountMinSketchAgent[A]):
+          Sink[Seq[A], NotUsed] = {
     compositeFlow(cmsAgt).to(Sink.ignore)
   }
 }

@@ -1,12 +1,24 @@
-/**
-  */
+/** Copyright 2016 Gary Struthers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs.algebird.agent.stream
 
 import akka.actor.ActorSystem
-import akka.event.{ LoggingAdapter, Logging }
+import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{ Flow, Keep }
-import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
+import akka.stream.scaladsl.{Keep, Source}
+import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.twitter.algebird.{HLL, HyperLogLogAggregator, HyperLogLogMonoid}
 import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest._
@@ -52,5 +64,38 @@ class HyperLogLogAgentFlowSpec extends WordSpecLike with Matchers with TestValue
         result.estimatedSize should equal(longs.distinct.size.toDouble +- 0.09)
       }
      }
+  }
+
+  "A composite HyperLogLogAgentFlow of Longs" should {
+     "update its total count" in {
+       val hllAgent = new HyperLogLogAgent("test Longs")
+       val composite = HyperLogLogAgentFlow.compositeFlow[Long](hllAgent)
+       val (pub, sub) = TestSource.probe[Seq[Long]]
+        .via(composite)
+        .toMat(TestSink.probe[Future[HLL]])(Keep.both)
+        .run()
+      sub.request(1)
+      pub.sendNext(longs)
+      val updateFuture = sub.expectNext()
+      pub.sendComplete()
+      sub.expectComplete()
+      whenReady(updateFuture, timeout) { result =>
+        result.estimatedSize should equal(longs.distinct.size.toDouble +- 0.09)
+      }
+    }
+  }
+
+  "A composite sink HyperLogLogAgentFlow of Longs" should {
+     "update its total count" ignore {
+       val source = Source.single(longs)
+       val hllAgent = new HyperLogLogAgent("test Longs")
+       val composite = HyperLogLogAgentFlow.compositeSink[Long](hllAgent)
+       source.runWith(composite)
+
+      val updateFuture = hllAgent.agent.future()
+      whenReady(updateFuture, timeout) { result =>
+        result.estimatedSize should equal(longs.distinct.size.toDouble +- 0.09)
+      }
+    }
   }
 }

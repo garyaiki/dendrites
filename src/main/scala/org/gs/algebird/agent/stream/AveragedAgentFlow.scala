@@ -39,14 +39,14 @@ class AveragedAgentFlow(avgAgent: AveragedAgent)
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
       setHandler(in, new InHandler {
-        override def onPush(): Unit = {
+        override def onPush(): Unit = { System.out.println("onPush")
           val elem = grab(in)
           push(out, avgAgent.alter(elem))
         }
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
+        override def onPull(): Unit = { System.out.println("onPull")
           pull(in)
         }
       })
@@ -75,6 +75,6 @@ object AveragedAgentFlow {
   	* @return Sink that accepts Seq[A]
   	*/  
   def compositeSink[A: TypeTag: Numeric](avgAgent: AveragedAgent): Sink[Seq[A], NotUsed] = {
-    compositeFlow(avgAgent).to(Sink.ignore).named("SeqToAvgAgentSink")
+    compositeFlow(avgAgent).to(Sink.head).named("SeqToAvgAgentSink")
   }
 }

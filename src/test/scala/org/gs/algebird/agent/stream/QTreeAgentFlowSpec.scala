@@ -47,7 +47,7 @@ class QTreeAgentFlowSpec extends WordSpecLike with TestValuesBuilder {
 
   "A QTreeAgentFlow of BigDecimals" should {
 	  val qtAgt = new QTreeAgent[BigDecimal]("test BigDecimals")
-			  val qtAgtFlow = new QTreeAgentFlow(qtAgt)
+	  val qtAgtFlow = new QTreeAgentFlow(qtAgt)
 	  val (pub, sub) = TestSource.probe[Seq[BigDecimal]]
 			  .via(qtAgtFlow)
 			  .toMat(TestSink.probe[Future[QTree[BigDecimal]]])(Keep.both)
@@ -58,9 +58,9 @@ class QTreeAgentFlowSpec extends WordSpecLike with TestValuesBuilder {
 			  pub.sendComplete()
 			  sub.expectComplete()
 			  "update its count" in {
-		  whenReady(updateFuture, timeout) { result =>
-		  result.count should equal(bigDecimals.size)
-		  }
+		      whenReady(updateFuture, timeout) { result =>
+		      result.count should equal(bigDecimals.size)
+		    }
 	  }
 
 	  "update its lower bound" in {
@@ -124,9 +124,8 @@ class QTreeAgentFlowSpec extends WordSpecLike with TestValuesBuilder {
 		  val composite = QTreeAgentFlow.compositeSink[BigDecimal](qtAgent)
 	    source.runWith(composite)
 		  val updateFuture = qtAgent.agent.future()
-
 		  whenReady(updateFuture, timeout) { result =>
-		  result.count should equal(bigDecimals.size)
+		    result.count should equal(bigDecimals.size)
 		  }
 	  }
 	}

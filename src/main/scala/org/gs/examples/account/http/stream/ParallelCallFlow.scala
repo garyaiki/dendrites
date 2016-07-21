@@ -3,7 +3,7 @@ package org.gs.examples.account.http.stream
 import akka.actor.ActorSystem
 import akka.event.{LoggingAdapter, Logging}
 import akka.stream.{Materializer, FlowShape, UniformFanOutShape}
-import akka.stream.scaladsl.{ Broadcast, Flow, GraphDSL, ZipWith}
+import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, ZipWith}
 import org.gs.stream.leftRightFlow
 
 /** Create Graph that calls Checking, MoneyMarket, Savings services in parallel, waits for them all

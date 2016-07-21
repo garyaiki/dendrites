@@ -40,14 +40,14 @@ class QTreeAgentFlow[A: QTreeLike](qtAgent: QTreeAgent[A])
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
       setHandler(in, new InHandler {
-        override def onPush(): Unit = {
+        override def onPush(): Unit = { System.out.println("onPush")
           val elem = grab(in)
           push(out, qtAgent.alter(elem))
         }
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
+        override def onPull(): Unit = { System.out.println("onPull")
           pull(in)
         }
       })
