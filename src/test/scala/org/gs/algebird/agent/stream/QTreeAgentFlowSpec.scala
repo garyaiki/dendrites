@@ -123,6 +123,7 @@ class QTreeAgentFlowSpec extends WordSpecLike with TestValuesBuilder {
 	    val qtAgent = new QTreeAgent[BigDecimal]("test BigDecimals")
 		  val composite = QTreeAgentFlow.compositeSink[BigDecimal](qtAgent)
 	    source.runWith(composite)
+      Thread.sleep(10)//Stream completes before agent updates
 		  val updateFuture = qtAgent.agent.future()
 		  whenReady(updateFuture, timeout) { result =>
 		    result.count should equal(bigDecimals.size)

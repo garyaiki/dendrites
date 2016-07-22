@@ -15,14 +15,16 @@ limitations under the License.
 package org.gs.algebird.agent.stream
 
 import akka.NotUsed
+import akka.event.LoggingAdapter
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.scaladsl.{Flow, Sink}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.twitter.algebird.AveragedValue
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.runtime.universe.TypeTag
 import org.gs.algebird.agent.AveragedAgent
 import org.gs.algebird.stream.avgFlow
+import org.gs.stream.FutureSink
 
 /** Flow to update AveragedValue Agent
   *
@@ -39,14 +41,14 @@ class AveragedAgentFlow(avgAgent: AveragedAgent)
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
       setHandler(in, new InHandler {
-        override def onPush(): Unit = { System.out.println("onPush")
+        override def onPush(): Unit = {
           val elem = grab(in)
           push(out, avgAgent.alter(elem))
         }
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = { System.out.println("onPull")
+        override def onPull(): Unit = {
           pull(in)
         }
       })
@@ -74,7 +76,9 @@ object AveragedAgentFlow {
   	* @param avgAgent Akka Agent accumulates AveragedValue
   	* @return Sink that accepts Seq[A]
   	*/  
-  def compositeSink[A: TypeTag: Numeric](avgAgent: AveragedAgent): Sink[Seq[A], NotUsed] = {
-    compositeFlow(avgAgent).to(Sink.head).named("SeqToAvgAgentSink")
+  def compositeSink[A: TypeTag: Numeric](avgAgent: AveragedAgent)
+          (implicit log: LoggingAdapter, ec: ExecutionContext): Sink[Seq[A], NotUsed] = {
+    //val sink = FutureSink.apply
+    compositeFlow(avgAgent).to(Sink.ignore).named("SeqToAvgAgentSink")
   }
 }

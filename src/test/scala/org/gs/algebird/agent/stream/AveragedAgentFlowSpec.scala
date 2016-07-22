@@ -138,6 +138,7 @@ class AveragedAgentFlowSpec extends WordSpecLike with TestValuesBuilder {
       val composite = AveragedAgentFlow.compositeSink[Double](avgAgent)
 
       source.runWith(composite)
+      Thread.sleep(10)//Stream completes before agent updates
       val updateFuture = avgAgent.agent.future()
       val mD = mean(doubles)
       whenReady(updateFuture, timeout) { result =>

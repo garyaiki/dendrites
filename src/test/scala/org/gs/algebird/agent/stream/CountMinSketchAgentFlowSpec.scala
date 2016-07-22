@@ -84,18 +84,17 @@ class CountMinSketchAgentFlowSpec extends WordSpecLike with TestValuesBuilder {
     }
   }
 
-  "A composite sink CountMinSketchAgentFlow of Longs" should {  //@FIXME
-    "update its total count" ignore {
+  "A composite sink CountMinSketchAgentFlow of Longs" should {
+    "update its total count" in {
       val source = Source.single(longs)
       val cmsAgt = new CountMinSketchAgent[Long]("test Longs")
       val composite = CountMinSketchAgentFlow.compositeSink[Long](cmsAgt)
       source.runWith(composite)
+      Thread.sleep(10)//Stream completes before agent updates
       val updateFuture = cmsAgt.agent.future()
 
       whenReady(updateFuture, timeout) { result =>
-        //result.totalCount should equal(longs.size)
-        val agentValue = cmsAgt.agent.get()
-        agentValue.totalCount should equal(longs.size)
+        result.totalCount should equal(longs.size)
       }
     }
   }

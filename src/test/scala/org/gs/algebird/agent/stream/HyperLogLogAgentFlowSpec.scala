@@ -86,11 +86,12 @@ class HyperLogLogAgentFlowSpec extends WordSpecLike with Matchers with TestValue
   }
 
   "A composite sink HyperLogLogAgentFlow of Longs" should {
-     "update its total count" ignore {
+     "update its total count" in {
        val source = Source.single(longs)
        val hllAgent = new HyperLogLogAgent("test Longs")
        val composite = HyperLogLogAgentFlow.compositeSink[Long](hllAgent)
        source.runWith(composite)
+       Thread.sleep(10)//Stream completes before agent updates
 
       val updateFuture = hllAgent.agent.future()
       whenReady(updateFuture, timeout) { result =>

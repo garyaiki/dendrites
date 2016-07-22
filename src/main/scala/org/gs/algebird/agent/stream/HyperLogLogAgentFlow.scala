@@ -42,14 +42,14 @@ class HyperLogLogAgentFlow(hllAgent: HyperLogLogAgent)
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
       setHandler(in, new InHandler {
-        override def onPush(): Unit = { System.out.println("onPush")
+        override def onPush(): Unit = {
           val elem = grab(in)
           push(out, hllAgent.alter(elem))
         }
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = { System.out.println("onPull")
+        override def onPull(): Unit = {
           pull(in)
         }
       })

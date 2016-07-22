@@ -114,12 +114,13 @@ class DecayedValueAgentFlowSpec extends WordSpecLike with TrigUtils {
   }
 
   "A composite sink of DecayedValueAgentFlow of value/time doubles" should {
-    "exceed the mean for 1st 90 values" ignore {
+    "exceed the mean for 1st 90 values" in {
         val dvAgent = new DecayedValueAgent("test90", halfLife, None)
         val source = Source.single(sines)
         val composite = DecayedValueAgentFlow.compositeSink[Double](dvAgent,
             DecayedValueAgentFlow.nowMillis)
         source.runWith(composite)
+        Thread.sleep(10)//Stream completes before agent updates
          
         val updateFuture = dvAgent.agent.future()
         whenReady(updateFuture, timeout) {  result =>

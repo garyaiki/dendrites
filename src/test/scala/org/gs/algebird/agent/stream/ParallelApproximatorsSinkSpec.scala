@@ -44,7 +44,7 @@ import org.gs.fixtures.TestValuesBuilder
   * @author Gary Struthers
   *
   */
-class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
+class ParallelApproximatorsSinkSpec extends WordSpecLike with TestValuesBuilder {
   implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
@@ -55,7 +55,7 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
   val qTreeLevel = AlgebirdConfigurer.qTreeLevel
   val timeout = Timeout(3000 millis)
   
-  "A BigDecimals ParallelApproximators" should {
+  "A composite sink of BigDecimals ParallelApproximators" should {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[BigDecimal](qTreeLevel)
 
@@ -64,30 +64,16 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val dvAgent = new DecayedValueAgent("test approximators DecayedValue Agent", halfLife)
       val hllAgent = new HyperLogLogAgent("test approximators HyperLogLog Agent")
       val qtAgent = new QTreeAgent[BigDecimal]("test approximators QTree Agent")
-      //val source = Source.single(bigDecimals)
-      val composite = ParallelApproximators.compositeFlow[BigDecimal](avgAgent,
+      val source = Source.single(bigDecimals)
+      val composite = ParallelApproximators.compositeSink[BigDecimal](avgAgent,
         cmsAgent,
         dvAgent,
         hllAgent,
         qtAgent,
         DecayedValueAgentFlow.nowMillis)
 
-      val ffg = Flow.fromGraph(composite)
-      val (pub, sub) = TestSource.probe[Seq[BigDecimal]]
-        .via(ffg)
-        .toMat(TestSink.probe[(Future[AveragedValue],
-            Future[CMS[BigDecimal]],
-            Future[Seq[com.twitter.algebird.DecayedValue]],
-            Future[HLL],
-            Future[QTree[BigDecimal]])])(Keep.both)
-        .run()
-      sub.request(1)
-      pub.sendNext(bigDecimals)
-      val response = sub.expectNext()
-      pub.sendComplete()
-      sub.expectComplete()
-
-      //source.via(ffg).runWith(Sink.ignore)
+      source.runWith(composite)
+      Thread.sleep(60)//Stream completes before agent updates
 
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
@@ -133,13 +119,17 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val dvAgent = new DecayedValueAgent("test approximators DecayedValue Agent", halfLife)
       val hllAgent = new HyperLogLogAgent("test approximators HyperLogLog Agent")
       val qtAgent = new QTreeAgent[BigInt]("test approximators QTree Agent")
-      //val source = Source.single(bigInts)
-      val composite = ParallelApproximators.compositeFlow[BigInt](avgAgent,
+      val source = Source.single(bigInts)
+      val composite = ParallelApproximators.compositeSink[BigInt](avgAgent,
         cmsAgent,
         dvAgent,
         hllAgent,
         qtAgent,
         DecayedValueAgentFlow.nowMillis)
+
+      source.runWith(composite)
+      Thread.sleep(30)//Stream completes before agent updates
+      /*
       val ffg = Flow.fromGraph(composite)
       val (pub, sub) = TestSource.probe[Seq[BigInt]]
         .via(ffg)
@@ -155,8 +145,8 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       pub.sendComplete()
       sub.expectComplete()
 
-      //source.via(ffg).runWith(Sink.ignore)
-
+      source.via(ffg).runWith(Sink.ignore)
+*/
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
         val count = result.count
@@ -201,13 +191,17 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val dvAgent = new DecayedValueAgent("test approximators DecayedValue Agent", halfLife)
       val hllAgent = new HyperLogLogAgent("test approximators HyperLogLog Agent")
       val qtAgent = new QTreeAgent[Double]("test approximators QTree Agent")
-      //val source = Source.single(doubles)
-      val composite = ParallelApproximators.compositeFlow[Double](avgAgent,
+      val source = Source.single(doubles)
+      val composite = ParallelApproximators.compositeSink[Double](avgAgent,
         cmsAgent,
         dvAgent,
         hllAgent,
         qtAgent,
         DecayedValueAgentFlow.nowMillis)
+
+      source.runWith(composite)
+      Thread.sleep(30)//Stream completes before agent updates
+      /*
       val ffg = Flow.fromGraph(composite)
       val (pub, sub) = TestSource.probe[Seq[Double]]
         .via(ffg)
@@ -223,7 +217,7 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       pub.sendComplete()
       sub.expectComplete()
 
-      //source.via(ffg).runWith(Sink.ignore)
+      //source.via(ffg).runWith(Sink.ignore)*/
 
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
@@ -269,13 +263,17 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val dvAgent = new DecayedValueAgent("test approximators DecayedValue Agent", halfLife)
       val hllAgent = new HyperLogLogAgent("test approximators HyperLogLog Agent")
       val qtAgent = new QTreeAgent[Float]("test approximators QTree Agent")
-      //val source = Source.single(floats)
-      val composite = ParallelApproximators.compositeFlow[Float](avgAgent,
+      val source = Source.single(floats)
+      val composite = ParallelApproximators.compositeSink[Float](avgAgent,
         cmsAgent,
         dvAgent,
         hllAgent,
         qtAgent,
         DecayedValueAgentFlow.nowMillis)
+
+      source.runWith(composite)
+      Thread.sleep(30)//Stream completes before agent updates
+      /*
       val ffg = Flow.fromGraph(composite)
       val (pub, sub) = TestSource.probe[Seq[Float]]
         .via(ffg)
@@ -291,7 +289,7 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       pub.sendComplete()
       sub.expectComplete()
 
-      //source.via(ffg).runWith(Sink.ignore)
+      //source.via(ffg).runWith(Sink.ignore)*/
 
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
@@ -337,13 +335,17 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val dvAgent = new DecayedValueAgent("test approximators DecayedValue Agent", halfLife)
       val hllAgent = new HyperLogLogAgent("test approximators HyperLogLog Agent")
       val qtAgent = new QTreeAgent[Int]("test approximators QTree Agent")
-      //val source = Source.single(ints)
-      val composite = ParallelApproximators.compositeFlow[Int](avgAgent,
+      val source = Source.single(ints)
+      val composite = ParallelApproximators.compositeSink[Int](avgAgent,
         cmsAgent,
         dvAgent,
         hllAgent,
         qtAgent,
         DecayedValueAgentFlow.nowMillis)
+
+      source.runWith(composite)
+      Thread.sleep(30)//Stream completes before agent updates
+/*
       val ffg = Flow.fromGraph(composite)
       val (pub, sub) = TestSource.probe[Seq[Int]]
         .via(ffg)
@@ -359,7 +361,7 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       pub.sendComplete()
       sub.expectComplete()
 
-      //source.via(ffg).runWith(Sink.ignore)
+      //source.via(ffg).runWith(Sink.ignore)*/
 
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
@@ -405,14 +407,18 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val dvAgent = new DecayedValueAgent("test approximators DecayedValue Agent", halfLife)
       val hllAgent = new HyperLogLogAgent("test approximators HyperLogLog Agent")
       val qtAgent = new QTreeAgent[Long]("test approximators QTree Agent")
-      //val source = Source.single(longs)
-      val composite = ParallelApproximators.compositeFlow[Long](avgAgent,
+      val source = Source.single(longs)
+      val composite = ParallelApproximators.compositeSink[Long](avgAgent,
         cmsAgent,
         dvAgent,
         hllAgent,
         qtAgent,
         DecayedValueAgentFlow.nowMillis)
-      val ffg = Flow.fromGraph(composite)
+
+      source.runWith(composite)
+      Thread.sleep(30)//Stream completes before agent updates
+
+/*      val ffg = Flow.fromGraph(composite)
       val (pub, sub) = TestSource.probe[Seq[Long]]
         .via(ffg)
         .toMat(TestSink.probe[(Future[AveragedValue],
@@ -427,7 +433,7 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       pub.sendComplete()
       sub.expectComplete()
 
-      //source.via(ffg).runWith(Sink.ignore)
+      //source.via(ffg).runWith(Sink.ignore)*/
 
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>

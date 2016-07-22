@@ -17,8 +17,8 @@ package org.gs.algebird.agent.stream
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
-import akka.stream.{Materializer, FlowShape, UniformFanOutShape}
-import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, ZipWith}
+import akka.stream.{FlowShape, Graph, Materializer, UniformFanOutShape}
+import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Sink, ZipWith}
 import akka.stream.scaladsl.GraphDSL.Implicits._
 import com.twitter.algebird.{AveragedValue, CMS, CMSHasher, DecayedValue, HLL, QTree}
 import scala.concurrent.Future
@@ -78,5 +78,45 @@ class ParallelApproximators[A: HyperLogLogLike: Numeric: CMSHasher: QTreeLike: T
     bcast ~> hll ~> zip.in3
     bcast ~> qtrAg ~> zip.in4
     FlowShape(bcast.in, zip.out)
-  }.named("approximatorsSinks")
+  }.named("parallelApproximators")
+}
+
+object ParallelApproximators {
+
+  def compositeFlow[A: HyperLogLogLike: Numeric: CMSHasher: QTreeLike: TypeTag](
+    avgAgent: AveragedAgent,
+    cmsAgent: CountMinSketchAgent[A],
+    dvAgent: DecayedValueAgent,
+    hllAgent: HyperLogLogAgent,
+    qtAgent: QTreeAgent[A],
+    time:A => Double)
+    (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
+            Graph[FlowShape[Seq[A], (Future[AveragedValue],
+                                              Future[CMS[A]],
+                                              Future[Seq[DecayedValue]],
+                                              Future[HLL],
+                                              Future[QTree[A]])], NotUsed] = {
+    val pa = new ParallelApproximators[A](avgAgent,
+        cmsAgent,
+        dvAgent,
+        hllAgent,
+        qtAgent,
+        DecayedValueAgentFlow.nowMillis)
+    pa.approximators
+  }
+
+  def compositeSink[A: HyperLogLogLike: Numeric: CMSHasher: QTreeLike: TypeTag](
+    avgAgent: AveragedAgent,
+    cmsAgent: CountMinSketchAgent[A],
+    dvAgent: DecayedValueAgent,
+    hllAgent: HyperLogLogAgent,
+    qtAgent: QTreeAgent[A],
+    time:A => Double)
+    (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
+        Sink[Seq[A], NotUsed] = {
+    
+      val composite = compositeFlow[A](avgAgent, cmsAgent, dvAgent, hllAgent, qtAgent, time)
+      val ffg = Flow.fromGraph(composite)
+      ffg.to(Sink.ignore).named("parallelApproximatorsSink")
+  }
 }
