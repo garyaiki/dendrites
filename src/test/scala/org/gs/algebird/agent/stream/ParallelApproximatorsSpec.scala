@@ -36,12 +36,7 @@ import scala.reflect.runtime.universe.TypeTag
 import org.gs.aggregator.mean
 import org.gs.aggregator._
 import org.gs.algebird._
-import org.gs.algebird.agent.{Agents, 
-  AveragedAgent,
-  CountMinSketchAgent,
-  DecayedValueAgent,
-  HyperLogLogAgent,
-  QTreeAgent}
+import org.gs.algebird.agent.Agents
 import org.gs.algebird.typeclasses.QTreeLike
 import org.gs.fixtures.TestValuesBuilder
 

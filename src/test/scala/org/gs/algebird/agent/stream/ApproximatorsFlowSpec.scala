@@ -28,19 +28,15 @@ import org.scalatest._
 import org.scalatest.Matchers._
 import org.gs.aggregator._
 import org.gs.algebird._
-import org.gs.algebird.agent.{ AveragedAgent,
-  CountMinSketchAgent,
-  DecayedValueAgent,
-  HyperLogLogAgent,
-  QTreeAgent }
+import org.gs.algebird.agent.Agents
 import org.gs.fixtures.TestValuesBuilder
 import org.gs.algebird.agent.stream.ApproximatorsFlow
 
-
-/** @author garystruthers
+/**
   *
+  * @author Gary Struthers
   */
-class ApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
+class ApproximatorsFlowSpec extends WordSpecLike with TestValuesBuilder {
   implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
@@ -53,12 +49,13 @@ class ApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
   "A BigDecimals ApproximatorsFlow" should {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[BigDecimal](qTreeLevel)
-      val bdFlow = new ApproximatorsFlow[BigDecimal](
-        new AveragedAgent("test approximators Averaged Value Agent"),
-        new CountMinSketchAgent[BigDecimal]("test approximators Count Min Sketch Agent"),
-        new DecayedValueAgent("test approximators DecayedValue Agent", halfLife),
-        new HyperLogLogAgent("test approximators HyperLogLog Agent"),
-        new QTreeAgent[BigDecimal]("test approximators QTree Agent"))
+      val agents = new Agents[BigDecimal]("test BigDecimal approximators agents")
+      val avgAgent = agents.avgAgent
+      val cmsAgent = agents.cmsAgent
+      val dvAgent = agents.dcaAgent
+      val hllAgent = agents.hllAgent
+      val qtAgent = agents.qtAgent
+      val bdFlow = new ApproximatorsFlow[BigDecimal](avgAgent, cmsAgent, dvAgent, hllAgent, qtAgent)
         
       val (pub, sub) = TestSource.probe[Seq[BigDecimal]]
         .via(bdFlow.approximators)
@@ -84,12 +81,13 @@ class ApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
   "A BigInts ApproximatorsFlow" should {
     "update all agents and return their latest values" in {
       implicit val qtBISemigroup = new QTreeSemigroup[BigInt](qTreeLevel)
-      val biFlow = new ApproximatorsFlow[BigInt](
-        new AveragedAgent("test approximators Averaged Value Agent"),
-        new CountMinSketchAgent[BigInt]("test approximators Count Min Sketch Agent"),
-        new DecayedValueAgent("test approximators DecayedValue Agent", halfLife),
-        new HyperLogLogAgent("test approximators HyperLogLog Agent"),
-        new QTreeAgent[BigInt]("test approximators QTree Agent"))
+      val agents = new Agents[BigInt]("test BigInt approximators agents")
+      val avgAgent = agents.avgAgent
+      val cmsAgent = agents.cmsAgent
+      val dvAgent = agents.dcaAgent
+      val hllAgent = agents.hllAgent
+      val qtAgent = agents.qtAgent
+      val biFlow = new ApproximatorsFlow[BigInt](avgAgent, cmsAgent, dvAgent, hllAgent, qtAgent)
         
       val (pub, sub) = TestSource.probe[Seq[BigInt]]
         .via(biFlow.approximators)
@@ -115,12 +113,13 @@ class ApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
   "A Doubles ApproximatorsFlow" should {
     "update all agents and return their latest values" in {
       implicit val qtBISemigroup = new QTreeSemigroup[Double](qTreeLevel)
-      val biFlow = new ApproximatorsFlow[Double](
-        new AveragedAgent("test approximators Averaged Value Agent"),
-        new CountMinSketchAgent[Double]("test approximators Count Min Sketch Agent"),
-        new DecayedValueAgent("test approximators DecayedValue Agent", halfLife),
-        new HyperLogLogAgent("test approximators HyperLogLog Agent"),
-        new QTreeAgent[Double]("test approximators QTree Agent"))
+      val agents = new Agents[Double]("test Double approximators agents")
+      val avgAgent = agents.avgAgent
+      val cmsAgent = agents.cmsAgent
+      val dvAgent = agents.dcaAgent
+      val hllAgent = agents.hllAgent
+      val qtAgent = agents.qtAgent
+      val biFlow = new ApproximatorsFlow[Double](avgAgent, cmsAgent, dvAgent, hllAgent, qtAgent)
         
       val (pub, sub) = TestSource.probe[Seq[Double]]
         .via(biFlow.approximators)
@@ -146,12 +145,13 @@ class ApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
   "A Floats ApproximatorsFlow" should {
     "update all agents and return their latest values" in {
       implicit val qtBISemigroup = new QTreeSemigroup[Float](qTreeLevel)
-      val biFlow = new ApproximatorsFlow[Float](
-        new AveragedAgent("test approximators Averaged Value Agent"),
-        new CountMinSketchAgent[Float]("test approximators Count Min Sketch Agent"),
-        new DecayedValueAgent("test approximators DecayedValue Agent", halfLife),
-        new HyperLogLogAgent("test approximators HyperLogLog Agent"),
-        new QTreeAgent[Float]("test approximators QTree Agent"))
+      val agents = new Agents[Float]("test Float approximators agents")
+      val avgAgent = agents.avgAgent
+      val cmsAgent = agents.cmsAgent
+      val dvAgent = agents.dcaAgent
+      val hllAgent = agents.hllAgent
+      val qtAgent = agents.qtAgent
+      val biFlow = new ApproximatorsFlow[Float](avgAgent, cmsAgent, dvAgent, hllAgent, qtAgent)
         
       val (pub, sub) = TestSource.probe[Seq[Float]]
         .via(biFlow.approximators)
@@ -177,12 +177,13 @@ class ApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
   "A Ints ApproximatorsFlow" should {
     "update all agents and return their latest values" in {
       implicit val qtBISemigroup = new QTreeSemigroup[Int](qTreeLevel)
-      val biFlow = new ApproximatorsFlow[Int](
-        new AveragedAgent("test approximators Averaged Value Agent"),
-        new CountMinSketchAgent[Int]("test approximators Count Min Sketch Agent"),
-        new DecayedValueAgent("test approximators DecayedValue Agent", halfLife),
-        new HyperLogLogAgent("test approximators HyperLogLog Agent"),
-        new QTreeAgent[Int]("test approximators QTree Agent"))
+      val agents = new Agents[Int]("test Int approximators agents")
+      val avgAgent = agents.avgAgent
+      val cmsAgent = agents.cmsAgent
+      val dvAgent = agents.dcaAgent
+      val hllAgent = agents.hllAgent
+      val qtAgent = agents.qtAgent
+      val biFlow = new ApproximatorsFlow[Int](avgAgent, cmsAgent, dvAgent, hllAgent, qtAgent)
         
       val (pub, sub) = TestSource.probe[Seq[Int]]
         .via(biFlow.approximators)
@@ -208,12 +209,13 @@ class ApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
   "A Longs ApproximatorsFlow" should {
     "update all agents and return their latest values" in {
       implicit val qtBISemigroup = new QTreeSemigroup[Long](qTreeLevel)
-      val biFlow = new ApproximatorsFlow[Long](
-        new AveragedAgent("test approximators Averaged Value Agent"),
-        new CountMinSketchAgent[Long]("test approximators Count Min Sketch Agent"),
-        new DecayedValueAgent("test approximators DecayedValue Agent", halfLife),
-        new HyperLogLogAgent("test approximators HyperLogLog Agent"),
-        new QTreeAgent[Long]("test approximators QTree Agent"))
+      val agents = new Agents[Long]("test Long approximators agents")
+      val avgAgent = agents.avgAgent
+      val cmsAgent = agents.cmsAgent
+      val dvAgent = agents.dcaAgent
+      val hllAgent = agents.hllAgent
+      val qtAgent = agents.qtAgent
+      val biFlow = new ApproximatorsFlow[Long](avgAgent, cmsAgent, dvAgent, hllAgent, qtAgent)
         
       val (pub, sub) = TestSource.probe[Seq[Long]]
         .via(biFlow.approximators)

@@ -36,7 +36,7 @@ import scala.reflect.runtime.universe.TypeTag
 import org.gs.aggregator.mean
 import org.gs.aggregator._
 import org.gs.algebird._
-import org.gs.algebird.agent.{AveragedAgent, CountMinSketchAgent, DecayedValueAgent, HyperLogLogAgent, QTreeAgent}
+import org.gs.algebird.agent.Agents
 import org.gs.algebird.typeclasses.QTreeLike
 import org.gs.fixtures.TestValuesBuilder
 
@@ -58,12 +58,12 @@ class ParallelApproximatorsSinkSpec extends WordSpecLike with TestValuesBuilder 
   "A composite sink of BigDecimals ParallelApproximators" should {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[BigDecimal](qTreeLevel)
-
-      val avgAgent = new AveragedAgent("test approximators Averaged Value Agent")
-      val cmsAgent = new CountMinSketchAgent[BigDecimal]("test approximators CountMinSketch Agent")
-      val dvAgent = new DecayedValueAgent("test approximators DecayedValue Agent", halfLife)
-      val hllAgent = new HyperLogLogAgent("test approximators HyperLogLog Agent")
-      val qtAgent = new QTreeAgent[BigDecimal]("test approximators QTree Agent")
+      val agents = new Agents[BigDecimal]("test BigDecimal approximators agents")
+      val avgAgent = agents.avgAgent
+      val cmsAgent = agents.cmsAgent
+      val dvAgent = agents.dcaAgent
+      val hllAgent = agents.hllAgent
+      val qtAgent = agents.qtAgent
       val source = Source.single(bigDecimals)
       val composite = ParallelApproximators.compositeSink[BigDecimal](avgAgent,
         cmsAgent,
@@ -110,15 +110,15 @@ class ParallelApproximatorsSinkSpec extends WordSpecLike with TestValuesBuilder 
     }
   }
   
-  "A BigInt ParallelApproximators" should {
+  "A composite sink of BigInt ParallelApproximators" should {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[BigInt](qTreeLevel)
-
-      val avgAgent = new AveragedAgent("test approximators Averaged Value Agent")
-      val cmsAgent = new CountMinSketchAgent[BigInt]("test approximators CountMinSketch Agent")
-      val dvAgent = new DecayedValueAgent("test approximators DecayedValue Agent", halfLife)
-      val hllAgent = new HyperLogLogAgent("test approximators HyperLogLog Agent")
-      val qtAgent = new QTreeAgent[BigInt]("test approximators QTree Agent")
+      val agents = new Agents[BigInt]("test BigInt approximators agents")
+      val avgAgent = agents.avgAgent
+      val cmsAgent = agents.cmsAgent
+      val dvAgent = agents.dcaAgent
+      val hllAgent = agents.hllAgent
+      val qtAgent = agents.qtAgent
       val source = Source.single(bigInts)
       val composite = ParallelApproximators.compositeSink[BigInt](avgAgent,
         cmsAgent,
@@ -129,24 +129,7 @@ class ParallelApproximatorsSinkSpec extends WordSpecLike with TestValuesBuilder 
 
       source.runWith(composite)
       Thread.sleep(30)//Stream completes before agent updates
-      /*
-      val ffg = Flow.fromGraph(composite)
-      val (pub, sub) = TestSource.probe[Seq[BigInt]]
-        .via(ffg)
-        .toMat(TestSink.probe[(Future[AveragedValue],
-            Future[CMS[BigInt]],
-            Future[Seq[com.twitter.algebird.DecayedValue]],
-            Future[HLL],
-            Future[QTree[BigInt]])])(Keep.both)
-        .run()
-      sub.request(1)
-      pub.sendNext(bigInts)
-      val response = sub.expectNext()
-      pub.sendComplete()
-      sub.expectComplete()
 
-      source.via(ffg).runWith(Sink.ignore)
-*/
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
         val count = result.count
@@ -182,15 +165,15 @@ class ParallelApproximatorsSinkSpec extends WordSpecLike with TestValuesBuilder 
     }
   }
   
-  "A Double ParallelApproximators" should {
+  "A composite sink of Double ParallelApproximators" should {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[Double](qTreeLevel)
-
-      val avgAgent = new AveragedAgent("test approximators Averaged Value Agent")
-      val cmsAgent = new CountMinSketchAgent[Double]("test approximators CountMinSketch Agent")
-      val dvAgent = new DecayedValueAgent("test approximators DecayedValue Agent", halfLife)
-      val hllAgent = new HyperLogLogAgent("test approximators HyperLogLog Agent")
-      val qtAgent = new QTreeAgent[Double]("test approximators QTree Agent")
+      val agents = new Agents[Double]("test Double approximators agents")
+      val avgAgent = agents.avgAgent
+      val cmsAgent = agents.cmsAgent
+      val dvAgent = agents.dcaAgent
+      val hllAgent = agents.hllAgent
+      val qtAgent = agents.qtAgent
       val source = Source.single(doubles)
       val composite = ParallelApproximators.compositeSink[Double](avgAgent,
         cmsAgent,
@@ -201,23 +184,6 @@ class ParallelApproximatorsSinkSpec extends WordSpecLike with TestValuesBuilder 
 
       source.runWith(composite)
       Thread.sleep(30)//Stream completes before agent updates
-      /*
-      val ffg = Flow.fromGraph(composite)
-      val (pub, sub) = TestSource.probe[Seq[Double]]
-        .via(ffg)
-        .toMat(TestSink.probe[(Future[AveragedValue],
-            Future[CMS[Double]],
-            Future[Seq[com.twitter.algebird.DecayedValue]],
-            Future[HLL],
-            Future[QTree[Double]])])(Keep.both)
-        .run()
-      sub.request(1)
-      pub.sendNext(doubles)
-      val response = sub.expectNext()
-      pub.sendComplete()
-      sub.expectComplete()
-
-      //source.via(ffg).runWith(Sink.ignore)*/
 
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
@@ -254,15 +220,15 @@ class ParallelApproximatorsSinkSpec extends WordSpecLike with TestValuesBuilder 
     }
   }
   
-  "A Float ParallelApproximators" should {
+  "A composite sink of Float ParallelApproximators" should {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[Float](qTreeLevel)
-
-      val avgAgent = new AveragedAgent("test approximators Averaged Value Agent")
-      val cmsAgent = new CountMinSketchAgent[Float]("test approximators CountMinSketch Agent")
-      val dvAgent = new DecayedValueAgent("test approximators DecayedValue Agent", halfLife)
-      val hllAgent = new HyperLogLogAgent("test approximators HyperLogLog Agent")
-      val qtAgent = new QTreeAgent[Float]("test approximators QTree Agent")
+      val agents = new Agents[Float]("test Float approximators agents")
+      val avgAgent = agents.avgAgent
+      val cmsAgent = agents.cmsAgent
+      val dvAgent = agents.dcaAgent
+      val hllAgent = agents.hllAgent
+      val qtAgent = agents.qtAgent
       val source = Source.single(floats)
       val composite = ParallelApproximators.compositeSink[Float](avgAgent,
         cmsAgent,
@@ -273,23 +239,6 @@ class ParallelApproximatorsSinkSpec extends WordSpecLike with TestValuesBuilder 
 
       source.runWith(composite)
       Thread.sleep(30)//Stream completes before agent updates
-      /*
-      val ffg = Flow.fromGraph(composite)
-      val (pub, sub) = TestSource.probe[Seq[Float]]
-        .via(ffg)
-        .toMat(TestSink.probe[(Future[AveragedValue],
-            Future[CMS[Float]],
-            Future[Seq[com.twitter.algebird.DecayedValue]],
-            Future[HLL],
-            Future[QTree[Float]])])(Keep.both)
-        .run()
-      sub.request(1)
-      pub.sendNext(floats)
-      val response = sub.expectNext()
-      pub.sendComplete()
-      sub.expectComplete()
-
-      //source.via(ffg).runWith(Sink.ignore)*/
 
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
@@ -326,15 +275,15 @@ class ParallelApproximatorsSinkSpec extends WordSpecLike with TestValuesBuilder 
     }
   }
   
-  "A Int ParallelApproximators" should {
+  "A composite sink of Int ParallelApproximators" should {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[Int](qTreeLevel)
-
-      val avgAgent = new AveragedAgent("test approximators Averaged Value Agent")
-      val cmsAgent = new CountMinSketchAgent[Int]("test approximators CountMinSketch Agent")
-      val dvAgent = new DecayedValueAgent("test approximators DecayedValue Agent", halfLife)
-      val hllAgent = new HyperLogLogAgent("test approximators HyperLogLog Agent")
-      val qtAgent = new QTreeAgent[Int]("test approximators QTree Agent")
+      val agents = new Agents[Int]("test Int approximators agents")
+      val avgAgent = agents.avgAgent
+      val cmsAgent = agents.cmsAgent
+      val dvAgent = agents.dcaAgent
+      val hllAgent = agents.hllAgent
+      val qtAgent = agents.qtAgent
       val source = Source.single(ints)
       val composite = ParallelApproximators.compositeSink[Int](avgAgent,
         cmsAgent,
@@ -345,23 +294,6 @@ class ParallelApproximatorsSinkSpec extends WordSpecLike with TestValuesBuilder 
 
       source.runWith(composite)
       Thread.sleep(30)//Stream completes before agent updates
-/*
-      val ffg = Flow.fromGraph(composite)
-      val (pub, sub) = TestSource.probe[Seq[Int]]
-        .via(ffg)
-        .toMat(TestSink.probe[(Future[AveragedValue],
-            Future[CMS[Int]],
-            Future[Seq[com.twitter.algebird.DecayedValue]],
-            Future[HLL],
-            Future[QTree[Int]])])(Keep.both)
-        .run()
-      sub.request(1)
-      pub.sendNext(ints)
-      val response = sub.expectNext()
-      pub.sendComplete()
-      sub.expectComplete()
-
-      //source.via(ffg).runWith(Sink.ignore)*/
 
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
@@ -398,15 +330,15 @@ class ParallelApproximatorsSinkSpec extends WordSpecLike with TestValuesBuilder 
     }
   }
   
-  "A Long ParallelApproximators" should {
+  "A composite sink of Long ParallelApproximators" should {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[Long](qTreeLevel)
-
-      val avgAgent = new AveragedAgent("test approximators Averaged Value Agent")
-      val cmsAgent = new CountMinSketchAgent[Long]("test approximators CountMinSketch Agent")
-      val dvAgent = new DecayedValueAgent("test approximators DecayedValue Agent", halfLife)
-      val hllAgent = new HyperLogLogAgent("test approximators HyperLogLog Agent")
-      val qtAgent = new QTreeAgent[Long]("test approximators QTree Agent")
+      val agents = new Agents[Long]("test Long approximators agents")
+      val avgAgent = agents.avgAgent
+      val cmsAgent = agents.cmsAgent
+      val dvAgent = agents.dcaAgent
+      val hllAgent = agents.hllAgent
+      val qtAgent = agents.qtAgent
       val source = Source.single(longs)
       val composite = ParallelApproximators.compositeSink[Long](avgAgent,
         cmsAgent,
@@ -417,23 +349,6 @@ class ParallelApproximatorsSinkSpec extends WordSpecLike with TestValuesBuilder 
 
       source.runWith(composite)
       Thread.sleep(30)//Stream completes before agent updates
-
-/*      val ffg = Flow.fromGraph(composite)
-      val (pub, sub) = TestSource.probe[Seq[Long]]
-        .via(ffg)
-        .toMat(TestSink.probe[(Future[AveragedValue],
-            Future[CMS[Long]],
-            Future[Seq[com.twitter.algebird.DecayedValue]],
-            Future[HLL],
-            Future[QTree[Long]])])(Keep.both)
-        .run()
-      sub.request(1)
-      pub.sendNext(longs)
-      val response = sub.expectNext()
-      pub.sendComplete()
-      sub.expectComplete()
-
-      //source.via(ffg).runWith(Sink.ignore)*/
 
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>

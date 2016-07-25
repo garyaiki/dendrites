@@ -2,7 +2,7 @@
   */
 package org.gs.algebird.agent
 
-import com.twitter.algebird._
+import com.twitter.algebird.QTreeSemigroup
 import org.scalatest.{ Matchers, WordSpecLike }
 import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
