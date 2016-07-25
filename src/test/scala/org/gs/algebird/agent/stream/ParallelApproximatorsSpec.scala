@@ -36,7 +36,12 @@ import scala.reflect.runtime.universe.TypeTag
 import org.gs.aggregator.mean
 import org.gs.aggregator._
 import org.gs.algebird._
-import org.gs.algebird.agent.{AveragedAgent, CountMinSketchAgent, DecayedValueAgent, HyperLogLogAgent, QTreeAgent}
+import org.gs.algebird.agent.{Agents, 
+  AveragedAgent,
+  CountMinSketchAgent,
+  DecayedValueAgent,
+  HyperLogLogAgent,
+  QTreeAgent}
 import org.gs.algebird.typeclasses.QTreeLike
 import org.gs.fixtures.TestValuesBuilder
 
@@ -58,13 +63,12 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
   "A BigDecimals ParallelApproximators" should {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[BigDecimal](qTreeLevel)
-
-      val avgAgent = new AveragedAgent("test approximators Averaged Value Agent")
-      val cmsAgent = new CountMinSketchAgent[BigDecimal]("test approximators CountMinSketch Agent")
-      val dvAgent = new DecayedValueAgent("test approximators DecayedValue Agent", halfLife)
-      val hllAgent = new HyperLogLogAgent("test approximators HyperLogLog Agent")
-      val qtAgent = new QTreeAgent[BigDecimal]("test approximators QTree Agent")
-      //val source = Source.single(bigDecimals)
+      val agents = new Agents[BigDecimal]("test BigDecimal approximators agents")
+      val avgAgent = agents.avgAgent
+      val cmsAgent = agents.cmsAgent
+      val dvAgent = agents.dcaAgent
+      val hllAgent = agents.hllAgent
+      val qtAgent = agents.qtAgent
       val composite = ParallelApproximators.compositeFlow[BigDecimal](avgAgent,
         cmsAgent,
         dvAgent,
@@ -86,8 +90,6 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-
-      //source.via(ffg).runWith(Sink.ignore)
 
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
@@ -128,12 +130,12 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[BigInt](qTreeLevel)
 
-      val avgAgent = new AveragedAgent("test approximators Averaged Value Agent")
-      val cmsAgent = new CountMinSketchAgent[BigInt]("test approximators CountMinSketch Agent")
-      val dvAgent = new DecayedValueAgent("test approximators DecayedValue Agent", halfLife)
-      val hllAgent = new HyperLogLogAgent("test approximators HyperLogLog Agent")
-      val qtAgent = new QTreeAgent[BigInt]("test approximators QTree Agent")
-      //val source = Source.single(bigInts)
+      val agents = new Agents[BigInt]("test BigInt approximators agents")
+      val avgAgent = agents.avgAgent
+      val cmsAgent = agents.cmsAgent
+      val dvAgent = agents.dcaAgent
+      val hllAgent = agents.hllAgent
+      val qtAgent = agents.qtAgent
       val composite = ParallelApproximators.compositeFlow[BigInt](avgAgent,
         cmsAgent,
         dvAgent,
@@ -154,8 +156,6 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-
-      //source.via(ffg).runWith(Sink.ignore)
 
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
@@ -196,12 +196,12 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[Double](qTreeLevel)
 
-      val avgAgent = new AveragedAgent("test approximators Averaged Value Agent")
-      val cmsAgent = new CountMinSketchAgent[Double]("test approximators CountMinSketch Agent")
-      val dvAgent = new DecayedValueAgent("test approximators DecayedValue Agent", halfLife)
-      val hllAgent = new HyperLogLogAgent("test approximators HyperLogLog Agent")
-      val qtAgent = new QTreeAgent[Double]("test approximators QTree Agent")
-      //val source = Source.single(doubles)
+      val agents = new Agents[Double]("test Double approximators agents")
+      val avgAgent = agents.avgAgent
+      val cmsAgent = agents.cmsAgent
+      val dvAgent = agents.dcaAgent
+      val hllAgent = agents.hllAgent
+      val qtAgent = agents.qtAgent
       val composite = ParallelApproximators.compositeFlow[Double](avgAgent,
         cmsAgent,
         dvAgent,
@@ -222,8 +222,6 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-
-      //source.via(ffg).runWith(Sink.ignore)
 
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
@@ -264,12 +262,12 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[Float](qTreeLevel)
 
-      val avgAgent = new AveragedAgent("test approximators Averaged Value Agent")
-      val cmsAgent = new CountMinSketchAgent[Float]("test approximators CountMinSketch Agent")
-      val dvAgent = new DecayedValueAgent("test approximators DecayedValue Agent", halfLife)
-      val hllAgent = new HyperLogLogAgent("test approximators HyperLogLog Agent")
-      val qtAgent = new QTreeAgent[Float]("test approximators QTree Agent")
-      //val source = Source.single(floats)
+      val agents = new Agents[Float]("test Float approximators agents")
+      val avgAgent = agents.avgAgent
+      val cmsAgent = agents.cmsAgent
+      val dvAgent = agents.dcaAgent
+      val hllAgent = agents.hllAgent
+      val qtAgent = agents.qtAgent
       val composite = ParallelApproximators.compositeFlow[Float](avgAgent,
         cmsAgent,
         dvAgent,
@@ -290,8 +288,6 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-
-      //source.via(ffg).runWith(Sink.ignore)
 
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
@@ -332,12 +328,12 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[Int](qTreeLevel)
 
-      val avgAgent = new AveragedAgent("test approximators Averaged Value Agent")
-      val cmsAgent = new CountMinSketchAgent[Int]("test approximators CountMinSketch Agent")
-      val dvAgent = new DecayedValueAgent("test approximators DecayedValue Agent", halfLife)
-      val hllAgent = new HyperLogLogAgent("test approximators HyperLogLog Agent")
-      val qtAgent = new QTreeAgent[Int]("test approximators QTree Agent")
-      //val source = Source.single(ints)
+      val agents = new Agents[Int]("test Int approximators agents")
+      val avgAgent = agents.avgAgent
+      val cmsAgent = agents.cmsAgent
+      val dvAgent = agents.dcaAgent
+      val hllAgent = agents.hllAgent
+      val qtAgent = agents.qtAgent
       val composite = ParallelApproximators.compositeFlow[Int](avgAgent,
         cmsAgent,
         dvAgent,
@@ -358,8 +354,6 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-
-      //source.via(ffg).runWith(Sink.ignore)
 
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
@@ -400,12 +394,12 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[Long](qTreeLevel)
 
-      val avgAgent = new AveragedAgent("test approximators Averaged Value Agent")
-      val cmsAgent = new CountMinSketchAgent[Long]("test approximators CountMinSketch Agent")
-      val dvAgent = new DecayedValueAgent("test approximators DecayedValue Agent", halfLife)
-      val hllAgent = new HyperLogLogAgent("test approximators HyperLogLog Agent")
-      val qtAgent = new QTreeAgent[Long]("test approximators QTree Agent")
-      //val source = Source.single(longs)
+      val agents = new Agents[Long]("test Long approximators agents")
+      val avgAgent = agents.avgAgent
+      val cmsAgent = agents.cmsAgent
+      val dvAgent = agents.dcaAgent
+      val hllAgent = agents.hllAgent
+      val qtAgent = agents.qtAgent
       val composite = ParallelApproximators.compositeFlow[Long](avgAgent,
         cmsAgent,
         dvAgent,
@@ -426,8 +420,6 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-
-      //source.via(ffg).runWith(Sink.ignore)
 
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
