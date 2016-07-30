@@ -14,18 +14,19 @@ limitations under the License.
 */
 package org.gs.algebird.stream
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.language.postfixOps
+
 import akka.actor.ActorSystem
-import akka.event.{ LoggingAdapter, Logging }
+import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
-import akka.stream.testkit.scaladsl.{ TestSink, TestSource }
+import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.twitter.algebird.CMSHasherImplicits._
 import com.twitter.algebird._
-import org.scalatest.{ WordSpecLike, Matchers }
+import org.scalatest.{Matchers,WordSpecLike}
 import org.scalatest._
 import org.scalatest.Matchers._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.language.postfixOps
 import org.gs.aggregator._
 import org.gs.algebird._
 import org.gs.algebird.agent.Agents
