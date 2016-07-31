@@ -15,8 +15,13 @@ limitations under the License.
 package org.gs.examples.account.http.stream.actor
 
 import akka.NotUsed
-import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
-import akka.actor.{OneForOneStrategy, SupervisorStrategy}
+import akka.actor.{Actor,
+  ActorLogging,
+  ActorRef,
+  ActorSystem,
+  Props,
+  OneForOneStrategy,
+  SupervisorStrategy}
 import akka.event.LoggingAdapter
 import akka.stream.{Materializer, OverflowStrategy}
 import akka.stream.scaladsl.{Sink, Source}
@@ -37,10 +42,9 @@ import org.gs.examples.account.GetAccountBalances
 import org.gs.examples.account.stream.extractBalancesFlow
 import org.gs.stream.actor.CallStream
 import org.gs.stream.actor.CallStream.props
-import org.gs.stream.actor.StreamSinkRefSupervisor.SinkActor
-
 import org.gs.stream.actor.OtherActor
 import ParallelCallSupervisor.props
+import ParallelCallSupervisor.SinkActor
 
 /** Creates ParallelCallSupervisor, LogLeftSendRightActor, ResultsActor
   *

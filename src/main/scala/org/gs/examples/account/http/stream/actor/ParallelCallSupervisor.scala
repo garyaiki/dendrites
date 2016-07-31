@@ -40,7 +40,7 @@ import scala.concurrent.duration._
 import scala.reflect.runtime.universe._
 import org.gs.examples.account.http.stream.ParallelCallFlow
 import org.gs.stream.actor.{CallStream, OtherActor}
-import org.gs.stream.actor.StreamSinkRefSupervisor.SinkActor
+import ParallelCallSupervisor.SinkActor
 
 /** Creates CallStream with a RunnablaGraph for ParallelCallFlow
   *
@@ -58,12 +58,12 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSinkActor: SinkActor) ex
   final implicit val materializer: ActorMaterializer =
     ActorMaterializer(ActorMaterializerSettings(system))
     
-  val pcf = new ParallelCallFlow
+  val pcf = new ParallelCallFlow()
   val wrappedFlow: Flow[A, (Seq[String], Seq[AnyRef]), NotUsed] = pcf.wrappedCallsLRFlow
   val bufferSize = 10
   val overflowStrategy = OverflowStrategy.fail
   var sinkActor: SinkActor = initSinkActor
-  val callStreamName = "CallStream"// + typeOf[A].getClass.getSimpleName
+  val callStreamName = "CallStream" + typeOf[A].getClass.getSimpleName
   var callStream: ActorRef = null
   
   /** Create a CallStream Actor. First watch the ActorRef of the Sink's target.
@@ -112,7 +112,6 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSinkActor: SinkActor) ex
         super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => SupervisorStrategy.Escalate)
     }
 
-
   /** ready:Receive normal processing
     *
     * Forward messages intended for CallStream
@@ -124,7 +123,6 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSinkActor: SinkActor) ex
   	* @see [[http://doc.akka.io/api/akka/current/#akka.actor.Terminated Terminated]]
   	*/
   def ready: Receive = {
-    case x: A ⇒ callStream forward x
 
     case Terminated(actor) ⇒ {
       context.parent ! SinkActor(null, sinkActor.name)
@@ -133,6 +131,8 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSinkActor: SinkActor) ex
       context.become(waiting)
       log.warning("sinkActor {} terminated", sinkActor)
     }
+    
+    case x: A ⇒ callStream forward x
   }
 
   /** waiting Receive state.
@@ -148,7 +148,6 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSinkActor: SinkActor) ex
   	* @see [[http://doc.akka.io/api/akka/current/#akka.actor.Terminated Terminated]]
   	*/
   def waiting: Receive = {
-    case x: A ⇒ stash()
 
     case Terminated(actor) ⇒ {
       context.parent ! SinkActor(null, sinkActor.name)
@@ -162,6 +161,8 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSinkActor: SinkActor) ex
       unstashAll()
       context.become(ready)
     }    
+
+    case x: A ⇒ stash()
   }
 
   /** receive is ready for normal processing, waiting while updating ActorRef for Sink	*/
@@ -170,8 +171,10 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSinkActor: SinkActor) ex
 }
 
 object ParallelCallSupervisor {
-  //case class SinkActor(override val ref: ActorRef, override val name: String) extends OtherActor  
 
-  def props[A <: Product: TypeTag](sinkActor: SinkActor): Props = Props(new ParallelCallSupervisor[A](sinkActor))
+  case class SinkActor(override val ref: ActorRef, override val name: String) extends OtherActor  
+
+  def props[A <: Product: TypeTag](sinkActor: SinkActor): Props =
+    Props(new ParallelCallSupervisor[A](sinkActor))
 }
 

@@ -89,7 +89,7 @@ class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) exte
         log.error(e, msg)
         throw(e)
       }
-      case x => System.out.println(s"unknown offerResult:$x")
+      case x => log.warning("unknown offerResult {}", x)
     }
   }
 
@@ -112,7 +112,8 @@ class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) exte
       offerResultHandler(y)
     }
 
-    case x: A ⇒ {System.out.println(s"x:$x")
+    case x: A ⇒ {
+      log.debug("Type A msg {}", x)
       val offerFuture: Future[QueueOfferResult] = rgMaterialized.offer(x)
       offerFuture pipeTo self
     }
@@ -137,18 +138,6 @@ object CallStream {
   def props[A: TypeTag](runnable: RunnableGraph[SourceQueueWithComplete[A]]): Props = {
     Props(new CallStream[A](runnable))
   }
-
-  /** Create CallStream Props for stream that don't send messages from their Sink
-    *
-    * @param flow Akka stream Flow
-    * @return Props to create actor
-  
-  def props[A: TypeTag](flow: Flow[A, (Seq[String], Seq[AnyRef]), NotUsed]): Props = {
-    val source = Source.queue[A](10, OverflowStrategy.fail)
-    val sink = Sink.ignore
-    val runnable: RunnableGraph[SourceQueueWithComplete[A]] = source.via(flow).to(sink)
-    Props(new CallStream[A](runnable))
-  }*/
 
   /** Create CallStream Props for stream that sends Sink input to the Actor Ref
     *
