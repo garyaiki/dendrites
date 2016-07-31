@@ -17,8 +17,9 @@ package org.gs.algebird.agent.stream
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
-import akka.stream.{FlowShape, Graph, Materializer, UniformFanOutShape}
-import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Sink, ZipWith}
+import akka.stream.{FlowShape, Graph, Materializer, OverflowStrategy, UniformFanOutShape}
+import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Keep, RunnableGraph, Sink, Source, SourceQueueWithComplete, ZipWith}
+
 import akka.stream.scaladsl.GraphDSL.Implicits._
 import com.twitter.algebird.{AveragedValue, CMS, CMSHasher, DecayedValue, HLL, QTree}
 import scala.concurrent.Future
@@ -118,5 +119,19 @@ object ParallelApproximators {
       val composite = compositeFlow[A](avgAgent, cmsAgent, dvAgent, hllAgent, qtAgent, time)
       val ffg = Flow.fromGraph(composite)
       ffg.to(Sink.ignore).named("parallelApproximatorsSink")
+  }
+
+  def runnable[A: HyperLogLogLike: Numeric: CMSHasher: QTreeLike: TypeTag](
+    avgAgent: AveragedAgent,
+    cmsAgent: CountMinSketchAgent[A],
+    dvAgent: DecayedValueAgent,
+    hllAgent: HyperLogLogAgent,
+    qtAgent: QTreeAgent[A],
+    time:A => Double)
+    (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
+            RunnableGraph[SourceQueueWithComplete[Seq[A]]] = {
+    val source = Source.queue[Seq[A]](10, OverflowStrategy.fail)
+    val composite = compositeFlow[A](avgAgent, cmsAgent, dvAgent, hllAgent, qtAgent, time)
+    source.via(composite).to(Sink.ignore)
   }
 }

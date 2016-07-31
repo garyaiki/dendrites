@@ -15,6 +15,7 @@ limitations under the License.
 package org.gs.actor
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props, Stash, Terminated}
+import org.gs.stream.actor.CallStream.CompleteMessage
 import org.gs.stream.actor.OtherActor
 import LogLeftSendRightActor.ResultsActor
 
@@ -43,27 +44,33 @@ class LogLeftSendRightActor(initActor: ResultsActor) extends Actor with Stash wi
   }
 
   def ready: Receive = {
-    case x: (Seq[String], Seq[AnyRef]) ⇒ {
-      for(errorMsg <- x._1) {System.out.println(s"errorMsg:$errorMsg")
-        log.warning(errorMsg)
-      }/*
-      for(results <- x._2) {System.out.println(s"results:$results")
-        resultsActor.ref ! results
-      }*/
-      resultsActor.ref ! x._2
-      //resultsActor.ref ! "complete"
+
+    case CompleteMessage => {
+      log.debug("CompleteMessage from {}", sender)
+      resultsActor.ref ! CompleteMessage
     }
 
     case Terminated(actor) ⇒ {
       context.parent ! ResultsActor(null, resultsActor.name)
       context.unwatch(resultsActor.ref)
       context.become(waiting)
-      log.warning("resultsActor {} terminated", actor)
+      log.debug("resultsActor {} terminated", actor)
+    }
+
+    case x: (Seq[String], Seq[AnyRef]) ⇒ {
+      for(errorMsg <- x._1) {
+        log.warning(errorMsg)
+      }
+      resultsActor.ref ! x._2
     }
   }
 
   def waiting: Receive = {
-    case x: (Seq[String], Seq[AnyRef]) ⇒ stash()
+
+    case CompleteMessage => {
+      log.debug("CompleteMessage from {}", sender)
+      resultsActor.ref ! CompleteMessage
+    }
 
     case Terminated(actor) ⇒ {
       context.parent ! ResultsActor(null, resultsActor.name)
@@ -76,7 +83,9 @@ class LogLeftSendRightActor(initActor: ResultsActor) extends Actor with Stash wi
       context.watch(resultsActor.ref)
       unstashAll()
       context.become(ready)
-    }    
+    }
+
+    case x: (Seq[String], Seq[AnyRef]) ⇒ stash()
   }
 
   def receive = ready

@@ -60,14 +60,11 @@ class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLik
       agents.qtAgent,
       nowMillis[A])
   val source = Source.queue[Seq[AnyRef]](10, OverflowStrategy.fail)
-  //val extB = extractBalancesFlow.via(agentsFlow)
-  val resultsRunnable = source.map { elem => System.out.println(s"elem:$elem"); elem }.via(extractBalancesFlow).via(agentsFlow).to(Sink.ignore)
-    /*  ParallelApproximators.runnable(agents.avgAgent,
-      agents.cmsAgent,
-      agents.dcaAgent,
-      agents.hllAgent,
-      agents.qtAgent,
-      nowMillis[A])*/
+  val resultsRunnable = source.map { elem => log.debug("Source queue elem{}", elem); elem }
+  .via(extractBalancesFlow)
+  .via(agentsFlow)
+  .to(Sink.ignore)
+
       
   val errorLoggerName = "errorLogger"
   var errorLogger: ActorRef = null

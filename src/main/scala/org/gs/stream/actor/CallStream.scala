@@ -28,6 +28,7 @@ import akka.stream.scaladsl.{Flow, RunnableGraph, Sink, Source, SourceQueueWithC
 import java.util.MissingResourceException
 import scala.concurrent.Future
 import scala.reflect.runtime.universe.TypeTag
+import CallStream.CompleteMessage
 
 /** Generic Actor that calls a stream in a RunnableGraph. All customization can be in the graph
   *
@@ -103,23 +104,30 @@ class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) exte
     * message everythingElse is the fall through and is logged
     */
   def receive = {
+
+    case CompleteMessage => {
+      log.debug("CompleteMessage from {}", sender)
+    }
     case y: QueueOfferResult => {
       offerResultHandler(y)
     }
+
     case x: A ⇒ {System.out.println(s"x:$x")
       val offerFuture: Future[QueueOfferResult] = rgMaterialized.offer(x)
       offerFuture pipeTo self
     }
-    case "completed" => rgMaterialized.complete()
+
     case everythingElse => {
       log.warning("unknown message {}", everythingElse)
-      //rgMaterialized.fail(ex)
     }
   }
 }
 
 /** Actor messages and Props factory */
 object CallStream {
+
+  /** message sent to ActorRef when stream completes */
+  case object CompleteMessage
 
   /** Create CallStream Props for stream that don't send messages from their Sink
     *
@@ -134,28 +142,26 @@ object CallStream {
     *
     * @param flow Akka stream Flow
     * @return Props to create actor
-  */
+  
   def props[A: TypeTag](flow: Flow[A, (Seq[String], Seq[AnyRef]), NotUsed]): Props = {
     val source = Source.queue[A](10, OverflowStrategy.fail)
     val sink = Sink.ignore
     val runnable: RunnableGraph[SourceQueueWithComplete[A]] = source.via(flow).to(sink)
     Props(new CallStream[A](runnable))
-  }
+  }*/
 
   /** Create CallStream Props for stream that sends Sink input to the Actor Ref
     *
     * @param sinkRef ActorRef that becomes the Sink
     * @param flow Akka stream Flow
     * @return Props to create actor
-  */
+  	*/
   def props[A: TypeTag](sinkRef: ActorRef,
           flow: Flow[A, (Seq[String], Seq[AnyRef]),
           NotUsed]): Props = {
     val source = Source.queue[A](10, OverflowStrategy.fail)
-    val sink = Sink.actorRef(sinkRef, onCompleteMessage)
+    val sink = Sink.actorRef(sinkRef, CompleteMessage)
     val runnable: RunnableGraph[SourceQueueWithComplete[A]] = source.via(flow).to(sink)
     Props(new CallStream[A](runnable))
   }
-
-  val onCompleteMessage = "completed" // message sent to ActorRef when stream completes 
 }
