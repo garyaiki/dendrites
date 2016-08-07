@@ -621,7 +621,8 @@ package object algebird {
     */
   def createCMSMonoid[K: Ordering: CMSHasher](eps: Double = 0.001,
                                               delta: Double = 1E-10,
-                                              seed: Int = 1): CMSMonoid[K] = new CMSMonoid[K](eps, delta, seed)
+                                              seed: Int = 1): CMSMonoid[K] =
+                                                new CMSMonoid[K](eps, delta, seed)
 
   /** Create a CMS
     *

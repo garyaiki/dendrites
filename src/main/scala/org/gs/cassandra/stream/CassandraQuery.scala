@@ -25,6 +25,19 @@ class CassandraQuery(session: Session, fetchSize: Int = 0)(implicit logger: Logg
     * getUniterruptibly method on ResultSetFuture. Then push the ResultSet
     *
     * @param inheritedAttributes
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/UnsupportedFeatureException.html UnsupportedFeatureException]]
+    * @throws UnsupportedFeatureException - if the protocol version 1 is in use and a feature not
+    * supported has been used. Features that are not supported by the version protocol 1 include:
+    * BatchStatement, ResultSet paging and binary values in RegularStatement.
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/NoHostAvailableException.html NoHostAvailableException]]
+    * @throws NoHostAvailableException - if no host in the cluster can be contacted successfully.
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/QueryExecutionException.html QueryExecutionException]]
+		* @throws QueryExecutionException - if the query triggered an execution exception, that is an
+		* exception thrown by Cassandra when it cannot execute the query with the requested consistency
+		* level successfully.
+		* @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/QueryValidationException.html QueryValidationException]]
+		* @throws QueryValidationException - if the query is invalid (syntax error, unauthorized or any
+		* other validation problem).
     */
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {

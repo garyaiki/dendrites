@@ -87,6 +87,11 @@ package object cassandra {
     * @see [[http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/Cluster.html Cluster]]
     * @param node Internet address of initial Cassandra node
     * @return cluster
+    * @see [[https://docs.oracle.com/javase/8/docs/api/java/lang/IllegalArgumentException.html IllegalArgumentException]]
+    * @throws IllegalArgumentException - if no IP address for address could be found
+    * @throws [[https://docs.oracle.com/javase/8/docs/api/java/lang/SecurityException.html SecurityException]]
+		* @throws SecurityException - if a security manager is present and permission to resolve the
+		*  host name is denied.
     */
   def createCluster(node: String): Cluster = Cluster.builder().addContactPoint(node).build()
 
@@ -104,8 +109,18 @@ package object cassandra {
 
   /** Log cluster's metadata.
     *
-    * @see [[http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/Metadata.html Metadata]]
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/Metadata.html Metadata]]
     * @param cluster
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/NoHostAvailableException.html NoHostAvailableException]]
+    * @throws NoHostAvailableException - if the Cluster has not been initialized yet and no host
+    * amongst the contact points can be reached.
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/AuthenticationException.html AuthenticationException]]
+		*	@throws AuthenticationException - if an authentication error occurs while contacting the
+		* initial contact points.
+		* @see [[https://docs.oracle.com/javase/8/docs/api/java/lang/IllegalStateException.html IllegalStateException]]
+		* @throws IllegalStateException - if the Cluster was closed prior to calling this method. This
+		* can occur either directly (through close() or closeAsync()), or as a result of an error while
+		* initializing the Cluster.
     */
   def logMetadata(cluster: Cluster): Unit = {
     val metadata = cluster.getMetadata()
@@ -122,6 +137,9 @@ package object cassandra {
     *
     * @see [[http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/QueryLogger.html QueryLogger]]
     * @param cluster
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/QueryLogger.Builder.html QueryLogger.Builder]]
+    * @throws IllegalArgumentException - if the builder is unable to build a valid instance due to
+    * incorrect settings.
     */
   def registerQueryLogger(cluster: Cluster): Unit = {
     val queryLogger = QueryLogger.builder()
@@ -146,6 +164,16 @@ package object cassandra {
     *
     * @param cluster
     * @param ldBalPolicy
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/NoHostAvailableException.html NoHostAvailableException]]
+    * @throws NoHostAvailableException - if the Cluster has not been initialized yet and no host
+    * amongst the contact points can be reached.
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/AuthenticationException.html AuthenticationException]]
+		*	@throws AuthenticationException - if an authentication error occurs while contacting the
+		* initial contact points.
+		* @see [[https://docs.oracle.com/javase/8/docs/api/java/lang/IllegalStateException.html IllegalStateException]]
+		* @throws IllegalStateException - if the Cluster was closed prior to calling this method. This
+		* can occur either directly (through close() or closeAsync()), or as a result of an error while
+		* initializing the Cluster.
     */
   def initLoadBalancingPolicy(cluster: Cluster, ldBalPolicy: LoadBalancingPolicy): Unit = {
     val hosts = cluster.getMetadata().getAllHosts()
@@ -158,6 +186,18 @@ package object cassandra {
     * @param cluster
     * @param keyspace Specify only if keyspace exists
     * @return Session
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/NoHostAvailableException.html NoHostAvailableException]]
+    * @throws NoHostAvailableException - if the Cluster has not been initialized yet and no host
+    * amongst the contact points can be reached.
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/AuthenticationException.html AuthenticationException]]
+		*	@throws AuthenticationException - if an authentication error occurs while contacting the
+		* initial contact points.
+		* @see [[https://docs.oracle.com/javase/8/docs/api/java/lang/IllegalStateException.html IllegalStateException]]
+		* @throws IllegalStateException - if the Cluster was closed prior to calling this method. This
+		* can occur either directly (through close() or closeAsync()), or as a result of an error while
+		* initializing the Cluster.
+		* @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/InvalidQueryException.html InvalidQueryException]]
+		* @throws InvalidQueryException
     */
   def connect(cluster: Cluster, keyspace: Option[String] = None): Session = {
     keyspace match {
@@ -173,6 +213,19 @@ package object cassandra {
     * @param strategy SimpleStrategy for 1 datacenter NetowrkTopologyStrategy for more datacenters
     * @param repCount number of copies of data
     * @return an empty ResultSet on Success
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/UnsupportedFeatureException.html UnsupportedFeatureException]]
+    * @throws UnsupportedFeatureException - if the protocol version 1 is in use and a feature not
+    * supported has been used. Features that are not supported by the version protocol 1 include:
+    * BatchStatement, ResultSet paging and binary values in RegularStatement.
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/NoHostAvailableException.html NoHostAvailableException]]
+    * @throws NoHostAvailableException - if no host in the cluster can be contacted successfully.
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/QueryExecutionException.html QueryExecutionException]]
+		* @throws QueryExecutionException - if the query triggered an execution exception, that is an
+		* exception thrown by Cassandra when it cannot execute the query with the requested consistency
+		* level successfully.
+		* @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/QueryValidationException.html QueryValidationException]]
+		* @throws QueryValidationException - if the query is invalid (syntax error, unauthorized or any
+		* other validation problem).
     */
   def createSchema(session: Session, schema: String, strategy: String, repCount: Int): ResultSet = {
     val rsf = session.executeAsync("CREATE KEYSPACE IF NOT EXISTS " + schema + " WITH replication"
@@ -186,6 +239,8 @@ package object cassandra {
     * @param schema
     * @param table
     * @return PreparedStatement Cassandra DB has prepared
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/NoHostAvailableException.html NoHostAvailableException]]
+    * @throws NoHostAvailableException - if no host in the cluster can be contacted successfully.
     */
   def selectAll(session: Session, schema: String, table: String): PreparedStatement = {
       session.prepare("SELECT * FROM " + schema + "." + table + ";")
@@ -196,6 +251,19 @@ package object cassandra {
     * @param session
     * @param bndStmt with values previously bound
     * @return ResultSet on Success
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/UnsupportedFeatureException.html UnsupportedFeatureException]]
+    * @throws UnsupportedFeatureException - if the protocol version 1 is in use and a feature not
+    * supported has been used. Features that are not supported by the version protocol 1 include:
+    * BatchStatement, ResultSet paging and binary values in RegularStatement.
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/NoHostAvailableException.html NoHostAvailableException]]
+    * @throws NoHostAvailableException - if no host in the cluster can be contacted successfully.
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/QueryExecutionException.html QueryExecutionException]]
+		* @throws QueryExecutionException - if the query triggered an execution exception, that is an
+		* exception thrown by Cassandra when it cannot execute the query with the requested consistency
+		* level successfully.
+		* @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/QueryValidationException.html QueryValidationException]]
+		* @throws QueryValidationException - if the query is invalid (syntax error, unauthorized or any
+		* other validation problem).
     */
   def executeBoundStmt(session: Session, bndStmt: BoundStatement): ResultSet = {
     val resultSetFuture = session.executeAsync(bndStmt)
@@ -213,6 +281,15 @@ package object cassandra {
     *
     * @param session
     * @param schema
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/NoHostAvailableException.html NoHostAvailableException]]
+    * @throws NoHostAvailableException - if no host in the cluster can be contacted successfully.
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/QueryExecutionException.html QueryExecutionException]]
+		* @throws QueryExecutionException - if the query triggered an execution exception, that is an
+		* exception thrown by Cassandra when it cannot execute the query with the requested consistency
+		* level successfully.
+		* @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/QueryValidationException.html QueryValidationException]]
+		* @throws QueryValidationException - if the query is invalid (syntax error, unauthorized or any
+		* other validation problem).
     */
   def dropSchema(session: Session, schema: String): Unit = {
     session.execute("DROP KEYSPACE IF EXISTS " + schema)
@@ -220,7 +297,7 @@ package object cassandra {
 
   /** Asynchronously close Session and Cluster. Turns Cassandra's Java Futures into Scala Futures
     *
-    * @see [[http://docs.datastax.com/en/drivers/java/3.0/com/datastax/driver/core/CloseFuture.html CloseFuture]]
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/CloseFuture.html CloseFuture]]
     * @see [[http://google.github.io/guava/releases/19.0/api/docs/com/google/common/util/concurrent/ListenableFuture.html ListenableFuture]]
     * @param session
     * @param cluster

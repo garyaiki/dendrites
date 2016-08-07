@@ -1,5 +1,17 @@
-/**
-  */
+/** Copyright 2016 Gary Struthers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs
 
 import _root_.akka.NotUsed
@@ -93,7 +105,7 @@ package object stream {
     (Seq(lefts: _*), Seq(rights: _*))
   }
 
-  /** Wrap tuple2LeftRight into a Flow
+  /** Wrap tuple3LeftRight into a Flow
     *
     * @return mapped tuple2
     */
@@ -101,4 +113,39 @@ package object stream {
           (Seq[String], Seq[AnyRef]), NotUsed] =
     Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef])].
     map(tuple3LeftRight)
+
+  /** Map tuple3 from Zip stage to log failure and pass success results
+    *
+    * @param in tuple3 the result from 3 parallel calls
+    * @return success results
+    */
+  def tuple3LogLeftRight(
+      in: (Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef]))
+      (implicit logger: LoggingAdapter): Seq[AnyRef] = {
+
+    val rights = new ArrayBuffer[AnyRef]()
+    in._1 match {
+      case Left(l)  => logger.warning(l)
+      case Right(r) => rights += r
+    }
+    in._2 match {
+      case Left(l)  => logger.warning(l)
+      case Right(r) => rights += r
+    }
+    in._3 match {
+      case Left(l)  => logger.warning(l)
+      case Right(r) => rights += r
+    }
+    Seq(rights: _*)
+  }
+
+  /** Wrap tuple3LogLeftRight into a Flow
+    *
+    * @return Seq[AnyRef]
+    */
+  def logLeftRightFlow(implicit logger: LoggingAdapter):
+          Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef]),
+            Seq[AnyRef], NotUsed] =
+    Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef])].
+    map(tuple3LogLeftRight)
 }
