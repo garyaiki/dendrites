@@ -1,21 +1,39 @@
-/**
-  */
+/** Copyright 2016 Gary Struthers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs.kafka.stream
 
 import akka.actor.ActorSystem
 import akka.event.{LoggingAdapter, Logging}
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Flow, Sink, Source}
+import akka.stream.scaladsl.{Keep,Flow, Sink, Source}
+import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.typesafe.config.ConfigFactory
-import org.scalatest._
-import org.scalatest.{BeforeAndAfterAll, WordSpecLike}
-import scala.collection.immutable.Iterable
-import scala.concurrent.duration._
+import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import org.scalatest.concurrent.PatienceConfiguration.Timeout
+import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.time.SpanSugar._
+import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.collection.immutable.{Iterable, Seq}
+//import scala.concurrent.duration._
 import org.gs.avro.ccToByteArray
 import org.gs.avro.stream.{AvroDeserializer, AvroSerializer}
 import org.gs.examples.account.GetAccountBalances
 import org.gs.examples.account.avro.genericRecordToGetAccountBalances
 import org.gs.examples.account.kafka.{AccountConsumer, AccountProducer}
+import KafkaSource.decider
 
 /** Test integration of Kafka with Akka Streams. There are 2 multi-stage flows. The first stream
   * serializes case classes to Avro byteArrays then writes them to Kafka. The second stream reads
@@ -64,9 +82,10 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   val config = ConfigFactory.load()
-  val timeout = config.getLong("dendrites.kafka.account.close-timeout")
+  val closeTimeout = config.getLong("dendrites.kafka.account.close-timeout")
   val ap = AccountProducer
   val accountConsumerConfig = AccountConsumer
+
   override def beforeAll() {
     
   }
@@ -81,6 +100,7 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
           GetAccountBalances(8L),
           GetAccountBalances(9L))
   val iter = Iterable(getBals.toSeq:_*)
+  val timeout: Timeout = Timeout(10000 millis)
 
   "An KafkaStream" should {
     "serialize case classes then write them to Kafka" in {
@@ -99,13 +119,15 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
           .via(consumerRecordQueue)
           .via(consumerRecordValueFlow)
           .via(deserializer)
-          .runWith(Sink.fold(0){(sum, _) => sum + 1})
+          .runWith(TestSink.probe[GetAccountBalances])
+          .request(10)
+          .expectNextUnorderedN(getBals)
     }
   }
 
   override def afterAll() {
     ap.producer.flush()
-    Thread.sleep(timeout)
-    ap.producer.close(timeout * 10, scala.concurrent.duration.MILLISECONDS)   
+    Thread.sleep(closeTimeout)
+    ap.producer.close(closeTimeout * 10, scala.concurrent.duration.MILLISECONDS)   
   }
 }
