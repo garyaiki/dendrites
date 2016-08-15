@@ -37,41 +37,28 @@ import org.apache.kafka.common.errors.{InvalidTopicException, //Stopping excepti
   UnknownServerException}
 import scala.util.control.NonFatal
 import org.gs.kafka.ProducerConfig
-
-/** Sink stage that writes to Kafka
-  *
-  * KafkaSink is initialized with a wrapped KafkaProducer. It includes topic, key, and Key, Value
-  * types specific to the topic. KafkaProducer is heavy weight, multi-threaded, usually serves other
-  * topics and is long lived. If a Kafka RetryableException is thrown while writing, KafkaSink
-  * catches it and retries the write. If a write throws a subclass of KafkaException this
-  * test's Decider stops the write stream.
-  *
-  * KafkaProducer's send() returns a Java/Guava ListenableFuture, not a nice Scala Future. Kafka's
-  * ListenableFuture passes 2 arguments to a Kafka Producer Callback, a RecordMetadata and an
-  * Exception. One of these arguments will be null. I cope with this in the least awful way I found.
-  * If a RecordMetadata was returned it means success so an AsynCallback is called that pulls a
-  * record from upstream. If an exception was returned a different AsynCallback is called that
-  * deals with 2 types of exceptions, RetriableException and KafkaException.
-  *
-  * RetriableException is when there was a fleeting error that may not recur so resend the message.
-  * This will keep retrying indefinitely until stream or other container times out.
-  *
-  * A KafkaException is logged and rethrown.
+import org.gs.kafka.stream.KafkaSink.decider
+/** A copy of [[org.gs.kafka.stream.KafkaSink]] modified to inject exceptions into Kafka Producer
+  * asynchronous callback
   *
   * @tparam K Kafka ProducerRecord key
   * @tparam V Type of serialized object received from stream and Kafka ProducerRecord value
   * @param wProd extends KafkaProducer with key, value, and topic fields
   *
   * @author Gary Struthers
-  *	exception - The exception thrown during processing of this record. Null if no error occurred.
-  * Possible thrown exceptions include: Non-Retriable exceptions (fatal, the message will never be
-  * sent):
+  *
   */
-class KafkaSink[K, V](wProd: ProducerConfig[K, V])(implicit logger: LoggingAdapter)
-    extends GraphStage[SinkShape[V]] {
+class MockKafkaSink[K, V](wProd: ProducerConfig[K, V], testException: RuntimeException)
+        (implicit logger: LoggingAdapter) extends GraphStage[SinkShape[V]] {
 
+  var handledTestException = false
   val producer = wProd.producer
-  val in = Inlet[V](s"KafkaSink")
+  /* for access to MockProducer debugging methods
+  import org.apache.kafka.clients.producer.MockProducer
+  val mockProducer = producer match {
+    case x: MockProducer[K, V] => x
+  }*/
+  val in = Inlet[V](s"MockKafkaSink")
   override val shape: SinkShape[V] = SinkShape(in)
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
@@ -110,7 +97,11 @@ class KafkaSink[K, V](wProd: ProducerConfig[K, V])(implicit logger: LoggingAdapt
           val pullCallback = getAsyncCallback{ (_: Unit) => pull(in) }
           val kafkaCallback = new Callback() {
             def onCompletion(meta: RecordMetadata, e: Exception): Unit = {
-              if (e != null) errorCallback invoke(e) else pullCallback invoke((): Unit)
+              if(!handledTestException && testException != null) {
+                handledTestException = true
+                errorCallback invoke(testException)
+              }
+              else pullCallback invoke((): Unit)
             }
           }
           val curriedAsyncEx = asyncExceptions(producerRecord, kafkaCallback) _
@@ -124,20 +115,8 @@ class KafkaSink[K, V](wProd: ProducerConfig[K, V])(implicit logger: LoggingAdapt
 
 /** Factory for KafkaSink with wrapped KafkaProducer and its properties configuration
   * Sink.fromGraph promotes KafkaSink from a SinkShape to a Sink
-  *
-  * KafkaSink companion object defines a Supervision Decider. Custom AkkaStream stages can use Akka
-  * Supervision but they must provide customized ways to handle exception directives returned by the
-  * Decider.
-  *
-  * Kafka's Retriable exceptions thrown by Kafka Producer are mapped to Supervision.Resume.
-  * AkkaStream doesn't have a Retry mode, so Resume is used instead.A Producer.send that failed with
-  * a Retriable exception will retry the send and will keep retrying until there is a Stop exception
-  * or the stream times out.
-  *
-  * Other exceptions thrown by Kafka Producer are mapped to Supervision.Stop. This stops KafkaSink.
-  *
   */
-object KafkaSink {
+object MockKafkaSink {
 
   /** Create Kafka Sink as Akka Sink with Supervision
     *
@@ -147,9 +126,9 @@ object KafkaSink {
  		* @param implicit logger
   	* @return Sink[V, NotUsed]
   	*/
-  def apply[K, V](producer: ProducerConfig[K, V])(implicit logger: LoggingAdapter):
+  def apply[K, V](producer: ProducerConfig[K, V], testException: RuntimeException)(implicit logger: LoggingAdapter):
           Sink[V, NotUsed] = {
-    val sink = Sink.fromGraph(new KafkaSink[K, V](producer))
+    val sink = Sink.fromGraph(new MockKafkaSink[K, V](producer, testException))
     sink.withAttributes(ActorAttributes.supervisionStrategy(decider))
   }
 
@@ -169,7 +148,7 @@ object KafkaSink {
   	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/OffsetOutOfRangeException.html OffsetOutOfRangeException]]
   	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/TimeoutException.html TimeoutException]]
   	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/UnknownTopicOrPartitionException.html UnknownTopicOrPartitionException]]
-		*/
+		
   def decider: Supervision.Decider = {
     case _: CorruptRecordException => Supervision.Resume
     case _: UnknownServerException => Supervision.Stop // subclass of InvalidMetadataException
@@ -186,5 +165,5 @@ object KafkaSink {
     case _: RecordTooLargeException => Supervision.Stop
     case _: KafkaException => Supervision.Stop // Catch all for Kafka exceptions
     case _  => Supervision.Stop
-  }
+  }*/
 }

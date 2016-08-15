@@ -14,22 +14,12 @@ limitations under the License.
 */
 package org.gs.kafka
 
-import org.apache.kafka.clients.producer.Producer
+import org.apache.kafka.clients.producer.MockProducer
+import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSerializer}
 
-/** Abstract KafkaProducer configuration
- *
- *
- * @tparam <K> Kafka ProducerRecord key
- * @tparam <V> Kafka ProducerRecord value
- *
- * @author Gary Struthers
- *
- */
-trait ProducerConfig[K, V] {
-  type Key = K
-  type Value = V
-
-  val producer: Producer[K, V]
-  val topic: String
-  val key: Key
+object MockProducerConfig extends ProducerConfig[String, Array[Byte]] {
+  val topic = "akkaKafka"
+  val key = topic + "Key"
+  val autoComplete = true // When false must call completeNext or errorNext for each record 
+  val producer = new MockProducer(autoComplete, new StringSerializer, new ByteArraySerializer)
 }
