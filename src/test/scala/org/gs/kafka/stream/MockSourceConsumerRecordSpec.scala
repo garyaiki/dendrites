@@ -1,13 +1,27 @@
+/** Copyright 2016 Gary Struthers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs.kafka.stream
 
 import akka.actor.ActorSystem
-import akka.event.{LoggingAdapter, Logging}
+import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
+import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import java.util.{List => JList}
 import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords}
-import org.scalatest.{WordSpecLike, Matchers}
+import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.Matchers._
 import scala.collection.immutable.Queue
 import org.gs.kafka.{MockConsumerConfig, MockConsumerRecords}
@@ -32,51 +46,51 @@ class MockSourceConsumerRecordSpec extends WordSpecLike {
         .request(1)
         .expectNext()
 
-      assert(result.length === 7)
+      result.length shouldBe 7
       val (cr0, q0Tail) = result.dequeue
-      assert(cr0.key() === this.mockConsumerFacade.key)
-      assert(cr0.offset() === 0L)
-      assert(cr0.partition() === 0)
-      assert(cr0.topic() === this.mockConsumerFacade.topic)
-      assert(cr0.value() === "0")
+      cr0.key() shouldBe this.mockConsumerFacade.key
+      cr0.offset() shouldBe 0L
+      cr0.partition() shouldBe 0
+      cr0.topic() shouldBe this.mockConsumerFacade.topic
+      cr0.value() shouldBe "0"
 
       val (cr1, q1Tail) = q0Tail.dequeue
-      assert(cr1.offset() === 10L)
-      assert(cr1.partition() === 0)
-      assert(cr1.topic() === this.mockConsumerFacade.topic)
-      assert(cr1.value() === "10")
+      cr1.offset() shouldBe 10L
+      cr1.partition() shouldBe 0
+      cr1.topic() shouldBe this.mockConsumerFacade.topic
+      cr1.value() shouldBe "10"
 
       val (cr2, q2Tail) = q1Tail.dequeue
-      assert(cr2.offset() === 20L)
-      assert(cr2.partition() === 0)
-      assert(cr2.topic() === this.mockConsumerFacade.topic)
-      assert(cr2.value() === "20")
+      cr2.offset() shouldBe 20L
+      cr2.partition() shouldBe 0
+      cr2.topic() shouldBe this.mockConsumerFacade.topic
+      cr2.value() shouldBe "20"
 
       val (cr3, q3Tail) = q2Tail.dequeue
-      assert(cr3.offset() === 0L)
-      assert(cr3.partition() === 1)
-      assert(cr3.topic() === this.mockConsumerFacade.topic)
-      assert(cr3.value() === "5")
+      cr3.offset() shouldBe 0L
+      cr3.partition() shouldBe 1
+      cr3.topic() shouldBe this.mockConsumerFacade.topic
+      cr3.value() shouldBe "5"
 
       val (cr4, q4Tail) = q3Tail.dequeue
-      assert(cr4.offset() === 10L)
-      assert(cr4.partition() === 1)
-      assert(cr4.topic() === this.mockConsumerFacade.topic)
-      assert(cr4.value() === "15")
+      cr4.offset() shouldBe 10L
+      cr4.partition() shouldBe 1
+      cr4.topic() shouldBe this.mockConsumerFacade.topic
+      cr4.value() shouldBe "15"
 
       val (cr5, q5Tail) = q4Tail.dequeue
-      assert(cr5.offset() === 20L)
-      assert(cr5.partition() === 1)
-      assert(cr5.topic() === this.mockConsumerFacade.topic)
-      assert(cr5.value() === "25")
+      cr5.offset() shouldBe 20L
+      cr5.partition() shouldBe 1
+      cr5.topic() shouldBe this.mockConsumerFacade.topic
+      cr5.value() shouldBe "25"
 
       val (cr6, q6Tail) = q5Tail.dequeue
-      assert(cr6.offset() === 30L)
-      assert(cr6.partition() === 1)
-      assert(cr6.topic() === this.mockConsumerFacade.topic)
-      assert(cr6.value() === "35")
+      cr6.offset() shouldBe 30L
+      cr6.partition() shouldBe 1
+      cr6.topic() shouldBe this.mockConsumerFacade.topic
+      cr6.value() shouldBe "35"
       intercept[java.util.NoSuchElementException] { q6Tail.dequeue }
-      assert(q6Tail.length === 0)
+      q6Tail.length shouldBe 0
     }
   }
 }
