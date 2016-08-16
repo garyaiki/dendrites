@@ -26,7 +26,7 @@ class ConsumerPropertiesSpec extends WordSpecLike {
       prop.getProperty("auto.commit.interval.ms") should equal("1000")
     }
     "have a session.timeout.ms" in {
-      prop.getProperty("session.timeout.ms") should equal("30000")
+      prop.getProperty("session.timeout.ms") should equal("7000")
     }
     "have a key.deserializer" in {
       prop.getProperty("key.deserializer") should equal(

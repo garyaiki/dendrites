@@ -1,3 +1,17 @@
+/** Copyright 2016 Gary Struthers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs.kafka
 
 import akka.actor.ActorSystem
@@ -15,11 +29,11 @@ class MockConsumerSpec extends WordSpecLike {
     "have valid properties" in {
       val mc = mockConsumerFacade.createAndSubscribe()
       val subscription = mc.subscription()
+      subscription should contain("akkaKafka")
 
-      assert(subscription.contains("akkaKafka"))
       val comsumerRecords = mc.poll(mockConsumerFacade.timeout)
 
-      assert(comsumerRecords.count === 7)
+      comsumerRecords.count should equal(7)
       mc.close()
     }
   }
