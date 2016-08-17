@@ -38,17 +38,20 @@ import org.apache.kafka.common.errors.{InvalidTopicException, //Stopping excepti
 import scala.util.control.NonFatal
 import org.gs.kafka.ProducerConfig
 import org.gs.kafka.stream.KafkaSink.decider
+
 /** A copy of [[org.gs.kafka.stream.KafkaSink]] modified to inject exceptions into Kafka Producer
   * asynchronous callback
   *
   * @tparam K Kafka ProducerRecord key
   * @tparam V Type of serialized object received from stream and Kafka ProducerRecord value
   * @param wProd extends KafkaProducer with key, value, and topic fields
+  * @param testException for injecting exceptions to test Supervision
+  * @param implicit logger
   *
   * @author Gary Struthers
   *
   */
-class MockKafkaSink[K, V](wProd: ProducerConfig[K, V], testException: RuntimeException)
+class MockKafkaSink[K, V](wProd: ProducerConfig[K, V], testException: RuntimeException = null)
         (implicit logger: LoggingAdapter) extends GraphStage[SinkShape[V]] {
 
   var handledTestException = false

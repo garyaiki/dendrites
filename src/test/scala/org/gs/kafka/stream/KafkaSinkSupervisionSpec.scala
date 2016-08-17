@@ -37,14 +37,12 @@ import org.apache.kafka.common.errors.{InvalidTopicException, //Stopping excepti
   RecordTooLargeException,
   UnknownServerException}
 import org.scalatest.{Matchers, WordSpecLike}
-//import org.scalatest.concurrent.Eventually.eventually
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.collection.immutable.{Iterable, Seq}
-//import scala.concurrent.duration._
 import org.gs.avro.ccToByteArray
 import org.gs.avro.stream.{AvroDeserializer, AvroSerializer}
 import org.gs.examples.account.GetAccountBalances
@@ -103,10 +101,9 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, null)
       source.via(serializer).runWith(sink)
-      Thread.sleep(5000)
+      Thread.sleep(100)
 			val history = producer.history()
-			history.size should be (10)
-      //eventually (timeout(3 seconds), interval(500 millis)) { history.size should be (10)  }
+			history.size shouldBe 10
       producer.clear()
     }
 
@@ -116,10 +113,9 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       val sink = MockKafkaSink[String, Array[Byte]](mock, new CorruptRecordException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(5000)
+      Thread.sleep(100)
 			val history = producer.history()
-			history.size should be (11)
-      //eventually (timeout(3 seconds), interval(500 millis)) { history.size should be (11)  }
+			history.size shouldBe 11
       producer.clear()
     }
 
@@ -129,10 +125,9 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       val sink = MockKafkaSink[String, Array[Byte]](mock, new UnknownServerException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(5000)
+      Thread.sleep(100)
 			val history = producer.history()
-			history.size should be (1)
-      //eventually (timeout(3 seconds), interval(500 millis)) { history.size should be (1)  }
+			history.size shouldBe 1
       producer.clear()
     }
 
@@ -143,10 +138,9 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
               new UnknownTopicOrPartitionException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(5000)
+      Thread.sleep(100)
 			val history = producer.history()
-			history.size should be (11)
-      //eventually (timeout(3 seconds), interval(500 millis)) { history.size should be (11)  }
+			history.size shouldBe 11
       producer.clear()
     }
 
@@ -156,10 +150,9 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       val sink = MockKafkaSink[String, Array[Byte]](mock, new NetworkException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(5000)
+      Thread.sleep(100)
 			val history = producer.history()
-			history.size should be (11)
-      //eventually (timeout(3 seconds), interval(500 millis)) { history.size should be (11)  }
+			history.size shouldBe 11
       producer.clear()
     }
 
@@ -170,10 +163,9 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
               new NotEnoughReplicasAfterAppendException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(5000)
+      Thread.sleep(100)
 			val history = producer.history()
-			history.size should be (11)
-      //eventually (timeout(3 seconds), interval(500 millis)) { history.size should be (11)  }
+			history.size shouldBe 11
       producer.clear()
     }
 
@@ -184,10 +176,9 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
               new NotEnoughReplicasAfterAppendException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(5000)
+      Thread.sleep(100)
 			val history = producer.history()
-			history.size should be (11)
-      //eventually (timeout(3 seconds), interval(500 millis)) { history.size should be (11)  }
+			history.size shouldBe 11
       producer.clear()
     }
 
@@ -197,10 +188,9 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       val sink = MockKafkaSink[String, Array[Byte]](mock, new OffsetOutOfRangeException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(5000)
+      Thread.sleep(100)
 			val history = producer.history()
-			history.size should be (11)
-      //eventually (timeout(3 seconds), interval(500 millis)) { history.size should be (11)  }
+			history.size shouldBe 11
       producer.clear()
     }
 
@@ -210,10 +200,9 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       val sink = MockKafkaSink[String, Array[Byte]](mock, new TimeoutException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(5000)
+      Thread.sleep(100)
 			val history = producer.history()
-			history.size should be (11)
-      //eventually (timeout(3 seconds), interval(500 millis)) { history.size should be (11)  }
+			history.size shouldBe 11
       producer.clear()
     }
 
@@ -223,10 +212,9 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       val sink = MockKafkaSink[String, Array[Byte]](mock, new TimeoutException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(5000)
+      Thread.sleep(100)
 			val history = producer.history()
-			history.size should be (11)
-      //eventually (timeout(3 seconds), interval(500 millis)) { history.size should be (11)  }
+			history.size shouldBe 11
       producer.clear()
     }
 
@@ -236,10 +224,9 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       val sink = MockKafkaSink[String, Array[Byte]](mock, new InvalidTopicException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(5000)
+      Thread.sleep(100)
 			val history = producer.history()
-			history.size should be (1)
-      //eventually (timeout(3 seconds), interval(500 millis)) { history.size should be (1)  }
+			history.size shouldBe 1
       producer.clear()
     }
 
@@ -249,10 +236,9 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       val sink = MockKafkaSink[String, Array[Byte]](mock, new OffsetMetadataTooLarge("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(5000)
+      Thread.sleep(100)
 			val history = producer.history()
-			history.size should be (1)
-      //eventually (timeout(3 seconds), interval(500 millis)) { history.size should be (1)  }
+			history.size shouldBe 1
       producer.clear()
     }
 
@@ -262,10 +248,9 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       val sink = MockKafkaSink[String, Array[Byte]](mock, new RecordBatchTooLargeException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(5000)
+      Thread.sleep(100)
 			val history = producer.history()
-			history.size should be (1)
-      //eventually (timeout(3 seconds), interval(500 millis)) { history.size should be (1)  }
+			history.size shouldBe 1
       producer.clear()
     }
 
@@ -275,10 +260,9 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       val sink = MockKafkaSink[String, Array[Byte]](mock, new RecordTooLargeException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(5000)
+      Thread.sleep(100)
 			val history = producer.history()
-			history.size should be (1)
-      //eventually (timeout(3 seconds), interval(500 millis)) { history.size should be (1)  }
+			history.size shouldBe 1
       producer.clear()
     }
 
@@ -288,10 +272,9 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       val sink = MockKafkaSink[String, Array[Byte]](mock, new KafkaException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(5000)
+      Thread.sleep(100)
 			val history = producer.history()
-			history.size should be (1)
-      //eventually (timeout(3 seconds), interval(500 millis)) { history.size should be (1)  }
+			history.size shouldBe 1
       producer.clear()
     }
   }
