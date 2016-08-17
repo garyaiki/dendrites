@@ -64,14 +64,14 @@ class DecayedValueAgentFlowSpec extends WordSpecLike with TrigUtils {
     
   "A DecayedValueAgentFlow of value/time doubles" should {
     "exceed the mean for 1st 90 values" in {
-      whenReady(updateFuture, timeout) {result => assert(result(90).average(halfLife) > meanDay90)}
+      whenReady(updateFuture, timeout) {result => result(90).average(halfLife) > meanDay90}
     }
   }
 
   it should {
     "be less than the mean for the first 180" in {
       whenReady(updateFuture, timeout) { result =>
-        assert(result(180).average(halfLife) < sines.take(180).sum / 180)
+        result(180).average(halfLife) < sines.take(180).sum / 180
       }
     }
   }
@@ -79,7 +79,7 @@ class DecayedValueAgentFlowSpec extends WordSpecLike with TrigUtils {
   it should {
     "be less than the mean for the first 270" in {
       whenReady(updateFuture, timeout) { result =>
-        assert(result(270).average(halfLife) < sines.take(270).sum / 270)
+        result(270).average(halfLife) < sines.take(270).sum / 270
       }
     }
   }
@@ -88,7 +88,7 @@ class DecayedValueAgentFlowSpec extends WordSpecLike with TrigUtils {
     "be less than the mean for all 3600" in {
 
       whenReady(updateFuture, timeout) { result =>
-        assert(result(360).average(halfLife) < sines.take(360).sum / 360)
+        result(360).average(halfLife) < sines.take(360).sum / 360
       }
     }
   }
@@ -108,7 +108,7 @@ class DecayedValueAgentFlowSpec extends WordSpecLike with TrigUtils {
         pub.sendComplete()
         sub.expectComplete()
         whenReady(updateFuture, timeout) {  result =>
-          assert(result(90).average(halfLife) > meanDay90)
+          result(90).average(halfLife) > meanDay90
         }
     }
   }
@@ -124,8 +124,7 @@ class DecayedValueAgentFlowSpec extends WordSpecLike with TrigUtils {
          
         val updateFuture = dvAgent.agent.future()
         whenReady(updateFuture, timeout) {  result =>
-          //assert(result.size < 0)
-          assert(result(90).average(halfLife) > meanDay90)
+          result(90).average(halfLife) > meanDay90
         }
     }
   }

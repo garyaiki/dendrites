@@ -1,5 +1,17 @@
-/**
-  */
+/** Copyright 2016 Gary Struthers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs.algebird.agent
 
 import com.twitter.algebird._
@@ -35,12 +47,12 @@ class DecayedValueAgentSpec extends WordSpecLike with TrigUtils {
 
     "equal the first 90 values" in {
         val old = decayedValues.agent.get().take(90)
-        assert(old(89).average(10.0) > meanDay90)
+        old(89).average(10.0) > meanDay90
     }
 
     "have a lower average after droping first 90" in {
       val newer = decayedValues.agent.get().drop(90)
-      assert(newer(90).average(10.0) < meanDay90)
+      newer(90).average(10.0) < meanDay90
     }
   }
 }

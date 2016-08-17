@@ -61,7 +61,7 @@ class AveragedAgentFlowSpec extends WordSpecLike with TestValuesBuilder {
       val mBD = mean(bigDecimals)
       whenReady(updateFuture, timeout) { result =>
           result should equal(avg(bigDecimals))
-          assert(result.value === (mBD.right.get.toDouble +- 0.005))
+          result.value shouldBe mBD.right.get.toDouble +- 0.005
       }
     }
   }
@@ -82,8 +82,8 @@ class AveragedAgentFlowSpec extends WordSpecLike with TestValuesBuilder {
       sub.expectComplete()
       val mD = mean(doubles)
       whenReady(updateFuture, timeout) { result =>
-        result should equal(avg(doubles))
-        assert(result.value === (mD.right.get +- 0.005))
+        result shouldBe avg(doubles)
+        result.value shouldBe mD.right.get +- 0.005
       }
     }
   }
@@ -104,8 +104,8 @@ class AveragedAgentFlowSpec extends WordSpecLike with TestValuesBuilder {
       sub.expectComplete()
       val mF = mean(floats)
       whenReady(updateFuture, timeout) { result =>
-        result should equal(avg(floats))
-        assert(result.value === (mF.right.get.toDouble +- 0.005))
+        result shouldBe avg(floats)
+        result.value shouldBe mF.right.get.toDouble +- 0.005
       }
     }
   }
@@ -125,8 +125,8 @@ class AveragedAgentFlowSpec extends WordSpecLike with TestValuesBuilder {
       sub.expectComplete()
       val mBD = mean(bigDecimals)
       whenReady(updateFuture, timeout) { result =>
-          result should equal(avg(bigDecimals))
-          assert(result.value === (mBD.right.get.toDouble +- 0.005))
+          result shouldBe avg(bigDecimals)
+          result.value shouldBe mBD.right.get.toDouble +- 0.005
       }
     }
   }
@@ -142,8 +142,8 @@ class AveragedAgentFlowSpec extends WordSpecLike with TestValuesBuilder {
       val updateFuture = avgAgent.agent.future()
       val mD = mean(doubles)
       whenReady(updateFuture, timeout) { result =>
-        result should equal(avg(doubles))
-        assert(result.value === (mD.right.get +- 0.005))
+        result shouldBe avg(doubles)
+        result.value shouldBe mD.right.get +- 0.005
       }
     }
   }
