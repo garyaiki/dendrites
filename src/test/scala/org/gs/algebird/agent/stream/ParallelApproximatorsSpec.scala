@@ -14,27 +14,25 @@ limitations under the License.
 */
 package org.gs.algebird.agent.stream
 
-
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Flow, Keep, Source, Sink}
+import akka.stream.scaladsl.{Flow, Keep}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.twitter.algebird.{QTree, QTreeSemigroup}
 import com.twitter.algebird.CMSHasherImplicits._
 import com.twitter.algebird._
 import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.Matchers._
-import org.scalatest._
+//import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
-import scala.reflect.runtime.universe.TypeTag
+//import scala.reflect.runtime.universe.TypeTag
 import org.gs.aggregator.mean
-import org.gs.aggregator._
 import org.gs.algebird._
 import org.gs.algebird.agent.Agents
 import org.gs.algebird.typeclasses.QTreeLike
@@ -88,36 +86,33 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
 
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
-        val count = result.count
-        count should equal(bigDecimals.size)
+        result.count should equal(bigDecimals.size)
         val dValue: Double = result.value
         val mD = mean(bigDecimals)
         val expectMean = mD.right.get.toDouble
-        dValue should be (expectMean  +- 0.1)
+        dValue shouldBe expectMean  +- 0.1
       }
 
       val updateCMSFuture = cmsAgent.agent.future()
       whenReady(updateCMSFuture, timeout) { result =>
         val totalCount = result.totalCount
-        totalCount should equal(longs.size)
+        totalCount shouldBe longs.size
       }
 
       val updateDVFuture = dvAgent.agent.future()
       whenReady(updateDVFuture, timeout) {  result =>
         val size = result.size
-        size should be (bigDecimals.size +- 2)
+        size shouldBe bigDecimals.size +- 2
       }
 
       val updateHLLFuture = hllAgent.agent.future()
       whenReady(updateHLLFuture, timeout) { result =>
         val estimatedSize = result.estimatedSize
-        estimatedSize should be(longs.distinct.size.toDouble +- 0.09)
+        estimatedSize shouldBe longs.distinct.size.toDouble +- 0.09
       }
 
 		  val updateQTFuture = qtAgent.agent.future()
-		  whenReady(updateQTFuture, timeout) { result =>
-		    result.count should equal(bigDecimals.size)
-		  }
+		  whenReady(updateQTFuture, timeout) { result => result.count shouldBe bigDecimals.size }
     }
   }
   
@@ -155,35 +150,33 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
         val count = result.count
-        count should equal(bigInts.size)
+        count shouldBe bigInts.size
         val dValue: Double = result.value
         val mD = mean(bigInts)
         val expectMean = mD.right.get.toDouble
-        dValue should be (expectMean  +- 0.5)
+        dValue shouldBe expectMean  +- 0.5
       }
 
       val updateCMSFuture = cmsAgent.agent.future()
       whenReady(updateCMSFuture, timeout) { result =>
         val totalCount = result.totalCount
-        totalCount should equal(longs.size)
+        totalCount shouldBe longs.size
       }
 
       val updateDVFuture = dvAgent.agent.future()
       whenReady(updateDVFuture, timeout) {  result =>
         val size = result.size
-        size should be (bigInts.size +- 2)
+        size shouldBe bigInts.size +- 2
       }
 
       val updateHLLFuture = hllAgent.agent.future()
       whenReady(updateHLLFuture, timeout) { result =>
         val estimatedSize = result.estimatedSize
-        estimatedSize should be(longs.distinct.size.toDouble +- 0.09)
+        estimatedSize shouldBe longs.distinct.size.toDouble +- 0.09
       }
 
 		  val updateQTFuture = qtAgent.agent.future()
-		  whenReady(updateQTFuture, timeout) { result =>
-		    result.count should equal(bigInts.size)
-		  }
+		  whenReady(updateQTFuture, timeout) { result => result.count shouldBe bigInts.size }
     }
   }
   
@@ -221,35 +214,33 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
         val count = result.count
-        count should equal(doubles.size)
+        count shouldBe doubles.size
         val dValue: Double = result.value
         val mD = mean(doubles)
         val expectMean = mD.right.get
-        dValue should be (expectMean  +- 0.5)
+        dValue shouldBe expectMean  +- 0.5
       }
 
       val updateCMSFuture = cmsAgent.agent.future()
       whenReady(updateCMSFuture, timeout) { result =>
         val totalCount = result.totalCount
-        totalCount should equal(longs.size)
+        totalCount shouldBe longs.size
       }
 
       val updateDVFuture = dvAgent.agent.future()
       whenReady(updateDVFuture, timeout) {  result =>
         val size = result.size
-        size should be (bigInts.size +- 2)
+        size shouldBe bigInts.size +- 2
       }
 
       val updateHLLFuture = hllAgent.agent.future()
       whenReady(updateHLLFuture, timeout) { result =>
         val estimatedSize = result.estimatedSize
-        estimatedSize should be(3.0 +- 0.09)//@FIXME
+        estimatedSize shouldBe 3.0 +- 0.09 //@FIXME
       }
 
 		  val updateQTFuture = qtAgent.agent.future()
-		  whenReady(updateQTFuture, timeout) { result =>
-		    result.count should equal(doubles.size)
-		  }
+		  whenReady(updateQTFuture, timeout) { result => result.count shouldBe doubles.size }
     }
   }
   
@@ -287,35 +278,33 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
         val count = result.count
-        count should equal(ints.size)
+        count shouldBe ints.size
         val dValue: Double = result.value
         val mD = mean(ints)
         val expectMean = mD.right.get.toDouble
-        dValue should be (expectMean  +- 12.0)
+        dValue shouldBe expectMean  +- 12.0
       }
 
       val updateCMSFuture = cmsAgent.agent.future()
       whenReady(updateCMSFuture, timeout) { result =>
         val totalCount = result.totalCount
-        totalCount should equal(longs.size)
+        totalCount shouldBe longs.size
       }
 
       val updateDVFuture = dvAgent.agent.future()
       whenReady(updateDVFuture, timeout) {  result =>
         val size = result.size
-        size should be (ints.size +- 2)
+        size shouldBe ints.size +- 2
       }
 
       val updateHLLFuture = hllAgent.agent.future()
       whenReady(updateHLLFuture, timeout) { result =>
         val estimatedSize = result.estimatedSize
-        estimatedSize should be(longs.distinct.size.toDouble +- 0.09)
+        estimatedSize shouldBe longs.distinct.size.toDouble +- 0.09
       }
 
 		  val updateQTFuture = qtAgent.agent.future()
-		  whenReady(updateQTFuture, timeout) { result =>
-		    result.count should equal(floats.size)
-		  }
+		  whenReady(updateQTFuture, timeout) { result => result.count shouldBe floats.size }
     }
   }
   
@@ -353,35 +342,33 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
         val count = result.count
-        count should equal(ints.size)
+        count shouldBe ints.size
         val dValue: Double = result.value
         val mD = mean(ints)
         val expectMean = mD.right.get.toDouble
-        dValue should be (expectMean  +- 0.5)
+        dValue shouldBe expectMean  +- 0.5
       }
 
       val updateCMSFuture = cmsAgent.agent.future()
       whenReady(updateCMSFuture, timeout) { result =>
         val totalCount = result.totalCount
-        totalCount should equal(longs.size)
+        totalCount shouldBe longs.size
       }
 
       val updateDVFuture = dvAgent.agent.future()
       whenReady(updateDVFuture, timeout) {  result =>
         val size = result.size
-        size should be (floats.size +- 2)
+        size shouldBe floats.size +- 2
       }
 
       val updateHLLFuture = hllAgent.agent.future()
       whenReady(updateHLLFuture, timeout) { result =>
         val estimatedSize = result.estimatedSize
-        estimatedSize should be(longs.distinct.size.toDouble +- 0.09)
+        estimatedSize shouldBe longs.distinct.size.toDouble +- 0.09
       }
 
 		  val updateQTFuture = qtAgent.agent.future()
-		  whenReady(updateQTFuture, timeout) { result =>
-		    result.count should equal(floats.size)
-		  }
+		  whenReady(updateQTFuture, timeout) { result => result.count shouldBe floats.size }
     }
   }
   
@@ -419,35 +406,33 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val updateAvgFuture = avgAgent.agent.future()
       whenReady(updateAvgFuture, timeout) { result =>
         val count = result.count
-        count should equal(longs.size)
+        count shouldBe longs.size
         val dValue: Double = result.value
         val mD = mean(longs)
         val expectMean = mD.right.get.toDouble
-        dValue should be (expectMean  +- 0.5)
+        dValue shouldBe expectMean  +- 0.5
       }
 
       val updateCMSFuture = cmsAgent.agent.future()
       whenReady(updateCMSFuture, timeout) { result =>
         val totalCount = result.totalCount
-        totalCount should equal(longs.size)
+        totalCount shouldBe longs.size
       }
 
       val updateDVFuture = dvAgent.agent.future()
       whenReady(updateDVFuture, timeout) {  result =>
         val size = result.size
-        size should be (longs.size +- 2)
+        size shouldBe longs.size +- 2
       }
 
       val updateHLLFuture = hllAgent.agent.future()
       whenReady(updateHLLFuture, timeout) { result =>
         val estimatedSize = result.estimatedSize
-        estimatedSize should be(longs.distinct.size.toDouble +- 0.09)
+        estimatedSize shouldBe longs.distinct.size.toDouble +- 0.09
       }
 
 		  val updateQTFuture = qtAgent.agent.future()
-		  whenReady(updateQTFuture, timeout) { result =>
-		    result.count should equal(longs.size)
-		  }
+		  whenReady(updateQTFuture, timeout) { result => result.count shouldBe longs.size }
     }
   }
 }
