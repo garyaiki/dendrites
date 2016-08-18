@@ -64,7 +64,9 @@ class DecayedValueAgentFlowSpec extends WordSpecLike with TrigUtils {
     
   "A DecayedValueAgentFlow of value/time doubles" should {
     "exceed the mean for 1st 90 values" in {
-      whenReady(updateFuture, timeout) {result => result(90).average(halfLife) > meanDay90}
+      whenReady(updateFuture, timeout) { result =>
+        result(90).average(halfLife) should be > meanDay90
+      }
     }
   }
 
@@ -108,7 +110,7 @@ class DecayedValueAgentFlowSpec extends WordSpecLike with TrigUtils {
         pub.sendComplete()
         sub.expectComplete()
         whenReady(updateFuture, timeout) {  result =>
-          result(90).average(halfLife) > meanDay90
+          result(90).average(halfLife) should be > meanDay90
         }
     }
   }
@@ -124,7 +126,7 @@ class DecayedValueAgentFlowSpec extends WordSpecLike with TrigUtils {
          
         val updateFuture = dvAgent.agent.future()
         whenReady(updateFuture, timeout) {  result =>
-          result(90).average(halfLife) > meanDay90
+          result(90).average(halfLife) should be > meanDay90
         }
     }
   }
