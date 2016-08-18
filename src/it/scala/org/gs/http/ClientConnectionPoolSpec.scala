@@ -61,18 +61,17 @@ class ClientConnectionPoolSpec extends FlatSpec
       .via(flow)
       .runWith(Sink.head)
 
-  "A ClientConnectionPool" should "receive a response to a root request" in {
+  "A ClientConnectionPool" should "receive a response to a root request" ignore {
     val responseFuture = simpleRequest("/ip", 42L, flow)
-
     whenReady(responseFuture, patience) { result =>
       result._2 should equal(42)
     }
   }
 
-  it should "receive a response to a GetAccountBalances simple request" in {
+  it should "receive a response to a GetAccountBalances simple request" ignore {
     val responseFuture = simpleRequest(
             s"/account/balances/checking/GetAccountBalances?id=1", 1L, flow)
-
+            
     whenReady(responseFuture, patience) { result =>
       val response = result._1.get
       result._2 should equal(1)
@@ -89,10 +88,9 @@ class ClientConnectionPoolSpec extends FlatSpec
     }
   }
 
-  it should "receive a response to a GetAccountBalances id Get request" in {
+  it should "receive a response to a GetAccountBalances id Get request" ignore {
     val responseFuture = methodRequest(GET,
                                     s"/account/balances/checking/GetAccountBalances?id=2", 2L, flow)
-
     whenReady(responseFuture, patience) { result =>
       val response = result._1.get
       result._2 should equal(2)

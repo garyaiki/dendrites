@@ -163,6 +163,7 @@ package object http {
                 (implicit system: ActorSystem, materializer: Materializer): Future[HttpResponse] = {
     val balancesQuery = ccToGet(cc, requestPath)
     val uriS = (baseURL ++ balancesQuery).mkString
+
     Http().singleRequest(HttpRequest(uri = uriS))
   }
 
@@ -185,7 +186,6 @@ package object http {
         (response: HttpResponse)
         (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
                    Future[Either[String, AnyRef]] = {
-
       response.status match {
         case OK => {
           val st = response.entity.contentType.mediaType.subType

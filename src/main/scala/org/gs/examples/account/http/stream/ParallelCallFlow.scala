@@ -5,6 +5,7 @@ import akka.event.{LoggingAdapter, Logging}
 import akka.stream.{Materializer, FlowShape, UniformFanOutShape}
 import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, ZipWith}
 import org.gs.stream.leftRightFlow
+import org.gs.stream.logLeftRightFlow
 
 /** Create Graph that calls Checking, MoneyMarket, Savings services in parallel, waits for them all
   * then groups failures and successes
@@ -50,4 +51,14 @@ class ParallelCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
     FlowShape(fgCalls.in, fgLR.outlet)
   }.named("callsLeftRight")
   val wrappedCallsLRFlow = Flow.fromGraph(fgLR)
+
+  // Map tuple3 from flowGraph
+  val fgLogLeftPassRight = GraphDSL.create() { implicit builder =>
+    val fgCalls = builder.add(asFlow)
+    val fgLR = builder.add(logLeftRightFlow) // results combiner
+
+    fgCalls ~> fgLR
+    FlowShape(fgCalls.in, fgLR.outlet)
+  }.named("callsLogLeftRight")
+  val wrappedCallsLogLeftPassRightFlow = Flow.fromGraph(fgLogLeftPassRight)
 }
