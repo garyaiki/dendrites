@@ -1,21 +1,31 @@
-/**
-  */
+/** Copyright 2016 Gary Struthers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs.examples.fixtures
 
-import org.gs.examples.account._
 import scala.collection.immutable.Range
 import scala.math.Numeric.BigDecimalAsIfIntegral
 import org.scalatest._
 import scala.annotation.implicitNotFound
+import org.gs.examples.account._
 
-/** @author garystruthers
-  *
+/**
+  * @author Gary Struthers
   */
 trait AccountTypesBuilder extends SuiteMixin { this: Suite =>
 
-  abstract override def withFixture(test: NoArgTest): Outcome = {
-    super.withFixture(test)
-  }
+  abstract override def withFixture(test: NoArgTest): Outcome = { super.withFixture(test) }
 
   val idRange = 1L until 9L
   implicit val bd = BigDecimalAsIfIntegral

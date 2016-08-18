@@ -70,6 +70,7 @@ import KafkaSource.decider
   * Each test sends 10 items to a sink. If no exception is injected MockProducer.history shows 10
   * sends. Injecting a Retryable exception produces 11 sends. Injecting a Stop exception sends 1.
   *
+  * @Note MockProducer is a singleton, call producer.clear() before and after tests
   * @author Gary Struthers
   *
   */
@@ -82,6 +83,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
   val closeTimeout = config.getLong("dendrites.kafka.account.close-timeout")
   val mock = MockProducerConfig
   val producer: MockProducer[String, Array[Byte]] = mock.producer
+  producer.clear()
   val serializer = new AvroSerializer("getAccountBalances.avsc", ccToByteArray)
 
   val getBals = Seq(GetAccountBalances(0L),
@@ -97,6 +99,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
 
   "A MockKafkaSink" should {
     "serialize case classes and MockSink should send them " in {
+      producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, null)
@@ -108,6 +111,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
     }
 
     "handle CorruptRecordException with Supervision.Resume " in {
+      producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new CorruptRecordException("test"))
@@ -120,6 +124,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
     }
 
     "handle UnknownServerException with Supervision.Stop " in {
+      producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new UnknownServerException("test"))
@@ -132,6 +137,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
     }
 
     "handle UnknownTopicOrPartitionException with Supervision.Resume " in {
+      producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock,
@@ -145,6 +151,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
     }
 
     "handle subclass of InvalidMetadataException with Supervision.Resume " in {
+      producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new NetworkException("test"))
@@ -157,6 +164,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
     }
 
     "handle NotEnoughReplicasAfterAppendException with Supervision.Resume " in {
+      producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock,
@@ -170,6 +178,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
     }
 
     "handle NotEnoughReplicasException with Supervision.Resume " in {
+      producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock,
@@ -183,6 +192,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
     }
 
     "handle OffsetOutOfRangeException with Supervision.Resume " in {
+      producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new OffsetOutOfRangeException("test"))
@@ -195,6 +205,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
     }
 
     "handle TimeoutException with Supervision.Resume " in {
+      producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new TimeoutException("test"))
@@ -207,6 +218,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
     }
 
     "handle subclass of RetriableException with Supervision.Resume " in {
+      producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new TimeoutException("test"))
@@ -219,6 +231,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
     }
 
     "handle InvalidTopicException with Supervision.Stop " in {
+      producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new InvalidTopicException("test"))
@@ -231,6 +244,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
     }
 
     "handle OffsetMetadataTooLarge with Supervision.Stop " in {
+      producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new OffsetMetadataTooLarge("test"))
@@ -243,6 +257,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
     }
 
     "handle RecordBatchTooLargeException with Supervision.Stop " in {
+      producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new RecordBatchTooLargeException("test"))
@@ -255,6 +270,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
     }
 
     "handle RecordTooLargeException with Supervision.Stop " in {
+      producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new RecordTooLargeException("test"))
@@ -267,6 +283,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
     }
 
     "handle KafkaException with Supervision.Stop " in {
+      producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new KafkaException("test"))

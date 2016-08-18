@@ -23,7 +23,10 @@ import org.scalatest.Matchers._
 import org.gs.avro.{byteArrayToGenericRecord, ccToByteArray, loadSchema}
 import org.gs.examples.account.GetAccountBalances
 
-/** Test a Kafka MockConsumer in a Source */ 
+/** Test a Kafka MockConsumer in a Source
+  *
+  * @Note MockProducer is a singleton, call producer.clear() before and after tests
+  */ 
 class MockAvroProducerSpec extends WordSpecLike {
   implicit val system = ActorSystem("dendrites")
   implicit val logger = Logging(system, getClass)
@@ -35,9 +38,11 @@ class MockAvroProducerSpec extends WordSpecLike {
   val topic = mock.topic
   val key = mock.key
   val producer: MockProducer[String, Array[Byte]] = mock.producer
+  producer.clear()
 
   "A MockAvroProducer" should {
     "serialize a case class and send a message" in {
+      producer.history.size shouldBe 0
       val bytes = ccToByteArray(schema, gab)
       val record = new ProducerRecord[String, Array[Byte]](topic, key, bytes)
       val kafkaCallback = new Callback() {
@@ -48,6 +53,9 @@ class MockAvroProducerSpec extends WordSpecLike {
         }
       }
       producer.send(record, kafkaCallback)
+      val history = producer.history()
+			history.size shouldBe 1
+      producer.clear()
     }
   }
 }
