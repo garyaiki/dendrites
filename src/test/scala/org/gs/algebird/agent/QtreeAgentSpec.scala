@@ -15,8 +15,8 @@ limitations under the License.
 package org.gs.algebird.agent
 
 import com.twitter.algebird.QTreeSemigroup
-import org.scalatest.{ Matchers, WordSpecLike }
-import org.scalatest._
+import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatest.Matchers._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
@@ -45,37 +45,34 @@ class QTreeAgentSpec extends WordSpecLike with Matchers with TestValuesBuilder {
     "have the count of first update data" in {
       val qTreeAgent = new QTreeAgent[BigDecimal]("testBD 1st update data")
       val updateFuture = qTreeAgent.alter(bigDecimals)
-      whenReady(updateFuture, timeout) { result =>
-        result.count shouldBe bigDecimals.size
-      }
+      whenReady(updateFuture, timeout) { result => result.count shouldBe bigDecimals.size }
     }
     val qTreeAgent = new QTreeAgent[BigDecimal]("testBD bounds", level, Some(bigDecimals))
     val qTree = qTreeAgent.agent.get()
     val lb = qTree.lowerBound
-    "have a lower bound" in {
-      lb <= bigDecimals.min
-    }
+
+    "have a lower bound" in { assert(lb <= bigDecimals.min) }
+
     val ub = qTree.upperBound
-    "have a upper bound" in {
-      ub >= bigDecimals.max
-    }
+    "have a upper bound" in { assert(ub >= bigDecimals.max) }
+
     "have 1st quantile bounds" in {
       val fst = qTree.quantileBounds(0.25)
       val q1 = 103.0
-      fst._1 >= q1
-      fst._2 <= q1 + 0.0001
+      fst._1 should be >= q1
+      fst._2 should be <= q1 + 0.0001
     }
     "have 2nd quantile bounds" in {
       val snd = qTree.quantileBounds(0.5)
       val q2 = 110.0
-      snd._1 >= q2
-      snd._2 <= q2 + 0.0001
+      snd._1 should be >= q2
+      snd._2 should be <= q2 + 0.0001
     }
     "have 3rd quantile bounds" in {
       val trd = qTree.quantileBounds(0.75)
       val q3 = 116.0
-      trd._1 >= q3
-      trd._2 <= q3 + 0.0001
+      trd._1 should be >= q3
+      trd._2 should be <= q3 + 0.0001
     }
     "have range sum bounds" in {
       val rsb = qTree.rangeSumBounds(lb, ub)

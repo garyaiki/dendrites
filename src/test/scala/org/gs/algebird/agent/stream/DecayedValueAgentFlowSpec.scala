@@ -71,7 +71,7 @@ class DecayedValueAgentFlowSpec extends WordSpecLike with TrigUtils {
   it should {
     "be less than the mean for the first 180" in {
       whenReady(updateFuture, timeout) { result =>
-        result(180).average(halfLife) < sines.take(180).sum / 180
+        result(180).average(halfLife) should be < sines.take(180).sum / 180
       }
     }
   }
@@ -79,7 +79,7 @@ class DecayedValueAgentFlowSpec extends WordSpecLike with TrigUtils {
   it should {
     "be less than the mean for the first 270" in {
       whenReady(updateFuture, timeout) { result =>
-        result(270).average(halfLife) < sines.take(270).sum / 270
+        result(270).average(halfLife) should be < sines.take(270).sum / 270
       }
     }
   }
@@ -88,7 +88,7 @@ class DecayedValueAgentFlowSpec extends WordSpecLike with TrigUtils {
     "be less than the mean for all 3600" in {
 
       whenReady(updateFuture, timeout) { result =>
-        result(360).average(halfLife) < sines.take(360).sum / 360
+        result(360).average(halfLife) should be < sines.take(360).sum / 360
       }
     }
   }

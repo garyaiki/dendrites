@@ -66,7 +66,7 @@ class BloomFilterFlowSpec extends WordSpecLike with BloomFilterBuilder {
     			for (i <- properFalseWords) pub.sendNext(i)
 
     			val falsePositives = sub.receiveWithin(FiniteDuration(1, SECONDS), properFalseWords.size)
-    			falsePositives.size <= properNames.size * fpProb
+    			assert(falsePositives.size <= properNames.size * fpProb)
     }
   }
 
@@ -92,13 +92,13 @@ class BloomFilterFlowSpec extends WordSpecLike with BloomFilterBuilder {
 
   it should {
     "have fewer false positives than the false positives probability" in {
-    val fpProb: Double = 0.04
-    val (pub, sub) = connectivesMat.run()
-    sub.request(connectivesFalseWords.size)
+    	val fpProb: Double = 0.04
+    			val (pub, sub) = connectivesMat.run()
+    			sub.request(connectivesFalseWords.size)
 
-    for (i <- connectivesFalseWords) pub.sendNext(i)
-    val falsePositives = sub.receiveWithin(FiniteDuration(1, SECONDS), connectivesFalseWords.size)
-    falsePositives.size <= connectives.size * fpProb
+    			for (i <- connectivesFalseWords) pub.sendNext(i)
+    			val falsePositives = sub.receiveWithin(FiniteDuration(1, SECONDS), connectivesFalseWords.size)
+    			assert(falsePositives.size <= connectives.size * fpProb)
     }
   }
 
@@ -124,12 +124,12 @@ class BloomFilterFlowSpec extends WordSpecLike with BloomFilterBuilder {
 
   it should {
     "have fewer false positives than the false positives probability" in {
-    val fpProb: Double = 0.04
-    val (pub, sub) = wordsMat.run()
-    sub.request(wordsFalseWords.size)
-        for (i <- wordsFalseWords) pub.sendNext(i)
-    val falsePositives = sub.receiveWithin(FiniteDuration(1, SECONDS), wordsFalseWords.size)
-    falsePositives.size < words.size * fpProb
+    	val fpProb: Double = 0.04
+    			val (pub, sub) = wordsMat.run()
+    			sub.request(wordsFalseWords.size)
+    			for (i <- wordsFalseWords) pub.sendNext(i)
+    			val falsePositives = sub.receiveWithin(FiniteDuration(1, SECONDS), wordsFalseWords.size)
+    			assert(falsePositives.size < words.size * fpProb)
     }
   }
 }

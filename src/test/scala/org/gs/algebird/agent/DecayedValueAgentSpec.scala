@@ -19,7 +19,7 @@ import org.gs._
 import org.gs.algebird._
 import org.gs.fixtures.TrigUtils
 import org.scalatest.WordSpecLike
-import org.scalatest._
+import org.scalatest.Matchers._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
@@ -41,18 +41,18 @@ class DecayedValueAgentSpec extends WordSpecLike with TrigUtils {
     val updateFuture = decayedValues.alter(sinesZip)
     "exceed the mean at 90º" in {
       whenReady(updateFuture, timeout) { result =>
-        result(90).average(10.0) > meanDay90
+        result(90).average(10.0) should be > meanDay90
       }
     }
 
     "equal the first 90 values" in {
         val old = decayedValues.agent.get().take(90)
-        old(89).average(10.0) > meanDay90
+        old(89).average(10.0) should be > meanDay90
     }
 
     "have a lower average after droping first 90" in {
       val newer = decayedValues.agent.get().drop(90)
-      newer(90).average(10.0) < meanDay90
+      newer(90).average(10.0) should be < meanDay90
     }
   }
 }

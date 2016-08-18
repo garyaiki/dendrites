@@ -52,18 +52,18 @@ class DecayedValueFlowSpec extends WordSpecLike with TrigUtils {
   sub.expectComplete()
 
   "A DecayedValue average with halfLife 10.0" should {
-    "exceed the mean at 90º" in { dvs(90).average(10.0) > sines.take(90).sum / 90 }
+    "exceed the mean at 90º" in { dvs(90).average(10.0) should be > sines.take(90).sum / 90 }
   }
 
   it should {
-    "be less than the mean at 180º" in { dvs(180).average(10.0) < sines.take(180).sum / 180 }
+    "be < the mean at 180º" in { dvs(180).average(10.0) should be < sines.take(180).sum / 180 }
   }
 
   it should {
-    "be less than the mean at 270º" in { dvs(270).average(10.0) < sines.take(270).sum / 270 }
+    "be < the mean at 270º" in { dvs(270).average(10.0) should be < sines.take(270).sum / 270 }
   }
 
   it should {
-    "be less than mean at 360º" in { dvs(360).average(10.0) < sines.take(360).sum / 360 }
+    "be < mean at 360º" in { dvs(360).average(10.0) should be < sines.take(360).sum / 360 }
   }
 }

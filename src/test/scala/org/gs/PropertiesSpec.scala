@@ -15,7 +15,7 @@ class PropertiesSpec extends WordSpecLike {
       prop.getProperty("acks") should equal("all")
     }
     "have a retries" in {
-      prop.getProperty("retries") should equal("0")
+      prop.getProperty("retries") should equal("3")
     }
     "have a batch.size" in {
       prop.getProperty("batch.size") should equal("16384")

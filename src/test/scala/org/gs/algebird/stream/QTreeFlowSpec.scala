@@ -21,6 +21,7 @@ import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.twitter.algebird._
 import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatest.Matchers._
 import org.gs.algebird.fixtures.QTreeBuilder
 
 /**
@@ -54,7 +55,7 @@ class QTreeFlowSpec extends WordSpecLike with QTreeBuilder {
     			val min = sub.expectNext()
     			pub.sendComplete()
     			sub.expectComplete()
-    			min <= bigDecimals.min
+    			assert(min <= bigDecimals.min)
     }
   }
   
@@ -69,7 +70,7 @@ class QTreeFlowSpec extends WordSpecLike with QTreeBuilder {
     			val max = sub.expectNext()
     			pub.sendComplete()
     			sub.expectComplete()
-    			max >= bigInts.max.toDouble
+    			max should be >= bigInts.max.toDouble
     }
   }
   
@@ -84,8 +85,8 @@ class QTreeFlowSpec extends WordSpecLike with QTreeBuilder {
     			val qB = sub.expectNext()
     			pub.sendComplete()
     			sub.expectComplete()
-    			qB._1 >= 110
-    			qB._2 <= 110 + 0.0001
+    			qB._1 should be >= 110.0
+    			qB._2 should be <= 110 + 0.0001
     }
   }
   
@@ -100,8 +101,8 @@ class QTreeFlowSpec extends WordSpecLike with QTreeBuilder {
     			val qB = sub.expectNext()
     			pub.sendComplete()
     			sub.expectComplete()
-    			qB._1 >= 121
-    			qB._2 <= 121 + 0.001
+    			qB._1 should be >= 121.0
+    			qB._2 should be <= 121 + 0.001
     }
   }
   
@@ -116,8 +117,8 @@ class QTreeFlowSpec extends WordSpecLike with QTreeBuilder {
     			val qB = sub.expectNext()
     			pub.sendComplete()
     			sub.expectComplete()
-    			qB._1 >= 116.0
-    			qB._2 <= 116.0 + 0.0001
+    			qB._1 should be >= 116.0
+    			qB._2 should be <= 116.0 + 0.0001
     }
   }
   
@@ -132,8 +133,8 @@ class QTreeFlowSpec extends WordSpecLike with QTreeBuilder {
     			val iqm = sub.expectNext()
     			pub.sendComplete()
     			sub.expectComplete()
-    			iqm._1 > 101.2
-    			iqm._2 < 119.93
+    			iqm._1 should be > 101.2
+    			iqm._2 should be < 119.93
     }
   }
 }
