@@ -17,12 +17,12 @@ package org.gs.examples.account.http.stream
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.Logging
-import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Keep, Flow}
+import akka.stream.{ActorMaterializer, Supervision}
+import akka.stream.ActorAttributes.SupervisionStrategy
+import akka.stream.scaladsl.{Flow, Keep}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import java.util.concurrent.Executors
 import org.scalatest.{Matchers, WordSpecLike}
-import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.time.SpanSugar._
 import scala.math.BigDecimal.double2bigDecimal
@@ -44,6 +44,7 @@ class CheckingCallFlowSpec extends WordSpecLike with Matchers with BalancesProto
   def source = TestSource.probe[Product]
   def sink = TestSink.probe[Either[String, AnyRef]]
   val ccf = new CheckingCallFlow
+  //val t = ccf.flow.addAttributes(attr)
   val testFlow = source.via(ccf.flow).toMat(sink)(Keep.both)
 
   "A CheckingCallFlowClient" should {
