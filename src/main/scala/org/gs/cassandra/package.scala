@@ -1,11 +1,29 @@
+/** Copyright 2016 Gary Struthers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs
 
 import _root_.akka.actor.ActorSystem
 import _root_.akka.event.Logging
 import com.datastax.driver.core.{BatchStatement, BoundStatement, CloseFuture, Cluster, Host}
 import com.datastax.driver.core.{Metadata, QueryLogger, PreparedStatement, ResultSet, Row, Session}
-import com.datastax.driver.core.policies.{DCAwareRoundRobinPolicy, DefaultRetryPolicy}
-import com.datastax.driver.core.policies.{LoadBalancingPolicy, LoggingRetryPolicy, RetryPolicy}
+import com.datastax.driver.core.policies.{DCAwareRoundRobinPolicy,
+  DefaultRetryPolicy,
+  LoadBalancingPolicy,
+  LoggingRetryPolicy,
+  ReconnectionPolicy,
+  RetryPolicy}
 import com.google.common.util.concurrent.ListenableFuture
 import com.typesafe.config.ConfigFactory
 import java.net.InetAddress
@@ -105,6 +123,15 @@ package object cassandra {
     */
   def createCluster(nodes: JCollection[InetAddress], policy: RetryPolicy): Cluster = {
     Cluster.builder().addContactPoints(nodes).withRetryPolicy(policy).build()
+  }
+
+  def createCluster(nodes: JCollection[InetAddress],
+      policy: RetryPolicy,
+      reConPolicy: ReconnectionPolicy): Cluster = {
+    Cluster.builder().addContactPoints(nodes)
+      .withRetryPolicy(policy)
+      .withReconnectionPolicy(reConPolicy)
+      .build()
   }
 
   /** Log cluster's metadata.

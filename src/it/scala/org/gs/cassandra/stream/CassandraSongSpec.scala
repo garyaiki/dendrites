@@ -1,3 +1,17 @@
+/** Copyright 2016 Gary Struthers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs.cassandra.stream
 
 import akka.NotUsed
@@ -6,7 +20,15 @@ import akka.event.{LoggingAdapter, Logging}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-import com.datastax.driver.core.{BoundStatement,Cluster,PreparedStatement,ResultSet,Row,Session}
+import com.datastax.driver.core.{BoundStatement,
+  Cluster,
+  Host,
+  HostDistance,
+  PoolingOptions,
+  PreparedStatement,
+  ResultSet,
+  Row,
+  Session}
 import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy, RetryPolicy}
 import java.util.{HashSet => JHashSet, UUID}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
@@ -26,10 +48,10 @@ class CassandraSongSpec extends WordSpecLike with Matchers with BeforeAndAfterAl
   var cluster: Cluster = null
   var session: Session = null
   val songsTags = Set[String]("jazz", "2013")
-  val songId = UUID.fromString("756716f7-2e54-4715-9f00-91dcbea6cf50")
-  val song = Song(songId,"La Petite Tonkinoise","Bye Bye Blackbird","Joséphine Baker",songsTags)
-  val songs = Seq(song)
-  val songIds = Seq(songId)
+  var songId: UUID = null
+  var song: Song = null
+  var songs: Seq[Song] = null
+  var songIds: Seq[UUID] = null
 
   override def beforeAll() {
     val addresses = myConfig.getInetAddresses()
@@ -40,9 +62,24 @@ class CassandraSongSpec extends WordSpecLike with Matchers with BeforeAndAfterAl
     logMetadata(cluster)
     registerQueryLogger(cluster)
     session = connect(cluster)
+    /* Debug PoolingOptions
+    var poolingOptions: PoolingOptions = cluster.getConfiguration().getPoolingOptions()
+    val metaData = cluster.getMetadata()
+    val hosts = metaData.getAllHosts()
+    val hostIter = hosts.iterator()
+    val host: Host = hostIter.next()
+    val distance = lbp.distance(host)//HostDistance
+    logger.debug("poolingOptions CoreConnectionsPerHost:{} MaxConnectionsPerHost:{}",
+        poolingOptions.getCoreConnectionsPerHost(distance),
+        poolingOptions.getMaxConnectionsPerHost(distance))
+    */
     val strategy = myConfig.replicationStrategy
     val createSchemaRS = createSchema(session, schema, strategy, 3)
     val songTRS = Songs.createTable(session, schema)
+    songId = UUID.fromString("756716f7-2e54-4715-9f00-91dcbea6cf50")
+    song = Song(songId,"La Petite Tonkinoise","Bye Bye Blackbird","Joséphine Baker",songsTags)
+    songs = Seq(song)
+    songIds = Seq(songId)
   }
 
   "A Cassandra Song client" should {

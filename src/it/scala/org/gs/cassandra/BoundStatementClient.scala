@@ -6,7 +6,7 @@ import com.datastax.driver.core.{BoundStatement, PreparedStatement, Session}
 import com.typesafe.config.ConfigFactory
 import java.util.{HashSet => JHashSet, UUID}
 
-class BoundStatementClient() {
+class BoundStatementClient() {/*
   implicit val system = ActorSystem("dendrites")
   implicit val logger = Logging(system, getClass)
   val songId = UUID.fromString("756716f7-2e54-4715-9f00-91dcbea6cf50")
@@ -61,10 +61,10 @@ class BoundStatementClient() {
   
   def updateSchema(): Unit = {
     logger.debug("updateSchema")
-  }
+  }*/
 }
 
-object BoundStatementClient {
+object BoundStatementClient {/*
   def main(args: Array[String]): Unit = {
     val config = ConfigFactory.load()
     val ipAddress = config.getString("dendrites.cassandra.ipAddress")
@@ -90,5 +90,5 @@ object BoundStatementClient {
     client.updateSchema()
     dropSchema(session, "simplex")
     close(session, cluster)
-  }
+  }*/
 }

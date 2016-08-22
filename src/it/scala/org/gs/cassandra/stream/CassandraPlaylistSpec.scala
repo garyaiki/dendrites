@@ -25,11 +25,11 @@ class CassandraPlaylistSpec extends WordSpecLike with Matchers with BeforeAndAft
   val schema = myConfig.keySpace
   var cluster: Cluster = null
   var session: Session = null
-  val songId = UUID.fromString("756716f7-2e54-4715-9f00-91dcbea6cf50")
-  val plId = UUID.fromString("2cc9ccb7-6221-4ccb-8387-f22b6a1b354d")
-  val playlist = Playlist(plId,"La Petite Tonkinoise","Bye Bye Blackbird","Joséphine Baker",songId)
-  val playlists = Seq(playlist)
-  val playlistIds = Seq(plId)
+  var songId: UUID = null// = UUID.randomUUID()//.fromString("756716f7-2e54-4715-9f00-91dcbea6cf50")
+  var plId: UUID = null// = UUID.randomUUID()//.fromString("2cc9ccb7-6221-4ccb-8387-f22b6a1b354d")
+  var playlist: Playlist = null// = Playlist(plId,"La Petite Tonkinoise","Bye Bye Blackbird","Joséphine Baker",songId)
+  var playlists: Seq[Playlist] = null// = Seq(playlist)
+  var playlistIds: Seq[UUID] = null// = Seq(plId)
 
   override def beforeAll() {
     val addresses = myConfig.getInetAddresses()
@@ -42,6 +42,11 @@ class CassandraPlaylistSpec extends WordSpecLike with Matchers with BeforeAndAft
     session = connect(cluster)
     val strategy = myConfig.replicationStrategy
     val createSchemaRS = createSchema(session, schema, strategy, 3)
+    songId = UUID.randomUUID()//.fromString("756716f7-2e54-4715-9f00-91dcbea6cf50")
+    plId = UUID.randomUUID()//.fromString("2cc9ccb7-6221-4ccb-8387-f22b6a1b354d")
+    playlist = Playlist(plId,"La Petite Tonkinoise","Bye Bye Blackbird","Joséphine Baker",songId)
+    playlists = Seq(playlist)
+    playlistIds = Seq(plId)
     val songTRS = Playlists.createTable(session, schema)
   }
 
