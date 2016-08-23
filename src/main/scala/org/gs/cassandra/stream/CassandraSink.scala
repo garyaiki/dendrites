@@ -24,7 +24,9 @@ import com.datastax.driver.core.{BoundStatement, Session}
 import com.datastax.driver.core.exceptions.{NoHostAvailableException,
   QueryExecutionException,
   QueryValidationException,
-  UnsupportedFeatureException}
+  UnavailableException,
+  UnsupportedFeatureException,
+  WriteTimeoutException}
 import scala.util.control.NonFatal
 import CassandraQuery.decider
 
@@ -52,38 +54,46 @@ class CassandraSink(session: Session)(implicit logger: LoggingAdapter)
 
       private def decider = inheritedAttributes.get[SupervisionStrategy].map(_.decider).
           getOrElse(Supervision.stoppingDecider)
-      private var retries = 3
 
       /** start backpressure in custom Sink */
       override def preStart(): Unit = {
         pull(in)
       }
 
+      def executeStmt(stmt: BoundStatement): Unit = {
+        try {
+          val resultSetFuture = session.executeAsync(stmt)
+          val rs = resultSetFuture.getUninterruptibly()
+          logger.debug("BoundStatement success")
+          pull(in)
+        } catch {
+          case NonFatal(e) => decider(e) match {
+            case Supervision.Stop => {
+              logger.error(e, "Query Stop exception")
+              failStage(e)
+            }
+            case Supervision.Resume => {
+              e match {
+                case e: UnavailableException => {
+                  logger.debug(s"""UnavailableException address:${e.getAddress()} aliveReplicas:
+                    ${e.getAliveReplicas()} consistency level:${e.getConsistencyLevel()}
+                    required replicas:${e.getRequiredReplicas()}""")
+                }
+                case e: WriteTimeoutException => {
+                  logger.debug(s"WriteTimeoutException:${e.getMessage} writeType:${e.getWriteType}")
+                }
+                case _ => logger.debug("Query Retryable exception :{}", e.getMessage)
+              }
+              executeStmt(stmt)
+            }
+          }
+        }        
+      }
+
       setHandler(in, new InHandler {
         override def onPush(): Unit = {
-          try {
-            val boundStatement = grab(in)
-            val rsF = session.executeAsync(boundStatement)
-            val rs = rsF.getUninterruptibly()
-            logger.debug("BoundStatement success")
-            pull(in)
-          } catch {
-            case NonFatal(e) => logger.error(e, "CassandraSink NonFatal exception"); decider(e) match {
-              case Supervision.Stop => {
-                logger.error(e, "CassandraSink Stop exception")
-                failStage(e)
-              }
-              case Supervision.Resume if(retries > 0) => {
-                logger.error(e, "CassandraSink Resume exception retries:{}", retries)
-                retries = retries - 1
-                onPush
-              }
-              case Supervision.Resume => {
-                logger.error(e, "CassandraSink too many Resume exception retries:{}", retries)
-                failStage(e) // too many retries
-              }
-            }            
-          }
+          val boundStatement = grab(in)
+          executeStmt(boundStatement: BoundStatement)
         }
       })
     }
