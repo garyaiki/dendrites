@@ -81,9 +81,10 @@ class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLik
     //create children here
     val resultsProps = CallStream.props[Seq[AnyRef]](resultsRunnable)
     results = context.actorOf(resultsProps, resultsName)
-    val logLeftProps = LogLeftSendRightActor.props(ResultsActor(results, resultsName))
-    errorLogger = context.actorOf(logLeftProps, errorLoggerName)
-    val sinkActor = SinkActor(errorLogger, errorLoggerName)
+    //val logLeftProps = LogLeftSendRightActor.props(ResultsActor(results, resultsName))
+    //errorLogger = context.actorOf(logLeftProps, errorLoggerName)
+    //val sinkActor = SinkActor(errorLogger, errorLoggerName)
+    val sinkActor = SinkActor(results, resultsName)
     val superProps = ParallelCallSupervisor.props[GetAccountBalances](sinkActor)
     streamSuper = context.actorOf(superProps, streamSuperName)
     log.debug("preStart {}", this.toString())

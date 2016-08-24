@@ -14,24 +14,27 @@ limitations under the License.
 */
 package org.gs.cassandra
 
+import akka.actor.ActorSystem
 import com.datastax.driver.core.{BoundStatement, Cluster, PreparedStatement, ResultSet, Session}
 import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy, RetryPolicy}
 import java.util.{HashSet => JHashSet, UUID}
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import org.gs.cassandra.Playlists._
 import org.gs.cassandra.Songs._
 
 class BoundStmtSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
+  implicit val system = ActorSystem("dendrites")
+  implicit val ec: ExecutionContext = system.dispatcher
   val myConfig = PlaylistSongConfig
   val schema = myConfig.keySpace
   var cluster: Cluster = null
   var session: Session = null
   val songsTags = Set[String]("jazz", "2013")
-  var songId: UUID = null//UUID.randomUUID()//.fromString("756716f7-2e54-4715-9f00-91dcbea6cf50")
+  var songId: UUID = null
   var song: Song = null
-  var plId: UUID = null// = UUID.randomUUID()//.fromString("2cc9ccb7-6221-4ccb-8387-f22b6a1b354d")
-  var playlist: Playlist = null// = Playlist(plId,"La Petite Tonkinoise","Bye Bye Blackbird","Joséphine Baker",songId)
+  var plId: UUID = null
+  var playlist: Playlist = null
 
   override def beforeAll() {
     val addresses = myConfig.getInetAddresses()

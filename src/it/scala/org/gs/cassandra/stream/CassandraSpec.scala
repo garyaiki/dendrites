@@ -14,6 +14,7 @@ limitations under the License.
 */
 package org.gs.cassandra.stream
 
+import akka.actor.ActorSystem
 import com.datastax.driver.core.{BoundStatement, Cluster, PreparedStatement, ResultSet, Session}
 import com.datastax.driver.core.policies.{DefaultRetryPolicy,
   ExponentialReconnectionPolicy,
@@ -21,16 +22,24 @@ import com.datastax.driver.core.policies.{DefaultRetryPolicy,
   RetryPolicy}
 import java.util.{HashSet => JHashSet, UUID}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
-import org.scalatest.Matchers._
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 import org.gs.cassandra.{Playlists, PlaylistSongConfig, Songs}
 import org.gs.cassandra.Playlists._
 import org.gs.cassandra.Songs._
-import org.gs.cassandra.{close, connect, createCluster, createLoadBalancingPolicy, createSchema}
-import org.gs.cassandra.{dropSchema, executeBoundStmt, initLoadBalancingPolicy, logMetadata}
+import org.gs.cassandra.{close,
+                         connect,
+                         createCluster,
+                         createLoadBalancingPolicy,
+                         createSchema,
+                         dropSchema,
+                         executeBoundStmt,
+                         initLoadBalancingPolicy,
+                         logMetadata}
 import org.gs.cassandra.registerQueryLogger
 
 class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
+  implicit val system = ActorSystem("dendrites")
+  implicit val ec: ExecutionContext = system.dispatcher
   val myConfig = PlaylistSongConfig
   val schema = myConfig.keySpace
   var cluster: Cluster = null

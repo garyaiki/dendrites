@@ -21,10 +21,10 @@ import akka.stream.{ActorMaterializer, Supervision}
 import akka.stream.ActorAttributes.SupervisionStrategy
 import akka.stream.scaladsl.{Flow, Keep}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-import java.util.concurrent.Executors
 import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.time.SpanSugar._
+import scala.concurrent.ExecutionContext
 import scala.math.BigDecimal.double2bigDecimal
 import org.gs.examples.account.{ CheckingAccountBalances, GetAccountBalances}
 import org.gs.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
@@ -36,15 +36,14 @@ import org.gs.http.{caseClassToGetQuery, typedQueryResponse}
   */
 class CheckingCallFlowSpec extends WordSpecLike with Matchers with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
+  implicit val ec: ExecutionContext = system.dispatcher
   override implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
-  implicit val executor = Executors.newSingleThreadExecutor()
   val timeout = Timeout(3000 millis)
 
   def source = TestSource.probe[Product]
   def sink = TestSink.probe[Either[String, AnyRef]]
   val ccf = new CheckingCallFlow
-  //val t = ccf.flow.addAttributes(attr)
   val testFlow = source.via(ccf.flow).toMat(sink)(Keep.both)
 
   "A CheckingCallFlowClient" should {

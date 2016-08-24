@@ -23,7 +23,7 @@ import akka.http.scaladsl.unmarshalling.Unmarshaller.UnsupportedContentTypeExcep
 import akka.stream.{ActorAttributes, Materializer, Supervision}
 import akka.stream.ActorAttributes.SupervisionStrategy
 import akka.stream.scaladsl.Flow
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import org.gs.http.typedResponse
 
 /** Map HttpResponse to Future[Either] Left for errors, Right case class for good result
@@ -40,7 +40,10 @@ import org.gs.http.typedResponse
   */
 class TypedResponseFlow(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
                          mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
-        (implicit val system: ActorSystem, logger: LoggingAdapter, val materializer: Materializer) {
+        (implicit val ec: ExecutionContext,
+         system: ActorSystem,
+         logger: LoggingAdapter,
+         val materializer: Materializer) {
 
   def partial: HttpResponse => Future[Either[String, AnyRef]] =
         typedResponse(mapLeft, mapRight) _ // curried

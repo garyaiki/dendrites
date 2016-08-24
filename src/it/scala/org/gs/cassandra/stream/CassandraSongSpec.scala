@@ -16,7 +16,7 @@ package org.gs.cassandra.stream
 
 import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.event.{LoggingAdapter, Logging}
+import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
@@ -33,15 +33,23 @@ import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy
 import java.util.{HashSet => JHashSet, UUID}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 import org.gs.cassandra.{PlaylistSongConfig, Songs}
 import org.gs.cassandra.Playlists._
 import org.gs.cassandra.Songs._
-import org.gs.cassandra.{close, connect, createCluster, createLoadBalancingPolicy, createSchema}
-import org.gs.cassandra.{dropSchema, initLoadBalancingPolicy, logMetadata, registerQueryLogger}
+import org.gs.cassandra.{close,
+                         connect,
+                         createCluster,
+                         createLoadBalancingPolicy,
+                         createSchema,
+                         dropSchema,
+                         initLoadBalancingPolicy,
+                         logMetadata,
+                         registerQueryLogger}
 
 class CassandraSongSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   implicit val system = ActorSystem("dendrites")
+  implicit val ec: ExecutionContext = system.dispatcher
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   val myConfig = PlaylistSongConfig
@@ -111,7 +119,7 @@ class CassandraSongSpec extends WordSpecLike with Matchers with BeforeAndAfterAl
       pub.sendComplete()
       sub.expectComplete()
 
-      response should equal(songs)
+      response shouldBe songs
   }
 
   override def afterAll() {

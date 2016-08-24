@@ -29,7 +29,7 @@ import com.typesafe.config.ConfigFactory
 import java.net.InetAddress
 import java.util.{Collection => JCollection, Date => JDate, HashSet => JHashSet, UUID}
 import scala.collection.JavaConversions._
-import scala.concurrent.ExecutionContext//.Implicits.global
+import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 import org.gs.concurrent.listenableFutureToScala
 
