@@ -21,7 +21,8 @@ import java.util.ArrayList
 import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.clients.consumer.{ConsumerRecord, KafkaConsumer}
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord, RecordMetadata}
-import org.scalatest.{BeforeAndAfterAll, WordSpecLike}
+import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import org.scalatest.Matchers._
 import scala.collection.immutable.{Iterable, Seq}
 import scala.concurrent.duration.MILLISECONDS
 import scala.io.Source._
@@ -47,6 +48,7 @@ class AvroKafkaProducerConsumerSpec extends WordSpecLike with BeforeAndAfterAll 
   val gab = GetAccountBalances(1L)
   var producer: KafkaProducer[String, Array[Byte]] = null
   var consumer: KafkaConsumer[String, Array[Byte]] = null
+
   override def beforeAll() {
     producer = createProducer[String, Array[Byte]]("testAvroKafkaProducer.properties")
     consumer = createConsumer[String, Array[Byte]]("testAvroKafkaConsumer.properties")
@@ -59,13 +61,13 @@ class AvroKafkaProducerConsumerSpec extends WordSpecLike with BeforeAndAfterAll 
       val bytes = ccToByteArray(schema, gab)
       val record = new ProducerRecord[String, Array[Byte]](topic, key, bytes)
       val rm: RecordMetadata = producer.send(record).get()
-      assert(rm != null)
-      assert(rm.topic === topic)
-  
+
+      rm should not be null
+      rm.topic shouldBe topic
     }
     "read the message" in {
       val crs = consumer.poll(timeout)
-      assert(crs.count === 1)
+      crs.count shouldBe 1
       val it = crs.iterator()
       var consumerRecord: ConsumerRecord[String, Array[Byte]] = null
       while(it.hasNext()) {
@@ -74,7 +76,8 @@ class AvroKafkaProducerConsumerSpec extends WordSpecLike with BeforeAndAfterAll 
       val value = consumerRecord.value()
       val genericRecord: GenericRecord = byteArrayToGenericRecord(schema, value)
       val accountBalances = genericRecordToGetAccountBalances(genericRecord)
-      assert(accountBalances === gab)
+
+      accountBalances shouldBe gab
     }
   }
 

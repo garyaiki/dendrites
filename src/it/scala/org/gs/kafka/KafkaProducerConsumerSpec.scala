@@ -20,7 +20,8 @@ import com.typesafe.config.ConfigFactory
 import java.util.ArrayList
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord, RecordMetadata}
-import org.scalatest.{BeforeAndAfterAll, WordSpecLike}
+import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import org.scalatest.Matchers._
 import scala.io.Source._
 import scala.collection.immutable.{Iterable, Seq}
 import scala.concurrent.duration.MILLISECONDS
@@ -54,11 +55,10 @@ class KafkaProducerConsumerSpec extends WordSpecLike with BeforeAndAfterAll {
   "A KafkaProducerConsumer" should {
     "send a message" in {
       val record = new ProducerRecord[String, String](topic, key, value)
-
       val rm: RecordMetadata = producer.send(record).get()
-      assert(rm != null)
-      assert(rm.topic === topic)
-  
+
+      rm should not be null
+      rm.topic shouldBe topic
     }
     "read the message" in {
       val crs = consumer.poll(timeout)

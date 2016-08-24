@@ -17,7 +17,7 @@ package org.gs.kafka.stream
 import akka.actor.ActorSystem
 import akka.event.{LoggingAdapter, Logging}
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Keep,Flow, Sink, Source}
+import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.typesafe.config.ConfigFactory
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}

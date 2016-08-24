@@ -1,11 +1,32 @@
+/** Copyright 2016 Gary Struthers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs.kafka.stream
 
 import akka.NotUsed
 import akka.event.LoggingAdapter
-import akka.stream.{Attributes, Outlet, SourceShape}
+import akka.stream.{ActorAttributes, Attributes, Outlet, SourceShape, Supervision}
+import akka.stream.ActorAttributes.SupervisionStrategy
 import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler}
 import akka.stream.scaladsl.Source
-import org.apache.kafka.clients.consumer.{Consumer, ConsumerRecords}
+import org.apache.kafka.clients.consumer.{Consumer,
+  ConsumerRecords,
+  CommitFailedException,
+  InvalidOffsetException}
+import org.apache.kafka.common.KafkaException
+import org.apache.kafka.common.errors.{AuthorizationException, WakeupException}
+import scala.util.control.NonFatal
 import org.gs.kafka.ConsumerConfig
 
 /** Source stage that reads from Kafka
@@ -47,6 +68,8 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
 
+      private def decider = inheritedAttributes.get[SupervisionStrategy].map(_.decider).
+          getOrElse(Supervision.stoppingDecider)
       var kafkaConsumer: Consumer[K, V] = null
 
       override def preStart(): Unit = {
@@ -54,17 +77,39 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
       }
 
       private var needCommit = false
+      private var retries = 3
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          if(needCommit) {
-            kafkaConsumer commitSync() // blocking
-            needCommit = false
+        override def onPull(): Unit = {logger.debug("KafkaSource onPull")
+          try {
+            if(needCommit) {
+              kafkaConsumer commitSync() // blocking
+              needCommit = false
+            }
+            logger.debug("KafkaSource before poll")
+            val records = kafkaConsumer poll(consumerConfig.timeout) // blocking
+            if(!records.isEmpty()) { // don't push if no record available
+              push(out, records)
+              needCommit = true
+            } else logger.debug("KafkaSource records isEmpty {}", records.isEmpty())
+            retries = 3
+          } catch {
+            case NonFatal(e) => logger.error(e, "KafkaSource NonFatal exception"); decider(e) match {
+              case Supervision.Stop => {
+                logger.error(e, "KafkaSource Stop exception")
+                failStage(e)
+              }
+              case Supervision.Resume => {
+                if(retries > 0) {
+                  logger.error(e, "KafkaSource Resume exception retries:{}", retries)
+                  retries = retries - 1
+                  onPull
+                } else {
+                  logger.error(e, "KafkaSource too many Resume exception retries:{}", retries)
+                  failStage(e) // too many retries
+                }
+              }
+            }
           }
-          val records = kafkaConsumer poll(consumerConfig.timeout) // blocking
-          if(!records.isEmpty()) { // don't push if no record available
-            push(out, records)
-            needCommit = true
-          } else logger.debug("KafkaSource records isEmpty {}", records.isEmpty())
         }
       })
 
@@ -80,8 +125,34 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
 
 /** Create a configured Kafka Source that is subscribed to topics */
 object KafkaSource {
+
+  /** Create Kafka Sink as Akka Sink subscribed to configured topic with Supervision
+    * @tparam K key type
+    * @tparam V value type
+  	* @param consumer configuration object
+  	* @param implicit logger
+  	* @return Source[ConsumerRecords[K, V], NotUsed]
+  	*/
   def apply[K, V](consumer: ConsumerConfig[K, V])(implicit logger: LoggingAdapter):
         Source[ConsumerRecords[K, V], NotUsed] = {
-    Source.fromGraph(new KafkaSource[K, V](consumer))
+    val source = Source.fromGraph(new KafkaSource[K, V](consumer))
+    source.withAttributes(ActorAttributes.supervisionStrategy(decider))
+  }
+
+  /** Supervision strategy
+    *
+  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/CommitFailedException.html CommitFailedException]]
+  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/WakeupException.html WakeupException]]
+  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/AuthorizationException.html AuthorizationException]]
+    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/InvalidOffsetException.html InvalidOffsetException]]
+  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/KafkaException.html KafkaException]]
+  	*/ 
+  def decider: Supervision.Decider = {
+    case _: CommitFailedException => Supervision.Resume // Can't commit current poll
+    case _: WakeupException => Supervision.Resume // poll interrupted
+    case _: AuthorizationException => Supervision.Stop
+    case _: InvalidOffsetException => Supervision.Stop
+    case _: KafkaException => Supervision.Stop // Catch all for Kafka exceptions
+    case _  => Supervision.Stop
   }
 }
