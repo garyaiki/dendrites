@@ -54,12 +54,14 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSinkActor: SinkActor) ex
         Actor with Stash with ActorLogging {
 
   implicit val system = context.system
+  implicit val ec = system.dispatcher
   implicit val logger = log
   final implicit val materializer: ActorMaterializer =
     ActorMaterializer(ActorMaterializerSettings(system))
     
   val pcf = new ParallelCallFlow()
-  val wrappedFlow: Flow[A, (Seq[String], Seq[AnyRef]), NotUsed] = pcf.wrappedCallsLRFlow
+//  val wrappedFlow: Flow[A, (Seq[String], Seq[AnyRef]), NotUsed] = pcf.wrappedCallsLRFlow
+  val wrappedFlow: Flow[A, Seq[AnyRef], NotUsed] = pcf.wrappedCallsLogLeftPassRightFlow
   val bufferSize = 10
   val overflowStrategy = OverflowStrategy.fail
   var sinkActor: SinkActor = initSinkActor

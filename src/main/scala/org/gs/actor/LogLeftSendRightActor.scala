@@ -15,7 +15,7 @@ limitations under the License.
 package org.gs.actor
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props, Stash, Terminated}
-import org.gs.stream.actor.CallStream.CompleteMessage
+import org.gs.kafka.stream.actor.ConsumerStream.CompleteMessage
 import org.gs.stream.actor.OtherActor
 import LogLeftSendRightActor.ResultsActor
 

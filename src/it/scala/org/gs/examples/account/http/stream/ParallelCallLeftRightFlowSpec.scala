@@ -1,3 +1,17 @@
+/** Copyright 2016 Gary Struthers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs.examples.account.http.stream
 
 import akka.actor.ActorSystem
@@ -6,10 +20,10 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import org.scalatest.{Matchers, WordSpecLike}
-import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
+import scala.concurrent.ExecutionContext
 import scala.math.BigDecimal.double2bigDecimal
 import org.gs.examples.account.{CheckingAccountBalances,
                                 GetAccountBalances,
@@ -22,6 +36,7 @@ import org.gs.examples.account.{CheckingAccountBalances,
   */
 class ParallelCallLeftRightFlowSpec extends WordSpecLike with Matchers {
   implicit val system = ActorSystem("dendrites")
+  implicit val ec: ExecutionContext = system.dispatcher
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   val timeout = Timeout(3000 millis)
@@ -43,9 +58,9 @@ class ParallelCallLeftRightFlowSpec extends WordSpecLike with Matchers {
       pub.sendComplete()
       sub.expectComplete()
 
-      response._2 should equal(List(CheckingAccountBalances[BigDecimal](Some(List((1,1000.1)))),
+      response._2 shouldBe List(CheckingAccountBalances[BigDecimal](Some(List((1,1000.1)))),
           MoneyMarketAccountBalances[BigDecimal](Some(List((1,11000.1)))),
-          SavingsAccountBalances[BigDecimal](Some(List((1,111000.1))))))
+          SavingsAccountBalances[BigDecimal](Some(List((1,111000.1)))))
     }
   }
 
@@ -61,10 +76,10 @@ class ParallelCallLeftRightFlowSpec extends WordSpecLike with Matchers {
       pub.sendComplete()
       sub.expectComplete()
 
-      response._2 should equal(List(CheckingAccountBalances[BigDecimal](
+      response._2 shouldBe List(CheckingAccountBalances[BigDecimal](
                   Some(List((2,2000.2), (22,2200.22)))),
           MoneyMarketAccountBalances[BigDecimal](Some(List((2,22000.2), (22,22200.22)))),
-          SavingsAccountBalances[BigDecimal](Some(List((2,222000.2), (22,222200.22))))))
+          SavingsAccountBalances[BigDecimal](Some(List((2,222000.2), (22,222200.22)))))
     }
   }
 
@@ -80,12 +95,12 @@ class ParallelCallLeftRightFlowSpec extends WordSpecLike with Matchers {
       pub.sendComplete()
       sub.expectComplete()
 
-      response._2 should equal(List(
+      response._2 shouldBe List(
           CheckingAccountBalances[BigDecimal](Some(List((3,3000.3), (33,3300.33), (333,3330.33)))),
           MoneyMarketAccountBalances[BigDecimal](
                   Some(List((3,33000.3), (33,33300.33), (333,33330.33)))),
           SavingsAccountBalances[BigDecimal](
-                  Some(List((3,333000.3), (33,333300.33), (333,333330.33))))))
+                  Some(List((3,333000.3), (33,333300.33), (333,333330.33)))))
     }
   }
 
@@ -101,9 +116,9 @@ class ParallelCallLeftRightFlowSpec extends WordSpecLike with Matchers {
       pub.sendComplete()
       sub.expectComplete()
 
-      response._1 should equal(List("Checking account 4 not found",
+      response._1 shouldBe List("Checking account 4 not found",
           "Money Market account 4 not found",
-          "Savings account 4 not found"))
+          "Savings account 4 not found")
     }
   }
 }

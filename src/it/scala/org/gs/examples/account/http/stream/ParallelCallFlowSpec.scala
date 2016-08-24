@@ -20,10 +20,10 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import org.scalatest.{Matchers, WordSpecLike}
-import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
+import scala.concurrent.ExecutionContext
 import scala.math.BigDecimal.double2bigDecimal
 import org.gs.examples.account.{CheckingAccountBalances,
                                 GetAccountBalances,
@@ -35,6 +35,7 @@ import org.gs.examples.account.{CheckingAccountBalances,
   */
 class ParallelCallFlowSpec extends WordSpecLike with Matchers {
   implicit val system = ActorSystem("dendrites")
+  implicit val ec: ExecutionContext = system.dispatcher
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   val timeout = Timeout(3000 millis)

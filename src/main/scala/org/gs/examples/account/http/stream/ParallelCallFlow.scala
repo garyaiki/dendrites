@@ -18,6 +18,7 @@ import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.{FlowShape, Materializer, UniformFanOutShape}
 import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, ZipWith}
+import scala.concurrent.ExecutionContext
 import org.gs.stream.leftRightFlow
 import org.gs.stream.logLeftRightFlow
 
@@ -29,8 +30,10 @@ import org.gs.stream.logLeftRightFlow
   * @param materializer implicit Materializer
   * @author Gary Struthers
   */
-class ParallelCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
-                val materializer: Materializer) {
+class ParallelCallFlow(implicit val ec: ExecutionContext,
+                       system: ActorSystem,
+                       logger: LoggingAdapter,
+                       val materializer: Materializer) {
 
   def zipper = ZipWith((in0: Either[String, AnyRef],
                         in1: Either[String, AnyRef],

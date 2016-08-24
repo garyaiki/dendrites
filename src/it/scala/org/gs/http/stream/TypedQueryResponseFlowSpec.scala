@@ -22,9 +22,9 @@ import akka.stream.scaladsl.{Flow, Keep}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import java.util.concurrent.Executors
 import org.scalatest.{Matchers, WordSpecLike}
-//import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.time.SpanSugar._
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.math.BigDecimal.double2bigDecimal
 import org.gs.examples.account.{ CheckingAccountBalances, GetAccountBalances}
 import org.gs.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}

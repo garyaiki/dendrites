@@ -19,6 +19,7 @@ import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
 import akka.stream.{ActorAttributes, Materializer}
 import akka.stream.scaladsl.Flow
+import scala.concurrent.ExecutionContext
 import org.gs.examples.account.http.{BalancesProtocols, MoneyMarketBalancesClientConfig}
 import org.gs.http.caseClassToGetQuery
 import org.gs.http.stream.{TypedQueryFlow, TypedQueryResponseFlow, TypedResponseFlow}
@@ -30,8 +31,10 @@ import org.gs.http.stream.TypedResponseFlow.decider
   * @author Gary Struthers
   *
   */
-class MoneyMarketCallFlow(implicit val system: ActorSystem, logger: LoggingAdapter,
-                val materializer: Materializer) extends BalancesProtocols {
+class MoneyMarketCallFlow(implicit ec: ExecutionContext,
+                          val system: ActorSystem,
+                          logger: LoggingAdapter,
+                          val materializer: Materializer) extends BalancesProtocols {
 
   val clientConfig = new MoneyMarketBalancesClientConfig()
   val hostConfig = clientConfig.hostConfig

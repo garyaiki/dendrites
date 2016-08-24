@@ -23,7 +23,7 @@ import _root_.akka.http.scaladsl.unmarshalling.Unmarshal
 import _root_.akka.stream.Materializer
 import com.typesafe.config.{Config, ConfigFactory}
 import scala.concurrent.{ExecutionContextExecutor, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext//.Implicits.global
 
 /** Provides Class to create an HostConnectionPool. Also functions to create requests and handle
   * response
@@ -184,7 +184,10 @@ package object http {
   def typedResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
                     mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
         (response: HttpResponse)
-        (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
+        (implicit ec: ExecutionContext,
+         system: ActorSystem,
+         logger: LoggingAdapter,
+         materializer: Materializer):
                    Future[Either[String, AnyRef]] = {
       response.status match {
         case OK => {
@@ -220,7 +223,10 @@ package object http {
 def typedFutureResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
                         mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
       (caller: Future[HttpResponse])
-      (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
+      (implicit ec: ExecutionContext,
+       system: ActorSystem,
+       logger: LoggingAdapter,
+       materializer: Materializer):
                     Future[Either[String, AnyRef]] = {
 
     caller.flatMap { response => typedResponse(mapLeft, mapRight)(response) }
@@ -247,7 +253,10 @@ def typedFutureResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
                mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
                mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
               (cc: Product)
-              (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
+              (implicit ec: ExecutionContext,
+               system: ActorSystem,
+               logger: LoggingAdapter,
+               materializer: Materializer):
                Future[Either[String, AnyRef]] = {
     val callFuture = typedQuery(baseURL, requestPath, ccToGet)(cc)
     typedFutureResponse(mapLeft, mapRight)(callFuture)
