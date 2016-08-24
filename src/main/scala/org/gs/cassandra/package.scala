@@ -29,7 +29,7 @@ import com.typesafe.config.ConfigFactory
 import java.net.InetAddress
 import java.util.{Collection => JCollection, Date => JDate, HashSet => JHashSet, UUID}
 import scala.collection.JavaConversions._
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext//.Implicits.global
 import scala.util.{Failure, Success}
 import org.gs.concurrent.listenableFutureToScala
 
@@ -330,7 +330,8 @@ package object cassandra {
     * @param cluster
     * @param force hurry up flag
     */
-  def close(session: Session, cluster: Cluster, force: Boolean = false): Unit = {
+  def close(session: Session, cluster: Cluster, force: Boolean = false)
+          (implicit ec: ExecutionContext): Unit = {
     val sessCloseF = session.closeAsync()
     val clusCloseF = cluster.closeAsync()
     if(force) {

@@ -22,6 +22,7 @@ import com.datastax.driver.core.policies.{DefaultRetryPolicy,
 import java.util.{HashSet => JHashSet, UUID}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import org.scalatest.Matchers._
+import scala.concurrent.ExecutionContext.Implicits.global
 import org.gs.cassandra.{Playlists, PlaylistSongConfig, Songs}
 import org.gs.cassandra.Playlists._
 import org.gs.cassandra.Songs._

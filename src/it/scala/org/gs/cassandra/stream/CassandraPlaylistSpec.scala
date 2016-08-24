@@ -11,6 +11,7 @@ import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy
 import java.util.{HashSet => JHashSet, UUID}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
+import scala.concurrent.ExecutionContext.Implicits.global
 import org.gs.cassandra.{Playlists, PlaylistSongConfig}
 import org.gs.cassandra.Playlists._
 import org.gs.cassandra.Playlists._

@@ -17,6 +17,7 @@ package org.gs.cassandra
 import com.datastax.driver.core.{BoundStatement, Cluster, PreparedStatement, ResultSet, Session}
 import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy, RetryPolicy}
 import java.util.{HashSet => JHashSet, UUID}
+import scala.concurrent.ExecutionContext.Implicits.global
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import org.gs.cassandra.Playlists._
 import org.gs.cassandra.Songs._
