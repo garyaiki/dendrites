@@ -346,7 +346,7 @@ package object cassandra {
     val scalaClusF = listenableFutureToScala[Unit](clusCloseF.asInstanceOf[ListenableFuture[Unit]])
     scalaClusF onComplete {
       case Success(x) => logger.debug("cluster closed")
-      case Failure(t) => logger.error(t, "cluster closed failed {}", t.getMessage())
+      case Failure(t) => logger.error(t, "failed cluster close {}", t.getMessage())
     }
   }
 }
