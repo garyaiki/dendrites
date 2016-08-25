@@ -26,6 +26,7 @@ import org.apache.kafka.clients.consumer.{Consumer,
   InvalidOffsetException}
 import org.apache.kafka.common.KafkaException
 import org.apache.kafka.common.errors.{AuthorizationException, WakeupException}
+import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
 import org.gs.kafka.ConsumerConfig
 
@@ -54,7 +55,7 @@ import org.gs.kafka.ConsumerConfig
   * @author Gary Struthers
   */
 class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logger: LoggingAdapter)
-    extends GraphStage[SourceShape[ConsumerRecords[K, V]]]{
+            extends GraphStage[SourceShape[ConsumerRecords[K, V]]]{
 
   val out = Outlet[ConsumerRecords[K, V]](s"KafkaSource")
   override val shape = SourceShape(out)
@@ -79,13 +80,12 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
       private var needCommit = false
       private var retries = 3
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {logger.debug("KafkaSource onPull")
+        override def onPull(): Unit = {
           try {
             if(needCommit) {
               kafkaConsumer commitSync() // blocking
               needCommit = false
             }
-            logger.debug("KafkaSource before poll")
             val records = kafkaConsumer poll(consumerConfig.timeout) // blocking
             if(!records.isEmpty()) { // don't push if no record available
               push(out, records)
@@ -93,7 +93,7 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
             } else logger.debug("KafkaSource records isEmpty {}", records.isEmpty())
             retries = 3
           } catch {
-            case NonFatal(e) => logger.error(e, "KafkaSource NonFatal exception"); decider(e) match {
+            case NonFatal(e) => decider(e) match {
               case Supervision.Stop => {
                 logger.error(e, "KafkaSource Stop exception")
                 failStage(e)
@@ -133,8 +133,9 @@ object KafkaSource {
   	* @param implicit logger
   	* @return Source[ConsumerRecords[K, V], NotUsed]
   	*/
-  def apply[K, V](consumer: ConsumerConfig[K, V])(implicit logger: LoggingAdapter):
-        Source[ConsumerRecords[K, V], NotUsed] = {
+  def apply[K, V](consumer: ConsumerConfig[K, V])
+          (implicit ec: ExecutionContext, logger: LoggingAdapter):
+                Source[ConsumerRecords[K, V], NotUsed] = {
     val source = Source.fromGraph(new KafkaSource[K, V](consumer))
     source.withAttributes(ActorAttributes.supervisionStrategy(decider))
   }

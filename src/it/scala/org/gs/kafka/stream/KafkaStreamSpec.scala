@@ -15,8 +15,8 @@ limitations under the License.
 package org.gs.kafka.stream
 
 import akka.actor.ActorSystem
-import akka.event.{LoggingAdapter, Logging}
-import akka.stream.ActorMaterializer
+import akka.event.{Logging, LoggingAdapter}
+import akka.stream.{ActorAttributes, ActorMaterializer}
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.typesafe.config.ConfigFactory
@@ -25,9 +25,7 @@ import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.collection.immutable.{Iterable, Seq}
-//import scala.concurrent.duration._
 import org.gs.avro.ccToByteArray
 import org.gs.avro.stream.{AvroDeserializer, AvroSerializer}
 import org.gs.examples.account.GetAccountBalances
@@ -79,16 +77,13 @@ import KafkaSource.decider
   */
 class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   implicit val system = ActorSystem("dendrites")
+  implicit val ec: ExecutionContext = system.dispatcher
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
-  val config = ConfigFactory.load()
-  val closeTimeout = config.getLong("dendrites.kafka.account.close-timeout")
+
   val ap = AccountProducer
   val accountConsumerConfig = AccountConsumer
 
-  override def beforeAll() {
-    
-  }
   val getBals = Seq(GetAccountBalances(0L),
           GetAccountBalances(1L),
           GetAccountBalances(2L),
@@ -100,7 +95,7 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
           GetAccountBalances(8L),
           GetAccountBalances(9L))
   val iter = Iterable(getBals.toSeq:_*)
-  val timeout: Timeout = Timeout(10000 millis)
+  //val timeout: Timeout = Timeout(10000 millis)
 
   "An KafkaStream" should {
     "serialize case classes then write them to Kafka" in {
@@ -109,8 +104,11 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
       val sink = KafkaSink[String, Array[Byte]](ap)
       val source = Source[GetAccountBalances](iter)
       source.via(serializer).runWith(sink)
+      
+      val dispatcher = ActorAttributes.dispatcher("dendrites.blocking-dispatcher")
 
       val kafkaSource = KafkaSource[String, Array[Byte]](accountConsumerConfig)
+              .withAttributes(dispatcher)
       val consumerRecordQueue = new ConsumerRecordQueue[String, Array[Byte]]()
       val deserializer = new AvroDeserializer("getAccountBalances.avsc",
             genericRecordToGetAccountBalances)
@@ -127,7 +125,9 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
 
   override def afterAll() {
     ap.producer.flush()
+    val config = ConfigFactory.load()
+    val closeTimeout = config.getLong("dendrites.kafka.account.close-timeout")
     Thread.sleep(closeTimeout)
-    ap.producer.close(closeTimeout * 10, scala.concurrent.duration.MILLISECONDS)   
+    ap.producer.close(closeTimeout, scala.concurrent.duration.MILLISECONDS)   
   }
 }

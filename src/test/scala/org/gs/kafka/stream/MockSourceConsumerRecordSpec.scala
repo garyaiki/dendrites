@@ -24,6 +24,7 @@ import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords}
 import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.Matchers._
 import scala.collection.immutable.Queue
+import scala.concurrent.ExecutionContext
 import org.gs.kafka.{MockConsumerConfig, MockConsumerRecords}
 
 /** Test a Flow that maps mock ConsumerRecords from a Kafka MockConsumer Source to a queue of
@@ -33,6 +34,7 @@ import org.gs.kafka.{MockConsumerConfig, MockConsumerRecords}
   */ 
 class MockSourceConsumerRecordSpec extends WordSpecLike {
   implicit val system = ActorSystem("dendrites")
+  implicit val ec: ExecutionContext = system.dispatcher
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   val mockConsumerFacade = MockConsumerConfig
