@@ -18,7 +18,7 @@ import akka.NotUsed
 import akka.event.LoggingAdapter
 import akka.stream.{ActorAttributes, Attributes, Outlet, SourceShape, Supervision}
 import akka.stream.ActorAttributes.SupervisionStrategy
-import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler}
+import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler, TimerGraphStageLogic}
 import akka.stream.scaladsl.Source
 import org.apache.kafka.clients.consumer.{Consumer,
   ConsumerRecords,
@@ -27,7 +27,9 @@ import org.apache.kafka.clients.consumer.{Consumer,
 import org.apache.kafka.common.KafkaException
 import org.apache.kafka.common.errors.{AuthorizationException, WakeupException}
 import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
 import scala.util.control.NonFatal
+import org.gs.concurrent.calculateDelay
 import org.gs.kafka.ConsumerConfig
 
 /** Source stage that reads from Kafka
@@ -67,20 +69,23 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
     * @param inheritedAttributes
     */
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
-    new GraphStageLogic(shape) {
+    new TimerGraphStageLogic(shape) {
 
       private def decider = inheritedAttributes.get[SupervisionStrategy].map(_.decider).
           getOrElse(Supervision.stoppingDecider)
       var kafkaConsumer: Consumer[K, V] = null
+      var retries = 0
+      val maxDuration = consumerConfig.maxDuration
+      val curriedDelay = consumerConfig.curriedDelay
+      var waitForTimer: Boolean = false
+      var needCommit = false
 
       override def preStart(): Unit = {
         kafkaConsumer = consumerConfig.createAndSubscribe()
       }
 
-      private var needCommit = false
-      private var retries = 3
-      setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
+      def myHandler(): Unit = {
+        if(!waitForTimer) {
           try {
             if(needCommit) {
               kafkaConsumer commitSync() // blocking
@@ -91,27 +96,36 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
               push(out, records)
               needCommit = true
             } else logger.debug("KafkaSource records isEmpty {}", records.isEmpty())
-            retries = 3
+            retries = 0
           } catch {
             case NonFatal(e) => decider(e) match {
               case Supervision.Stop => {
-                logger.error(e, "KafkaSource Stop exception")
                 failStage(e)
               }
               case Supervision.Resume => {
-                if(retries > 0) {
-                  logger.error(e, "KafkaSource Resume exception retries:{}", retries)
-                  retries = retries - 1
-                  onPull
+                val duration = curriedDelay(retries)
+                if(duration < maxDuration) {
+                  waitForTimer = true
+                  scheduleOnce(None, duration)
                 } else {
-                  logger.error(e, "KafkaSource too many Resume exception retries:{}", retries)
                   failStage(e) // too many retries
                 }
               }
             }
           }
         }
+      }
+      setHandler(out, new OutHandler {
+        override def onPull(): Unit = {
+          myHandler()
+        }
       })
+
+      override protected def onTimer(timerKey: Any): Unit = {
+        retries += 1
+        waitForTimer = false
+        myHandler()
+      }
 
       override def postStop(): Unit = {
         if(needCommit) {

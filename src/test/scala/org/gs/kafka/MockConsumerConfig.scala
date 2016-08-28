@@ -19,8 +19,10 @@ import java.util.{ArrayList, List => JList}
 import org.apache.kafka.clients.consumer.{Consumer, MockConsumer, OffsetResetStrategy}
 import org.apache.kafka.clients.consumer.internals.NoOpConsumerRebalanceListener
 import org.apache.kafka.common.TopicPartition
-import scala.collection.mutable.HashMap
+import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 import scala.collection.JavaConverters._
+import scala.collection.mutable.HashMap
+import org.gs.concurrent.calculateDelay
 
 /** Create MockConsumer, initilize with test topics, partitions, and ConsumerRecords. Subscribe to
   * test topics
@@ -32,7 +34,11 @@ object MockConsumerConfig extends ConsumerConfig[String, String] with MockConsum
   val config = null
   val topics = List(topic).asJava
   val timeout = 1000L
-
+  val minDuration = FiniteDuration(100, MILLISECONDS)
+  val maxDuration = FiniteDuration(1000, MILLISECONDS)
+  val randomFactor = 0.2
+  val curriedDelay = calculateDelay(minDuration, maxDuration, 0.2) _
+  
   def createAndSubscribe(): Consumer[Key, Value] = {
     val mc = new MockConsumer[Key, Value](OffsetResetStrategy.EARLIEST)
     mc.subscribe(topics, new NoOpConsumerRebalanceListener())

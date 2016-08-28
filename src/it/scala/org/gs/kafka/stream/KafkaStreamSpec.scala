@@ -95,7 +95,6 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
           GetAccountBalances(8L),
           GetAccountBalances(9L))
   val iter = Iterable(getBals.toSeq:_*)
-  //val timeout: Timeout = Timeout(10000 millis)
 
   "An KafkaStream" should {
     "serialize case classes then write them to Kafka" in {

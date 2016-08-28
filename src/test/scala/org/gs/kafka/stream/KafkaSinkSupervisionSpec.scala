@@ -47,9 +47,8 @@ import org.gs.avro.ccToByteArray
 import org.gs.avro.stream.{AvroDeserializer, AvroSerializer}
 import org.gs.examples.account.GetAccountBalances
 import org.gs.examples.account.avro.genericRecordToGetAccountBalances
-import org.gs.examples.account.kafka.{AccountConsumer, AccountProducer}
+import org.gs.examples.account.kafka.AccountProducer
 import org.gs.kafka.MockProducerConfig
-import KafkaSource.decider
 
 /** Test KafkaSink Supervision. KafkaSink companion object defines a Supervision Decider. Custom
   * AkkaStream stages can use Akka Supervision but they must provide customized ways to handle
