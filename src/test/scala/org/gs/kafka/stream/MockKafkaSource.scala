@@ -18,12 +18,14 @@ import akka.NotUsed
 import akka.event.LoggingAdapter
 import akka.stream.{ActorAttributes, Attributes, Outlet, SourceShape, Supervision}
 import akka.stream.ActorAttributes.SupervisionStrategy
-import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler}
+import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler, TimerGraphStageLogic}
 import akka.stream.scaladsl.Source
 import org.apache.kafka.clients.consumer.{CommitFailedException, InvalidOffsetException}
 import org.apache.kafka.common.KafkaException
 import org.apache.kafka.common.errors.{AuthorizationException, WakeupException}
+import scala.concurrent.duration._
 import scala.util.control.NonFatal
+import org.gs.concurrent.calculateDelay
 import org.gs.kafka.stream.KafkaSource.decider
 
 /** A mock version of [[org.gs.kafka.stream.KafkaSource]] to test KafkaSource's exception handling
@@ -34,42 +36,47 @@ import org.gs.kafka.stream.KafkaSource.decider
   * @author Gary Struthers
   */
 class MockKafkaSource[V](iter: Iterator[V], testException: RuntimeException = null)
-        (implicit logger: LoggingAdapter) extends GraphStage[SourceShape[V]]{
+        (implicit logger: LoggingAdapter) extends GraphStage[SourceShape[V]] {
 
   val out = Outlet[V](s"KafkaSource")
   override val shape = SourceShape(out)
 
   /** On downstream pull check if exception injected and throw it, KafkaSink Supervision decides
     * what handler should be used. Supervision.Resume is handled by retrying the poll or commit, up
-    * to the # of retries. Supervision.Stop stops the Stage
+    * to maxBackoff delay. Supervision.Stop stops the Stage
     *
     * @param inheritedAttributes
     */
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
-    new GraphStageLogic(shape) {
+    new TimerGraphStageLogic(shape) {
 
       private def decider = inheritedAttributes.get[SupervisionStrategy].map(_.decider).
           getOrElse(Supervision.stoppingDecider)
 
-      private var retries = 3
-      setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
+      var retries = 0
+      val minDuration = FiniteDuration(100, MILLISECONDS)
+      val maxDuration = FiniteDuration(1, SECONDS) // So tests run quicker
+      val curriedDelay = calculateDelay(minDuration, maxDuration, 0.2) _
+      var waitForTimer: Boolean = false
+
+      def myHandler(): Unit = {
+        if(!waitForTimer) {
           try {
             if(testException != null) throw testException
+            retries = 0
             if(iter.hasNext) {
               push(out, iter.next())
             }
-            retries = 3
           } catch {
             case NonFatal(e) => decider(e) match {
               case Supervision.Stop => {
                 failStage(e)
               }
               case Supervision.Resume => {
-                if(retries > 0) {
-                  logger.debug("MockKafkaSource Resume exception retries:{}", retries)
-                  retries = retries - 1
-                  onPull
+                val duration = curriedDelay(retries)
+                if(duration < maxDuration) {
+                  waitForTimer = true
+                  scheduleOnce(None, duration)
                 } else {
                   failStage(e) // too many retries
                 }
@@ -77,8 +84,20 @@ class MockKafkaSource[V](iter: Iterator[V], testException: RuntimeException = nu
             }
           }
         }
+      }
+
+      setHandler(out, new OutHandler {
+        override def onPull(): Unit = {
+          myHandler()
+        }
       })
-    }
+
+      override protected def onTimer(timerKey: Any): Unit = {
+        retries += 1
+        waitForTimer = false
+        myHandler()
+      }
+    } 
   }
 }
 

@@ -63,25 +63,27 @@ class KafkaSourceSupervisionSpec extends WordSpecLike with Matchers {
       .expectNextN(nums)
     }
 
-    "output CommitFailedException when it's injected" in {
+    "retry CommitFailedException until > maxBackoff" in {
       val iter: Iterator[String] = nums.toIterator
       val source = MockKafkaSource[String](iter, new CommitFailedException("test"))
       val error = source.runWith(TestSink.probe[String])
       .request(10)
       .expectError()
+      Thread.sleep(200) //Wait for retries
       error shouldBe a [CommitFailedException]
     }
 
-    "output WakeupException when it's injected" in {
+    "retry WakeupException until > maxBackoff" in {
       val iter: Iterator[String] = nums.toIterator
       val source = MockKafkaSource[String](iter, new WakeupException())
       val error = source.runWith(TestSink.probe[String])
       .request(10)
       .expectError()
+      Thread.sleep(200) //Wait for retries
       error shouldBe a [WakeupException]
     }
 
-    "output AuthorizationException when it's injected" in {
+    "Stop on AuthorizationException" in {
       val iter: Iterator[String] = nums.toIterator
       val source = MockKafkaSource[String](iter, new AuthorizationException("test"))
       val error = source.runWith(TestSink.probe[String])
@@ -90,7 +92,7 @@ class KafkaSourceSupervisionSpec extends WordSpecLike with Matchers {
       error shouldBe a [AuthorizationException]
     }
 
-    "output subclass of InvalidOffsetException when it's injected" in {
+    "Stop on subclass of InvalidOffsetException" in {
       val iter: Iterator[String] = nums.toIterator
       val source = MockKafkaSource[String](iter, new OffsetOutOfRangeException(null))
       val error = source.runWith(TestSink.probe[String])
@@ -99,7 +101,7 @@ class KafkaSourceSupervisionSpec extends WordSpecLike with Matchers {
       error shouldBe a [OffsetOutOfRangeException]
     }
 
-    "output KafkaException when it's injected" in {
+    "Stop on KafkaException" in {
       val iter: Iterator[String] = nums.toIterator
       val source = MockKafkaSource[String](iter, new KafkaException("test"))
       val error = source.runWith(TestSink.probe[String])

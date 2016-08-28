@@ -1,7 +1,9 @@
 package org.gs
 
 import com.google.common.util.concurrent.{FutureCallback, Futures, ListenableFuture}
+import java.util.concurrent.ThreadLocalRandom
 import scala.concurrent.{Future, Promise}
+import scala.concurrent.duration.FiniteDuration
 
 /** Functions for concurrency
   *
@@ -33,4 +35,30 @@ package object concurrent {
     })
     p.future
   }
+
+  /** Calculate delay, used for exponential backoff. This is copied from Akka BackoffSupervisor
+    * Used here in Akka Streams for the same purpose
+    *
+   	* @param minBackoff minimum (initial) duration
+   	* @param maxBackoff the exponential back-off is capped to this duration
+   	* @param randomFactor after calculation of the exponential back-off an additional random delay
+   	* based on this factor is added, e.g. `0.2` adds up to `20%` delay.
+   	* In order to skip this additional delay pass in `0`.
+    * @param retryCount in 2nd arg list for currying
+    * @see [[https://github.com/akka/akka/blob/v2.4.9/akka-actor/src/main/scala/akka/pattern/BackoffSupervisor.scala BackoffSupervisor]]
+   	*
+    */
+  def calculateDelay(
+	  minBackoff:   FiniteDuration,
+	  maxBackoff:   FiniteDuration,
+		randomFactor: Double)(retryCount: Int): FiniteDuration = {
+	  val rnd = 1.0 + ThreadLocalRandom.current().nextDouble() * randomFactor
+			if (retryCount >= 30) // Duration overflow protection (> 100 years)
+				maxBackoff
+			else
+				maxBackoff.min(minBackoff * math.pow(2, retryCount)) * rnd match {
+					case f: FiniteDuration ⇒ f
+						case _               ⇒ maxBackoff
+				}
+    }
 }
