@@ -15,6 +15,7 @@ limitations under the License.
 package org.gs.kafka
 
 import org.apache.kafka.clients.producer.Producer
+import scala.concurrent.duration.FiniteDuration
 
 /** Abstract KafkaProducer configuration
  *
@@ -28,6 +29,11 @@ import org.apache.kafka.clients.producer.Producer
 trait ProducerConfig[K, V] {
   type Key = K
   type Value = V
+
+  val minDuration: FiniteDuration // min poll, commit backoff
+  val maxDuration: FiniteDuration // max poll, commit backoff
+  val randomFactor: Double // random delay factor between 0.0, 1.0
+  val curriedDelay: Int => FiniteDuration // curried calculateDelay
 
   val producer: Producer[K, V]
   val topic: String

@@ -19,7 +19,11 @@ import akka.event.LoggingAdapter
 import akka.stream.{ActorAttributes, Attributes, Inlet, SinkShape, Supervision}
 import akka.stream.ActorAttributes.SupervisionStrategy
 import akka.stream.scaladsl.Sink
-import akka.stream.stage.{AsyncCallback, GraphStage, GraphStageLogic, InHandler}
+import akka.stream.stage.{AsyncCallback,
+    GraphStage,
+    GraphStageLogic,
+    InHandler,
+    TimerGraphStageLogic}
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord, RecordMetadata}
 import org.apache.kafka.common.KafkaException
 import org.apache.kafka.common.errors.{CorruptRecordException, // Retriable exceptions
@@ -51,11 +55,10 @@ import org.gs.kafka.stream.KafkaSink.decider
   * @author Gary Struthers
   *
   */
-class MockKafkaSink[K, V](wProd: ProducerConfig[K, V], testException: RuntimeException = null)
+class MockKafkaSink[K, V](prod: ProducerConfig[K, V], testException: RuntimeException = null)
         (implicit logger: LoggingAdapter) extends GraphStage[SinkShape[V]] {
 
-  var handledTestException = false
-  val producer = wProd.producer
+  val producer = prod.producer
   /* for access to MockProducer debugging methods
   import org.apache.kafka.clients.producer.MockProducer
   val mockProducer = producer match {
@@ -64,10 +67,15 @@ class MockKafkaSink[K, V](wProd: ProducerConfig[K, V], testException: RuntimeExc
   val in = Inlet[V](s"MockKafkaSink")
   override val shape: SinkShape[V] = SinkShape(in)
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
-    new GraphStageLogic(shape) {
+    new TimerGraphStageLogic(shape) {
 
       private def decider = inheritedAttributes.get[SupervisionStrategy].map(_.decider).
           getOrElse(Supervision.stoppingDecider)
+
+      var retries = 0
+      val maxDuration = prod.maxDuration
+      val curriedDelay = prod.curriedDelay
+      var waitForTimer: Boolean = false
 
       /** pull initializes stream requests */
       override def preStart(): Unit = {
@@ -79,11 +87,18 @@ class MockKafkaSink[K, V](wProd: ProducerConfig[K, V], testException: RuntimeExc
         e match {
           case NonFatal(e) => decider(e) match {
               case Supervision.Stop => {
+                logger.error(e, "MockKafkaSink Stop ex:{}", e.getMessage)
                 failStage(e)
               }
               case Supervision.Resume => {
-                logger debug("Kafka send retryable exception, attempt retry {}", e.getMessage)
-                producer send(pRecord, callback)
+                val duration = curriedDelay(retries)
+                if(duration < maxDuration) {
+                  waitForTimer = true
+                  scheduleOnce((pRecord, callback), duration)
+                } else {
+                  logger.error(e, "MockKafkaSink Resume ex:{} duration:{}", e.getMessage, duration)
+                  failStage(e) // too many retries
+                }
               }
           }
         }
@@ -94,24 +109,34 @@ class MockKafkaSink[K, V](wProd: ProducerConfig[K, V], testException: RuntimeExc
         */
       setHandler(in, new InHandler {
         override def onPush(): Unit = {
-          val item = grab(in)
-          val producerRecord = new ProducerRecord[K, V](wProd.topic, wProd.key, item)
-          var errorCallback: AsyncCallback[Exception] = null
-          val pullCallback = getAsyncCallback{ (_: Unit) => pull(in) }
-          val kafkaCallback = new Callback() {
-            def onCompletion(meta: RecordMetadata, e: Exception): Unit = {
-              if(!handledTestException && testException != null) {
-                handledTestException = true
-                errorCallback invoke(testException)
+          if(!waitForTimer) {
+            val item = grab(in)
+            val producerRecord = new ProducerRecord[K, V](prod.topic, prod.key, item)
+            var errorCallback: AsyncCallback[Exception] = null
+            val pullCallback = getAsyncCallback{ (_: Unit) => pull(in) }
+            val kafkaCallback = new Callback() {
+              def onCompletion(meta: RecordMetadata, e: Exception): Unit = {
+                if (e != null) errorCallback invoke(e) else
+                  if (testException != null) errorCallback invoke(testException)
+                  else pullCallback invoke((): Unit)
               }
-              else pullCallback invoke((): Unit)
             }
+            val curriedAsyncEx = asyncExceptions(producerRecord, kafkaCallback) _
+            errorCallback = getAsyncCallback(curriedAsyncEx)
+            producer send(producerRecord, kafkaCallback)
           }
-          val curriedAsyncEx = asyncExceptions(producerRecord, kafkaCallback) _
-          errorCallback = getAsyncCallback(curriedAsyncEx)
-          producer send(producerRecord, kafkaCallback)
         }
       })
+
+      override protected def onTimer(timerKey: Any): Unit = {
+        retries += 1
+        waitForTimer = false
+        timerKey match {
+          case (pRec: ProducerRecord[K, V], callback: Callback) => producer send(pRec, callback)
+          case x => throw new IllegalArgumentException(
+              s"expected (ProducerRecord[K, V], Callback)) received:${x.toString()}")
+        }
+      }
     }
   }
 }

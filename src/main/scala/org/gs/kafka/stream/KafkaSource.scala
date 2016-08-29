@@ -34,22 +34,27 @@ import org.gs.kafka.ConsumerConfig
 
 /** Source stage that reads from Kafka
   *
-  * KafkaSource calls KafkaConsumer.poll() which reads all available messages into a ConsumerRecords
-  * if it's not empty it's pushed to the next stage. KafkaSource receives an onPull when the stream
-  * starts and when all messages in the last poll() have been processed. This uses KafkaConsumer's
-  * commitSync after all messages from the last poll() have been processed.
+  * KafkaSource calls KafkaConsumer.poll() which reads all available messages into ConsumerRecords
+  * if not empty it's pushed to the next stage. KafkaSource receives onPull when stream starts and
+  * when all messages in the last poll() have been processed.
   *
   * Kafka commitSync was meant to confirm that messages have been read. But in an Akka Stream it
-  * can confirm all messages have been processed. If there is a thrown exception or a timeout
-  * commitSync won't be called. So messages that weren't committed will be retried.
+  * can confirm messages have been processed. If there is a thrown exception or timeout commitSync
+  * won't be called. So messages that weren't committed will be re-polled.
   *
-  * To use commitSync() this way, in Kafka server.properties enable.auto.commit=false
+  * To use commitSync() this way, set Kafka server.properties enable.auto.commit=false
   *
   * Do Not add a consumer to a consumer group while uncommitted messages are being processed. This
   * can cause a rebalancing defeating this trick.
   *
-  * KafkaConsumer is single threaded and is created and closed with the stream, as opposed to
-  * KafkaProducer which should be reused by other streams and processes.
+  * KafkaConsumer is single threaded and is created and closed with the stream. It's poll and commit
+  * block, Akka Stream's default dispatcher may run out of threads, use a blocking dispatcher
+  * {{{
+  *   val dispatcher = ActorAttributes.dispatcher("dendrites.blocking-dispatcher")
+  *
+  *   val kafkaSource = KafkaSource[String, Array[Byte]](accountConsumerConfig)
+  *           .withAttributes(dispatcher)
+  * }}}
   *
   * @tparam K Kafka key
   * @tparam V Kafka value
@@ -73,6 +78,7 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
 
       private def decider = inheritedAttributes.get[SupervisionStrategy].map(_.decider).
           getOrElse(Supervision.stoppingDecider)
+
       var kafkaConsumer: Consumer[K, V] = null
       var retries = 0
       val maxDuration = consumerConfig.maxDuration
@@ -137,7 +143,7 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
   }
 }
 
-/** Create a configured Kafka Source that is subscribed to topics */
+/** Create a configured Kafka Source that is subscribed to topics and has a Supervision Strategy*/
 object KafkaSource {
 
   /** Create Kafka Sink as Akka Sink subscribed to configured topic with Supervision

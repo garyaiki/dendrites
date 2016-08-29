@@ -70,6 +70,7 @@ class MockKafkaSource[V](iter: Iterator[V], testException: RuntimeException = nu
           } catch {
             case NonFatal(e) => decider(e) match {
               case Supervision.Stop => {
+                logger.error(e, "MockKafkaSource Stop ex:{}", e.getMessage)
                 failStage(e)
               }
               case Supervision.Resume => {
@@ -78,6 +79,7 @@ class MockKafkaSource[V](iter: Iterator[V], testException: RuntimeException = nu
                   waitForTimer = true
                   scheduleOnce(None, duration)
                 } else {
+                  logger.error(e, "MockKafkaSource retry ex:{} duration:{}", e.getMessage, duration)
                   failStage(e) // too many retries
                 }
               }

@@ -16,10 +16,17 @@ package org.gs.kafka
 
 import org.apache.kafka.clients.producer.MockProducer
 import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSerializer}
+import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
+import org.gs.concurrent.calculateDelay
 
 object MockProducerConfig extends ProducerConfig[String, Array[Byte]] {
   val topic = "akkaKafka"
   val key = topic + "Key"
-  val autoComplete = true // When false must call completeNext or errorNext for each record 
+  val autoComplete = true // When false must call completeNext or errorNext for each record
+  val minDuration = FiniteDuration(100, MILLISECONDS)
+  val maxDuration = FiniteDuration(1000, MILLISECONDS)
+  val randomFactor = 0.2
+  val curriedDelay = calculateDelay(minDuration, maxDuration, randomFactor) _
+
   val producer = new MockProducer(autoComplete, new StringSerializer, new ByteArraySerializer)
 }

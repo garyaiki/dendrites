@@ -15,6 +15,8 @@ limitations under the License.
 package org.gs.examples.account.kafka
 
 import com.typesafe.config.ConfigFactory
+import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
+import org.gs.concurrent.calculateDelay
 import org.gs.kafka.ProducerConfig
 import org.gs.kafka.createProducer
 
@@ -28,4 +30,10 @@ object AccountProducer extends ProducerConfig[String, Array[Byte]] {
   val topic = config.getString("dendrites.kafka.account.topic")
   val key = config.getString("dendrites.kafka.account.key")
   val producer = createProducer[Key, Value]("kafkaProducer.properties")
+  val min = config getInt("dendrites.kafka.account.min-backoff")
+  val minDuration = FiniteDuration(min, MILLISECONDS)
+  val max = config getInt("dendrites.kafka.account.max-backoff")
+  val maxDuration = FiniteDuration(max, MILLISECONDS)
+  val randomFactor = config getDouble("dendrites.kafka.account.randomFactor")
+  val curriedDelay = calculateDelay(minDuration, maxDuration, 0.2) _
 }
