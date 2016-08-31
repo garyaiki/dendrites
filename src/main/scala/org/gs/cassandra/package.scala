@@ -281,6 +281,8 @@ package object cassandra {
 
   /** Asynchronously execute a BoundStatement but getUninterruptibly blocks, use blocking-dispatcher
     *
+    * [[org.gs.cassandra.stream.CassandraSink]] shows fully asynchronous executeAsync with Future
+    *
     * @param session
     * @param bndStmt with values previously bound
     * @return ResultSet on Success

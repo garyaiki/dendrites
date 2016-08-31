@@ -48,8 +48,7 @@ class CassandraSink(session: Session)(implicit val ec: ExecutionContext, logger:
   val in = Inlet[BoundStatement]("CassandraSink.in")
   override val shape: SinkShape[BoundStatement] = SinkShape(in)
 
-  /** When upstream pushes a BoundStatement execute it asynchronously and use Cassandra's preferred
-    * getUniterruptibly method on ResultSetFuture. Then pull another BoundStatement
+  /** When upstream pushes a BoundStatement execute it asynchronously. Then pull
     *
     * @param inheritedAttributes
     */
@@ -73,7 +72,7 @@ class CassandraSink(session: Session)(implicit val ec: ExecutionContext, logger:
           case Failure(t) => {
             val failCallback = getAsyncCallback{
               (_: Unit) => {
-                logger.error(t, "ListenableFuture[ResultSet] fail e:{}", t.getMessage)
+                logger.error(t, "CassandraSink ListenableFuture fail e:{}", t.getMessage)
                 failStage(t)
               }
             }

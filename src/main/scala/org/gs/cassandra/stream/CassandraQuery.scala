@@ -70,7 +70,7 @@ class CassandraQuery(session: Session, fetchSize: Int = 0)(implicit val ec: Exec
           case Failure(t) => {
             val failCallback = getAsyncCallback{
               (_: Unit) => {
-                logger.error(t, "ListenableFuture[ResultSet] fail e:{}", t.getMessage)
+                logger.error(t, "CassandraQuery ListenableFuture fail e:{}", t.getMessage)
                 failStage(t)
               }
             }
