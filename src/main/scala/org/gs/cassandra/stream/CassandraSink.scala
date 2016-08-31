@@ -16,29 +16,33 @@ package org.gs.cassandra.stream
 
 import akka.NotUsed
 import akka.event.LoggingAdapter
-import akka.stream.{ActorAttributes, Attributes, Inlet, SinkShape, Supervision}
-import akka.stream.ActorAttributes.SupervisionStrategy
+import akka.stream.{Attributes, Inlet, SinkShape}
 import akka.stream.scaladsl.Sink
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler}
-import com.datastax.driver.core.{BoundStatement, Session}
-import com.datastax.driver.core.exceptions.{NoHostAvailableException,
-  QueryExecutionException,
-  QueryValidationException,
-  UnavailableException,
-  UnsupportedFeatureException,
-  WriteTimeoutException}
+import com.datastax.driver.core.{BoundStatement, ResultSet, Session}
+import com.google.common.util.concurrent.ListenableFuture
+import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
-import CassandraQuery.decider
+import org.gs.concurrent.listenableFutureToScala
 
 /** Execute Cassandra BoundStatements that don't return Rows (Insert, Update, Delete). Values are
   * bound to the statement in the previous stage. BoundStatements can be for different queries.
   *
+  * Cassandra's Async Execute statement returns a Guava ListenableFuture which is converted to a
+  * completed Scala Future.
+  * Success invokes an Akka Stream AsyncCallback which pulls
+  * Failure invokes an Akka Stream AsyncCallback which fails the stage
+  *
+  * Cassandra's Java driver handles retry and reconnection, so Supervision isn't used
+  *
   * @param session is long lived, it's created sometime before the stream and closed sometime after
   * the stream and may be used with other clients
+	* @param implicit ec ExecutionContext
   * @param implicit logger
   * @author Gary Struthers
   */
-class CassandraSink(session: Session)(implicit logger: LoggingAdapter)
+class CassandraSink(session: Session)(implicit val ec: ExecutionContext, logger: LoggingAdapter)
     extends GraphStage[SinkShape[BoundStatement]] {
 
   val in = Inlet[BoundStatement]("CassandraSink.in")
@@ -52,40 +56,28 @@ class CassandraSink(session: Session)(implicit logger: LoggingAdapter)
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
 
-      private def decider = inheritedAttributes.get[SupervisionStrategy].map(_.decider).
-          getOrElse(Supervision.stoppingDecider)
-
       /** start backpressure in custom Sink */
       override def preStart(): Unit = {
         pull(in)
       }
 
       def executeStmt(stmt: BoundStatement): Unit = {
-        try {
-          val resultSetFuture = session.executeAsync(stmt)
-          val rs = resultSetFuture.getUninterruptibly()
-          logger.debug("BoundStatement success")
-          pull(in)
-        } catch {
-          case NonFatal(e) => decider(e) match {
-            case Supervision.Stop => {
-              logger.error(e, "Query Stop exception")
-              failStage(e)
-            }
-            case Supervision.Resume => {
-              e match {
-                case e: UnavailableException => {
-                  logger.debug(s"""UnavailableException address:${e.getAddress()} aliveReplicas:
-                    ${e.getAliveReplicas()} consistency level:${e.getConsistencyLevel()}
-                    required replicas:${e.getRequiredReplicas()}""")
-                }
-                case e: WriteTimeoutException => {
-                  logger.debug(s"WriteTimeoutException:${e.getMessage} writeType:${e.getWriteType}")
-                }
-                case _ => logger.debug("Query Retryable exception :{}", e.getMessage)
+        val resultSetFuture = session.executeAsync(stmt)
+        val scalaRSF = listenableFutureToScala[ResultSet](
+                resultSetFuture.asInstanceOf[ListenableFuture[ResultSet]])
+        scalaRSF.onComplete { 
+          case Success(rs) => {
+            val successCallback = getAsyncCallback{ (_: Unit) => pull(in) }
+            successCallback.invoke(rs)
+          }
+          case Failure(t) => {
+            val failCallback = getAsyncCallback{
+              (_: Unit) => {
+                logger.error(t, "ListenableFuture[ResultSet] fail e:{}", t.getMessage)
+                failStage(t)
               }
-              executeStmt(stmt)
             }
+            failCallback.invoke(t)
           }
         }        
       }
@@ -102,14 +94,15 @@ class CassandraSink(session: Session)(implicit logger: LoggingAdapter)
 
 object CassssandraSink {
 
-  /** Create CassandraSink as Akka Flow with Supervision
+  /** Create CassandraSink as Akka Sink
     *
     * @param session Cassandra Session
+		* @param implicit ec ExecutionContext
     * @param implicit logger
     * @return Sink[BoundStatement, NotUsed]
     */
-  def apply(session: Session)(implicit logger: LoggingAdapter): Sink[BoundStatement, NotUsed] = {
-    val sink = Sink.fromGraph(new CassandraSink(session))
-    sink.withAttributes(ActorAttributes.supervisionStrategy(decider))
+  def apply(session: Session)(implicit ec: ExecutionContext,
+              logger: LoggingAdapter): Sink[BoundStatement, NotUsed] = {
+    Sink.fromGraph(new CassandraSink(session))
   }
 }

@@ -16,86 +16,74 @@ package org.gs.cassandra.stream
 
 import akka.NotUsed
 import akka.event.LoggingAdapter
-import akka.stream.{ActorAttributes, Attributes, FlowShape, Inlet, Outlet, Supervision}
-import akka.stream.ActorAttributes.SupervisionStrategy
+import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.scaladsl.Flow
-import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
+import akka.stream.stage.{AsyncCallback, GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.datastax.driver.core.{BoundStatement, ResultSet, Session}
-import com.datastax.driver.core.exceptions.{NoHostAvailableException,
-  QueryExecutionException,
-  QueryValidationException,
-  ReadTimeoutException,
-  UnavailableException,
-  UnsupportedFeatureException,
-  WriteTimeoutException}
+import com.google.common.util.concurrent.ListenableFuture
+import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
+import org.gs.concurrent.listenableFutureToScala
 
 /** Execute Cassandra BoundStatement queries that return Rows. Values are
   * bound to the statement in the previous stage. BoundStatements can be for different queries.
   *
+  * Cassandra's Async Execute statement returns a Guava ListenableFuture which is converted to a
+  * completed Scala Future.
+  * Success invokes an Akka Stream AsyncCallback which pushes the ResultSet
+  * Failure invokes an Akka Stream AsyncCallback which fails the stage
+  *
+  * Cassandra's Java driver handles retry and reconnection, so Supervision isn't used
+  *
   * @param session is long lived, it's created sometime before the stream and closed sometime after
   * the stream and may be used with other clients
   * @param fetchSize used by SELECT queries for page size. Default 0 means use Cassandra default
+	* @param implicit ec ExecutionContext
   * @param implicit logger
+  *
   * @author Gary Struthers
   */
-class CassandraQuery(session: Session, fetchSize: Int = 0)(implicit logger: LoggingAdapter)
-    extends GraphStage[FlowShape[BoundStatement, ResultSet]]{
+class CassandraQuery(session: Session, fetchSize: Int = 0)(implicit val ec: ExecutionContext,
+            logger: LoggingAdapter) extends GraphStage[FlowShape[BoundStatement, ResultSet]]{
 
   val in = Inlet[BoundStatement]("CassandraQuery.in")
   val out = Outlet[ResultSet]("CassandraQuery.out")
   override val shape = FlowShape.of(in, out)
 
-  /** When upstream pushes a BoundStatement execute it asynchronously and use Cassandra's preferred
-    * getUniterruptibly method on ResultSetFuture. Then push the ResultSet
+  /** When upstream pushes a BoundStatement execute it asynchronously. Then push the ResultSet
     *
     * @param inheritedAttributes
     */
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
 
-      private def decider = inheritedAttributes.get[SupervisionStrategy].map(_.decider).
-          getOrElse(Supervision.stoppingDecider)
-
       def executeStmt(stmt: BoundStatement): Unit = {
-        try {
-          val resultSetFuture = session.executeAsync(stmt)
-          val rs = resultSetFuture.getUninterruptibly()
-          logger.debug("BoundStatement query success")
-          push(out, rs)
-        } catch {
-          case NonFatal(e) => decider(e) match {
-            case Supervision.Stop => {
-              logger.error(e, "Query Stop exception")
-              failStage(e)
-            }
-            case Supervision.Resume => {
-              e match {
-                case e: UnavailableException => {
-                  logger.debug(s"""UnavailableException address:${e.getAddress()} aliveReplicas:
-                    ${e.getAliveReplicas()} consistency level:${e.getConsistencyLevel()}
-                    required replicas:${e.getRequiredReplicas()}""")
-                }
-                case e: ReadTimeoutException => {
-                  logger.debug(s"""ReadTimeoutException:${e.getMessage} wasDataRetrieved:
-                    ${e.wasDataRetrieved()}""")
-                }
-                case e: WriteTimeoutException => {
-                  logger.debug(s"WriteTimeoutException:${e.getMessage} writeType:${e.getWriteType}")
-                }
-                case _ => logger.debug("Query Retryable exception :{}", e.getMessage)
-              }
-              executeStmt(stmt)
-            }
+        val resultSetFuture = session.executeAsync(stmt)
+        val scalaRSF = listenableFutureToScala[ResultSet](
+                resultSetFuture.asInstanceOf[ListenableFuture[ResultSet]])
+        scalaRSF.onComplete { 
+          case Success(rs) => {
+            val successCallback = getAsyncCallback{ (_: Unit) => push(out, rs) }
+            successCallback.invoke(rs)
           }
-        }        
+          case Failure(t) => {
+            val failCallback = getAsyncCallback{
+              (_: Unit) => {
+                logger.error(t, "ListenableFuture[ResultSet] fail e:{}", t.getMessage)
+                failStage(t)
+              }
+            }
+            failCallback.invoke(t)
+          }
+        }       
       }
 
       setHandler(in, new InHandler {
         override def onPush(): Unit = {
           val boundStatement = grab(in)
           boundStatement.setFetchSize(fetchSize)
-          executeStmt(boundStatement: BoundStatement)
+          executeStmt(boundStatement)
         }
       })
 
@@ -110,34 +98,16 @@ class CassandraQuery(session: Session, fetchSize: Int = 0)(implicit logger: Logg
 
 object CassandraQuery {
 
-  /** Create CassandraQuery as Flow with Supervision
+  /** Create CassandraQuery as Flow
     *
     * @param session Cassandra Session
     * @param fetchSize limits how many results retrieved simultaneously, 0 means use default size
+		* @param implicit ec ExecutionContext
     * @param implicit logger
     * @return Flow[BoundStatement, ResultSet, NotUsed]
     */
-  def apply(session: Session, fetchSize: Int = 0)
-          (implicit logger: LoggingAdapter): Flow[BoundStatement, ResultSet, NotUsed] = {
-    val query = Flow.fromGraph(new CassandraQuery(session, fetchSize))
-    query.withAttributes(ActorAttributes.supervisionStrategy(decider))
-  }
-
-  /** Supervision strategy
-    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/UnavailableException.html UnavailableException]]
-   	* @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/UnsupportedFeatureException.html UnsupportedFeatureException]]
-    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/NoHostAvailableException.html NoHostAvailableException]]
-		* @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/ReadTimeoutException.html ReadTimeoutException]]
-		* @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/WriteTimeoutException.html WriteTimeoutException]]
-    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/QueryExecutionException.html QueryExecutionException]]
-		* @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/exceptions/QueryValidationException.html QueryValidationException]]
-    */
-  def decider: Supervision.Decider = {
-    case _: UnavailableException => Supervision.Resume
-    case _: ReadTimeoutException => Supervision.Resume
-    case _: QueryExecutionException => Supervision.Resume
-    case _: NoHostAvailableException => Supervision.Stop
-    case _: QueryValidationException => Supervision.Stop
-    case _: UnsupportedFeatureException => Supervision.Stop
+  def apply(session: Session, fetchSize: Int = 0)(implicit ec: ExecutionContext,
+              logger: LoggingAdapter): Flow[BoundStatement, ResultSet, NotUsed] = {
+    Flow.fromGraph(new CassandraQuery(session, fetchSize))
   }
 }

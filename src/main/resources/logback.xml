@@ -22,6 +22,7 @@
 
   <logger name="com.datastax.driver.core.QueryLogger.SLOW" level="TRACE" />
   <logger name="org.gs.cassandra" level="debug" />
+  <logger name="org.gs.cassandra.stream" level="debug" />
   <logger name="org.gs.cassandra.scalacass" level="debug" />
   <logger name="org.gs.examples.cassandra" level="debug" />
   <logger name="org.gs.kafka" level="debug" />
