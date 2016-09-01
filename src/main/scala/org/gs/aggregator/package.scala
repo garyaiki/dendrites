@@ -1,8 +1,22 @@
+/** Copyright 2016 Gary Struthers
 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs
 
-/** aggregate functions
+/** Aggregate functions
   *
+  * == mean ==
   * Mean of sequence of Numeric
   * {{{
   * val doubles = List(1.0, 2.1, 3.2)
@@ -12,9 +26,9 @@ package org.gs
   */
 package object aggregator {
 
-  /** Find the arithmetic mean of a generic Sequence of Numeric elements
+  /** Find arithmetic mean of a Sequence of Numeric elements
     *
-    * @tparam A is a Numeric type
+    * @tparam A Numeric type
     * @param xs
     * @return mean of xs in Right or error message in Left
     */

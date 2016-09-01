@@ -18,7 +18,8 @@ import java.util.Properties
 
 /** Utility functions for case classes and Properties files
   *
-  * Case class fields to map of field names and values
+  *	== ccToMap ==
+  *  Case class fields to map of field names and values
   * {{{
   * val kvMap = ccToMap(cc)
   *  kvMap foreach {
@@ -26,7 +27,8 @@ import java.util.Properties
   * }
   * }}}
   *
-  * Is case class field at index a specified type
+  *	== isElementEqual ==
+  *  Is case class field at index a specified type
   * {{{
   * system.actorOf(props) ! GetCustomerAccountBalances(2, Set(Checking, Savings, MoneyMarket))
   *   receiveOne(2.seconds) match {
@@ -38,6 +40,8 @@ import java.util.Properties
   *    case result ⇒ assert(false, s"Expect 3 AccountTypes, got $result")
   *   }
   * }}}
+  *
+  * == loadProperties ==
   * Load Properties file from classpath
   * {{{
   *   val prop: Properties = loadProperties("kafkaProducer.properties")
@@ -47,8 +51,6 @@ import java.util.Properties
 package object gs {
 
   /** Extract case class elements into a Map
-    *
-    * [[org.gs.http.caseClassToGetQuery]]
     *
     * @param cc case class (Product is super type)
     * @return map of field names and values
@@ -61,8 +63,6 @@ package object gs {
   }
 
   /** Does the indexed case class field have desired type?
-    *
-    * org.gs.examples.account.actor.AccountBalanceRetrieverSpec
     *
     * @param case class (Product is supertype)
     * @param ele field element

@@ -1,16 +1,29 @@
+/** Copyright 2016 Gary Struthers
 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs
 
 import com.twitter.algebird.{Approximate, AveragedValue, AveragedGroup, Averager, BF, BloomFilter,
   CMS, CMSHasher, CMSMonoid, DecayedValue, DecayedValueMonoid, Field, Functor, Group, HLL,
   HyperLogLogAggregator, IntRing, LongRing, MaxAggregator, MinAggregator, Monoid, NumericRing,
   QTree, QTreeSemigroup, Ring, Semigroup}
-import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
+import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
 
 /** Aggregation functions for Twitter Algebird.
   *
   * Algebird provides implicit implementations of common types which are imported here. Class
-  * extraction methods in `org.gs` can be used to extract a field from your case classes and tuples.
+  * extraction methods in [[org.gs]] can be used to extract a field from your case classes and tuples.
   * When the extracted field is an already supported type, you don't have to write custom Algebird
   * classes.
   *
@@ -312,122 +325,117 @@ import org.gs.algebird.typeclasses.{ HyperLogLogLike, QTreeLike }
   */
 package object algebird {
 
-  /** Sums sequence elements
-    *
-    * Implicit Algebird Semigroup
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Semigroup "Semigroup"]]
+  /** Semigroup sums sequence elements
     *
     * @tparam A: Semigroup, element
     * @param xs sequence
     * @return Some(sum) or None if xs empty
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Semigroup "Semigroup"]]
     */
   def sumOption[A: Semigroup](xs: Seq[A]): Option[A] = implicitly[Semigroup[A]].sumOption(xs)
 
-  /** Sums sequence elements
-    *
-    * Implicit Algebird Monoid
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Monoid "Monoid"]]
+  /** Monoid sums sequence elements
     *
     * @tparam A: Monoid, element
     * @param xs sequence
     * @return sum or Monoid[A] zero for empty sequence
+		*
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Monoid "Monoid"]]
+		*
     */
   def sum[A: Monoid](xs: Seq[A]): A = implicitly[Monoid[A]].sum(xs)
 
-  /** Negates an element
-    *
-    * Implicit Algebird Group
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Group Group]]
+  /** Group negates an element
     *
     * @tparam A: Group, element
     * @param x element to negate
     * @return -x
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Group Group]]
     */
   def negate[A: Group](x: A): A = implicitly[Group[A]].negate(x)
 
-  /** Subtracts an element from another
+  /** Group subtracts an element from another
     *
-    * Implicit Algebird Group
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Group Group]]
     *
     * @tparam A: Group, element
     * @param l
     * @param r
     * @return l - r
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Group Group]]
     */
   def minus[A: Group](l: A, r: A): A = implicitly[Group[A]].minus(l, r)
 
-  /** Multiplies 2 elements
-    *
-    * Implicit Algebird Ring, some types extended to Field in this file
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Ring Ring]]
+  /** Ring multiplies 2 elements 
     *
     * @tparam A: Ring, element
     * @param l
     * @param r
     * @return l * r
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Ring Ring]]
     */
   def times[A: Ring](l: A, r: A): A = implicitly[Ring[A]].times(l, r)
 
-  /** Multiplies sequence elements
-    *
-    * Implicit Algebird Ring, some types extended to Field in this file
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Ring Ring]]
+  /** Ring multiplies sequence elements
     *
     * @tparam A: Ring, element
     * @param xs sequence
     * @return sum or Monoid[A] zero for empty sequence
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Ring Ring]]
     */
   def product[A: Ring](xs: Seq[A]): A = implicitly[Ring[A]].product(xs)
 
-  /** Reciprocal of an element
-    *
-    * Implicit Algebird Field, some Field types in this file
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Field Field]]
+  /** Field inverts an element
     *
     * @tparam A: element and Field
     * @param x element to divide one
     * @return 1/x
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Field Field]]
     */
   def inverse[A: Field](x: A): A = implicitly[Field[A]].inverse(x)
 
-  /** Divide an element by another using Field
-    *
-    * Implicit Algebird Field, some Field types in this file
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Field Field]]
+  /** Field divides an element by another
     *
     * @tparam A: element and Field
     * @param l
     * @param r
     * @return l * r
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Field Field]]
     */
   def div[A: Field](l: A, r: A): A = implicitly[Field[A]].div(l, r)
 
-  /** Find maximum element in a Seq
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.MaxAggregator MaxAggregator]]
-    * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
+  /** MaxAggregator finds maximum element in a Seq
     *
     * @tparam A: Ordering element type that can be ordered, uses Ordering[A]
     * @param xs Seq[A]
     * @return max
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.MaxAggregator MaxAggregator]]
+    * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     */
   def max[A: Ordering](xs: Seq[A]): A = MaxAggregator[A].reduce(xs)
 
-  /** Find minimum element in a Seq
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.MinAggregator MinAggregator]]
-    * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
+  /** MinAggregator find minimum element in a Seq
     *
     * @tparam A: Ordering element type that can be ordered, uses Ordering[A]
     * @param xs Seq[A]
     * @return min element
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.MinAggregator MinAggregator]]
+    * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     */
   def min[A: Ordering](xs: Seq[A]): A = MinAggregator[A].reduce(xs)
 
   /** Field[BigDecimal] implicit
     *
     * BigDecimal implicits supported in Algebird with NumericRing[BigDecimal]
+    *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Field Field]]
     */
   implicit object BigDecimalField extends NumericRing[BigDecimal] with Field[BigDecimal] {
@@ -440,13 +448,15 @@ package object algebird {
   /** Field[BigInt] implicit
     *
     * BigInt implicits supported in Algebird with NumericRing[BigInt]
-    * @see http://twitter.github.io/algebird/#com.twitter.algebird.Field
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Field Field]]
     */
   implicit object BigIntField extends NumericRing[BigInt] with Field[BigInt] {
     override def div(l: BigInt, r: BigInt): BigInt = {
       assertNotZero(r)
       l / r
     }
+
     override def inverse(v: BigInt): BigInt = {
       assertNotZero(v)
       1 / v
@@ -456,19 +466,27 @@ package object algebird {
   /** Field[Int] implicit
     *
     * Int implicits supported in Algebird with IntRing
-    * @see http://twitter.github.io/algebird/#com.twitter.algebird.Field
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Field Field]]
     */
   implicit object IntField extends Field[Int] {
     def zero: Int = IntRing.zero
+
     def one: Int = IntRing.one
+
     override def negate(v: Int): Int = IntRing.negate(v)
+
     def plus(l: Int, r: Int): Int = IntRing.plus(l, r)
+
     override def minus(l: Int, r: Int): Int = IntRing.minus(l, r)
+
     def times(l: Int, r: Int): Int = IntRing.times(l, r)
+
     override def div(l: Int, r: Int): Int = {
       assertNotZero(r)
       l / r
     }
+
     override def inverse(v: Int): Int = {
       assertNotZero(v)
       1 / v
@@ -478,26 +496,34 @@ package object algebird {
   /** Field[Long] implicit
     *
     * Long implicits supported in Algebird with LongRing
+    *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Field Field]]
     */
   implicit object LongField extends Field[Long] {
     def zero: Long = LongRing.zero
+
     def one: Long = LongRing.one
+
     override def negate(v: Long): Long = LongRing.negate(v)
+
     def plus(l: Long, r: Long): Long = LongRing.plus(l, r)
+
     override def minus(l: Long, r: Long): Long = LongRing.minus(l, r)
+
     def times(l: Long, r: Long): Long = LongRing.times(l, r)
+
     override def div(l: Long, r: Long): Long = {
       assertNotZero(r)
       l / r
     }
+
     override def inverse(v: Long): Long = {
       assertNotZero(v)
       1 / v
     }
   }
 
-  /** map sequence[A] to sequence[B] using Algebird Functor
+  /** Functor maps sequence[A] to sequence[B]
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Functor Functor]]
     *
@@ -512,7 +538,7 @@ package object algebird {
     def map[A, B](fa: Seq[A])(f: A => B): Seq[B] = (for {a <- fa} yield f(a))
   }
 
-  /** Compose 2 functors map Seq[A] -> Seq[B] -> Seq[C] using Algebird Functor
+  /** Functor composes 2 functors map Seq[A] -> Seq[B] -> Seq[C]
     *
     * @tparam A original element
     * @tparam B intermediate element
@@ -527,18 +553,17 @@ package object algebird {
     ev.map(ev.map(fa)(f))(g)
   }
 
-  /** AverageValue of a Seq of Numeric elements. First create AveragedValue for each element then
-    * sum them
-    *
-    * @note when there's more than 1 Numeric type in scope you must use explicitly typed avg below
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedGroup$ AveragedGroup]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Averager$ Averager]]
+  /** AverageValue of a Seq of Numeric elements. Create AveragedValue for each element then sum
     *
     * @tparam A: Numeric, elements must be Numeric
     * @param xs Seq
     * @param evidence implicit Numeric[A]
     * @return AverageValue
+    *
+    * @note when there's more than 1 Numeric type in scope you must use explicitly typed avg below
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedGroup$ AveragedGroup]]
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Averager$ Averager]]
     */
   def avg[A: Numeric](xs: Seq[A]): AveragedValue = {
     val at = andThen[A, Double, AveragedValue](xs)(implicitly[Numeric[A]].toDouble)(
@@ -548,11 +573,11 @@ package object algebird {
 
   /** AverageValue of a Seq of AverageValues.
     *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedGroup$ AveragedGroup]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
-    *
     * @param xs Seq
     * @return AverageValue
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedGroup$ AveragedGroup]]
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
     */
   def sumAverageValues(xs: Seq[AveragedValue]): AveragedValue = {
     xs.reduce(AveragedGroup.plus(_, _))
@@ -560,11 +585,11 @@ package object algebird {
 
   /** Create BloomFilter configure and load it from a Seq of words
     *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.BloomFilter$ BloomFilter]]
-    *
     * @param words
     * @param fpProb false positive probability, 1% default
     * @return BloomFilter
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.BloomFilter$ BloomFilter]]
     */
   def createBF(words: Seq[String], fpProb: Double = 0.01): BF = {
     val wc = words.size
@@ -574,15 +599,19 @@ package object algebird {
 
   /** Find if strings in Bloom filter
     *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.BloomFilter$ BloomFilter]]
-    *
     * @param xs strings to test
     * @param bf configured and data initialized Bloom filter
     * @return tuple ._1 is matches including false positives, ._2 are not in BF
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.BloomFilter$ BloomFilter]]
     */
   def bloomFilterPartition(xs: Seq[String])(implicit bf: BF): (Seq[String], Seq[String]) =
     xs.partition(bf.contains(_).isTrue)
 
+  /** Array[Byte] hasher for CMS
+    *
+    * @see [[https://twitter.github.io/algebird/index.html#com.twitter.algebird.CMSHasher CMSHasher]]
+    */
   implicit object CMSHasherArrayByte extends CMSHasher[Array[Byte]] {
     override def hash(a: Int, b: Int, width: Int)(x: Array[Byte]): Int = {
       val hash: Int = scala.util.hashing.MurmurHash3.arrayHash(x, a)
@@ -606,62 +635,63 @@ package object algebird {
   /** Double.NEGATIVE_INFINITY or Double.POSITIVE_INFINITY when > Double */
   def bigDecimalToArrayBytes(bd: BigDecimal): Array[Byte] =
     doubleToArrayBytes(bd.toDouble)
+
   implicit val cmsHasherBigDecimal: CMSHasher[BigDecimal] =
     CMSHasherArrayByte.contramap((bd: BigDecimal) => bigDecimalToArrayBytes(bd))
+
   /** create CMSMonoid
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSMonoid CMSMonoid]]
-    * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     *
     * @tparam K elements which are implicitly Ordering[K] and CMSHasher[K]
     * @param eps
     * @param delta
     * @param seed
     * @return CMSMonoid[K]
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSMonoid CMSMonoid]]
+    * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     */
-  def createCMSMonoid[K: Ordering: CMSHasher](eps: Double = 0.001,
-                                              delta: Double = 1E-10,
-                                              seed: Int = 1): CMSMonoid[K] =
+  def createCMSMonoid[K: Ordering: CMSHasher](
+          eps: Double = 0.001, delta: Double = 1E-10, seed: Int = 1): CMSMonoid[K] =
                                                 new CMSMonoid[K](eps, delta, seed)
 
   /** Create a CMS
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSHasher CMSHasher]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSMonoid CMSMonoid]]
-    * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     *
     * @tparam K elements which are implicitly Ordering[K] and CMSHasher[K]
     * @param xs data
     * @param monoid implicit CMSMonoid for K
     * @return CMS for data
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSHasher CMSHasher]]
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSMonoid CMSMonoid]]
+    * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     */
   def createCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])(implicit monoid: CMSMonoid[K]):
       CMS[K] = monoid.create(xs)
 
   /** Sum a Sequence of CMS
     *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSHasher CMSHasher]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSMonoid CMSMonoid]]
-    * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
-    *
     * @tparam K elements which are implicitly Ordering[K] and CMSHasher[K]
     * @param xs Sequence of CMS
     * @param monoid
     * @return CMS as the sum of Sequence of CMS
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSHasher CMSHasher]]
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSMonoid CMSMonoid]]
+    * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     */
   def sumCountMinSketch[K: Ordering: CMSHasher](xs: Seq[CMS[K]])(implicit monoid: CMSMonoid[K]):
       CMS[K] = xs.reduce(monoid.plus(_, _))
 
   /** Turn a sequence of value, time tuples into a seq of DecayedValues
     *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValue DecayedValue]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValueMonoid DecayedValueMonoid]]
-    *
     * @param xs sequence of value, time tuples
     * @param halfLife to scale value based on time
     * @param last is initial element, if None use implicit monoid.zero
     * @param monoid implicit DecayedValueMonoid used to scan from initial value
     * @return seq of DecayedValues
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValue DecayedValue]]
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValueMonoid DecayedValueMonoid]]
     */
   def toDecayedValues(halfLife: Double, last: Option[DecayedValue] = None)
       (xs: Seq[(Double, Double)])(implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
@@ -684,36 +714,36 @@ package object algebird {
 
   /** Create HyperLogLog
     *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HyperLogLogAggregator HyperLogLogAggregator]]
-    * @see [[org.gs.algebird.typeclasses.HyperLogLogLike]]
-    *
     * @tparam A: can only be Int, Long
     * @param xs sequence
     * @param ev implicit HyperLogLogLike typeclass to create HLL
     * @param agg implicit HyperLogLogAggregator, initialized with # of bits for hashing
     * @return an HLL
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HyperLogLogAggregator HyperLogLogAggregator]]
+    * @see [[org.gs.algebird.typeclasses.HyperLogLogLike]]
     */
   def createHLL[A: HyperLogLogLike](xs: Seq[A])(
     implicit ev: HyperLogLogLike[A], agg: HyperLogLogAggregator): HLL = ev(xs)
 
   /** Map Sequence of HyperLogLogs to Sequence of Approximate
     *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Approximate Approximate]]
-    *
     * @param xs sequence of HLL
     * @return Sequence of Approximate
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Approximate Approximate]]
     */
   def mapHLL2Approximate(xs: Seq[HLL]): Seq[Approximate[Long]] = xs.map(_.approximateSize)
 
   /** Estimate total count of distinct integer values in multiple HyperLogLogs
     *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Approximate Approximate]]
-    *
     * @param xs sequence of HLL
     * @return estimate count in an Approximate object
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Approximate Approximate]]
     */
   def sumHLLApproximateSizes(xs: Seq[HLL]): Approximate[Long] = {
     xs.reduce(_ + _).approximateSize
@@ -724,29 +754,29 @@ package object algebird {
 
   /** Build a QTree from a Seq
     *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTreeSemigroup QTreeSemigroup]]
-    * @see [[org.gs.algebird.typeclasses.QTreeLike]]
-    *
     * @tparam A: one of: BigDecimal, BigInt, Double, Float, Int, Long
     * @param vals
     * @param ev implicit Typeclass to build from Seq
     * @param sg implicit QTreeSemigroup
     * @return
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTreeSemigroup QTreeSemigroup]]
+    * @see [[org.gs.algebird.typeclasses.QTreeLike]]
     */
   def buildQTree[A: QTreeLike](vals: Seq[A])(implicit ev: QTreeLike[A], sg: QTreeSemigroup[A]):
       QTree[A] = vals.map { ev(_) }.reduce { sg.plus(_, _) }
 
   /** Sum a Sequence of QTrees
     *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTreeSemigroup QTreeSemigroup]]
-    *
     * @tparam A: BigDecimal, BigInt, Double, Float, Int, Long
     * @param vals
     * @param ev Typeclass to build from Seq
     * @param sg
     * @return
+    *
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
+    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTreeSemigroup QTreeSemigroup]]
     */
   def sumQTrees[A: QTreeSemigroup](qTrees: Seq[QTree[A]])(implicit sg: QTreeSemigroup[A]):
       QTree[A] = qTrees.reduce(sg.plus(_, _))

@@ -24,7 +24,6 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.runtime.universe.TypeTag
 import org.gs.algebird.agent.AveragedAgent
 import org.gs.algebird.stream.avgFlow
-import org.gs.stream.FutureSink
 
 /** Flow to update AveragedValue Agent
   *
@@ -78,7 +77,7 @@ object AveragedAgentFlow {
   	*/  
   def compositeSink[A: TypeTag: Numeric](avgAgent: AveragedAgent)
           (implicit log: LoggingAdapter, ec: ExecutionContext): Sink[Seq[A], NotUsed] = {
-    //val sink = FutureSink.apply
+
     compositeFlow(avgAgent).to(Sink.ignore).named("SeqToAvgAgentSink")
   }
 }
