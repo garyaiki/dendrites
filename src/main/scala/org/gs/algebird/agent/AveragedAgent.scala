@@ -20,14 +20,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 /** Akka Agent for concurrently updating AveragedValue
   *
-  * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent]]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue]
-  * @example [[org.gs.algebird.agent.AveragedAgentSpec]]
-  * @author garystruthers
-  *
   * @param name
   * @param init optional initial AveragedValue
   * @param ec execution context for future
+  *
+  * @example [[org.gs.algebird.agent.stream.AveragedAgentFlow]]
+  * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]
+  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
+  * @author Gary Struthers
   */
 class AveragedAgent(val name: String = "", init: AveragedValue = new AveragedValue(0, 0.0))
   (implicit ec: ExecutionContext) {

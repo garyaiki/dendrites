@@ -1,3 +1,17 @@
+/** Copyright 2016 Gary Struthers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs.algebird.agent
 
 import akka.agent.Agent
@@ -7,16 +21,17 @@ import org.gs.algebird.toDecayedValues
 
 /** Akka Agent for concurrently updating DecayedValues
   *
-  * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValue DecayedValue]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValueMonoid DecayedValueMonoid]]
-  * @author Gary Struthers
-  *
   * @param name
   * @param halfLife to scale value based on time
   * @param last is initial element, if None use implicit monoid.zero
   * @param implicit ec execution context for future
   * @param implicit monoid DecayedValueMonoid to scan from initial value
+  *
+	* @example [[org.gs.algebird.agent.stream.DecayedValueAgentFlow]]
+  * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]
+  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValue DecayedValue]]
+  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValueMonoid DecayedValueMonoid]]
+  * @author Gary Struthers
   */
 class DecayedValueAgent(val name: String = "", halfLife: Double, last: Option[DecayedValue] = None)
   (implicit ec: ExecutionContext, monoid: DecayedValueMonoid) {
