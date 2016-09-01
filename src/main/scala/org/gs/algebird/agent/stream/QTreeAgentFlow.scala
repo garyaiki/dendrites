@@ -26,9 +26,9 @@ import org.gs.algebird.typeclasses.QTreeLike
 
 /** Flow to update QTreeAgent
   *
-  * @author Gary Struthers
   * @tparam A: QTreeLike either BigDecimal, BigInt, Double, Float, Int or Long
   * @param qtAgent QTreeAgent
+  * @author Gary Struthers
   */
 class QTreeAgentFlow[A: QTreeLike](qtAgent: QTreeAgent[A])
   extends GraphStage[FlowShape[Seq[A], Future[QTree[A]]]] {

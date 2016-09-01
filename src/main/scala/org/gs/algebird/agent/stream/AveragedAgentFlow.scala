@@ -27,8 +27,8 @@ import org.gs.algebird.stream.avgFlow
 
 /** Flow to update AveragedValue Agent
   *
-  * @author Gary Struthers
   * @param avgAgent AveragedAgent
+  * @author Gary Struthers
   */
 class AveragedAgentFlow(avgAgent: AveragedAgent)
   extends GraphStage[FlowShape[AveragedValue, Future[AveragedValue]]] {

@@ -32,19 +32,17 @@ import org.gs.algebird.agent.{AveragedAgent,
 import org.gs.algebird.stream.{CreateCMSFlow, CreateHLLFlow}
 import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
 
-/** Update Algebird approximators concurrently
-  * Input a Seq[A] broadcast it to Agents for Algebird approximaters then zip the latest values of
-  * the agents.
+/** Update Algebird approximator Agents concurrently. Input Seq[A] broadcast it to Agents then zip
+  * agents latest values
   *
-  * @author Gary Struthers
-  *
-  * @tparam <A> with implicitl HyperLogLogLike[A], Numeric[A] and CMSHasher[A]
+  * @tparam A: HyperLogLogLike: Numeric: CMSHasher: QTreeLike: TypeTag
   * @param avgAgent AveragedAgent
   * @param cmsAgent: CountMinSketchAgent
   * @param dcaAgent: DecayedValueAgent
   * @param hllAgent: HyperLogLogAgent
   * @param qtrAgent: QTreeAgent
   * @param time function generates time as doubles for DecayedValue
+  * @author Gary Struthers
   */
 class ParallelApproximators[A: HyperLogLogLike: Numeric: CMSHasher: QTreeLike: TypeTag](
     avgAgent: AveragedAgent,
@@ -84,6 +82,17 @@ class ParallelApproximators[A: HyperLogLogLike: Numeric: CMSHasher: QTreeLike: T
 
 object ParallelApproximators {
 
+/** Create a Flow from ParallelApproximators
+  *
+  * @tparam A: HyperLogLogLike: Numeric: CMSHasher: QTreeLike: TypeTag
+  * @param avgAgent AveragedAgent
+  * @param cmsAgent: CountMinSketchAgent
+  * @param dcaAgent: DecayedValueAgent
+  * @param hllAgent: HyperLogLogAgent
+  * @param qtrAgent: QTreeAgent
+  * @param time function generates time as doubles for DecayedValue
+  * @author Gary Struthers
+  */
   def compositeFlow[A: HyperLogLogLike: Numeric: CMSHasher: QTreeLike: TypeTag](
     avgAgent: AveragedAgent,
     cmsAgent: CountMinSketchAgent[A],
@@ -106,6 +115,17 @@ object ParallelApproximators {
     pa.approximators
   }
 
+/** Create a composite Sink from ParallelApproximators flow and a Sink that ignores its inputs
+  *
+  * @tparam A: HyperLogLogLike: Numeric: CMSHasher: QTreeLike: TypeTag
+  * @param avgAgent AveragedAgent
+  * @param cmsAgent: CountMinSketchAgent
+  * @param dcaAgent: DecayedValueAgent
+  * @param hllAgent: HyperLogLogAgent
+  * @param qtrAgent: QTreeAgent
+  * @param time function generates time as doubles for DecayedValue
+  * @author Gary Struthers
+  */
   def compositeSink[A: HyperLogLogLike: Numeric: CMSHasher: QTreeLike: TypeTag](
     avgAgent: AveragedAgent,
     cmsAgent: CountMinSketchAgent[A],
@@ -121,6 +141,18 @@ object ParallelApproximators {
       ffg.to(Sink.ignore).named("parallelApproximatorsSink")
   }
 
+/** Create a RunnableGraph from a SourceQueueWithComplete Source, compositeFlow, compositeSink. This
+  * SourceQueueWithComplete accepts inputs passed to it. i.e. in Actor receive 
+  *
+  * @tparam A: HyperLogLogLike: Numeric: CMSHasher: QTreeLike: TypeTag
+  * @param avgAgent AveragedAgent
+  * @param cmsAgent: CountMinSketchAgent
+  * @param dcaAgent: DecayedValueAgent
+  * @param hllAgent: HyperLogLogAgent
+  * @param qtrAgent: QTreeAgent
+  * @param time function generates time as doubles for DecayedValue
+  * @author Gary Struthers
+  */
   def runnable[A: HyperLogLogLike: Numeric: CMSHasher: QTreeLike: TypeTag](
     avgAgent: AveragedAgent,
     cmsAgent: CountMinSketchAgent[A],

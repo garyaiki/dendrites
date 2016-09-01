@@ -1,25 +1,38 @@
+/** Copyright 2016 Gary Struthers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs.algebird.agent.stream
 
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
 import akka.stream.{Materializer, FlowShape, UniformFanOutShape}
-import akka.stream.scaladsl.{ Broadcast, Flow, GraphDSL, ZipWith}
+import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, ZipWith}
 import akka.stream.scaladsl.GraphDSL.Implicits._
 import com.twitter.algebird.{AveragedValue, CMS, CMSHasher, DecayedValue, HLL, QTree}
-import scala.Range
 import scala.reflect.runtime.universe.TypeTag
-import org.gs.algebird.agent.{AveragedAgent, CountMinSketchAgent,DecayedValueAgent,HyperLogLogAgent,
+import org.gs.algebird.agent.{AveragedAgent,
+  CountMinSketchAgent,
+  DecayedValueAgent,
+  HyperLogLogAgent,
   QTreeAgent}
 import org.gs.algebird.stream.{CreateCMSFlow, CreateHLLFlow, ZipTimeFlow}
 import org.gs.algebird.stream.avgFlow
 import org.gs.algebird.typeclasses.HyperLogLogLike
 
-/** Update Algebird approximators concurrently
-  * Input a Seq[A] broadcast it to Agents for Algebird approximaters then zip the latest values of
-  * the agents.
-  *
-  * @author Gary Struthers
+/** Update Algebird approximators concurrently, Input Seq[A] broadcast it to 5 Algebird Agents then
+  * zip their latest values
   *
   * @tparam <A> with implicitl HyperLogLogLike[A], Numeric[A] and CMSHasher[A]
   * @param avgAgent AveragedAgent
@@ -27,6 +40,8 @@ import org.gs.algebird.typeclasses.HyperLogLogLike
   * @param dcaAgent: DecayedValueAgent
   * @param hllAgent: HyperLogLogAgent
   * @param qtrAgent: QTreeAgent
+  *
+  * @author Gary Struthers
   */
 class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
     avgAgent: AveragedAgent,

@@ -27,8 +27,8 @@ import org.gs.algebird.stream.ZipTimeFlow
 
 /** Flow to update DecayedValue Agent
   *
-  * @author Gary Struthers
   * @param dvAgent DecayedValueAgent
+  * @author Gary Struthers
   */
 class DecayedValueAgentFlow(dvAgent: DecayedValueAgent)
   extends GraphStage[FlowShape[Seq[(Double, Double)], Future[Seq[DecayedValue]]]] {
@@ -59,6 +59,7 @@ object DecayedValueAgentFlow {
 
   /** Generate a time value as a Double
     *
+		* tparam A: Numeric : TypeTag
   	* @param ignore is same numeric type passed to flow, this function ignores it
   	* @return Now as a Double
   	*/

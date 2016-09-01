@@ -21,18 +21,15 @@ import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.twitter.algebird.{CMS, CMSHasher}
 import scala.concurrent.Future
 import scala.reflect.runtime.universe.TypeTag
-import org.gs.algebird.createCMSMonoid
-import org.gs.algebird.cmsHasherBigDecimal
-import org.gs.algebird.cmsHasherDouble
-import org.gs.algebird.cmsHasherFloat
-
+import org.gs.algebird.{createCMSMonoid, cmsHasherBigDecimal, cmsHasherDouble, cmsHasherFloat}
 import org.gs.algebird.agent.CountMinSketchAgent
 import org.gs.algebird.stream.CreateCMSFlow
 
 /** Flow to update CountMinSketch Agent
   *
-  * @author Gary Struthers
+  * @tparam K: Ordering: CMSHasher
   * @param cmsAgent CountMinSketchAgent
+  * @author Gary Struthers
   */
 class CountMinSketchAgentFlow[K: Ordering: CMSHasher](cmsAgent: CountMinSketchAgent[K])
   extends GraphStage[FlowShape[CMS[K], Future[CMS[K]]]] {

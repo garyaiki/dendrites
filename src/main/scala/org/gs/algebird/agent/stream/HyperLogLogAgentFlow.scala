@@ -29,8 +29,8 @@ import org.gs.algebird.typeclasses.HyperLogLogLike
 
 /** Flow to update HyperLogLogAgent Agent
   *
-  * @author Gary Struthers
   * @param hllAgent HyperLogLogAgent
+  * @author Gary Struthers
   */
 class HyperLogLogAgentFlow(hllAgent: HyperLogLogAgent)
   extends GraphStage[FlowShape[HLL, Future[HLL]]] {
@@ -61,10 +61,10 @@ object HyperLogLogAgentFlow {
 
   /** Compose hllFlow & HyperLogLogAgentFlow
     *
-    * @see [[org.gs.algebird.typeclasses.HyperLogLogLike]]
   	*	@tparam A is a HyperLogLogLike with a TypeTag
   	* @param hllAgent Akka Agent accumulates HLL values
   	* @return Future for Agents updated value
+    * @see [[org.gs.algebird.typeclasses.HyperLogLogLike]]
   	*/
   def compositeFlow[A: TypeTag: HyperLogLogLike](hllAgent: HyperLogLogAgent):
           Flow[Seq[A], Future[HLL], NotUsed] = {
@@ -76,10 +76,10 @@ object HyperLogLogAgentFlow {
 
   /** Compose hllFlow & HyperLogLogAgentFlow & Sink
     *
-    * @see [[org.gs.algebird.typeclasses.HyperLogLogLike]]
   	*	@tparam A is a HyperLogLogLike with a TypeTag
   	* @param hllAgent Akka Agent accumulates HLL values
   	* @return Sink that accepts Seq[A]
+    * @see [[org.gs.algebird.typeclasses.HyperLogLogLike]]
   	*/  
   def compositeSink[A: TypeTag: HyperLogLogLike](hllAgent: HyperLogLogAgent): Sink[Seq[A], NotUsed] = {
     compositeFlow(hllAgent).to(Sink.ignore)
