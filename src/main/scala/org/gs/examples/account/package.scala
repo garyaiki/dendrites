@@ -22,12 +22,12 @@ import scala.reflect.runtime.universe._
   *
   * Filter for AccountType
   * {{{
-  * assert(isAccountType(MoneyMarket) === true)
+  * if(isAccountType(MoneyMarket) == true)
   * }}}
   * Filter for desired balances types
   * {{{
   * val cb = CheckingAccountBalances[BigDecimal](Some(List((3,3000.3), (33,3300.33), (333,3.33))))
-  * assert(isAccountBalances(cb) === true)
+  * if(isAccountBalances(cb) == true)
   * }}}
   * Filter for desired types in an Option[List[(Long, A)]]
   * {{{

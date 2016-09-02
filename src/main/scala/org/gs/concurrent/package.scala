@@ -26,11 +26,8 @@ import scala.concurrent.duration.FiniteDuration
   *	val maxDuration = FiniteDuration(max, MILLISECONDS)
   *	val randomFactor = config getDouble("dendrites.kafka.account.randomFactor")
   * val curriedDelay = calculateDelay(minDuration, maxDuration, randomFactor) _
-  * }}}
-  * Second arg list can be curried
-  * {{{
+  * //Second arg list can be curried
   * val curriedDelay = consumerConfig.curriedDelay
-  * ...
   * val duration = curriedDelay(retries)
   *	if(duration < maxDuration) {
   *   waitForTimer = true
@@ -38,6 +35,7 @@ import scala.concurrent.duration.FiniteDuration
   * } else {
   *   failStage(e) // too many retries
   * }
+  * }}}
   * @author Gary Struthers
   */
 package object concurrent {

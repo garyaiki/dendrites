@@ -35,6 +35,14 @@ import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
 /** Update Algebird approximator Agents concurrently. Input Seq[A] broadcast it to Agents then zip
   * agents latest values
   *
+  * {{{
+  * bcast ~> avg ~> zip.in0
+  * bcast ~> cms ~> zip.in1
+  * bcast ~> dvt ~> zip.in2
+  * bcast ~> hll ~> zip.in3
+  * bcast ~> qtrAg ~> zip.in4
+  * }}}
+  *
   * @tparam A: HyperLogLogLike: Numeric: CMSHasher: QTreeLike: TypeTag
   * @param avgAgent AveragedAgent
   * @param cmsAgent: CountMinSketchAgent
