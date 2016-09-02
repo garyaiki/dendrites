@@ -38,8 +38,6 @@ import org.gs.concurrent.listenableFutureToScala
   *
   * @param session is long lived, it's created sometime before the stream and closed sometime after
   * the stream and may be used with other clients
-	* @param implicit ec ExecutionContext
-  * @param implicit logger
   * @author Gary Struthers
   */
 class CassandraSink(session: Session)(implicit val ec: ExecutionContext, logger: LoggingAdapter)
@@ -96,8 +94,6 @@ object CassssandraSink {
   /** Create CassandraSink as Akka Sink
     *
     * @param session Cassandra Session
-		* @param implicit ec ExecutionContext
-    * @param implicit logger
     * @return Sink[BoundStatement, NotUsed]
     */
   def apply(session: Session)(implicit ec: ExecutionContext,

@@ -39,8 +39,6 @@ import org.gs.concurrent.listenableFutureToScala
   * @param session is long lived, it's created sometime before the stream and closed sometime after
   * the stream and may be used with other clients
   * @param fetchSize used by SELECT queries for page size. Default 0 means use Cassandra default
-	* @param implicit ec ExecutionContext
-  * @param implicit logger
   *
   * @author Gary Struthers
   */
@@ -102,8 +100,6 @@ object CassandraQuery {
     *
     * @param session Cassandra Session
     * @param fetchSize limits how many results retrieved simultaneously, 0 means use default size
-		* @param implicit ec ExecutionContext
-    * @param implicit logger
     * @return Flow[BoundStatement, ResultSet, NotUsed]
     */
   def apply(session: Session, fetchSize: Int = 0)(implicit ec: ExecutionContext,

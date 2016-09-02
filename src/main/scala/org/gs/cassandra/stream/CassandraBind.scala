@@ -22,6 +22,7 @@ import com.datastax.driver.core.{BoundStatement, PreparedStatement}
 /** Create BoundStatement from a PreparedStatement and a Product (superclass of case class
   * and tuple)
   *
+  * @tparam input type
   * @param stmt PreparedStatement that has been pre-parsed by the database
   * @param f function to create BoundStatement from PreparedStatement and Product which contains
   * values to bind
