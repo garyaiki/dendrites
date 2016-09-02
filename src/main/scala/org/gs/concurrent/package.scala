@@ -16,6 +16,28 @@ import scala.concurrent.duration.FiniteDuration
   *   case Failure(t) => logger.error(t, "session closed failed {}", t.getMessage())
   * }
   * }}}
+  *
+  * Calculate exponential backoff delay
+  * Constant params can be passed to first argument list on startup
+  * {{{
+  * val min = config getInt("dendrites.kafka.account.min-backoff")
+  *	val minDuration = FiniteDuration(min, MILLISECONDS)
+  *	val max = config getInt("dendrites.kafka.account.max-backoff")
+  *	val maxDuration = FiniteDuration(max, MILLISECONDS)
+  *	val randomFactor = config getDouble("dendrites.kafka.account.randomFactor")
+  * val curriedDelay = calculateDelay(minDuration, maxDuration, randomFactor) _
+  * }}}
+  * Second arg list can be curried
+  * {{{
+  * val curriedDelay = consumerConfig.curriedDelay
+  * ...
+  * val duration = curriedDelay(retries)
+  *	if(duration < maxDuration) {
+  *   waitForTimer = true
+  *   scheduleOnce(None, duration)
+  * } else {
+  *   failStage(e) // too many retries
+  * }
   * @author Gary Struthers
   */
 package object concurrent {
@@ -53,7 +75,7 @@ package object concurrent {
 	  maxBackoff:   FiniteDuration,
 		randomFactor: Double)(retryCount: Int): FiniteDuration = {
 	  val rnd = 1.0 + ThreadLocalRandom.current().nextDouble() * randomFactor
-			if (retryCount >= 30) // Duration overflow protection (> 100 years)
+			if (retryCount >= 30) // Duration overflow protection
 				maxBackoff
 			else
 				maxBackoff.min(minBackoff * math.pow(2, retryCount)) * rnd match {

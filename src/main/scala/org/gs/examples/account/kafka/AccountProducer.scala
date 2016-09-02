@@ -35,5 +35,5 @@ object AccountProducer extends ProducerConfig[String, Array[Byte]] {
   val max = config getInt("dendrites.kafka.account.max-backoff")
   val maxDuration = FiniteDuration(max, MILLISECONDS)
   val randomFactor = config getDouble("dendrites.kafka.account.randomFactor")
-  val curriedDelay = calculateDelay(minDuration, maxDuration, 0.2) _
+  val curriedDelay = calculateDelay(minDuration, maxDuration, randomFactor) _
 }
