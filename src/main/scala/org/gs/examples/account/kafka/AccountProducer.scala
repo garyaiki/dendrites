@@ -20,9 +20,8 @@ import org.gs.concurrent.calculateDelay
 import org.gs.kafka.ProducerConfig
 import org.gs.kafka.createProducer
 
-/** Create KafkaProducer for GetAccountBalances
+/** Create KafkaProducer configured for GetAccountBalances
   *
-  * Value is the serialized id of GetAccountBalances
   */
 object AccountProducer extends ProducerConfig[String, Array[Byte]] {
 
