@@ -63,7 +63,7 @@ package object avro {
     *
     * @tparam A case class or tuple
     * @param schema for type A
-    * @param case class or tuple that only has simple types
+    * @param cc case class or tuple that only has simple types
     * @return byte array of values
     */
   def ccToByteArray[A <: Product](schema: Schema, cc: A): Array[Byte] = {
@@ -75,6 +75,7 @@ package object avro {
 
   /** Map case class values that are only simple types to GenericRecord
     *
+    * @tparam A case class or tuple
     * @param GenericData.Record initialized with schema for case class
     * @param cc a case class (or tuple)
     */
