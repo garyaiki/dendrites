@@ -24,19 +24,19 @@ import org.gs.algebird.typeclasses.QTreeLike
 
 /** Akka Agent for concurrently updating Qtree
   *
-  * @example [[org.gs.algebird.agent.stream.QTreeAgentFlow]]
-  * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTreeSemigroup QTreeSemigroup]]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.SeqMonoid SeqMonoid]]
-  * @author Gary sStruthers
-  *
+  * @constructor Creates Agent singleton for QTree
   * @tparam A: QTreeLike either BigDecimal, BigInt, Double, Float, Int or Long
   * @param name
   * @param xs optional initial values
   * @param ec implicit execution context for future
   * @param sg implicit QTreeSemigroup for adding
   *
+  * @example [[org.gs.algebird.agent.stream.QTreeAgentFlow]]
+  * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]
+  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]
+  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTreeSemigroup QTreeSemigroup]]
+  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.SeqMonoid SeqMonoid]]
+  * @author Gary sStruthers
   */
 class QTreeAgent[A: QTreeLike : TypeTag](
     val name: String = "",

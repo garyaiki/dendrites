@@ -19,13 +19,14 @@ import com.twitter.algebird.{DecayedValue, DecayedValueMonoid}
 import scala.concurrent.{ExecutionContext, Future}
 import org.gs.algebird.toDecayedValues
 
-/** Akka Agent for concurrently updating DecayedValues
+/** Akka Agent for concurrently updating DecayedValue
   *
+  * @constructor Creates Agent singleton for CountMinSketch
   * @param name
   * @param halfLife to scale value based on time
   * @param last is initial element, if None use implicit monoid.zero
-  * @param implicit ec execution context for future
-  * @param implicit monoid DecayedValueMonoid to scan from initial value
+  * @param ec implicit execution context for future
+  * @param monoid implicit DecayedValueMonoid to scan from initial value
   *
 	* @example [[org.gs.algebird.agent.stream.DecayedValueAgentFlow]]
   * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]

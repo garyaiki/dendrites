@@ -20,11 +20,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 /** Akka Agent for concurrently updating DecayedValues
   *
+  * @constructor Creates Agent singleton for HyperLogLog
   * @param name
   * @param xs optional initial values
-  * @param ec execution context for future
-  * @param monoid HyperLogLogMonoid for zero value and adding HLLs, 12 bits for 1% accuracy
-  * @param agg HyperLogLogAggregator to add HLLs, 12 bits for 1% accuracy
+  * @param ec implicit execution context for future
+  * @param monoid implicit HyperLogLogMonoid for zero value and adding HLLs, 12 bits for 1% accuracy
+  * @param agg implicit HyperLogLogAggregator to add HLLs, 12 bits for 1% accuracy
   *
   * @example [[org.gs.algebird.agent.stream.HyperLogLogAgentFlow]]
   * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]

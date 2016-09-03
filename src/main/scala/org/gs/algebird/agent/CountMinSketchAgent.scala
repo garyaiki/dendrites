@@ -21,13 +21,15 @@ import org.gs.algebird.createCMSMonoid
 
 /** Akka Agent for concurrently updating CountMinSketch
   *
+  * @constructor Creates Agent singleton for CountMinSketch
   * @tparam K elements which are implicitly Ordering[K] and CMSHasher[K]
-  * @param name
+  * @param name Agent name
   * @param ec execution context for future
+  * @param ec implicit ExecutionContext
   *
   * @example [[org.gs.algebird.agent.stream.CountMinSketchAgentFlow]]
   * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSHasher CMSHasher]
+  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSHasher CMSHasher]]
   * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
   *
   * @author Gary Struthers
