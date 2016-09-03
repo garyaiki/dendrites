@@ -1,5 +1,17 @@
-/**
-  */
+/** Copyright 2016 Gary Struthers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs
 
 import scala.reflect.ClassTag
@@ -13,7 +25,7 @@ import scala.reflect.ClassTag
   * }}}
   * Filter by type
   * {{{
-  * assert(filtered.forall(isType[BigDecimal]))
+  * if(filtered.forall(isType[BigDecimal]))
   * }}}
   * Filter by Option[type]
   * {{{
@@ -38,9 +50,9 @@ package object filters {
 
   type TypeFilter = Any => Boolean
 
-  /** Return only the fields of a case class or tuple that match a predicate
+  /** Return only fields of case class or tuple that match predicate. Can filter by type
     *
-    * Can be used to filter by type
+    * @tparam P <: Product
     * @param e case class or tuple
     * @param f filter or predicate function
     * @return matching elements
@@ -52,7 +64,7 @@ package object filters {
 
   type ProductFilter[P <: Product] = (P, TypeFilter) => IndexedSeq[Any]
 
-  /** Returns only matching elements of an indexed seq of mixed case class or tuple types
+  /** Returns matching elements of indexed seq of mixed case class or tuple types
     *
     * @param xs Indexed Sequence of heterogeneous types of case classes or tuples
     * @param pf function returns only elements of case class or tuple matching predicate
@@ -66,11 +78,11 @@ package object filters {
     } yield ef
   }
 
-  /** true if arg e:A false if not A
+  /** Filter by type
     *
-    * @tparam A type e should be
+    * @tparam A: ClassTag type e should be
     * @param e
-    * @return true if e:A false if not A
+    * @return true if e is type A
     */
   def isType[A: ClassTag](e: Any): Boolean = {
     evidence$1.unapply(e) match {
@@ -79,7 +91,7 @@ package object filters {
     }
   }
 
-  /** true if arg e: Option[A] false if None or not A
+  /** Filter by type within Option
     *
     * @tparam A type of Some
     * @param e
@@ -140,8 +152,8 @@ package object filters {
 
   /** Extract value from Either Right
     *
-    * @tparam A type of Left element
-    * @tparam B type of Right element
+    * @tparam A Left element
+    * @tparam B Right element
     * @param in Either
     * @return value in Right
     */
@@ -150,16 +162,16 @@ package object filters {
     case _ => None
   }
 
-  /** Extract a specified single element from a sequence of case classes or tuples
+  /** Extract specified element type from sequence of case classes or tuples
     *
-    * Use when a Sequence contains different tuples or case classes and the element wanted is at the
+    * Use when a Sequence contains mixed tuples or case classes and the element wanted is at the
     * same index in all of them.
-    * Product is the base trait for all case classes and tuples, its productElement gets by index
-    * @tparam A type of element
+    *
+    * @tparam A element
     * @param l sequence of case classes or tuples
     * @param element zero based index of element tuple ._2 == 1, first element of case class == 0
-    * @return sequence of just that element
-    * @throws ClassCastException if element doesn't match type param
+    * @return sequence of type A
+    * @throws ClassCastException if element doesn't match type
     */
   def extractElementByIndex[A](l: Seq[Product], element: Int): Seq[A] =
     for(p <- l) yield p.productElement(element).asInstanceOf[A]
