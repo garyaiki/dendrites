@@ -24,6 +24,7 @@ import org.gs.algebird.typeclasses.HyperLogLogLike
 /** Flow to create HLL from Seq[A]
   *
   * @tparam A: HyperLogLogLike
+  * @param bits to initialize HyperLogLogAggregator
   * @author Gary Struthers
   */
 class CreateHLLFlow[A: HyperLogLogLike](bits: Int = hyperLogLogBits)
