@@ -15,8 +15,11 @@ limitations under the License.
 package org.gs.http.stream
 
 /** Send query to Http service. Build a GET request and call the server in queryFlow, handle
-  * response in responseHandler flow. Compose both flows into a single flow.
+  * response in responseHandler flow.
   *
+  *	@constructor Creates a composite flow query ++ responseHandler
+  * @param query: TypedQueryFlow
+  * @param responseHandler: TypedResponseFlow
   * @author Gary Struthers
   *
   */

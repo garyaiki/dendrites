@@ -28,6 +28,7 @@ import org.gs.http.typedQuery
   * passes the rest. Flow mapAsync calls curried typedQuery and passes 1 Future, the HTTP Response
   * downstream
   *
+  * @constructor inits first arg list of typedQuery
   * @param baseURL
   * @param requestPath
   * @param ccToGet function to map case class to requestPath and Get request

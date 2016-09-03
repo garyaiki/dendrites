@@ -32,9 +32,12 @@ import org.gs.http.typedResponse
   * passes the rest. Flow mapAsync calls curried typedResponse and passes 1 Future, the Either
   * response value or error message downstream
   *
+  * @constructor Inits first arg list of typedResponse, passes it to mapAsync
   * @param mapLeft maps a failure message to Left
   * @param mapRight maps good result to Right.
-  *
+  * @param system implicit ActorSystem
+  * @param logger implicit LoggingAdapter
+  * @param materializer implicit Materializer
   * @author Gary Struthers
   *
   */
