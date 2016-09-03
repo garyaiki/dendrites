@@ -26,8 +26,8 @@ import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
 import org.gs.concurrent.listenableFutureToScala
 
-/** Execute Cassandra BoundStatement queries that return Rows. Values are
-  * bound to the statement in the previous stage. BoundStatements can be for different queries.
+/** Execute Cassandra BoundStatement queries that return Rows. Values bound in previous stage.
+  * BoundStatements can be for different queries.
   *
   * Cassandra's Async Execute statement returns a Guava ListenableFuture which is converted to a
   * completed Scala Future.
@@ -36,9 +36,10 @@ import org.gs.concurrent.listenableFutureToScala
   *
   * Cassandra's Java driver handles retry and reconnection, so Supervision isn't used
   *
-  * @param session is long lived, it's created sometime before the stream and closed sometime after
-  * the stream and may be used with other clients
+  * @param session created and closed elsewhere
   * @param fetchSize used by SELECT queries for page size. Default 0 means use Cassandra default
+  * @param ec implicit ExecutionContext
+  * @param logger implicit LoggingAdapter
   *
   * @author Gary Struthers
   */

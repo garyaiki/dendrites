@@ -24,7 +24,7 @@ import scala.collection.mutable.ArrayBuffer
 /** Send a Page of specified number of Rows from a ResultSet
   *
   * @param pageSize number of Rows to send downstream
-  * @param implicit logger
+  * @param logger implicit LoggingAdapter
   * @author Gary Struthers
   */
 class CassandraPaging(pageSize: Int)(implicit logger: LoggingAdapter)

@@ -36,8 +36,9 @@ import org.gs.concurrent.listenableFutureToScala
   *
   * Cassandra's Java driver handles retry and reconnection, so Supervision isn't used
   *
-  * @param session is long lived, it's created sometime before the stream and closed sometime after
-  * the stream and may be used with other clients
+  * @param session created and closed elsewhere
+  * @param ec implicit ExecutionContext
+  * @param logger implicit LoggingAdapter
   * @author Gary Struthers
   */
 class CassandraSink(session: Session)(implicit val ec: ExecutionContext, logger: LoggingAdapter)
