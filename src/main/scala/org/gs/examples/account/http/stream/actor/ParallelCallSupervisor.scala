@@ -42,11 +42,12 @@ import org.gs.examples.account.http.stream.ParallelCallFlow
 import org.gs.stream.actor.{CallStream, OtherActor}
 import ParallelCallSupervisor.SinkActor
 
-/** Creates CallStream with a RunnablaGraph for ParallelCallFlow
+/** Creates CallStream Actor with a RunnablaGraph for ParallelCallFlow from a Flow and a Sink which
+  * is an actor ref. 
   *
   * Watches Sink actor and changes state to waiting when it dies
   *
-  * @tparam A case class or tuple type passed to stream
+  * @tparam A <: Product: TypeTag case class or tuple type passed to stream
   * @param sinkActor actorRef for Sink
   * @author Gary Struthers
   */
@@ -60,7 +61,6 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSinkActor: SinkActor) ex
     ActorMaterializer(ActorMaterializerSettings(system))
     
   val pcf = new ParallelCallFlow()
-//  val wrappedFlow: Flow[A, (Seq[String], Seq[AnyRef]), NotUsed] = pcf.wrappedCallsLRFlow
   val wrappedFlow: Flow[A, Seq[AnyRef], NotUsed] = pcf.wrappedCallsLogLeftPassRightFlow
   val bufferSize = 10
   val overflowStrategy = OverflowStrategy.fail

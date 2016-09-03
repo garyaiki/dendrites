@@ -43,6 +43,7 @@ import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
   * bcast ~> qtrAg ~> zip.in4
   * }}}
   *
+  * @constructor builds graph of parallel agent flows
   * @tparam A: HyperLogLogLike: Numeric: CMSHasher: QTreeLike: TypeTag
   * @param avgAgent AveragedAgent
   * @param cmsAgent: CountMinSketchAgent
@@ -50,6 +51,9 @@ import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
   * @param hllAgent: HyperLogLogAgent
   * @param qtrAgent: QTreeAgent
   * @param time function generates time as doubles for DecayedValue
+  * @param system implicit ActorSystem
+  * @param logger implicit LoggingAdapter
+  * @param materializer implicit Materializer
   * @author Gary Struthers
   */
 class ParallelApproximators[A: HyperLogLogLike: Numeric: CMSHasher: QTreeLike: TypeTag](

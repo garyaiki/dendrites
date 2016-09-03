@@ -24,7 +24,6 @@ import org.gs.algebird.createCMSMonoid
   * @constructor Creates Agent singleton for CountMinSketch
   * @tparam K elements which are implicitly Ordering[K] and CMSHasher[K]
   * @param name Agent name
-  * @param ec execution context for future
   * @param ec implicit ExecutionContext
   *
   * @example [[org.gs.algebird.agent.stream.CountMinSketchAgentFlow]]

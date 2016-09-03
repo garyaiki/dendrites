@@ -42,13 +42,16 @@ import org.gs.algebird.typeclasses.HyperLogLogLike
   * bcast ~> qtrAg        ~> zip.in4
   *	}}}
   *  
+  *	@constructor creates graph to update Agents in parallel
   * @tparam A: HyperLogLogLike: Numeric: CMSHasher: TypeTag
   * @param avgAgent AveragedAgent
-  * @param cmsAgent: CountMinSketchAgent
-  * @param dcaAgent: DecayedValueAgent
-  * @param hllAgent: HyperLogLogAgent
-  * @param qtrAgent: QTreeAgent
-  *
+  * @param cmsAgent CountMinSketchAgent
+  * @param dcaAgent DecayedValueAgent
+  * @param hllAgent HyperLogLogAgent
+  * @param qtrAgent QTreeAgent
+  * @param system implicit ActorSystem
+  * @param logger implicit LoggingAdapter
+  * @param materializer implicit Materializer
   * @author Gary Struthers
   */
 class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
