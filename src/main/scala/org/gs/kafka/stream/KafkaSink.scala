@@ -59,14 +59,13 @@ import org.gs.kafka.ProducerConfig
   * RetriableException means the error may not recur, so retry the message. Retries use exponential
   * backoff until success or the configured maxBackoff is reached and then the stream is shutdown.
   *
-  * @tparam K Kafka ProducerRecord key
-  * @tparam V Type of serialized object received from stream and Kafka ProducerRecord value
+  * @constructor sets up Supervision with exponential backoff
+  * @tparam K ProducerRecord key
+  * @tparam V Type of serialized object received from stream and ProducerRecord value
   * @param prod extends KafkaProducer with key, value, topic, and backoff fields
+  * @param logger implicit LoggingAdapter
   *
   * @author Gary Struthers
-  *	exception - The exception thrown during processing of this record. Null if no error occurred.
-  * Possible thrown exceptions include: Non-Retriable exceptions (fatal, the message will never be
-  * sent):
   */
 class KafkaSink[K, V](prod: ProducerConfig[K, V])(implicit logger: LoggingAdapter)
     extends GraphStage[SinkShape[V]] {

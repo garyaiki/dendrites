@@ -20,8 +20,8 @@ import scala.concurrent.duration.FiniteDuration
 /** Abstract KafkaProducer configuration
  *
  *
- * @tparam <K> Kafka ProducerRecord key
- * @tparam <V> Kafka ProducerRecord value
+ * @tparam K ProducerRecord key
+ * @tparam V ProducerRecord value
  *
  * @author Gary Struthers
  *

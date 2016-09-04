@@ -59,6 +59,7 @@ import org.gs.kafka.ConsumerConfig
   * @tparam K Kafka key
   * @tparam V Kafka value
   * @param consumerConfig a consumer,or mock consumer, factory with properties, topics, timeout
+  * @param logger implicit LoggingAdapter
   * @author Gary Struthers
   */
 class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logger: LoggingAdapter)
@@ -71,6 +72,7 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
     * Then poll Kafka, this also blocks. If poll returns an empty ConsumerRecords do nothing, if it
     * contains records, push ConsumerRecords to the next stage
     *
+	  * @constructor sets up Supervision with exponential backoff
     * @param inheritedAttributes
     */
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
