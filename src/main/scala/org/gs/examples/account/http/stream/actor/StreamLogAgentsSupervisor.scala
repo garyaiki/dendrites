@@ -29,8 +29,8 @@ import com.twitter.algebird.{CMSHasher, DecayedValue, DecayedValueMonoid, HLL, Q
 import com.twitter.algebird.CMSHasherImplicits._
 import scala.concurrent.duration._
 import scala.reflect.runtime.universe.TypeTag
-import org.gs.actor.LogLeftSendRightActor
-import org.gs.actor.LogLeftSendRightActor._
+//import org.gs.actor.LogLeftSendRightActor
+//import org.gs.actor.LogLeftSendRightActor._
 import org.gs.algebird.BigDecimalField
 import org.gs.algebird.cmsHasherBigDecimal
 import org.gs.algebird.agent.Agents
@@ -45,9 +45,25 @@ import org.gs.stream.actor.CallStream.props
 import org.gs.stream.actor.OtherActor
 import ParallelCallSupervisor.props
 import ParallelCallSupervisor.SinkActor
+import StreamLogAgentsSupervisor.ResultsActor
 
 /** Creates ParallelCallSupervisor, LogLeftSendRightActor, ResultsActor
   *
+  *	Results Runnable Graph
+  * {{{
+  *																								agentsFlow
+  *  																			  bcast ~> avg ~> zip.in0
+  * 																				bcast ~> cms ~> zip.in1
+  * sourceQueue ~> 	extractBalancesFlow ~>  bcast ~> dvt ~> zip.in2 ~> sink
+  * 																				bcast ~> hll ~> zip.in3
+  * 																				bcast ~> qtrAg ~> zip.in4
+  * }}}
+  *	@constructor creates RunnableGraph for results then creates CallStream child actor for it
+  * @tparam A: CMSHasher: HyperLogLogLike: Numeric: QTreeLike: TypeTag
+  * @param agents Algebird approximator agents
+  * @param system implicit ActorSystem
+  * @param logger implicit LoggingAdapter
+  * @param materializer Materializer
   * @see [[http://doc.akka.io/docs/akka/current/general/supervision.html supervision]]
   * @author Gary Struthers
   *
@@ -81,9 +97,6 @@ class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLik
     //create children here
     val resultsProps = CallStream.props[Seq[AnyRef]](resultsRunnable)
     results = context.actorOf(resultsProps, resultsName)
-    //val logLeftProps = LogLeftSendRightActor.props(ResultsActor(results, resultsName))
-    //errorLogger = context.actorOf(logLeftProps, errorLoggerName)
-    //val sinkActor = SinkActor(errorLogger, errorLoggerName)
     val sinkActor = SinkActor(results, resultsName)
     val superProps = ParallelCallSupervisor.props[GetAccountBalances](sinkActor)
     streamSuper = context.actorOf(superProps, streamSuperName)
@@ -115,6 +128,7 @@ class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLik
 }
 
 object StreamLogAgentsSupervisor {
+  case class ResultsActor(override val ref: ActorRef, override val name: String) extends OtherActor
 
   def props[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLike: TypeTag](agents: Agents[A])
           (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer) =

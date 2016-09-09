@@ -15,7 +15,8 @@ limitations under the License.
 package org.gs.stream.actor
 
 import akka.NotUsed
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, Props, Status}
+import akka.actor.Status.{Failure => StatusFailure}
 import akka.pattern.pipe
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, QueueOfferResult}
 import akka.stream.OverflowStrategy
@@ -27,7 +28,9 @@ import akka.stream.QueueOfferResult.QueueClosed
 import akka.stream.scaladsl.{Flow, RunnableGraph, Sink, Source, SourceQueueWithComplete}
 import java.util.MissingResourceException
 import scala.concurrent.Future
+import scala.reflect.ClassTag
 import scala.reflect.runtime.universe.TypeTag
+import scala.reflect.runtime.universe._
 import CallStream.CompleteMessage
 
 /** Generic Actor that calls a stream in a RunnableGraph. All customization can be in the graph
@@ -39,8 +42,9 @@ import CallStream.CompleteMessage
   * The graph's Sink can be created with Sink.actorRef. This will forward the sink's input to that
   * actorRef. Other types of Sink also work
   *
-  * @tparam A case class or tuple passed to stream
-  * @param rg complete RunnableGraph with Source and Sink. Not yet materialized 
+  * @tparam A: TypeTag case class or tuple passed to stream
+  * @param rg complete RunnableGraph with Source and Sink. Not yet materialized
+  * @see [[http://doc.akka.io/api/akka/2.4/#akka.stream.javadsl.SourceQueueWithComplete SourceQueueWithComplete]]
   * @author Gary Struthers
   */
 class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) extends Actor
@@ -48,7 +52,6 @@ class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) exte
 
   implicit val system = context.system
   import system.dispatcher
-
   final implicit val materializer: ActorMaterializer =
     ActorMaterializer(ActorMaterializerSettings(system))
 
@@ -58,7 +61,6 @@ class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) exte
   override def preStart() = {
     log.debug("preStart {}", this.toString())
     rgMaterialized = rg.run
-    super.preStart()
   }
 
   /** Complete the stream */
@@ -111,11 +113,16 @@ class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) exte
     case y: QueueOfferResult => {
       offerResultHandler(y)
     }
+    case s: StatusFailure => {
+      val t = s.cause
+      log.error(t, "Stream enqueue failed {}", t.getMessage)
+      throw(t)
+    }
 
-    case x: A ⇒ {
-      log.debug("Type A msg {}", x)
-      val offerFuture: Future[QueueOfferResult] = rgMaterialized.offer(x)
-      offerFuture pipeTo self
+    case m: A => {
+          log.debug("Type A msg {} class{}", m, m.getClass().getName)
+          val offerFuture: Future[QueueOfferResult] = rgMaterialized.offer(m)
+          offerFuture pipeTo self          
     }
 
     case everythingElse => {
@@ -134,20 +141,12 @@ object CallStream {
     *
     * @param flow Akka stream Flow
     * @return Props to create actor
-  */
+  	*/
   def props[A: TypeTag](runnable: RunnableGraph[SourceQueueWithComplete[A]]): Props = {
     Props(new CallStream[A](runnable))
   }
 
-  /** Create CallStream Props for stream that sends Sink input to the Actor Ref
-    *
-    * @param sinkRef ActorRef that becomes the Sink
-    * @param flow Akka stream Flow
-    * @return Props to create actor
-  	*/
-  def props[A: TypeTag](sinkRef: ActorRef,
-          flow: Flow[A, (Seq[String], Seq[AnyRef]),
-          NotUsed]): Props = {
+  def props[A: TypeTag](sinkRef: ActorRef, flow: Flow[A, Seq[AnyRef], NotUsed]): Props = {
     val source = Source.queue[A](10, OverflowStrategy.fail)
     val sink = Sink.actorRef(sinkRef, CompleteMessage)
     val runnable: RunnableGraph[SourceQueueWithComplete[A]] = source.via(flow).to(sink)

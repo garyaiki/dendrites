@@ -1,19 +1,29 @@
-/**
-  */
+/** Copyright 2016 Gary Struthers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs.algebird.fixtures
 
-import org.gs._
-import org.gs.fixtures.SysProcessUtils
-import org.gs.algebird._
-import language.postfixOps
+import org.scalatest.{TestSuite, TestSuiteMixin}
 import util.Random
-import org.scalatest._
-import com.twitter.algebird._
+import org.gs.fixtures.SysProcessUtils
+import org.gs.algebird.createBF
 
-/** @author garystruthers
+/**
   *
+  * @author Gary Struthers
   */
-trait BloomFilterBuilder extends SuiteMixin with SysProcessUtils { this: Suite =>
+trait BloomFilterBuilder extends TestSuiteMixin with SysProcessUtils { this: TestSuite =>
 
   abstract override def withFixture(test: NoArgTest) = {
     super.withFixture(test)

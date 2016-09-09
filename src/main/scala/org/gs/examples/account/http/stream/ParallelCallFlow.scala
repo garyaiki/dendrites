@@ -25,11 +25,27 @@ import org.gs.stream.logLeftRightFlow
 /** Create Graph that calls Checking, MoneyMarket, Savings services in parallel, waits for them all
   * then groups failures and successes
   *
+  * parallelCallFlow
   * {{{
   * bcast ~> check ~> zip.in0
   * bcast ~> mm ~> zip.in1
   * bcast ~> savings ~> zip.in2
   * }}}
+  *	composite flow
+  * {{{
+  * parallelCallFlow ~> leftRightFlow
+  * }}}
+  *	composite flow with logging
+  * {{{
+  * parallelCallFlow ~> logLeftRightFlow
+  * }}}
+  *
+  * @constructor builds graph to call 3 services in parallel then a left/right composite and
+  * logging left/right composite
+  * @param ec implicit ExecutionContext
+  * @param system implicit ActorSystem
+  * @param logger implicit LoggingAdapter
+  * @param materializer implicit Materializer
   * @author Gary Struthers
   */
 class ParallelCallFlow(implicit val ec: ExecutionContext,

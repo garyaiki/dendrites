@@ -16,14 +16,16 @@ package org.gs.examples.fixtures
 
 import scala.collection.immutable.Range
 import scala.math.Numeric.BigDecimalAsIfIntegral
-import org.scalatest._
+import org.scalatest.{Outcome, TestSuite, TestSuiteMixin}
 import scala.annotation.implicitNotFound
-import org.gs.examples.account._
+import org.gs.examples.account.AccBalances
+import org.gs.examples.account.AccountType
+import org.gs.examples.account.accountTypes
 
 /**
   * @author Gary Struthers
   */
-trait AccountTypesBuilder extends SuiteMixin { this: Suite =>
+trait AccountTypesBuilder extends TestSuiteMixin { this: TestSuite =>
 
   abstract override def withFixture(test: NoArgTest): Outcome = { super.withFixture(test) }
 

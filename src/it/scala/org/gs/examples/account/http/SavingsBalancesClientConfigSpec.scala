@@ -21,7 +21,6 @@ import java.util.concurrent.Executors
 import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
-import org.scalatest.matchers.ShouldMatchers._
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.math.BigDecimal.double2bigDecimal

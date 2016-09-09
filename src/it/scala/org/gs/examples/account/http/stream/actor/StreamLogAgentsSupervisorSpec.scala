@@ -33,7 +33,7 @@ import org.gs.algebird.cmsHasherBigDecimal
 import org.gs.algebird.agent.Agents
 import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
 import org.gs.examples.account.{GetCustomerAccountBalances, Savings}
-import org.gs.kafka.stream.actor.ConsumerStream.CompleteMessage
+//import org.gs.kafka.stream.actor.ConsumerStream.CompleteMessage
 
 /** Copyright 2016 Gary Struthers
 

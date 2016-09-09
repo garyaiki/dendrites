@@ -42,13 +42,21 @@ import org.gs.examples.account.http.stream.ParallelCallFlow
 import org.gs.stream.actor.{CallStream, OtherActor}
 import ParallelCallSupervisor.SinkActor
 
-/** Creates CallStream Actor with a RunnablaGraph for ParallelCallFlow from a Flow and a Sink which
-  * is an actor ref. 
+/** Creates CallStream Actor with a RunnablaGraph composite flow of parallelCallFlow
+ 	* logLeftRightFlow, and a Sink, which is an actor receiving the stream's results
   *
   * Watches Sink actor and changes state to waiting when it dies
   *
+  * parallelCallsLogLeftPassRightFlow
+  * {{{
+  * bcast ~> check ~> zip.in0
+  * bcast ~> mm ~> zip.in1 ~> logLeftRightFlow
+  * bcast ~> savings ~> zip.in2
+  * }}}
+  *
+  *	@constructor initialized flow and Actor refs
   * @tparam A <: Product: TypeTag case class or tuple type passed to stream
-  * @param sinkActor actorRef for Sink
+  * @param initSinkActor: SinkActor case class with ActorRef, name
   * @author Gary Struthers
   */
 class ParallelCallSupervisor[A <: Product: TypeTag](initSinkActor: SinkActor) extends

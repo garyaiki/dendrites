@@ -1,16 +1,29 @@
-/**
-  */
+/** Copyright 2016 Gary Struthers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.gs.fixtures
 
-import org.gs.filters._
-import scala.collection.immutable.NumericRange
-import org.scalatest._
+import org.scalatest.{Outcome, TestSuite, TestSuiteMixin}
 import scala.annotation.implicitNotFound
+import scala.collection.immutable.NumericRange
+import org.gs.filters.extractElementByIndex
 
-/** @author garystruthers
+/**
   *
+  * @author Gary Struthers
   */
-trait TestValuesBuilder extends SuiteMixin { this: Suite =>
+trait TestValuesBuilder extends TestSuiteMixin { this: TestSuite =>
 
   abstract override def withFixture(test: NoArgTest): Outcome = {
     super.withFixture(test)

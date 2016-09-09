@@ -5,7 +5,7 @@ lazy val commonSettings = Seq(
 	scalaVersion := "2.11.8"
 )
 lazy val akkaV = "2.4.9"
-lazy val scalaTestV = "2.2.6"
+lazy val scalaTestV = "3.0.0"
 lazy val algebirdV = "0.12.0"
 lazy val root = (project in file(".")).
   configs(IntegrationTest).
