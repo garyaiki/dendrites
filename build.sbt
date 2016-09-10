@@ -14,6 +14,7 @@ lazy val root = (project in file(".")).
 	settings(
 		name := "dendrites",
 		libraryDependencies ++= Seq(
+		  "org.scalactic" % "scalactic_2.11" % "3.0.0",
 			"org.scalatest" % "scalatest_2.11" % scalaTestV % "it,test",
 		   "junit" % "junit" % "4.11" % "it,test",
 		   "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
