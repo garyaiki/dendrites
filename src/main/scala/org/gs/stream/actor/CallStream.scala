@@ -65,7 +65,7 @@ class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) exte
 
   /** Complete the stream */
   override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
-    log.error(reason, "Restarting due to {} when processing {}",
+    log.error(reason, "preRestart due to {} when processing {}",
         reason.getMessage, message.getOrElse(""))
     rgMaterialized.complete()
     super.preRestart(reason, message)
@@ -79,14 +79,14 @@ class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) exte
     */
   def offerResultHandler(offerResult: QueueOfferResult): Unit = {
     offerResult match {
-      case Dropped => log.warning("Stream dropped element")
-      case Enqueued => log.debug("Stream enqueued element")
+      case Dropped => log.warning("offerResult Dropped")
+      case Enqueued => log.debug("offerResult Enqueued")
       case f:Failure => {
-        log.error(f.cause, "Stream enqueue failed")
+        log.error(f.cause, "offerResult Failure {}", f.cause.getMessage)
         throw(f.cause)
       }
       case QueueClosed => {
-        val msg = "Stream completed before enqueue"
+        val msg = "QueueClosed: stream completed before enqueue"
         val e = new MissingResourceException(msg, rg.getClass.getName, "")
         log.error(e, msg)
         throw(e)
@@ -108,25 +108,25 @@ class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) exte
   def receive = {
 
     case CompleteMessage => {
-      log.debug("CompleteMessage from {}", sender)
+      log.debug("receive CompleteMessage from {}", sender)
     }
     case y: QueueOfferResult => {
       offerResultHandler(y)
     }
     case s: StatusFailure => {
       val t = s.cause
-      log.error(t, "Stream enqueue failed {}", t.getMessage)
+      log.error(t, "receive StatusFailure: enqueue:{} ex:{}", t.getMessage, t.getClass.getName)
       throw(t)
     }
 
     case m: A => {
-          log.debug("Type A msg {} class{}", m, m.getClass().getName)
+          log.debug("receive msg:{} class:{}", m, m.getClass().getName)
           val offerFuture: Future[QueueOfferResult] = rgMaterialized.offer(m)
           offerFuture pipeTo self          
     }
 
     case everythingElse => {
-      log.warning("unknown message {}", everythingElse)
+      log.warning("receive unknown message {}", everythingElse)
     }
   }
 }

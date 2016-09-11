@@ -27,6 +27,7 @@
   <logger name="org.gs.examples.cassandra" level="debug" />
   <logger name="org.gs.kafka" level="debug" />
   <logger name="org.gs.kafka.stream" level="debug" />
+  <logger name="org.gs.kafka.stream.actor" level="debug" />
   <logger name="org.gs.examples.account.akka" level="debug" />
   <logger name="org.gs.examples.account.http.actor" level="debug" />
   <logger name="org.gs.examples.account.http.stream" level="debug" />
