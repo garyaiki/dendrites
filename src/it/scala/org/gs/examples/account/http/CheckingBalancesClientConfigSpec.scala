@@ -32,7 +32,7 @@ import org.gs.http.{caseClassToGetQuery, typedQuery, typedFutureResponse}
   */
 class CheckingBalancesClientConfigSpec extends WordSpecLike with Matchers with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
-  override implicit val materializer = ActorMaterializer()
+  override implicit val mat = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   implicit val ec: ExecutionContext = system.dispatcher
   val clientConfig = new CheckingBalancesClientConfig()

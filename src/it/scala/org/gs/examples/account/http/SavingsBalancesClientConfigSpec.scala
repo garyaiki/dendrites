@@ -33,7 +33,7 @@ import org.gs.http.{caseClassToGetQuery, typedQuery, typedFutureResponse}
   */
 class SavingsBalancesClientConfigSpec extends WordSpecLike with Matchers with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
-  override implicit val materializer = ActorMaterializer()
+  override implicit val mat = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   implicit val executor = Executors.newSingleThreadExecutor()
   val clientConfig = new SavingsBalancesClientConfig()

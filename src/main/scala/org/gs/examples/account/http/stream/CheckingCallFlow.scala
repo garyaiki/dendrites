@@ -34,7 +34,7 @@ import org.gs.http.stream.TypedResponseFlow.decider
 class CheckingCallFlow(implicit ec: ExecutionContext,
                        val system: ActorSystem,
                        logger: LoggingAdapter,
-                       val materializer: Materializer) extends BalancesProtocols {
+                       val mat: Materializer) extends BalancesProtocols {
 
   val clientConfig = new CheckingBalancesClientConfig()
   val baseURL = clientConfig.baseURL

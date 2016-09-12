@@ -29,7 +29,7 @@ import org.gs.examples.account.{CheckingAccountBalances,
   */
 class BalancesProtocolsSpec extends BalancesProtocols with WordSpecLike{
   implicit val system = ActorSystem("dendrites")
-  implicit val materializer = ActorMaterializer()
+  implicit val mat = ActorMaterializer()
 
   "An AccountBalancesFormat" should {
     "produce the expected Json" in {

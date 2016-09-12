@@ -34,7 +34,7 @@ import org.gs.http.stream.TypedResponseFlow.decider
 class MoneyMarketCallFlow(implicit ec: ExecutionContext,
                           val system: ActorSystem,
                           logger: LoggingAdapter,
-                          val materializer: Materializer) extends BalancesProtocols {
+                          val mat: Materializer) extends BalancesProtocols {
 
   val clientConfig = new MoneyMarketBalancesClientConfig()
   val hostConfig = clientConfig.hostConfig

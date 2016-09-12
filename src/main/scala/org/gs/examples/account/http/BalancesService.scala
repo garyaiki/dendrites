@@ -40,7 +40,7 @@ trait BalancesProtocols extends DefaultJsonProtocol {
   implicit val savingsAccountBalancesFormat = jsonFormat1(SavingsAccountBalances[BigDecimal])
 
   implicit val system: ActorSystem
-  implicit val materializer: Materializer
+  implicit val mat: Materializer
 
   /** Unmarshall HttpEntity result
   	* @param entity
@@ -89,7 +89,7 @@ trait BalancesProtocols extends DefaultJsonProtocol {
 trait BalancesService extends BalancesProtocols {
   implicit val system: ActorSystem
   implicit def executor: ExecutionContextExecutor
-  implicit val materializer: Materializer
+  implicit val mat: Materializer
 
   def fetchCheckingBalances(id: Long): Either[String, CheckingAccountBalances[BigDecimal]] = {
     checkingBalances.get(id) match {

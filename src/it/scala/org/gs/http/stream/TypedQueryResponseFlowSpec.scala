@@ -36,10 +36,10 @@ import org.gs.http.{caseClassToGetQuery, typedQueryResponse}
   */
 class TypedQueryResponseFlowSpec extends WordSpecLike with Matchers with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
-  override implicit val materializer = ActorMaterializer()
+  override implicit val mat = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   implicit val executor = Executors.newSingleThreadExecutor()
-  val timeout = Timeout(3000 millis)
+  val timeout = Timeout(200 millis)
 
   def source = TestSource.probe[Product]
   def sink = TestSink.probe[Either[String, AnyRef]]

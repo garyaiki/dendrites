@@ -20,7 +20,7 @@ class CheckingAccountClient(clientConfig: CheckingBalancesClientConfig) extends 
   BalancesProtocols with ActorLogging {
   import context._
   override implicit val system = context.system
-  override implicit val materializer = ActorMaterializer()
+  override implicit val mat = ActorMaterializer()
   implicit val logger = log
   val hostConfig = clientConfig.hostConfig
   val config = hostConfig._1
