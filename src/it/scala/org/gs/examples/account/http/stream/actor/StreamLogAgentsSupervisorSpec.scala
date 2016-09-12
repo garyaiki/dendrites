@@ -25,37 +25,25 @@ import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext
-import org.gs.aggregator.mean
 import scala.reflect.runtime.universe.TypeTag
+import org.gs.aggregator.mean
 import org.gs.algebird.AlgebirdConfigurer
 import org.gs.algebird.BigDecimalField
 import org.gs.algebird.cmsHasherBigDecimal
 import org.gs.algebird.agent.Agents
 import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
 import org.gs.examples.account.{GetCustomerAccountBalances, Savings}
-//import org.gs.kafka.stream.actor.ConsumerStream.CompleteMessage
 
-/** Copyright 2016 Gary Struthers
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+/** Parent Supervisor creates child supervisor of parallel HTTP stream and actor with parallel
+  * Agents stream
+  */
 class StreamLogAgentsSupervisorSpec extends WordSpecLike with Matchers {
 
   implicit val system = ActorSystem("dendrites")
   implicit val ec: ExecutionContext = system.dispatcher
-  implicit val materializer = ActorMaterializer()
+  implicit val mat = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
-  val timeout = Timeout(3000 millis)
+  val timeout = Timeout(200 millis)
 
   "A StreamLogAgentsSupervisor of BigDecimals" should {
     "update all agents and return their latest values" in {
