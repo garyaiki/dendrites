@@ -56,7 +56,7 @@ class MockSourceSupervisionSpec extends TestKit(ActorSystem("test")) with WordSp
       val sb = new StringBuilder()
       val rg: RunnableGraph[SourceQueueWithComplete[String]] = source.map{
         elem => if(elem == "2") {
-            throw new NullPointerException("forced exception when elem = 2 {}, elem")
+            throw new NullPointerException("throw exception when elem = 2 {}, elem")
           } else elem
       }.map{ elem => sb.append(elem); elem }.to(sink)
       
@@ -72,7 +72,7 @@ class MockSourceSupervisionSpec extends TestKit(ActorSystem("test")) with WordSp
       val sb = new StringBuilder()
       val rg: RunnableGraph[SourceQueueWithComplete[String]] = source.map{
         elem => elem match {
-          case "2" | "4" | "6" | "8" => throw new NullPointerException("exception elem:{}, elem")
+          case "2" | "4" | "6" | "8" => throw new NullPointerException("throw when elem = {}, elem")
           case _ => elem
         }
       }.map{ elem => sb.append(elem); elem }.to(sink)

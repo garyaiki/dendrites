@@ -20,10 +20,8 @@ import akka.actor.{Actor,
   ActorRef,
   OneForOneStrategy,
   Props,
-  Stash,
-  SupervisorStrategy,
-  Terminated}
-import akka.actor.SupervisorStrategy.{Escalate, Restart, Resume, Stop}
+  SupervisorStrategy}
+import akka.actor.SupervisorStrategy.{Escalate, Restart, Stop}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, OverflowStrategy}
 import akka.stream.OverflowStrategy.fail
 import akka.stream.scaladsl.{Flow, RunnableGraph, SourceQueueWithComplete}
@@ -31,21 +29,20 @@ import java.util.MissingResourceException
 import scala.concurrent.duration._
 import scala.reflect.runtime.universe._
 
-/** Creates CallStream Actor with a RunnablaGraph
-  *
+/** Creates CallStream Actor with a RunnablaGraph. Forwards messages to CallStream actor. Supervisor
+  * Restarts, Stops, or Escalates
   *
   * @tparam A: TypeTag type passed to stream
-  * @param initSinkActor: SinkActor case class with ActorRef, name
+  * @param rg: RunnableGraph[SourceQueueWithComplete[A]]
   * @author Gary Struthers
   */
 class CallStreamSupervisor[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]])
-        extends Actor with Stash with ActorLogging {
+        extends Actor with ActorLogging {
 
   implicit val system = context.system
   implicit val ec = system.dispatcher
   implicit val logger = log
-  final implicit val materializer: ActorMaterializer =
-    ActorMaterializer(ActorMaterializerSettings(system))
+  final implicit val mat: ActorMaterializer = ActorMaterializer(ActorMaterializerSettings(system))
     
   val bufferSize = 10
   val overflowStrategy = OverflowStrategy.fail
@@ -56,14 +53,12 @@ class CallStreamSupervisor[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete
     log.debug("preStart {} callStream:{}", this.toString(), callStreamName)    
     //create children here
     val props = CallStream.props[A](rg)
-
     callStream = context.actorOf(props, callStreamName)
   }
 
-  override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
-    log.error(reason, "preRestart due to [{}] when processing [{}]",
-        reason.getMessage, message.getOrElse(""))
-    super.preRestart(reason, message) // stops children
+  override def preRestart(t: Throwable, msg: Option[Any]): Unit = {
+    log.error(t, "preRestart cause [{}] on msg [{}]", t.getMessage, msg.getOrElse(""))
+    super.preRestart(t, msg) // stops children
   }
 
   /** SupervisorStrategy for child actors. Non-escalating errors are logged, these logs should guide
@@ -81,12 +76,11 @@ class CallStreamSupervisor[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete
     }
 
   def receive = {
-        case x: A ⇒ callStream forward x
+    case x: A ⇒ callStream forward x
   }
 }
 
 object CallStreamSupervisor {
-
   def props[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]): Props =
     Props(new CallStreamSupervisor[A](rg))
 }

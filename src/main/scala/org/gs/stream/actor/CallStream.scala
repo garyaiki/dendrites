@@ -38,6 +38,11 @@ import CallStream.CompleteMessage
   * The RunnableGraph's Source must be created with Source.queue, which is materialized as a
   * SourceQueue. When receive get a message of type A it's offered to the stream. The offer returns
   * a Future of QueueOfferResult which is pipeTo offerResultHandler.
+  *
+  * An exception in the RunnableGraph that isn't handled by its own Supervision will stop the stream
+  * and a Failure message will be received. The original NonFatal exception isn't thrown to the
+  * actor. Instead the Actor throws an IllegalStateException and its Supervisor should restart the
+  * actor (and its stream). Too many retries should cause the Supervisor to Stop the actor.
   * 
   * The graph's Sink can be created with Sink.actorRef. This will forward the sink's input to that
   * actorRef. Other types of Sink also work
@@ -59,7 +64,7 @@ class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) exte
 
   /** Materialize the RunnableGraph */
   override def preStart() = {
-    log.debug("preStart {}", this.toString())
+    log.debug("preStart:{}", this.toString())
     rgMaterialized = rg.run
   }
 

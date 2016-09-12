@@ -23,6 +23,7 @@ import akka.actor.{Actor,
   Stash,
   SupervisorStrategy,
   Terminated}
+import akka.actor.SupervisorStrategy.{Escalate, Restart, Resume, Stop}
 import akka.http.scaladsl.model.{EntityStreamException,
           EntityStreamSizeException,
           IllegalHeaderException,
@@ -59,20 +60,19 @@ import ParallelCallSupervisor.SinkActor
   * @param initSinkActor: SinkActor case class with ActorRef, name
   * @author Gary Struthers
   */
-class ParallelCallSupervisor[A <: Product: TypeTag](initSinkActor: SinkActor) extends
+class ParallelCallSupervisor[A <: Product: TypeTag](initSink: SinkActor) extends
         Actor with Stash with ActorLogging {
 
   implicit val system = context.system
   implicit val ec = system.dispatcher
   implicit val logger = log
-  final implicit val materializer: ActorMaterializer =
-    ActorMaterializer(ActorMaterializerSettings(system))
+  final implicit val mat: ActorMaterializer = ActorMaterializer(ActorMaterializerSettings(system))
     
   val pcf = new ParallelCallFlow()
   val wrappedFlow: Flow[A, Seq[AnyRef], NotUsed] = pcf.wrappedCallsLogLeftPassRightFlow
   val bufferSize = 10
   val overflowStrategy = OverflowStrategy.fail
-  var sinkActor: SinkActor = initSinkActor
+  var sink: SinkActor = initSink
   val callStreamName = "CallStream" + typeOf[A].getClass.getSimpleName
   var callStream: ActorRef = null
   
@@ -88,16 +88,15 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSinkActor: SinkActor) ex
   }
 
   override def preStart() = {
-    log.debug("preStart {}", this.toString())    
+    log.debug("preStart:{} callStream:{} sink:{}", this.toString(), callStreamName, sink.name)    
     //create children here
-    callStream = createCallStream(sinkActor.ref)
+    callStream = createCallStream(sink.ref)
   }
 
-  override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
-    log.error(reason, "Restarting due to [{}] when processing [{}]",
-        reason.getMessage, message.getOrElse(""))
-    context.unwatch(sinkActor.ref)
-    super.preRestart(reason, message) // stops children
+  override def preRestart(t: Throwable, msg: Option[Any]): Unit = {
+    log.error(t, "preRestart cause [{}] on msg [{}]", t.getMessage, msg.getOrElse(""))
+    context.unwatch(sink.ref)
+    super.preRestart(t, msg) // stops children
   }
 
   /** SupervisorStrategy for child actors. Non-escalating errors are logged, these logs should guide
@@ -106,18 +105,19 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSinkActor: SinkActor) ex
     */
   override val supervisorStrategy =
     OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1.minute) {
-      case _: EntityStreamSizeException => SupervisorStrategy.Resume
-      case _: InvalidContentLengthException => SupervisorStrategy.Resume
-      case _: MissingResourceException => SupervisorStrategy.Resume
-      case _: RequestTimeoutException => SupervisorStrategy.Resume
-      case _: EntityStreamException => SupervisorStrategy.Restart
-      case _: NullPointerException => SupervisorStrategy.Restart
-      case _: IllegalArgumentException => SupervisorStrategy.Stop
-      case _: IllegalHeaderException => SupervisorStrategy.Stop
-      case _: IllegalRequestException => SupervisorStrategy.Stop
-      case _: IllegalResponseException => SupervisorStrategy.Stop
-      case _: IllegalUriException => SupervisorStrategy.Stop
-      case _: ParsingException => SupervisorStrategy.Stop
+      case _: EntityStreamSizeException => Resume
+      case _: InvalidContentLengthException => Resume
+      case _: MissingResourceException => Restart
+      case _: RequestTimeoutException => Resume
+      case _: EntityStreamException => Restart
+      case _: NullPointerException => Restart
+      case _: IllegalArgumentException => Stop
+      case _: IllegalHeaderException => Stop
+      case _: IllegalRequestException => Stop
+      case _: IllegalResponseException => Stop
+      case _: IllegalStateException => Restart
+      case _: IllegalUriException => Stop
+      case _: ParsingException => Stop
       case t =>
         super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => SupervisorStrategy.Escalate)
     }
@@ -133,15 +133,13 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSinkActor: SinkActor) ex
   	* @see [[http://doc.akka.io/api/akka/current/#akka.actor.Terminated Terminated]]
   	*/
   def ready: Receive = {
-
     case Terminated(actor) ⇒ {
-      context.parent ! SinkActor(null, sinkActor.name)
+      context.parent ! SinkActor(null, sink.name)
       context.stop(callStream)
-      context.unwatch(sinkActor.ref)
+      context.unwatch(sink.ref)
       context.become(waiting)
-      log.warning("sinkActor {} terminated", sinkActor)
+      log.warning("sinkActor {} terminated", sink)
     }
-    
     case x: A ⇒ callStream forward x
   }
 
@@ -158,26 +156,22 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSinkActor: SinkActor) ex
   	* @see [[http://doc.akka.io/api/akka/current/#akka.actor.Terminated Terminated]]
   	*/
   def waiting: Receive = {
-
     case Terminated(actor) ⇒ {
-      context.parent ! SinkActor(null, sinkActor.name)
-      context.unwatch(sinkActor.ref)
-      log.warning("sinkActor {} terminated while not ready", sinkActor)
+      context.parent ! SinkActor(null, sink.name)
+      context.unwatch(sink.ref)
+      log.warning("sinkActor {} terminated while not ready", sink)
     }
-
     case newSink: SinkActor => {
-      sinkActor = newSink
+      sink = newSink
       callStream = createCallStream(newSink.ref)
       unstashAll()
       context.become(ready)
     }    
-
     case x: A ⇒ stash()
   }
 
   /** receive is ready for normal processing, waiting while updating ActorRef for Sink	*/
   def receive = ready
-
 }
 
 object ParallelCallSupervisor {

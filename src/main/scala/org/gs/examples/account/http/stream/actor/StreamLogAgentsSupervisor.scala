@@ -22,15 +22,15 @@ import akka.actor.{Actor,
   Props,
   OneForOneStrategy,
   SupervisorStrategy}
+import akka.actor.SupervisorStrategy.{Escalate, Restart, Resume, Stop}
 import akka.event.LoggingAdapter
 import akka.stream.{Materializer, OverflowStrategy}
 import akka.stream.scaladsl.{Sink, Source}
 import com.twitter.algebird.{CMSHasher, DecayedValue, DecayedValueMonoid, HLL, QTreeSemigroup}
 import com.twitter.algebird.CMSHasherImplicits._
+import java.util.MissingResourceException
 import scala.concurrent.duration._
 import scala.reflect.runtime.universe.TypeTag
-//import org.gs.actor.LogLeftSendRightActor
-//import org.gs.actor.LogLeftSendRightActor._
 import org.gs.algebird.BigDecimalField
 import org.gs.algebird.cmsHasherBigDecimal
 import org.gs.algebird.agent.Agents
@@ -47,7 +47,7 @@ import ParallelCallSupervisor.props
 import ParallelCallSupervisor.SinkActor
 import StreamLogAgentsSupervisor.ResultsActor
 
-/** Creates ParallelCallSupervisor, LogLeftSendRightActor, ResultsActor
+/** Creates ParallelCallSupervisor, ResultsActor
   *
   *	Results Runnable Graph
   * {{{
@@ -70,7 +70,7 @@ import StreamLogAgentsSupervisor.ResultsActor
   */
 class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLike: TypeTag]
         (agents: Agents[A])
-        (implicit val system: ActorSystem, logger: LoggingAdapter, val materializer: Materializer)
+        (implicit val system: ActorSystem, logger: LoggingAdapter, val mat: Materializer)
         extends Actor with ActorLogging {
 
   val agentsFlow = ParallelApproximators.compositeFlow(agents.avgAgent,
@@ -85,7 +85,6 @@ class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLik
   .via(agentsFlow)
   .to(Sink.ignore)
 
-      
   val errorLoggerName = "errorLogger"
   var errorLogger: ActorRef = null
   val streamSuperName = "streamSuper"
@@ -94,19 +93,18 @@ class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLik
   var results: ActorRef = null
 
   override def preStart() = {
+    log.debug("preStart:{} sink:{} streamSuper:{}", this.toString(), resultsName, streamSuperName)    
     //create children here
     val resultsProps = CallStream.props[Seq[AnyRef]](resultsRunnable)
     results = context.actorOf(resultsProps, resultsName)
-    val sinkActor = SinkActor(results, resultsName)
-    val superProps = ParallelCallSupervisor.props[GetAccountBalances](sinkActor)
+    val sink = SinkActor(results, resultsName)
+    val superProps = ParallelCallSupervisor.props[GetAccountBalances](sink)
     streamSuper = context.actorOf(superProps, streamSuperName)
-    log.debug("preStart {}", this.toString())
   }
 
-  override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
-    super.preRestart(reason, message) // stops children
-    log.error(reason, "Restarting due to [{}] when processing [{}]",
-        reason.getMessage, message.getOrElse(""))
+  override def preRestart(t: Throwable, msg: Option[Any]): Unit = {
+    log.error(t, "preRestart cause [{}] on msg [{}]", t.getMessage, msg.getOrElse(""))
+    super.preRestart(t, msg) // stops children
   }
 
   /** SupervisorStrategy for child actors. Non-escalating errors are logged, these logs should guide
@@ -115,8 +113,10 @@ class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLik
     */
   override val supervisorStrategy =
     OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1.minute) {
-      case _: NullPointerException => SupervisorStrategy.Stop
-      case _: IllegalArgumentException => SupervisorStrategy.Stop
+      case _: MissingResourceException => Restart
+      case _: NullPointerException => Restart
+      case _: IllegalArgumentException => Stop
+      case _: IllegalStateException => Restart
       case t =>
         super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => SupervisorStrategy.Escalate)
     }
