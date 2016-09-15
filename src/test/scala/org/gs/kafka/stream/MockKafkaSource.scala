@@ -26,7 +26,7 @@ import org.apache.kafka.common.errors.{AuthorizationException, WakeupException}
 import scala.concurrent.duration._
 import scala.util.control.NonFatal
 import org.gs.concurrent.calculateDelay
-import org.gs.kafka.stream.KafkaSource.decider
+import KafkaSource.decider
 
 /** A mock version of [[org.gs.kafka.stream.KafkaSource]] to test KafkaSource's exception handling
   *
@@ -40,7 +40,7 @@ class MockKafkaSource[V](iter: Iterator[V], testException: RuntimeException = nu
 
   val out = Outlet[V](s"KafkaSource")
   override val shape = SourceShape(out)
-
+  var testCounter = 0
   /** On downstream pull check if exception injected and throw it, KafkaSink Supervision decides
     * what handler should be used. Supervision.Resume is handled by retrying the poll or commit, up
     * to maxBackoff delay. Supervision.Stop stops the Stage
@@ -106,16 +106,28 @@ class MockKafkaSource[V](iter: Iterator[V], testException: RuntimeException = nu
 /** Create a Mock Kafka Source with KafkaSource Supervision */
 object MockKafkaSource {
 
-  /** Create Kafka Sink as Akka Sink subscribed to configured topic with Supervision
+  /** Create MockKafka Source subscribed to configured topic with Supervision
     * @tparam V value type
     * @param iter test values
     * @param testException injected exception, can be null
   	* @param implicit logger
   	* @return Source[V, NotUsed]
   	*/
-  def apply[V](iter: Iterator[V], testException: RuntimeException)(implicit logger: LoggingAdapter):
+  def apply[V](iter: Iterator[V], testEx: RuntimeException = null)(implicit logger: LoggingAdapter):
         Source[V, NotUsed] = {
-    val source = Source.fromGraph(new MockKafkaSource[V](iter, testException))
+    val source = Source.fromGraph(new MockKafkaSource[V](iter, testEx))
+    source.withAttributes(ActorAttributes.supervisionStrategy(decider))
+  }
+  /** Create MockKafka Source subscribed to configured topic with Supervision
+    * @tparam V value type
+    * @param iter test values
+    * @param ms: MockKafkaSource[V] exposes MockSource for testing
+  	* @param implicit logger
+  	* @return Source[V, NotUsed]
+  	*/
+  def apply[V](iter: Iterator[V], ms: MockKafkaSource[V])(implicit logger: LoggingAdapter):
+        Source[V, NotUsed] = {
+    val source = Source.fromGraph(ms)
     source.withAttributes(ActorAttributes.supervisionStrategy(decider))
   }
 }

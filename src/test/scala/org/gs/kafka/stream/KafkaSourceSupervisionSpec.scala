@@ -57,7 +57,7 @@ class KafkaSourceSupervisionSpec extends WordSpecLike with Matchers {
   "A MockKafkaSource" should {
     "output all input elements when no exception injected" in {
       val iter: Iterator[String] = nums.toIterator
-      val source = MockKafkaSource[String](iter, null)
+      val source = MockKafkaSource[String](iter)
       val countFuture = source.runWith(TestSink.probe[String])
       .request(10)
       .expectNextN(nums)

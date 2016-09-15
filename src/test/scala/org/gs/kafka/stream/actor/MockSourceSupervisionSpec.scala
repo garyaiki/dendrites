@@ -25,7 +25,6 @@ import java.util.MissingResourceException
 import org.scalatest.{Matchers, WordSpecLike}
 import scala.collection.mutable.ArrayBuffer
 import org.gs.examples.account.GetAccountBalances
-import org.gs.kafka.stream.MockKafkaSource
 import org.gs.stream.actor.CallStreamSupervisor
 import org.gs.stream.actor.CallStreamSupervisor.props
 

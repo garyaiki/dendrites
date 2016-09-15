@@ -47,6 +47,9 @@ import org.gs.kafka.ConsumerConfig
   * Do Not add a consumer to a consumer group while uncommitted messages are being processed. This
   * can cause a rebalancing defeating this trick.
   *
+  * The stream containing KafkaSource and all stages in the stream must use Supervision.Stop (the
+  * default) to ensure Kafka doesn't erroneously commit after an exception.
+  *
   * KafkaConsumer is single threaded and is created and closed with the stream. It's poll and commit
   * block, Akka Stream's default dispatcher may run out of threads, use a blocking dispatcher
   * {{{
