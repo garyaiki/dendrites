@@ -38,7 +38,7 @@ lazy val root = (project in file(".")).
 		   "com.twitter" % "algebird-test_2.11" % algebirdV,
 		   "io.spray" %%  "spray-json" % "1.3.2",
 		   "commons-io" % "commons-io" % "2.5" % "it,test",
-			 "com.chuusai" %% "shapeless" % "2.3.0",
+			 "com.chuusai" %% "shapeless" % "2.3.2",
 			 "org.apache.kafka" % "kafka-clients" % "0.10.0.1",
 			 "com.datastax.cassandra" % "cassandra-driver-core" % "3.1.0",
 			 "com.datastax.cassandra" % "cassandra-driver-mapping" % "3.1.0",
