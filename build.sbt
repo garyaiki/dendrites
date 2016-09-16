@@ -16,7 +16,7 @@ lazy val root = (project in file(".")).
 		libraryDependencies ++= Seq(
 		  "org.scalactic" % "scalactic_2.11" % "3.0.0",
 			"org.scalatest" % "scalatest_2.11" % scalaTestV % "it,test",
-		   "junit" % "junit" % "4.11" % "it,test",
+		   "junit" % "junit" % "4.12" % "it,test",
 		   "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
 		   "com.typesafe.akka" %% "akka-actor" % "2.4.10",
 		   "ch.qos.logback" % "logback-classic" % "1.1.3",
