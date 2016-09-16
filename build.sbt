@@ -19,7 +19,7 @@ lazy val root = (project in file(".")).
 		   "junit" % "junit" % "4.12" % "it,test",
 		   "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
 		   "com.typesafe.akka" %% "akka-actor" % "2.4.10",
-		   "ch.qos.logback" % "logback-classic" % "1.1.3",
+		   "ch.qos.logback" % "logback-classic" % "1.1.7",
   	   "com.typesafe.akka" %% "akka-slf4j" % "2.4.10",
 	     "com.typesafe.akka" %% "akka-remote" % "2.4.10",
 		   "com.typesafe.akka" %% "akka-cluster" % "2.4.10",
