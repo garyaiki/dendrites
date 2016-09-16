@@ -74,9 +74,10 @@ class ResilientStreamSpec extends WordSpecLike {
       .via(spy2)
       val result = sourceUnderTest
         .runWith(TestSink.probe[String])
-        .request(8)
+        .request(9)
         .expectNextUnorderedN(mockVals)
-      spy.pulls shouldBe 1
+      Thread.sleep(100)
+      spy.pulls shouldBe 2
       spy.pushes shouldBe 1
       spy2.pulls shouldBe 8
       spy2.pushes shouldBe 7

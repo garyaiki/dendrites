@@ -64,7 +64,10 @@ class MockSourceSupervisionSpec extends TestKit(ActorSystem("test")) with WordSp
         proxy ! iter.next()
         Thread.sleep(50)
       }
-      sb.toString shouldBe "01456789101112"
+      val result = sb.toString
+      result should startWith ("01")
+      result should endWith ("6789101112")
+      result should not include ("23") //4,5 may or may not be in result
     }
     "stop child actor after exceeding supervisor maxNrOfRetries" in {
       val iter: Iterator[String] = nums.toIterator

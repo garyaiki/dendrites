@@ -37,12 +37,12 @@ class MockAvroProducerSpec extends WordSpecLike {
   val mock = MockProducerConfig
   val topic = mock.topic
   val key = mock.key
-  val producer: MockProducer[String, Array[Byte]] = mock.producer
-  producer.clear()
+
 
   "A MockAvroProducer" should {
     "serialize a case class and send a message" in {
-      producer.history.size shouldBe 0
+      val producer: MockProducer[String, Array[Byte]] = mock.producer
+      producer.clear()
       val bytes = ccToByteArray(schema, gab)
       val record = new ProducerRecord[String, Array[Byte]](topic, key, bytes)
       val kafkaCallback = new Callback() {
@@ -50,12 +50,11 @@ class MockAvroProducerSpec extends WordSpecLike {
           e should be(null)
           meta should not be(null)
           meta.topic should equal(topic)
+			    producer.history().size shouldBe 1
+          producer.close()
         }
       }
       producer.send(record, kafkaCallback)
-      val history = producer.history()
-			history.size shouldBe 1
-      producer.clear()
     }
   }
 }

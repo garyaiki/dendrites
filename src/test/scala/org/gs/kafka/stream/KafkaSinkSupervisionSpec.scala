@@ -78,8 +78,6 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
   val config = ConfigFactory.load()
   val closeTimeout = config.getLong("dendrites.kafka.account.close-timeout")
   val mock = MockProducerConfig
-  val producer: MockProducer[String, Array[Byte]] = mock.producer
-  producer.clear()
   val serializer = new AvroSerializer("getAccountBalances.avsc", ccToByteArray)
 
   val getBals = Seq(GetAccountBalances(0L),
@@ -95,44 +93,43 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
 
   "A MockKafkaSink" should {
     "serialize case classes and MockSink should send them " in {
+      val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
+      Thread.sleep(400)
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, null)
       source.via(serializer).runWith(sink)
-      Thread.sleep(100)
-			val history = producer.history()
-			history.size shouldBe 10
-      producer.clear()
+      Thread.sleep(400)
+			producer.history().size shouldBe 10
+			producer.close()
     }
-
     "handle CorruptRecordException with Supervision.Resume " in {
+      val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new CorruptRecordException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(100)
-			val history = producer.history()
-			history.size shouldBe 3 +- 2
-      producer.clear()
-    }
-
+      Thread.sleep(200)
+			producer.history().size shouldBe 3 +- 2
+			producer.close()
+		}
     "handle UnknownServerException with Supervision.Stop " in {
+      val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new UnknownServerException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(100)
-			val history = producer.history()
-			history.size shouldBe 3 +- 2
-      producer.clear()
-    }
-
+      Thread.sleep(200)
+			producer.history().size shouldBe 3 +- 2
+			producer.close()
+		}
     "handle UnknownTopicOrPartitionException with Supervision.Resume " in {
+      val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
@@ -140,26 +137,24 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
               new UnknownTopicOrPartitionException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(100)
-			val history = producer.history()
-			history.size shouldBe 3 +- 2
-      producer.clear()
-    }
-
+      Thread.sleep(200)
+			producer.history().size shouldBe 3 +- 2
+			producer.close()
+		}
     "handle subclass of InvalidMetadataException with Supervision.Resume " in {
+      val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new NetworkException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(100)
-			val history = producer.history()
-			history.size shouldBe 3 +- 2
-      producer.clear()
-    }
-
+      Thread.sleep(200)
+			producer.history().size shouldBe 3 +- 2
+			producer.close()
+		}
     "handle NotEnoughReplicasAfterAppendException with Supervision.Resume " in {
+      val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
@@ -167,13 +162,12 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
               new NotEnoughReplicasAfterAppendException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(100)
-			val history = producer.history()
-			history.size shouldBe 3 +- 2
-      producer.clear()
-    }
-
+      Thread.sleep(200)
+			producer.history().size shouldBe 3 +- 2
+			producer.close()
+		}
     "handle NotEnoughReplicasException with Supervision.Resume " in {
+      val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
@@ -181,114 +175,105 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
               new NotEnoughReplicasAfterAppendException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(100)
-			val history = producer.history()
-			history.size shouldBe 3 +- 2
-      producer.clear()
-    }
-
+      Thread.sleep(300)
+			producer.history().size shouldBe 3 +- 2
+			producer.close()
+		}
     "handle OffsetOutOfRangeException with Supervision.Resume " in {
+      val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new OffsetOutOfRangeException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(100)
-			val history = producer.history()
-			history.size shouldBe 3 +- 2
-      producer.clear()
-    }
-
+      Thread.sleep(200)
+			producer.history().size shouldBe 3 +- 2
+			producer.close()
+		}
     "handle TimeoutException with Supervision.Resume " in {
+      val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new TimeoutException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(100)
-			val history = producer.history()
-			history.size shouldBe 3 +- 2
-      producer.clear()
-    }
-
+      Thread.sleep(200)
+			producer.history().size shouldBe 3 +- 2
+			producer.close()
+		}
     "handle subclass of RetriableException with Supervision.Resume " in {
+      val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new TimeoutException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(100)
-			val history = producer.history()
-			history.size shouldBe 3 +- 2
-      producer.clear()
-    }
-
+      Thread.sleep(200)
+			producer.history().size shouldBe 4 +- 2
+			producer.close()
+		}
     "handle InvalidTopicException with Supervision.Stop " in {
+      val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new InvalidTopicException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(100)
-			val history = producer.history()
-			history.size shouldBe 3 +- 2
-      producer.clear()
-    }
-
+      Thread.sleep(300)
+			producer.history().size shouldBe 3 +- 2
+			producer.close()
+		}
     "handle OffsetMetadataTooLarge with Supervision.Stop " in {
+      val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new OffsetMetadataTooLarge("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(100)
-			val history = producer.history()
-			history.size shouldBe 3 +- 2
-      producer.clear()
-    }
-
+      Thread.sleep(300)
+			producer.history().size shouldBe 3 +- 2
+			producer.close()
+		}
     "handle RecordBatchTooLargeException with Supervision.Stop " in {
+      val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new RecordBatchTooLargeException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(100)
-			val history = producer.history()
-			history.size shouldBe 3 +- 2
-      producer.clear()
-    }
-
+      Thread.sleep(300)
+			producer.history().size shouldBe 3 +- 2
+			producer.close()
+		}
     "handle RecordTooLargeException with Supervision.Stop " in {
+      val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new RecordTooLargeException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(100)
-			val history = producer.history()
-			history.size shouldBe 3 +- 2
-      producer.clear()
-    }
-
+      Thread.sleep(300)
+			producer.history().size shouldBe 3 +- 2
+			producer.close()
+		}
     "handle KafkaException with Supervision.Stop " in {
+      val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
       val sink = MockKafkaSink[String, Array[Byte]](mock, new KafkaException("test"))
           
       source.via(serializer).runWith(sink)
-      Thread.sleep(100)
-			val history = producer.history()
-			history.size shouldBe 3 +- 2
-      producer.clear()
-    }
+      Thread.sleep(300)
+			producer.history().size shouldBe 3 +- 2
+			producer.close()
+		}
   }
 }

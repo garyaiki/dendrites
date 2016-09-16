@@ -63,9 +63,7 @@ package object stream {
     */
   def queueRecords[K, V](it: Iterator[ConsumerRecord[K, V]]): Queue[ConsumerRecord[K, V]] = {
     val queue = Queue.newBuilder[ConsumerRecord[K, V]]
-    while(it.hasNext) {
-      queue += it.next()
-    }
+    it foreach(cr => queue += cr)
     queue.result()
   }
 
@@ -96,28 +94,76 @@ package object stream {
           Flow[ConsumerRecords[K, V]].map(extractRecords[K, V])
 
   /** Like extract records but unzips them into 2 queues of ConsumerRecord, separated by partition
-    * Use this when there are 2 topic partitions and they should be processed separately
+    * Use this when there are 2 topic partitions to be processed separately
     *
     * @tparam K key type
     * @tparam V value type
     * @param records ConsumerRecords returned from Kafka consumer poll
     * @return tuple2 of queue of ConsumerRecord
     */
-  def unzipRecords[K, V](records: ConsumerRecords[K,V]): (Queue[ConsumerRecord[K, V]],
-          Queue[ConsumerRecord[K, V]]) = {
+  def unzip2PartitionQs[K, V](records: ConsumerRecords[K,V]): 
+          (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]) = {
     val partitions = records.partitions()
     require(partitions.size() == 2)
     val buff = new ArrayBuffer[TopicPartition](2)
-    val it = partitions.iterator()
-    while(it.hasNext()) {
-      buff += it.next()
-    }
+    val it = partitions.iterator().asScala
+    it foreach(tp => buff += tp)
     val l0 = records.records(buff(0))
     val ab0 = l0.asScala
     val l1 = records.records(buff(1))
     val ab1 = l1.asScala
-    (queueRecords(ab0.iterator), queueRecords(ab0.iterator))
+    (queueRecords(ab0.iterator), queueRecords(ab1.iterator))
   }
+
+  /** Flow to map ConsumerRecords to a Queue of ConsumerRecord for each of 2 partitions. This allows
+    * a Stream to pull one ConsumerRecord at a time for both partitions in parallel
+    *
+    * @tparam K key type
+    * @tparam V value type
+    * @return a tuple2 of queues of ConsumerRecord
+    * @see [[org.gs.examples.account]]
+    */
+  def dualConsumerRecordsFlow[K, V]: Flow[ConsumerRecords[K, V],
+            (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]), NotUsed] =
+          Flow[ConsumerRecords[K, V]].map(unzip2PartitionQs[K, V])
+
+  /** Like extract records but unzips them into 3 queues of ConsumerRecord, separated by partition
+    * Use this when there are 3 topic partitions to be processed separately
+    *
+    * @tparam K key type
+    * @tparam V value type
+    * @param records ConsumerRecords returned from Kafka consumer poll
+    * @return tuple3 of queue of ConsumerRecord
+    */
+  def unzip3PartitionQs[K, V](records: ConsumerRecords[K,V]): 
+          (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]) =
+          {
+    val partitions = records.partitions()
+    require(partitions.size() == 3)
+    val buff = new ArrayBuffer[TopicPartition](3)
+    val it = partitions.iterator().asScala
+    it foreach(tp => buff += tp)
+
+    val l0 = records.records(buff(0))
+    val ab0 = l0.asScala
+    val l1 = records.records(buff(1))
+    val ab1 = l1.asScala
+    val l2 = records.records(buff(2))
+    val ab2 = l2.asScala
+    (queueRecords(ab0.iterator), queueRecords(ab1.iterator), queueRecords(ab2.iterator))
+  }
+
+  /** Flow to map ConsumerRecords to a Queue of ConsumerRecord for each of 3 partitions. This allows
+    * a Stream to pull one ConsumerRecord at a time for all partitions in parallel
+    *
+    * @tparam K key type
+    * @tparam V value type
+    * @return a tuple3 of queues of ConsumerRecord
+    * @see [[org.gs.examples.account]]
+    */
+  def tripleConsumerRecordsFlow[K, V]: Flow[ConsumerRecords[K, V],
+            (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]),
+                NotUsed] = Flow[ConsumerRecords[K, V]].map(unzip3PartitionQs[K, V]) 
 
   /** Map a ConsumerRecord to just its value */
   def extractValue[K, V](record: ConsumerRecord[K,V]): V = {

@@ -61,17 +61,28 @@ class ConsumerRecordSpec extends WordSpecLike with MockConsumerRecords {
   "ConsumerRecords with 2 TopicPartition2" should {
     "extract 2 queues of ConsumerRecord" in {
       val (pub, sub) = TestSource.probe[ConsumerRecords[String, String]]
-      .via(consumerRecordsFlow[String, String])
-      .toMat(TestSink.probe[Queue[ConsumerRecord[String, String]]])(Keep.both)
+      .via(dualConsumerRecordsFlow[String, String])
+      .toMat(TestSink.probe[(Queue[ConsumerRecord[String, String]], Queue[ConsumerRecord[String, String]])])(Keep.both)
       .run()
       sub.request(1)
-      pub.sendNext(cRecords0)
+      pub.sendNext(cRecords1)
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-      response.size shouldBe 3
+      val partition0Queue = response._1
+      partition0Queue.size shouldBe 3
+      val partition1Queue = response._2
+      partition1Queue.size shouldBe 4
 
-      val (cr0, q1) = response.dequeue
+      val q1Vals = new StringBuilder()
+      partition0Queue foreach( cr => q1Vals.++=(cr.value()))
+      q1Vals.toString() shouldBe "01020"
+
+      val q2Vals = new StringBuilder()
+      partition1Queue foreach( cr => q2Vals.++=(cr.value()))
+      q2Vals.toString() shouldBe "5152535"
+      /*q1Vals.
+      val (cr0, q1) = response._1.dequeue
       q1.size shouldBe 2
       cr0.value() shouldBe "0"
 
@@ -81,7 +92,7 @@ class ConsumerRecordSpec extends WordSpecLike with MockConsumerRecords {
 
       val (cr2, q3) = q2.dequeue
       q3.size shouldBe 0
-      cr2.value() shouldBe "20"
+      cr2.value() shouldBe "20"*/
     }
   }
 }
