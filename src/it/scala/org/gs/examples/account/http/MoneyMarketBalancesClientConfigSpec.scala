@@ -21,7 +21,6 @@ import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
-import org.gs.examples.account.http.actor.CheckingAccountClient._
 import scala.concurrent.ExecutionContext
 import scala.math.BigDecimal.double2bigDecimal
 import org.gs.examples.account.{GetAccountBalances, MoneyMarketAccountBalances}

@@ -31,7 +31,6 @@ import com.twitter.algebird.CMSHasherImplicits._
 import java.util.MissingResourceException
 import scala.concurrent.duration._
 import scala.reflect.runtime.universe.TypeTag
-import org.gs.algebird.BigDecimalField
 import org.gs.algebird.cmsHasherBigDecimal
 import org.gs.algebird.agent.Agents
 import org.gs.algebird.agent.stream.ParallelApproximators
