@@ -1,7 +1,7 @@
 
 lazy val commonSettings = Seq(
 	organization := "org.gs",
-	version := "0.2.0",
+	version := "0.2.1",
 	scalaVersion := "2.11.8"
 )
 lazy val akkaV = "2.4.10"
@@ -21,12 +21,9 @@ lazy val root = (project in file(".")).
 		   "com.typesafe.akka" %% "akka-actor" % "2.4.10",
 		   "ch.qos.logback" % "logback-classic" % "1.1.7",
   	   "com.typesafe.akka" %% "akka-slf4j" % "2.4.10",
-	     "com.typesafe.akka" %% "akka-remote" % "2.4.10",
-		   "com.typesafe.akka" %% "akka-cluster" % "2.4.10",
 		   "com.typesafe.akka" %% "akka-agent" % "2.4.10", 
 		   "com.typesafe.akka" %% "akka-testkit" % "2.4.10" % "it,test",
 		   "com.typesafe.akka" %% "akka-contrib" % "2.4.10",
-		   "com.typesafe.akka" %% "akka-persistence" % "2.4.10",
 			 "com.typesafe.akka" % "akka-stream_2.11" % "2.4.10",
 			 "com.typesafe.akka" % "akka-http-core_2.11" % "2.4.10",
        "com.typesafe.akka" % "akka-http-experimental_2.11" % "2.4.10",
