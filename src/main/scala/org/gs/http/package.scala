@@ -18,12 +18,11 @@ import _root_.akka.actor.ActorSystem
 import _root_.akka.event.LoggingAdapter
 import _root_.akka.http.scaladsl.Http
 import _root_.akka.http.scaladsl.model.{HttpEntity, HttpResponse, HttpRequest}
-import _root_.akka.http.scaladsl.model.StatusCodes._
+import _root_.akka.http.scaladsl.model.StatusCodes.{BadRequest, OK}
 import _root_.akka.http.scaladsl.unmarshalling.Unmarshal
 import _root_.akka.stream.Materializer
 import com.typesafe.config.{Config, ConfigFactory}
-import scala.concurrent.{ExecutionContextExecutor, Future}
-import scala.concurrent.ExecutionContext//.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
 /** Provides Class to create an HostConnectionPool. Also functions to create requests and handle
   * response
@@ -167,7 +166,7 @@ package object http {
     Http().singleRequest(HttpRequest(uri = uriS))
   }
 
-  /**	Map HttpResponse to a Future[Either] Left for error, Right for good result
+  /** Map HttpResponse to a Future[Either] Left for error, Right for good result
     *
     * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.model.HttpResponse HttpResponse]]
     * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.unmarshalling.Unmarshal Unmarshal]]
@@ -206,7 +205,7 @@ package object http {
       }
   }
 
-  /**	Map Future[HttpResponse} to a Future[Either] Left for error, Right for good result
+  /** Map Future[HttpResponse} to a Future[Either] Left for error, Right for good result
     *
     * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.model.HttpResponse HttpResponse]]
     * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.unmarshalling.Unmarshal Unmarshal]]

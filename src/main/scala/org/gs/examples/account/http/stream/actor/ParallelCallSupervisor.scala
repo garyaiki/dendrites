@@ -44,7 +44,7 @@ import org.gs.stream.actor.{CallStream, OtherActor}
 import ParallelCallSupervisor.SinkActor
 
 /** Creates CallStream Actor with a RunnablaGraph composite flow of parallelCallFlow
- 	* logLeftRightFlow, and a Sink, which is an actor receiving the stream's results
+  * logLeftRightFlow, and a Sink, which is an actor receiving the stream's results
   *
   * Watches Sink actor and changes state to waiting when it dies
   *
@@ -55,7 +55,7 @@ import ParallelCallSupervisor.SinkActor
   * bcast ~> savings ~> zip.in2
   * }}}
   *
-  *	@constructor initialized flow and Actor refs
+  * @constructor initialized flow and Actor refs
   * @tparam A <: Product: TypeTag case class or tuple type passed to stream
   * @param initSinkActor: SinkActor case class with ActorRef, name
   * @author Gary Struthers
@@ -67,7 +67,7 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSink: SinkActor) extends
   implicit val ec = system.dispatcher
   implicit val logger = log
   final implicit val mat: ActorMaterializer = ActorMaterializer(ActorMaterializerSettings(system))
-    
+
   val pcf = new ParallelCallFlow()
   val wrappedFlow: Flow[A, Seq[AnyRef], NotUsed] = pcf.wrappedCallsLogLeftPassRightFlow
   val bufferSize = 10
@@ -75,21 +75,21 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSink: SinkActor) extends
   var sink: SinkActor = initSink
   val callStreamName = "CallStream" + typeOf[A].getClass.getSimpleName
   var callStream: ActorRef = null
-  
+
   /** Create a CallStream Actor. First watch the ActorRef of the Sink's target.
     *
-  	* @param sinkRef ActorRef passed to Sink
-  	* @return CallStream ActorRef
-  	*/
+    * @param sinkRef ActorRef passed to Sink
+    * @return CallStream ActorRef
+    */
   def createCallStream(ref: ActorRef): ActorRef = {
     val props = CallStream.props[A](ref, wrappedFlow)
-    context.watch(ref)    
+    context.watch(ref)
     context.actorOf(props, callStreamName)
   }
 
   override def preStart() = {
-    log.debug("preStart:{} callStream:{} sink:{}", this.toString(), callStreamName, sink.name)    
-    //create children here
+    log.debug("preStart:{} callStream:{} sink:{}", this.toString(), callStreamName, sink.name)
+    // create children here
     callStream = createCallStream(sink.ref)
   }
 
@@ -125,13 +125,13 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSink: SinkActor) extends
   /** ready:Receive normal processing
     *
     * Forward messages intended for CallStream
-    *  
+    *
     * Watched actors send Terminated msg when they die. Unwatch it, stop the child that uses it, ask
     * parent supervisor for replacement actor. Then swap actor to waiting
     *
-  	*
-  	* @see [[http://doc.akka.io/api/akka/current/#akka.actor.Terminated Terminated]]
-  	*/
+    *
+    * @see [[http://doc.akka.io/api/akka/current/#akka.actor.Terminated Terminated]]
+    */
   def ready: Receive = {
     case Terminated(actor) ⇒ {
       context.parent ! SinkActor(null, sink.name)
@@ -146,15 +146,15 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSink: SinkActor) extends
   /** waiting Receive state.
     *
     * Stash messages intended for CallStream
-    *  
+    *
     * Watched actors send Terminated msg when they die. Unwatch it, ask parent supervisor for
     * replacement actor.
     *
     * When parent sends a new actor to watch, createCallStream watches it, creates a new
     * CallStream actor, unStashes all messages for CallStream
-  	*
-  	* @see [[http://doc.akka.io/api/akka/current/#akka.actor.Terminated Terminated]]
-  	*/
+    *
+    * @see [[http://doc.akka.io/api/akka/current/#akka.actor.Terminated Terminated]]
+    */
   def waiting: Receive = {
     case Terminated(actor) ⇒ {
       context.parent ! SinkActor(null, sink.name)
@@ -166,17 +166,17 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSink: SinkActor) extends
       callStream = createCallStream(newSink.ref)
       unstashAll()
       context.become(ready)
-    }    
+    }
     case x: A ⇒ stash()
   }
 
-  /** receive is ready for normal processing, waiting while updating ActorRef for Sink	*/
+  /** receive is ready for normal processing, waiting while updating ActorRef for Sink  */
   def receive = ready
 }
 
 object ParallelCallSupervisor {
 
-  case class SinkActor(override val ref: ActorRef, override val name: String) extends OtherActor  
+  case class SinkActor(override val ref: ActorRef, override val name: String) extends OtherActor
 
   def props[A <: Product: TypeTag](sinkActor: SinkActor): Props =
     Props(new ParallelCallSupervisor[A](sinkActor))

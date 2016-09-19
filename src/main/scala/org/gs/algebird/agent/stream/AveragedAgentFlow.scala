@@ -59,10 +59,10 @@ object AveragedAgentFlow {
 
   /** Compose avgFlow & AveragedAgentFlow
     *
-  	*	@tparam A is a Numeric with a TypeTag
-  	* @param avgAgent Akka Agent accumulates AveragedValue
-  	* @return Future for Agents updated value
-  	*/
+    *  @tparam A is a Numeric with a TypeTag
+    * @param avgAgent Akka Agent accumulates AveragedValue
+    * @return Future for Agents updated value
+    */
   def compositeFlow[A: TypeTag: Numeric](avgAgent: AveragedAgent):
           Flow[Seq[A], Future[AveragedValue], NotUsed] = {
     val agnt = new AveragedAgentFlow(avgAgent)
@@ -71,10 +71,10 @@ object AveragedAgentFlow {
 
   /** Compose avgFlow & AveragedAgentFlow & Sink
     *
-  	*	@tparam A is a Numeric with a TypeTag
-  	* @param avgAgent Akka Agent accumulates AveragedValue
-  	* @return Sink that accepts Seq[A]
-  	*/  
+    * @tparam A is a Numeric with a TypeTag
+    * @param avgAgent Akka Agent accumulates AveragedValue
+    * @return Sink that accepts Seq[A]
+    */
   def compositeSink[A: TypeTag: Numeric](avgAgent: AveragedAgent)
           (implicit log: LoggingAdapter, ec: ExecutionContext): Sink[Seq[A], NotUsed] = {
 

@@ -63,7 +63,7 @@ class CassandraSink(session: Session)(implicit val ec: ExecutionContext, logger:
         val resultSetFuture = session.executeAsync(stmt)
         val scalaRSF = listenableFutureToScala[ResultSet](
                 resultSetFuture.asInstanceOf[ListenableFuture[ResultSet]])
-        scalaRSF.onComplete { 
+        scalaRSF.onComplete {
           case Success(rs) => {
             val successCallback = getAsyncCallback{ (_: Unit) => pull(in) }
             successCallback.invoke(rs)
@@ -77,7 +77,7 @@ class CassandraSink(session: Session)(implicit val ec: ExecutionContext, logger:
             }
             failCallback.invoke(t)
           }
-        }        
+        }  
       }
 
       setHandler(in, new InHandler {

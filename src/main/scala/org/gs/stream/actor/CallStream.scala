@@ -21,16 +21,12 @@ import akka.pattern.pipe
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, QueueOfferResult}
 import akka.stream.OverflowStrategy
 import akka.stream.OverflowStrategy.fail
-import akka.stream.QueueOfferResult.Dropped
-import akka.stream.QueueOfferResult.Enqueued
-import akka.stream.QueueOfferResult.Failure
-import akka.stream.QueueOfferResult.QueueClosed
+import akka.stream.QueueOfferResult.{Dropped, Enqueued, Failure, QueueClosed}
 import akka.stream.scaladsl.{Flow, RunnableGraph, Sink, Source, SourceQueueWithComplete}
 import java.util.MissingResourceException
 import scala.concurrent.Future
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe.TypeTag
-import scala.reflect.runtime.universe._
 import CallStream.CompleteMessage
 
 /** Generic Actor that calls a stream in a RunnableGraph. All customization can be in the graph
@@ -43,7 +39,7 @@ import CallStream.CompleteMessage
   * and a Failure message will be received. The original NonFatal exception isn't thrown to the
   * actor. Instead the Actor throws an IllegalStateException and its Supervisor should restart the
   * actor (and its stream). Too many retries should cause the Supervisor to Stop the actor.
-  * 
+  *
   * The graph's Sink can be created with Sink.actorRef. This will forward the sink's input to that
   * actorRef. Other types of Sink also work
   *
@@ -104,10 +100,10 @@ class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) exte
     * message type A is offered to the SourceQueue. The offer result is returned as a
     * Future[QueueOfferResult] and pipeTo this actor. If this message is successfully enqueued, the
     * stream processes it
-    * 
+    *
     * message type QueueOfferResult is passed to offerResultHanlder which logs all types and throws
     * an exception for errors
-    * 
+    *
     * message everythingElse is the fall through and is logged
     */
   def receive = {
@@ -127,7 +123,7 @@ class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) exte
     case m: A => {
           log.debug("receive msg:{} class:{}", m, m.getClass().getName)
           val offerFuture: Future[QueueOfferResult] = rgMaterialized.offer(m)
-          offerFuture pipeTo self          
+          offerFuture pipeTo self
     }
 
     case everythingElse => {
@@ -146,7 +142,7 @@ object CallStream {
     *
     * @param flow Akka stream Flow
     * @return Props to create actor
-  	*/
+    */
   def props[A: TypeTag](runnable: RunnableGraph[SourceQueueWithComplete[A]]): Props = {
     Props(new CallStream[A](runnable))
   }

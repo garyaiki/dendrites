@@ -101,7 +101,7 @@ package object stream {
     * @param records ConsumerRecords returned from Kafka consumer poll
     * @return tuple2 of queue of ConsumerRecord
     */
-  def unzip2PartitionQs[K, V](records: ConsumerRecords[K,V]): 
+  def unzip2PartitionQs[K, V](records: ConsumerRecords[K,V]):
           (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]) = {
     val partitions = records.partitions()
     require(partitions.size() == 2)
@@ -135,7 +135,7 @@ package object stream {
     * @param records ConsumerRecords returned from Kafka consumer poll
     * @return tuple3 of queue of ConsumerRecord
     */
-  def unzip3PartitionQs[K, V](records: ConsumerRecords[K,V]): 
+  def unzip3PartitionQs[K, V](records: ConsumerRecords[K,V]):
           (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]) =
           {
     val partitions = records.partitions()
@@ -163,7 +163,7 @@ package object stream {
     */
   def tripleConsumerRecordsFlow[K, V]: Flow[ConsumerRecords[K, V],
             (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]),
-                NotUsed] = Flow[ConsumerRecords[K, V]].map(unzip3PartitionQs[K, V]) 
+                NotUsed] = Flow[ConsumerRecords[K, V]].map(unzip3PartitionQs[K, V])
 
   /** Map a ConsumerRecord to just its value */
   def extractValue[K, V](record: ConsumerRecord[K,V]): V = {

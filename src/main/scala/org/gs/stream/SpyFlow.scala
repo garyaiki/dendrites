@@ -35,7 +35,7 @@ import org.gs.algebird.stream.avgFlow
 class SpyFlow[A](name: String, var pulls: Int, var pushes: Int)(implicit logger: LoggingAdapter)
         extends GraphStage[FlowShape[A, A]] {
 
-  logger.debug("spyFlow:{} init pulls:{} pushes{}", name, pulls, pushes) 
+  logger.debug("spyFlow:{} init pulls:{} pushes{}", name, pulls, pushes)
 
   val in = Inlet[A]("MonitorStream in")
   val out = Outlet[A]("MonitorStream out")
@@ -47,7 +47,7 @@ class SpyFlow[A](name: String, var pulls: Int, var pushes: Int)(implicit logger:
         override def onPush(): Unit = {
           elem = grab(in)
           pushes += 1
-          logger.debug("spyFlow:{} onPush count:{} elem{}", name, pushes, elem) 
+          logger.debug("spyFlow:{} onPush count:{} elem{}", name, pushes, elem)
           push(out, elem)
         }
       })
@@ -55,7 +55,7 @@ class SpyFlow[A](name: String, var pulls: Int, var pushes: Int)(implicit logger:
       setHandler(out, new OutHandler {
         override def onPull(): Unit = {
           pulls += 1
-          logger.debug("spyFlow:{} onPull count:{}", name, pulls) 
+          logger.debug("spyFlow:{} onPull count:{}", name, pulls)
           pull(in)
         }
       })

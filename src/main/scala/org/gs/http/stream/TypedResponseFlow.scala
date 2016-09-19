@@ -59,8 +59,8 @@ object TypedResponseFlow {
 
   /** Supervision strategy for flows with Unmarshalling functions i.e. map*
     *
-  	* @see [[http://doc.akka.io/api/akka/current/#akka.http.scaladsl.unmarshalling.Unmarshaller$$NoContentException$ NoContentException]]
-  	*/ 
+    * @see [[http://doc.akka.io/api/akka/current/#akka.http.scaladsl.unmarshalling.Unmarshaller$$NoContentException$ NoContentException]]
+    */
   def decider: Supervision.Decider = {
     case NoContentException => Supervision.Resume
     case _  => Supervision.Stop

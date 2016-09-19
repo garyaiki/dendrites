@@ -59,13 +59,13 @@ object QTreeAgentFlow {
 
   /** Compose QTreeAgentFlow & Sink
     *
-  	*	@tparam A is a QTreeLike with a TypeTag
-  	* @param qtAgent Akka Agent builds QTree
-  	* @return Sink that accepts Seq[A]
-  	*/  
+    * @tparam A is a QTreeLike with a TypeTag
+    * @param qtAgent Akka Agent builds QTree
+    * @return Sink that accepts Seq[A]
+    */
   def compositeSink[A: TypeTag: QTreeLike](qtAgent: QTreeAgent[A]): Sink[Seq[A], NotUsed] = {
     val qtAgtFlow = new QTreeAgentFlow(qtAgent)
     val ffg = Flow.fromGraph(qtAgtFlow)
     ffg.to(Sink.ignore).named("SeqToAvgAgentSink")
-  }  
+  }
 }

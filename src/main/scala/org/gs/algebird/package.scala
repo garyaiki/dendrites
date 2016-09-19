@@ -340,9 +340,9 @@ package object algebird {
     * @tparam A: Monoid, element
     * @param xs sequence
     * @return sum or Monoid[A] zero for empty sequence
-		*
+    *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Monoid "Monoid"]]
-		*
+    *
     */
   def sum[A: Monoid](xs: Seq[A]): A = implicitly[Monoid[A]].sum(xs)
 
@@ -368,7 +368,7 @@ package object algebird {
     */
   def minus[A: Group](l: A, r: A): A = implicitly[Group[A]].minus(l, r)
 
-  /** Ring multiplies 2 elements 
+  /** Ring multiplies 2 elements
     *
     * @tparam A: Ring, element
     * @param l

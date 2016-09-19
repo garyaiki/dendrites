@@ -23,8 +23,8 @@ import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
 
 /** Create Agents for Algebird AveragedValue, CountMinSketch, DecayedValue, HyperLogLog, QTree
   *
-  *	@constructor constructs agents and loads Algebird support classes
-  *	@tparam A: Numeric type that can be used with all the agents
+  * @constructor constructs agents and loads Algebird support classes
+  * @tparam A: Numeric type that can be used with all the agents
   * @param name optional agent name
   * @param last optional previous DecayedValue
   * @param init optional initial HLL

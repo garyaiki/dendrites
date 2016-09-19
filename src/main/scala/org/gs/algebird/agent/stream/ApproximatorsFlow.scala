@@ -18,7 +18,7 @@ import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
 import akka.stream.{Materializer, FlowShape, UniformFanOutShape}
-import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, ZipWith}
+import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, ZipWith, ZipWith5}
 import akka.stream.scaladsl.GraphDSL.Implicits._
 import com.twitter.algebird.{AveragedValue, CMS, CMSHasher, DecayedValue, HLL, QTree}
 import scala.reflect.runtime.universe.TypeTag
@@ -40,9 +40,9 @@ import org.gs.algebird.typeclasses.HyperLogLogLike
   * bcast ~> dvt ~> dcaAg ~> zip.in2
   * bcast ~> hll ~> hllAg ~> zip.in3
   * bcast ~> qtrAg        ~> zip.in4
-  *	}}}
-  *  
-  *	@constructor creates graph to update Agents in parallel
+  * }}}
+  *
+  * @constructor creates graph to update Agents in parallel
   * @tparam A: HyperLogLogLike: Numeric: CMSHasher: TypeTag
   * @param avgAgent AveragedAgent
   * @param cmsAgent CountMinSketchAgent
@@ -63,7 +63,8 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
   (implicit val system: ActorSystem, logger: LoggingAdapter, val materializer: Materializer) {
 
   // Zip input agent update Futures, waits for all to complete
-  def zipper = ZipWith((in0: AveragedValue,
+  def zipper: ZipWith5[AveragedValue, CMS[A], Seq[DecayedValue], HLL, QTree[A],
+          (AveragedValue, CMS[A], Seq[DecayedValue], HLL, QTree[A])] = ZipWith((in0: AveragedValue,
                         in1: CMS[A],
                         in2: Seq[DecayedValue],
                         in3: HLL,

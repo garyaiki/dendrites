@@ -75,7 +75,7 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
     * Then poll Kafka, this also blocks. If poll returns an empty ConsumerRecords do nothing, if it
     * contains records, push ConsumerRecords to the next stage
     *
-	  * @constructor sets up Supervision with exponential backoff
+    * @constructor sets up Supervision with exponential backoff
     * @param inheritedAttributes
     */
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
@@ -148,16 +148,16 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
   }
 }
 
-/** Create a configured Kafka Source that is subscribed to topics and has a Supervision Strategy*/
+/** Create a configured Kafka Source that is subscribed to topics and has a Supervision Strategy */
 object KafkaSource {
 
   /** Create Kafka Sink as Akka Sink subscribed to configured topic with Supervision
     * @tparam K key type
     * @tparam V value type
-  	* @param consumer configuration object
-  	* @param implicit logger
-  	* @return Source[ConsumerRecords[K, V], NotUsed]
-  	*/
+    * @param consumer configuration object
+    * @param implicit logger
+    * @return Source[ConsumerRecords[K, V], NotUsed]
+    */
   def apply[K, V](consumer: ConsumerConfig[K, V])
           (implicit ec: ExecutionContext, logger: LoggingAdapter):
                 Source[ConsumerRecords[K, V], NotUsed] = {
@@ -167,12 +167,12 @@ object KafkaSource {
 
   /** Supervision strategy
     *
-  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/CommitFailedException.html CommitFailedException]]
-  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/WakeupException.html WakeupException]]
-  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/AuthorizationException.html AuthorizationException]]
+    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/CommitFailedException.html CommitFailedException]]
+    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/WakeupException.html WakeupException]]
+    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/AuthorizationException.html AuthorizationException]]
     * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/InvalidOffsetException.html InvalidOffsetException]]
-  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/KafkaException.html KafkaException]]
-  	*/ 
+    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/KafkaException.html KafkaException]]
+    */
   def decider: Supervision.Decider = {
     case _: CommitFailedException => Supervision.Resume // Can't commit current poll
     case _: WakeupException => Supervision.Resume // poll interrupted

@@ -41,7 +41,7 @@ class CheckingCallFlow(implicit ec: ExecutionContext,
   val requestPath = clientConfig.requestPath
   val queryFlow = new TypedQueryFlow(baseURL, requestPath, caseClassToGetQuery)
   val responseFlow = new TypedResponseFlow(mapPlain, mapChecking)
-  
+
   val tqr = new TypedQueryResponseFlow(queryFlow, responseFlow)
 
   def flow: Flow[Product, Either[String, AnyRef], NotUsed] = {

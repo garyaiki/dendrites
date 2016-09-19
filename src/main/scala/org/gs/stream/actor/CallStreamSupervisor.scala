@@ -27,7 +27,8 @@ import akka.stream.OverflowStrategy.fail
 import akka.stream.scaladsl.{Flow, RunnableGraph, SourceQueueWithComplete}
 import java.util.MissingResourceException
 import scala.concurrent.duration._
-import scala.reflect.runtime.universe._
+import scala.reflect.runtime.universe.TypeTag
+import scala.reflect.runtime.universe.typeOf
 
 /** Creates CallStream Actor with a RunnablaGraph. Forwards messages to CallStream actor. Supervisor
   * Restarts, Stops, or Escalates
@@ -43,15 +44,15 @@ class CallStreamSupervisor[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete
   implicit val ec = system.dispatcher
   implicit val logger = log
   final implicit val mat: ActorMaterializer = ActorMaterializer(ActorMaterializerSettings(system))
-    
+
   val bufferSize = 10
   val overflowStrategy = OverflowStrategy.fail
   val callStreamName = "CallStream" + typeOf[A].getClass.getSimpleName
   var callStream: ActorRef = null
-  
+
   override def preStart() = {
-    log.debug("preStart {} callStream:{}", this.toString(), callStreamName)    
-    //create children here
+    log.debug("preStart {} callStream:{}", this.toString(), callStreamName)
+    // create children here
     val props = CallStream.props[A](rg)
     callStream = context.actorOf(props, callStreamName)
   }

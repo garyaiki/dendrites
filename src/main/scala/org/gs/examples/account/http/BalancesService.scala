@@ -43,41 +43,41 @@ trait BalancesProtocols extends DefaultJsonProtocol {
   implicit val mat: Materializer
 
   /** Unmarshall HttpEntity result
-  	* @param entity
-  	* @return Future case class
-  	* @see [[http://doc.akka.io/api/akka/current/#akka.http.scaladsl.unmarshalling.Unmarshaller$$NoContentException$ NoContentException]]
-  	* @throws NoContentException
-  	*/
+    * @param entity
+    * @return Future case class
+    * @see [[http://doc.akka.io/api/akka/current/#akka.http.scaladsl.unmarshalling.Unmarshaller$$NoContentException$ NoContentException]]
+    * @throws NoContentException
+    */
   def mapChecking(entity: HttpEntity): Future[Right[String, AnyRef]] = {
     Unmarshal(entity).to[CheckingAccountBalances[BigDecimal]].map(Right(_))
   }
 
   /** Unmarshall HttpEntity error
-  	* @param entity
-  	* @return Future error message
-  	* @see [[http://doc.akka.io/api/akka/current/#akka.http.scaladsl.unmarshalling.Unmarshaller$$NoContentException$ NoContentException]]
-  	* @throws NoContentException
-  */
+    * @param entity
+    * @return Future error message
+    * @see [[http://doc.akka.io/api/akka/current/#akka.http.scaladsl.unmarshalling.Unmarshaller$$NoContentException$ NoContentException]]
+    * @throws NoContentException
+    */
   def mapPlain(entity: HttpEntity): Future[Left[String, Nothing]] = {
     Unmarshal(entity).to[String].map(Left(_))
   }
 
   /** Unmarshall HttpEntity result
-  	* @param entity
-  	* @return Future case class
-  	* @see [[http://doc.akka.io/api/akka/current/#akka.http.scaladsl.unmarshalling.Unmarshaller$$NoContentException$ NoContentException]]
-  	* @throws NoContentException
-  	*/
+    * @param entity
+    * @return Future case class
+    * @see [[http://doc.akka.io/api/akka/current/#akka.http.scaladsl.unmarshalling.Unmarshaller$$NoContentException$ NoContentException]]
+    * @throws NoContentException
+    */
   def mapMoneyMarket(entity: HttpEntity): Future[Right[String, AnyRef]] = {
     Unmarshal(entity).to[MoneyMarketAccountBalances[BigDecimal]].map(Right(_))
   }
 
   /** Unmarshall HttpEntity result
-  	* @param entity
-  	* @return Future case class
-  	* @see [[http://doc.akka.io/api/akka/current/#akka.http.scaladsl.unmarshalling.Unmarshaller$$NoContentException$ NoContentException]]
-  	* @throws NoContentException
-  	*/
+    * @param entity
+    * @return Future case class
+    * @see [[http://doc.akka.io/api/akka/current/#akka.http.scaladsl.unmarshalling.Unmarshaller$$NoContentException$ NoContentException]]
+    * @throws NoContentException
+    */
   def mapSavings(entity: HttpEntity): Future[Right[String, AnyRef]] = {
     Unmarshal(entity).to[SavingsAccountBalances[BigDecimal]].map(Right(_))
   }
@@ -85,7 +85,7 @@ trait BalancesProtocols extends DefaultJsonProtocol {
 
 /** Example Rest/microserver using Akka Http DSL. Valid routes call accessors for dummy data
   *
-  */ 
+  */
 trait BalancesService extends BalancesProtocols {
   implicit val system: ActorSystem
   implicit def executor: ExecutionContextExecutor

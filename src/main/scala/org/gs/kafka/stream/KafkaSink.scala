@@ -34,7 +34,7 @@ import org.apache.kafka.common.errors.{CorruptRecordException, // Retriable exce
   TimeoutException,
   UnknownTopicOrPartitionException,
   RetriableException}
-import org.apache.kafka.common.errors.{InvalidTopicException, //Stopping exceptions
+import org.apache.kafka.common.errors.{InvalidTopicException, // Stopping exceptions
   OffsetMetadataTooLarge,
   RecordBatchTooLargeException,
   RecordTooLargeException,
@@ -167,10 +167,10 @@ object KafkaSink {
     *
     * @tparam K key type
     * @tparam V value type
-  	* @param producer configuration object
- 		* @param implicit logger
-  	* @return Sink[V, NotUsed]
-  	*/
+    * @param producer configuration object
+    * @param implicit logger
+    * @return Sink[V, NotUsed]
+    */
   def apply[K, V](producer: ProducerConfig[K, V])(implicit logger: LoggingAdapter):
           Sink[V, NotUsed] = {
     val sink = Sink.fromGraph(new KafkaSink[K, V](producer))
@@ -178,22 +178,22 @@ object KafkaSink {
   }
 
   /** Supervision strategy
-   	*
-  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/InvalidTopicException.html InvalidTopicException]]
-  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/OffsetMetadataTooLarge.html OffsetMetadataTooLarge]]
-  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/RecordBatchTooLargeException.html RecordBatchTooLargeException]]
-  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/RecordTooLargeException.html RecordTooLargeException]]
-  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/UnknownServerException.html UnknownServerException]]
-  	* Retriable exceptions (transient, may be covered by increasing #.retries):
-  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/CorruptRecordException.html CorruptRecordException]]
-  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/InvalidMetadataException.html InvalidMetadataException]]
-  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/NotEnoughReplicasAfterAppendException.html NotEnoughReplicasAfterAppendException]]
-  	* NotEnoughReplicasAfterAppendException @note retries cause duplicates
-  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/NotEnoughReplicasException.html NotEnoughReplicasException]]
-  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/OffsetOutOfRangeException.html OffsetOutOfRangeException]]
-  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/TimeoutException.html TimeoutException]]
-  	* @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/UnknownTopicOrPartitionException.html UnknownTopicOrPartitionException]]
-		*/
+    *
+    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/InvalidTopicException.html InvalidTopicException]]
+    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/OffsetMetadataTooLarge.html OffsetMetadataTooLarge]]
+    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/RecordBatchTooLargeException.html RecordBatchTooLargeException]]
+    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/RecordTooLargeException.html RecordTooLargeException]]
+    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/UnknownServerException.html UnknownServerException]]
+    * Retriable exceptions (transient, may be covered by increasing #.retries):
+    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/CorruptRecordException.html CorruptRecordException]]
+    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/InvalidMetadataException.html InvalidMetadataException]]
+    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/NotEnoughReplicasAfterAppendException.html NotEnoughReplicasAfterAppendException]]
+    * NotEnoughReplicasAfterAppendException @note retries cause duplicates
+    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/NotEnoughReplicasException.html NotEnoughReplicasException]]
+    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/OffsetOutOfRangeException.html OffsetOutOfRangeException]]
+    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/TimeoutException.html TimeoutException]]
+    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/UnknownTopicOrPartitionException.html UnknownTopicOrPartitionException]]
+    */
   def decider: Supervision.Decider = {
     case _: CorruptRecordException => Supervision.Resume
     case _: UnknownServerException => Supervision.Stop // subclass of InvalidMetadataException

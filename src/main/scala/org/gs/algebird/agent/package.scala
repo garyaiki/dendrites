@@ -20,4 +20,4 @@ package org.gs.algebird
   * @author Gary Struthers
   *
   */
-package object agent { }
+package object agent

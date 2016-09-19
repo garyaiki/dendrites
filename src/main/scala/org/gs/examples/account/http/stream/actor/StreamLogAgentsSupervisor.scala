@@ -35,7 +35,6 @@ import org.gs.algebird.cmsHasherBigDecimal
 import org.gs.algebird.agent.Agents
 import org.gs.algebird.agent.stream.ParallelApproximators
 import org.gs.algebird.agent.stream.DecayedValueAgentFlow.nowMillis
-import org.gs.algebird.agent.stream.ParallelApproximators._
 import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
 import org.gs.examples.account.GetAccountBalances
 import org.gs.examples.account.stream.extractBalancesFlow
@@ -48,16 +47,16 @@ import StreamLogAgentsSupervisor.ResultsActor
 
 /** Creates ParallelCallSupervisor, ResultsActor
   *
-  *	Results Runnable Graph
+  * Results Runnable Graph
   * {{{
-  *																								agentsFlow
-  *  																			  bcast ~> avg ~> zip.in0
-  * 																				bcast ~> cms ~> zip.in1
-  * sourceQueue ~> 	extractBalancesFlow ~>  bcast ~> dvt ~> zip.in2 ~> sink
-  * 																				bcast ~> hll ~> zip.in3
-  * 																				bcast ~> qtrAg ~> zip.in4
+  *                                               agentsFlow
+  *                                         bcast ~> avg ~> zip.in0
+  *                                         bcast ~> cms ~> zip.in1
+  * sourceQueue ~>   extractBalancesFlow ~> bcast ~> dvt ~> zip.in2 ~> sink
+  *                                         bcast ~> hll ~> zip.in3
+  *                                         bcast ~> qtrAg ~> zip.in4
   * }}}
-  *	@constructor creates RunnableGraph for results then creates CallStream child actor for it
+  * @constructor creates RunnableGraph for results then creates CallStream child actor for it
   * @tparam A: CMSHasher: HyperLogLogLike: Numeric: QTreeLike: TypeTag
   * @param agents Algebird approximator agents
   * @param system implicit ActorSystem
@@ -93,7 +92,7 @@ class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLik
 
   override def preStart() = {
     log.debug("preStart:{} sink:{} streamSuper:{}", this.toString(), resultsName, streamSuperName)    
-    //create children here
+    // create children here
     val resultsProps = CallStream.props[Seq[AnyRef]](resultsRunnable)
     results = context.actorOf(resultsProps, resultsName)
     val sink = SinkActor(results, resultsName)

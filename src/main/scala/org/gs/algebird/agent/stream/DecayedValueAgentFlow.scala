@@ -59,23 +59,22 @@ object DecayedValueAgentFlow {
 
   /** Generate a time value as a Double
     *
-		* tparam A: Numeric : TypeTag
-  	* @param ignore is same numeric type passed to flow, this function ignores it
-  	* @return Now as a Double
-  	*/
+    * tparam A: Numeric : TypeTag
+    * @param ignore is same numeric type passed to flow, this function ignores it
+    * @return Now as a Double
+    */
   def nowMillis[A: Numeric : TypeTag](ignore: A = null): Double = Instant.now.toEpochMilli.toDouble
 
   /** Compose ZipTimeFlow & dvFlow & DecayedValueAgentFlow
     *
-  	*	@tparam A Numeric that has implicit conversions to Double with a TypeTag
-  	* @param dvAgent Akka Agent accumulates DecayedValues
-  	* @param time function that adds time value, needed by DecayedValue
-  	* @return Future for Agents updated value
-  	*/
+    * @tparam A Numeric that has implicit conversions to Double with a TypeTag
+    * @param dvAgent Akka Agent accumulates DecayedValues
+    * @param time function that adds time value, needed by DecayedValue
+    * @return Future for Agents updated value
+    */
   def compositeFlow[A: TypeTag : Numeric](dvAgent: DecayedValueAgent, time:A => Double):
           Flow[Seq[A], Future[Seq[DecayedValue]], NotUsed] = {
 
-    
     val zt = new ZipTimeFlow[A](time)
     val ffg = Flow.fromGraph(zt)
     val dvAgtFlow = new DecayedValueAgentFlow(dvAgent)
@@ -84,11 +83,11 @@ object DecayedValueAgentFlow {
 
   /** Compose ZipTimeFlow & dvFlow & DecayedValueAgentFlow & Sink
     *
-  	*	@tparam A Numeric that has implicit conversions to Double with a TypeTag
-  	* @param dvAgent Akka Agent accumulates DecayedValues
-  	* @param time function that adds time value, needed by DecayedValue
-  	* @return Sink that accepts Seq[A]
-  	*/  
+    * @tparam A Numeric that has implicit conversions to Double with a TypeTag
+    * @param dvAgent Akka Agent accumulates DecayedValues
+    * @param time function that adds time value, needed by DecayedValue
+    * @return Sink that accepts Seq[A]
+    */  
   def compositeSink[A: TypeTag: Numeric](dvAgent: DecayedValueAgent,
               time:A => Double): Sink[Seq[A], NotUsed] = {
     compositeFlow(dvAgent, time).to(Sink.ignore)

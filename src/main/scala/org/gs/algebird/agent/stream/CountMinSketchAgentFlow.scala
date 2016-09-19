@@ -60,10 +60,10 @@ object CountMinSketchAgentFlow {
 
   /** Compose cmsFlow & CountMinSketchAgentFlow
     *
-  	*	@tparam A a Numeric that has conversions to CMSHasher with a TypeTag
-  	* @param cmsAgt Akka Agent accumulates CountMinSketch
-  	* @return Future for Agents updated value
-  	*/
+    * @tparam A a Numeric that has conversions to CMSHasher with a TypeTag
+    * @param cmsAgt Akka Agent accumulates CountMinSketch
+    * @return Future for Agents updated value
+    */
   def compositeFlow[A: TypeTag: Numeric: CMSHasher](cmsAgt: CountMinSketchAgent[A]):
           Flow[Seq[A], Future[CMS[A]], NotUsed] = {
     val cmsFlow = new CreateCMSFlow[A]()
@@ -74,10 +74,10 @@ object CountMinSketchAgentFlow {
 
   /** Compose cmsFlow & CountMinSketchAgentFlow & Sink
     *
-  	*	@tparam A a Numeric that has conversions to CMSHasher with a TypeTag
-  	* @param cmsAgt Akka Agent accumulates CountMinSketch
-  	* @return Sink that accepts Seq[A]
-  	*/  
+    * @tparam A a Numeric that has conversions to CMSHasher with a TypeTag
+    * @param cmsAgt Akka Agent accumulates CountMinSketch
+    * @return Sink that accepts Seq[A]
+    */
   def compositeSink[A: TypeTag: Numeric: CMSHasher](cmsAgt: CountMinSketchAgent[A]):
           Sink[Seq[A], NotUsed] = {
     compositeFlow(cmsAgt).to(Sink.ignore)

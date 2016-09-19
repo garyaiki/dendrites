@@ -19,7 +19,7 @@ import org.apache.avro.Schema
 import org.apache.avro.generic.{GenericData, GenericDatumReader, GenericDatumWriter, GenericRecord}
 import org.apache.avro.io.{Decoder, DecoderFactory, Encoder, EncoderFactory}
 import scala.io.Source
-import scala.io.Source._
+import scala.io.Source.fromInputStream
 
 /** Avro serializer/deserializer functions
   *

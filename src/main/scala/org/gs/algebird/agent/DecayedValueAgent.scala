@@ -28,7 +28,7 @@ import org.gs.algebird.toDecayedValues
   * @param ec implicit execution context for future
   * @param monoid implicit DecayedValueMonoid to scan from initial value
   *
-	* @example [[org.gs.algebird.agent.stream.DecayedValueAgentFlow]]
+  * @example [[org.gs.algebird.agent.stream.DecayedValueAgentFlow]]
   * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]
   * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValue DecayedValue]]
   * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValueMonoid DecayedValueMonoid]]

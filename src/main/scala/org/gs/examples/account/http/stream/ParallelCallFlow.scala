@@ -31,11 +31,11 @@ import org.gs.stream.logLeftRightFlow
   * bcast ~> mm ~> zip.in1
   * bcast ~> savings ~> zip.in2
   * }}}
-  *	composite flow
+  * composite flow
   * {{{
   * parallelCallFlow ~> leftRightFlow
   * }}}
-  *	composite flow with logging
+  * composite flow with logging
   * {{{
   * parallelCallFlow ~> logLeftRightFlow
   * }}}

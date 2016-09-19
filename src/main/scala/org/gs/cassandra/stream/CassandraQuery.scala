@@ -61,7 +61,7 @@ class CassandraQuery(session: Session, fetchSize: Int = 0)(implicit val ec: Exec
         val resultSetFuture = session.executeAsync(stmt)
         val scalaRSF = listenableFutureToScala[ResultSet](
                 resultSetFuture.asInstanceOf[ListenableFuture[ResultSet]])
-        scalaRSF.onComplete { 
+        scalaRSF.onComplete {
           case Success(rs) => {
             val successCallback = getAsyncCallback{ (_: Unit) => push(out, rs) }
             successCallback.invoke(rs)
@@ -75,7 +75,7 @@ class CassandraQuery(session: Session, fetchSize: Int = 0)(implicit val ec: Exec
             }
             failCallback.invoke(t)
           }
-        }       
+        }
       }
 
       setHandler(in, new InHandler {

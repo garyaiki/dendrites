@@ -18,7 +18,7 @@ import java.util.Properties
 
 /** Utility functions for case classes and Properties files
   *
-  *	== ccToMap ==
+  * == ccToMap ==
   *  Case class fields to map of field names and values
   * {{{
   * val kvMap = ccToMap(cc)
@@ -27,7 +27,7 @@ import java.util.Properties
   * }
   * }}}
   *
-  *	== isElementEqual ==
+  * == isElementEqual ==
   *  Is case class field at index a specified type
   * {{{
   * system.actorOf(props) ! GetCustomerAccountBalances(2, Set(Checking, Savings, MoneyMarket))
