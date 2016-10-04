@@ -14,10 +14,11 @@ limitations under the License.
 */
 package org.gs.kafka.stream
 
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
-import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.Keep
+import akka.stream.{ActorMaterializer, ClosedShape, FanOutShape2, FanOutShape3, FlowShape, UniformFanOutShape}
+import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Keep, Merge, RunnableGraph, Source, Sink, Unzip, UnzipWith, UnzipWith3}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import java.util.{List => JList}
 import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords}
@@ -58,7 +59,7 @@ class ConsumerRecordSpec extends WordSpecLike with MockConsumerRecords {
     }
   }
   
-  "ConsumerRecords with 2 TopicPartition2" should {
+  "ConsumerRecords with 2 TopicPartition" should {
     "extract 2 queues of ConsumerRecord" in {
       val (pub, sub) = TestSource.probe[ConsumerRecords[String, String]]
       .via(dualConsumerRecordsFlow[String, String])
@@ -81,18 +82,61 @@ class ConsumerRecordSpec extends WordSpecLike with MockConsumerRecords {
       val q2Vals = new StringBuilder()
       partition1Queue foreach( cr => q2Vals.++=(cr.value()))
       q2Vals.toString() shouldBe "5152535"
-      /*q1Vals.
-      val (cr0, q1) = response._1.dequeue
-      q1.size shouldBe 2
-      cr0.value() shouldBe "0"
+    }
+    "extract tuple2 of String" in {
+      val g2 = RunnableGraph.fromGraph(GraphDSL.create() { implicit b: GraphDSL.Builder[NotUsed] ⇒
+        import GraphDSL.Implicits._
+        import scala.language.postfixOps
+        val uz = Unzip[String, String]
+        val unzip = b.add(uz)
+        val source = Source.single("hello")
+        val two = Flow.fromFunction[String, (String, String)] { x => (x, x) }
+        source ~> two ~> unzip.in
 
-      val (cr1, q2) = q1.dequeue
-      q2.size shouldBe 1
-      cr1.value() shouldBe "10"
+        unzip.out0 ~> Sink.ignore
+        unzip.out1 ~> Sink.ignore
+        ClosedShape
+      }).run()
+    }
+    "extract tuple2 of queues of ConsumerRecord" in {//@FIXME
+      val g2 = RunnableGraph.fromGraph(GraphDSL.create() { implicit b: GraphDSL.Builder[NotUsed] ⇒
+        import GraphDSL.Implicits._
+        import scala.language.postfixOps
+        val dual = b.add(dualConsumerRecordsFlow[String, String])
+        val uz = Unzip[Queue[ConsumerRecord[String, String]], Queue[ConsumerRecord[String, String]]]
+        val unzip = b.add(uz)
+        val source = Source.single(cRecords1)
+        source ~> dual ~> unzip.in
 
-      val (cr2, q3) = q2.dequeue
-      q3.size shouldBe 0
-      cr2.value() shouldBe "20"*/
+        unzip.out0 ~> Sink.ignore
+        unzip.out1 ~> Sink.ignore
+        ClosedShape
+      }).run()
+    }
+    "extract tuple3 of queues of ConsumerRecord" in {
+
+      val g2 = RunnableGraph.fromGraph(GraphDSL.create() { implicit b: GraphDSL.Builder[NotUsed] ⇒
+        import GraphDSL.Implicits._
+        import scala.language.postfixOps
+        val unzip: FanOutShape3[Int, Int, Int, Int] = b.add(UnzipWith[Int, Int, Int, Int]((b: Int) ⇒ (b, b, b)))
+
+        Source(1 to 10) ~> unzip.in
+
+        unzip.out0 ~> Sink.ignore
+        unzip.out1 ~> Sink.ignore
+        unzip.out2 ~> Sink.ignore  
+        ClosedShape
+      }).run()
+      /*
+      val split3Partitions = GraphDSL.create() { implicit b: GraphDSL.Builder[NotUsed] ⇒
+        import GraphDSL.Implicits._
+        import scala.language.postfixOps
+        val unzip: FanOutShape3[Int, Int, Int, Int] = b.add(UnzipWith[Int, Int, Int, Int]((b: Int) ⇒ (b, b, b)))
+
+        Source(1 to 10) ~> unzip.in
+        UniformFanOutShape(unzip.in, unzip.out0, unzip.out1, unzip.out2)
+      }
+*/
     }
   }
 }

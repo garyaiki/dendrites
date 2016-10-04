@@ -101,7 +101,7 @@ package object stream {
     * @param records ConsumerRecords returned from Kafka consumer poll
     * @return tuple2 of queue of ConsumerRecord
     */
-  def unzip2PartitionQs[K, V](records: ConsumerRecords[K,V]):
+  def tuple2PartitionQs[K, V](records: ConsumerRecords[K,V]):
           (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]) = {
     val partitions = records.partitions()
     require(partitions.size() == 2)
@@ -125,7 +125,7 @@ package object stream {
     */
   def dualConsumerRecordsFlow[K, V]: Flow[ConsumerRecords[K, V],
             (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]), NotUsed] =
-          Flow[ConsumerRecords[K, V]].map(unzip2PartitionQs[K, V])
+          Flow[ConsumerRecords[K, V]].map(tuple2PartitionQs[K, V])
 
   /** Like extract records but unzips them into 3 queues of ConsumerRecord, separated by partition
     * Use this when there are 3 topic partitions to be processed separately
@@ -135,7 +135,7 @@ package object stream {
     * @param records ConsumerRecords returned from Kafka consumer poll
     * @return tuple3 of queue of ConsumerRecord
     */
-  def unzip3PartitionQs[K, V](records: ConsumerRecords[K,V]):
+  def tuple3PartitionQs[K, V](records: ConsumerRecords[K,V]):
           (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]) =
           {
     val partitions = records.partitions()
@@ -163,7 +163,7 @@ package object stream {
     */
   def tripleConsumerRecordsFlow[K, V]: Flow[ConsumerRecords[K, V],
             (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]),
-                NotUsed] = Flow[ConsumerRecords[K, V]].map(unzip3PartitionQs[K, V])
+                NotUsed] = Flow[ConsumerRecords[K, V]].map(tuple3PartitionQs[K, V])
 
   /** Map a ConsumerRecord to just its value */
   def extractValue[K, V](record: ConsumerRecord[K,V]): V = {

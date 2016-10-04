@@ -1,4 +1,19 @@
 
+val gitHeadCommitSha = taskKey[String]("Determines the current git commit SHA")
+
+gitHeadCommitSha in ThisBuild := Process("git rev-parse HEAD").lines.head
+
+val makeVersionProperties = taskKey[Seq[File]]("Create version.properties file runtime findable")
+
+makeVersionProperties := {
+  val propFile = (resourceManaged in Compile).value / "version.properties"
+  val content = "version=%s" format (gitHeadCommitSha.value)
+  IO.write(propFile, content)
+  Seq(propFile)
+}
+
+mappings in packageBin in Compile += (baseDirectory.value / "LICENSE.md") -> "dendrites-LICENSE"
+
 lazy val commonSettings = Seq(
 	organization := "org.gs",
 	version := "0.3.0",
@@ -7,6 +22,7 @@ lazy val commonSettings = Seq(
 lazy val akkaV = "2.4.10"
 lazy val scalaTestV = "3.0.0"
 lazy val algebirdV = "0.12.1"
+lazy val cassandraDriverV = "3.1.0"
 lazy val root = (project in file(".")).
   configs(IntegrationTest).
 	settings(commonSettings: _*).
@@ -14,31 +30,30 @@ lazy val root = (project in file(".")).
 	settings(
 		name := "dendrites",
 		libraryDependencies ++= Seq(
-		  "org.scalactic" % "scalactic_2.11" % "3.0.0",
-			"org.scalatest" % "scalatest_2.11" % scalaTestV % "it,test",
-		   "junit" % "junit" % "4.12" % "it,test",
+		  "org.scalactic" %% "scalactic" % "3.0.0",
+			"org.scalatest" %% "scalatest" % scalaTestV % "it,test",
 		   "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
-		   "com.typesafe.akka" %% "akka-actor" % "2.4.10",
-		   "ch.qos.logback" % "logback-classic" % "1.1.7",
-  	   "com.typesafe.akka" %% "akka-slf4j" % "2.4.10",
-		   "com.typesafe.akka" %% "akka-agent" % "2.4.10", 
-		   "com.typesafe.akka" %% "akka-testkit" % "2.4.10" % "it,test",
-			 "com.typesafe.akka" % "akka-stream_2.11" % "2.4.10",
-			 "com.typesafe.akka" % "akka-http-core_2.11" % "2.4.10",
-       "com.typesafe.akka" % "akka-http-experimental_2.11" % "2.4.10",
-			 "com.typesafe.akka" % "akka-stream-testkit_2.11" % "2.4.10",
-       "com.typesafe.akka" % "akka-http-spray-json-experimental_2.11" % "2.4.10",
-			 "com.typesafe.akka" % "akka-http-testkit_2.11" % "2.4.10",
-		   "com.twitter" % "algebird_2.11" % algebirdV,
-		   "com.twitter" % "algebird-core_2.11" % algebirdV,
-		   "com.twitter" % "algebird-test_2.11" % algebirdV,
-		   "io.spray" %%  "spray-json" % "1.3.2",
+       "ch.qos.logback" % "logback-classic" % "1.1.7",
+		   "com.typesafe.akka" %% "akka-actor" % akkaV,
+  	   "com.typesafe.akka" %% "akka-slf4j" % akkaV,
+		   "com.typesafe.akka" %% "akka-agent" % akkaV, 
+		   "com.typesafe.akka" %% "akka-testkit" % akkaV % "it,test",
+			 "com.typesafe.akka" %% "akka-stream" % akkaV,
+			 "com.typesafe.akka" %% "akka-http-core" % akkaV,
+       "com.typesafe.akka" %% "akka-http-experimental" % akkaV,
+			 "com.typesafe.akka" %% "akka-stream-testkit" % akkaV,
+       "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaV,
+			 "com.typesafe.akka" %% "akka-http-testkit" % akkaV,
+		   "com.twitter" %% "algebird" % algebirdV,
+		   "com.twitter" %% "algebird-core" % algebirdV,
+		   "com.twitter" %% "algebird-test" % algebirdV,
+		   "io.spray" %% "spray-json" % "1.3.2",
 		   "commons-io" % "commons-io" % "2.5" % "it,test",
 			 "com.chuusai" %% "shapeless" % "2.3.2",
 			 "org.apache.kafka" % "kafka-clients" % "0.10.0.1",
-			 "com.datastax.cassandra" % "cassandra-driver-core" % "3.1.0",
-			 "com.datastax.cassandra" % "cassandra-driver-mapping" % "3.1.0",
-			 "com.datastax.cassandra" % "cassandra-driver-extras" % "3.1.0",
+			 "com.datastax.cassandra" % "cassandra-driver-core" % cassandraDriverV,
+			 "com.datastax.cassandra" % "cassandra-driver-mapping" % cassandraDriverV,
+			 "com.datastax.cassandra" % "cassandra-driver-extras" % cassandraDriverV,
 			 "org.apache.avro" % "avro" % "1.8.1",
 			 "com.google.guava" % "guava" % "19.0",
 			 "com.google.code.findbugs" % "jsr305" % "3.0.1",
@@ -47,8 +62,6 @@ lazy val root = (project in file(".")).
 		javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
 		scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-feature"),
 		scalacOptions in (Compile, doc) ++= Seq("-doc-root-content", baseDirectory.value+"/root-doc.txt"),
-		resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-		resolvers += "spray repo" at "http://repo.spray.io",
 		resolvers += "ivy2 cache" at "file://"+Path.userHome+"/.ivy2/cache",
 		resolvers += Resolver.jcenterRepo,
 		javaOptions += "-Xmx500M",
