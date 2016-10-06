@@ -14,3 +14,20 @@ A Kafka Source Stream polls Kafka, enqueues records, dequeues single record for 
 When all records have passed completely through the stream, ConsumerRecordQueue pulls from upstream causing KafkaSource to commit the offsets of messages polled and then it polls again.
 
 An exception thrown in the stream (other than a retriable in KafkaSource) should stop the stream. This is default behavior. Stopping the stream means KafkaSource doesn’t commit messages polled so the messages will be polled again.
+
+```scala
+val accountConsumerConfig = AccountConsumer // configures, creates KafkaConsumer
+val dispatcher = ActorAttributes.dispatcher("dendrites.blocking-dispatcher")
+val kafkaSource = KafkaSource[String, Array[Byte]](accountConsumerConfig)
+              .withAttributes(dispatcher)
+val consumerRecordQueue = new ConsumerRecordQueue[String, Array[Byte]]()
+val deserializer = new AvroDeserializer("getAccountBalances.avsc",
+            genericRecordToGetAccountBalances)
+val runnableGraph = kafkaSource
+    .via(consumerRecordsFlow[String, Array[Byte]])
+    .via(consumerRecordQueue)
+    .via(consumerRecordValueFlow)
+    .via(deserializer)
+    .via(userFlows) // custom flows here
+    .to(sink)
+```

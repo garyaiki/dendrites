@@ -3,4 +3,10 @@
 
 [CassandraBind](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/org/gs/cassandra/stream/CassandraBind.scala) flow binds message values to the PreparedStatement with a user defined function. The [BoundStatement](http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/BoundStatement.html) is pushed to the next stage.
 
-[CassandraSink](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/org/gs/cassandra/stream/CassandraSink.scala) is a generic flow that asynchronously executes the BoundStatement. The Java driver immediately returns a [ResultSet Future](http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/ResultSetFuture.html) which extends [Guava ListenableFuture](https://github.com/google/guava/wiki/ListenableFutureExplained). It is converted to a Scala Future and uses its onComplete. Success invokes an Akka Stream [AsyncCallback](http://doc.akka.io/docs/akka/2.4/scala/stream/stream-customize.html#Using_asynchronous_side-channels). Failure invokes an AsyncCallback which fails the stage. The ResultSet is not pushed by the sink. 
+[CassandraSink](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/org/gs/cassandra/stream/CassandraSink.scala) is a generic flow that asynchronously executes the BoundStatement. The Java driver immediately returns a [ResultSet Future](http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/ResultSetFuture.html) which extends [Guava ListenableFuture](https://github.com/google/guava/wiki/ListenableFutureExplained). It is converted to a Scala Future and uses its onComplete. Success invokes an Akka Stream [AsyncCallback](http://doc.akka.io/docs/akka/2.4/scala/stream/stream-customize.html#Using_asynchronous_side-channels). Failure invokes an AsyncCallback which fails the stage. The ResultSet is not pushed by the sink.
+
+```scala
+val bndStmt = new CassandraBind(Playlists.playlistsPrepInsert(session, schema), playlistToBndInsert)
+val sink = new CassandraSink(session)
+val runnableGraph = source.via(bndStmt).to(sink)
+```

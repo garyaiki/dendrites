@@ -8,3 +8,18 @@ Querying [Cassandra](http://cassandra.apache.org) can use mostly generic flows a
 [CassandraPaging](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/org/gs/cassandra/stream/CassandraPaging.scala) is a generic flow that pushes a user specified page size Sequence of [Row](http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/Row.html) from the ResultSet.
 
 A built in Akka Stream map flow takes a user defined function to map Rows to case classes. [ScalaCass](https://github.com/thurstonsand/scala-cass) does the mapping ([example](https://github.com/garyaiki/dendrites/blob/master/src/it/scala/org/gs/cassandra/Playlists.scala))
+
+```scala
+val bndStmt = new CassandraBind(Playlists.playlistsPrepQuery(session, schema),
+                    playlistToBndQuery)
+val query = new CassandraQuery(session)
+val paging = new CassandraPaging(10)
+def toPlaylists: Flow[Seq[Row], Seq[Playlist], NotUsed] =
+                    Flow[Seq[Row]].map(Playlists.rowsToPlaylists)
+
+val runnableGraph = source
+    .via(bndStmt)
+    .via(query).via(paging)
+    .via(toPlaylists)
+    .to(sink)
+```

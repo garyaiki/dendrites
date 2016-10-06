@@ -5,6 +5,6 @@
 
 CallStream is constructed with a runnable graph with any flows and any sink.
 
-CallStreamSupervisor is a generic supervisor that creates CallStream with a RunnableGraph and handles its errors. An error in the stream invokes a Supervision Decider when an error causes the stream to stop, the actor’s offerResultHandler throws an exception to the supervisor.
+[CallStreamSupervisor](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/org/gs/stream/actor/CallStreamSupervisor.scala) is a generic supervisor that creates CallStream with a RunnableGraph and handles its errors. An error in the stream invokes a Supervision Decider when an error causes the stream to stop, the actor’s offerResultHandler throws an exception to the supervisor.
 
 CallStreamSupervisor receives messages intended for CallStream and forwards them. This saves actors sending to CallStream from putting a DeathWatch on it.
