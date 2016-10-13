@@ -19,7 +19,7 @@ lazy val commonSettings = Seq(
 	version := "0.3.0",
 	scalaVersion := "2.11.8"
 )
-lazy val akkaV = "2.4.10"
+lazy val akkaV = "2.4.11"
 lazy val scalaTestV = "3.0.0"
 lazy val algebirdV = "0.12.1"
 lazy val cassandraDriverV = "3.1.0"
