@@ -36,7 +36,7 @@ import org.gs.algebird.agent.Agents
 import org.gs.algebird.agent.stream.ParallelApproximators
 import org.gs.algebird.agent.stream.DecayedValueAgentFlow.nowMillis
 import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
-import org.gs.examples.account.GetAccountBalances
+import org.gs.examples.account.{GetAccountBalances, GetCustomerAccountBalances}
 import org.gs.examples.account.stream.extractBalancesFlow
 import org.gs.stream.actor.CallStream
 import org.gs.stream.actor.CallStream.props
@@ -78,7 +78,7 @@ class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLik
       agents.qtAgent,
       nowMillis[A])
   val source = Source.queue[Seq[AnyRef]](10, OverflowStrategy.fail)
-  val resultsRunnable = source.map { elem => log.debug("Source queue elem{}", elem); elem }
+  val resultsRunnable = source//.map { elem => log.debug("Source queue elem{}", elem); elem }
   .via(extractBalancesFlow)
   .via(agentsFlow)
   .to(Sink.ignore)
@@ -120,6 +120,7 @@ class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLik
     }
 
   def receive = {
+    case x: GetCustomerAccountBalances ⇒ streamSuper forward x
     case ResultsActor(_, resultsName) => sender ! ResultsActor(results, resultsName)
     case SinkActor(_, errorLoggerName) ⇒ sender ! SinkActor(errorLogger, errorLoggerName)
   }

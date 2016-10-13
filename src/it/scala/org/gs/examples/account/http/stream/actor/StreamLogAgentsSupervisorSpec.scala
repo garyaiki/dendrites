@@ -18,13 +18,12 @@ import akka.actor.{ActorSystem, Props}
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
-import com.twitter.algebird.{CMSHasher, DecayedValue, DecayedValueMonoid, HLL, QTreeSemigroup}
+import com.twitter.algebird.{AveragedValue, CMSHasher, DecayedValue, DecayedValueMonoid, HLL, QTreeSemigroup}
 import com.twitter.algebird.CMSHasherImplicits._
-import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
-import scala.concurrent.ExecutionContext
 import scala.reflect.runtime.universe.TypeTag
 import org.gs.aggregator.mean
 import org.gs.algebird.AlgebirdConfigurer
@@ -37,55 +36,74 @@ import org.gs.examples.account.{GetCustomerAccountBalances, Savings}
 /** Parent Supervisor creates child supervisor of parallel HTTP stream and actor with parallel
   * Agents stream
   */
-class StreamLogAgentsSupervisorSpec extends WordSpecLike with Matchers {
+class StreamLogAgentsSupervisorSpec extends WordSpecLike with Matchers with BeforeAndAfter {
 
   implicit val system = ActorSystem("dendrites")
-  implicit val ec: ExecutionContext = system.dispatcher
+  implicit val ec = system.dispatcher
   implicit val mat = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
-  val timeout = Timeout(200 millis)
+  val futureTimeout = Timeout(200 millis)
+  var agents: Agents[BigDecimal] = null
+
+  def testAvgVal(avgVal: AveragedValue): Unit = {
+		  val count = avgVal.count
+				  count should equal(3)
+				  val dValue: Double = avgVal.value
+				  val mD = mean(List[BigDecimal](1000.1, 11000.1, 111000.1))
+				  val expectMean = mD.right.get.toDouble
+				  dValue should be (expectMean  +- 0.1)        
+  }
+
+  before {
+      val level = AlgebirdConfigurer.qTreeLevel
+      implicit val qtSG = new QTreeSemigroup[BigDecimal](level)
+      agents = new Agents[BigDecimal]("test BigDecimal approximators agents")
+      val props = StreamLogAgentsSupervisor.props[BigDecimal](agents)
+      val supervisor = system.actorOf(props)
+      supervisor ! GetCustomerAccountBalances(1, Set(Savings))
+      Thread.sleep(8000)//tests complete before agent updates
+  }
 
   "A StreamLogAgentsSupervisor of BigDecimals" should {
     "update all agents and return their latest values" in {
-      val level = AlgebirdConfigurer.qTreeLevel
-      implicit val qtSG = new QTreeSemigroup[BigDecimal](level)
-      val agents = new Agents[BigDecimal]("test BigDecimal approximators agents")
-      val props = StreamLogAgentsSupervisor.props[BigDecimal](agents)
-      val supervisor = TestActorRef(props)
-      val streamSuperRef = supervisor.getSingleChild("streamSuper")
-      streamSuperRef ! GetCustomerAccountBalances(1, Set(Savings))
-      Thread.sleep(6000)//Stream completes before agent updates
       val avgAgent = agents.avgAgent
-      val updateAvgFuture = avgAgent.agent.future()
-      whenReady(updateAvgFuture, timeout) { result =>
-        val count = result.count
-        count should equal(3)
-        val dValue: Double = result.value
-        val mD = mean(List[BigDecimal](1000.1, 11000.1, 111000.1))
-        val expectMean = mD.right.get.toDouble
-        dValue should be (expectMean  +- 0.1)
+      whenReady(avgAgent.agent.future(), futureTimeout) { result =>
+        var count = result.count
+        if(count > 0) testAvgVal(result) else {
+          Thread.sleep(8000)//tests complete before agent updates
+          whenReady(avgAgent.agent.future(), futureTimeout) { result =>
+            count = result.count
+            if(count > 0) testAvgVal(result) else {
+              Thread.sleep(8000)//tests complete before agent updates
+              whenReady(avgAgent.agent.future(), futureTimeout) { result =>
+                count = result.count
+                testAvgVal(result)
+              }
+            }
+          }
+        }
       }
       val cmsAgent = agents.cmsAgent
       val updateCMSFuture = cmsAgent.agent.future()
-      whenReady(updateCMSFuture, timeout) { result =>
+      whenReady(updateCMSFuture, futureTimeout) { result =>
         val totalCount = result.totalCount
         totalCount should equal(3)
       }
       val dvAgent = agents.dcaAgent
       val updateDVFuture = dvAgent.agent.future()
-      whenReady(updateDVFuture, timeout) {  result =>
+      whenReady(updateDVFuture, futureTimeout) {  result =>
         val size = result.size
         size should be (3 +- 2)
       }
       val hllAgent = agents.hllAgent
       val updateHLLFuture = hllAgent.agent.future()
-      whenReady(updateHLLFuture, timeout) { result =>
+      whenReady(updateHLLFuture, futureTimeout) { result =>
         val estimatedSize = result.estimatedSize
         estimatedSize should be(3.0 +- 0.09)
       }
       val qtAgent = agents.qtAgent
 		  val updateQTFuture = qtAgent.agent.future()
-		  whenReady(updateQTFuture, timeout) { result =>
+		  whenReady(updateQTFuture, futureTimeout) { result =>
 		    result.count should equal(3)
 		  }
     }
