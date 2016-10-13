@@ -148,7 +148,7 @@ object CallStream {
   }
 
   def props[A: TypeTag](sinkRef: ActorRef, flow: Flow[A, Seq[AnyRef], NotUsed]): Props = {
-    val source = Source.queue[A](10, OverflowStrategy.fail)
+    val source = Source.queue[A](1, OverflowStrategy.fail)
     val sink = Sink.actorRef(sinkRef, CompleteMessage)
     val runnable: RunnableGraph[SourceQueueWithComplete[A]] = source.via(flow).to(sink)
     Props(new CallStream[A](runnable))

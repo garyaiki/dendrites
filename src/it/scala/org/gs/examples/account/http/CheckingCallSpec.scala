@@ -48,7 +48,6 @@ class CheckingCallSpec extends WordSpecLike with Matchers with BalancesProtocols
           baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
   def badPartial = typedQueryResponse(
           badBaseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
-  
   "A CheckingCallClient" should {
     "get balances for id 1" in {
       val id = 1L 
