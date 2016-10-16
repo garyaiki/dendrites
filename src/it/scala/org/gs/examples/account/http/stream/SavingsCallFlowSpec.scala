@@ -20,7 +20,7 @@ import akka.event.Logging
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Flow}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
@@ -34,7 +34,8 @@ import org.gs.http.{caseClassToGetQuery, typedQueryResponse}
   *
   * @author Gary Struthers
   */
-class SavingsCallFlowSpec extends WordSpecLike with Matchers with BalancesProtocols {
+class SavingsCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfter
+        with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   implicit val ec: ExecutionContext = system.dispatcher
   override implicit val mat = ActorMaterializer()
@@ -45,7 +46,18 @@ class SavingsCallFlowSpec extends WordSpecLike with Matchers with BalancesProtoc
   def sink = TestSink.probe[Either[String, AnyRef]]
   val scf = new SavingsCallFlow
   val testFlow = source.via(scf.flow).toMat(sink)(Keep.both)
-  
+
+  before { // init connection pool 
+    val id = 1L
+    val clientConfig = new SavingsBalancesClientConfig()
+    val baseURL = clientConfig.baseURL
+    def partial = typedQueryResponse(
+            baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapSavings) _
+      val responseFuture = partial(GetAccountBalances(id))
+
+      whenReady(responseFuture, Timeout(120000 millis)) { result => }    
+  }
+
   "A SavingsCallFlowClient" should {
     "get balances for id 1" in {
       val id = 1L

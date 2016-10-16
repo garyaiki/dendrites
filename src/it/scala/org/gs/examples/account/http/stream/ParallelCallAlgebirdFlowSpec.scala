@@ -21,23 +21,26 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Keep}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.twitter.algebird.{AveragedValue, HLL}
-import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext
 import org.gs.algebird.stream.{avgFlow, CreateHLLFlow, maxFlow, minFlow}
 import org.gs.examples.account.{extractBalancesVals, GetAccountBalances}
+import org.gs.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
+import org.gs.http.{caseClassToGetQuery, typedQueryResponse}
 import org.gs.examples.account.stream.extractBalancesFlow
 
 /**
   *
   * @author Gary Struthers
   */
-class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
+class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers with BeforeAndAfter
+        with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   implicit val ec: ExecutionContext = system.dispatcher
-  implicit val materializer = ActorMaterializer()
+  override implicit val mat = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   val timeout = Timeout(3000 millis)
 
@@ -47,6 +50,18 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
   val wrappedFlow = pcf.wrappedCallsLRFlow
   var rightResponse: Option[Seq[AnyRef]] = None
 
+  before { // init connection pool
+    val id = 1L
+    val clientConfig = new CheckingBalancesClientConfig()
+    val baseURL = clientConfig.baseURL
+
+    def partial = typedQueryResponse(
+          baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
+    val responseFuture = partial(GetAccountBalances(id))
+
+    whenReady(responseFuture, Timeout(120000 millis)) { result => }    
+  }
+
   "A ParallelCallAlgebirdFlowClient" should {
     "get balances for id 1" in {
       val id = 1L
@@ -55,6 +70,7 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers {
         .toMat(sinkLeftRight)(Keep.both).run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
+      Thread.sleep(2000)
       val response = sub.expectNext
       pub.sendComplete()
       sub.expectComplete()

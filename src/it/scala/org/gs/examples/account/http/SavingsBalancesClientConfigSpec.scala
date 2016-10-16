@@ -18,7 +18,7 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.stream.ActorMaterializer
 import java.util.concurrent.Executors
-import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
@@ -31,7 +31,8 @@ import org.gs.http.{caseClassToGetQuery, typedQuery, typedFutureResponse}
   *
   * @author Gary Struthers
   */
-class SavingsBalancesClientConfigSpec extends WordSpecLike with Matchers with BalancesProtocols {
+class SavingsBalancesClientConfigSpec extends WordSpecLike with Matchers with BeforeAndAfter with
+        BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   override implicit val mat = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
@@ -41,7 +42,16 @@ class SavingsBalancesClientConfigSpec extends WordSpecLike with Matchers with Ba
   val config = hostConfig._1
   val baseURL = clientConfig.baseURL
   val badBaseURL = baseURL.dropRight(1)
-  val timeout = Timeout(3000 millis)
+  val timeout = Timeout(1000 millis)
+  
+  before { // Send dummy request to ensure connection pool initialized
+      val id = 1L
+      val cc = GetAccountBalances(id)
+      val callFuture = typedQuery(baseURL, cc.productPrefix, caseClassToGetQuery)(cc)
+      val responseFuture = typedFutureResponse(mapPlain, mapSavings)(callFuture)
+
+      whenReady(responseFuture, Timeout(120000 millis)) { result => }    
+  }
 
   "A SavingsBalancesClient" should {
     "get balances for id 1" in {

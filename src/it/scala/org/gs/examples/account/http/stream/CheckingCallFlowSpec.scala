@@ -21,12 +21,13 @@ import akka.stream.{ActorMaterializer, Supervision}
 import akka.stream.ActorAttributes.SupervisionStrategy
 import akka.stream.scaladsl.{Flow, Keep}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
+import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext
 import scala.math.BigDecimal.double2bigDecimal
-import org.gs.examples.account.{ CheckingAccountBalances, GetAccountBalances}
+import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances}
 import org.gs.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
 import org.gs.http.{caseClassToGetQuery, typedQueryResponse}
 
@@ -34,17 +35,29 @@ import org.gs.http.{caseClassToGetQuery, typedQueryResponse}
   *
   * @author Gary Struthers
   */
-class CheckingCallFlowSpec extends WordSpecLike with Matchers with BalancesProtocols {
+class CheckingCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfter
+        with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   implicit val ec: ExecutionContext = system.dispatcher
   override implicit val mat = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   val timeout = Timeout(200 millis)
-
   def source = TestSource.probe[Product]
   def sink = TestSink.probe[Either[String, AnyRef]]
   val ccf = new CheckingCallFlow
   val testFlow = source.via(ccf.flow).toMat(sink)(Keep.both)
+
+  before { // init connection pool 
+    val id = 1L
+    val clientConfig = new CheckingBalancesClientConfig()
+    val baseURL = clientConfig.baseURL
+    def partial = typedQueryResponse(
+            baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
+
+    val responseFuture = partial(GetAccountBalances(id))
+
+    whenReady(responseFuture, Timeout(120000 millis)) { result => }    
+  }
 
   "A CheckingCallFlowClient" should {
     "get balances for id 1" in {

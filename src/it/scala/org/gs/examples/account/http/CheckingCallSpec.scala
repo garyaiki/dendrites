@@ -18,7 +18,7 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.stream.ActorMaterializer
 import java.util.concurrent.Executors
-import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
@@ -31,7 +31,8 @@ import org.gs.http.{caseClassToGetQuery, typedQueryResponse}
   *
   * @author Gary Struthers
   */
-class CheckingCallSpec extends WordSpecLike with Matchers with BalancesProtocols {
+class CheckingCallSpec extends WordSpecLike with Matchers with BeforeAndAfter
+        with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   implicit val ec: ExecutionContext = system.dispatcher
   override implicit val mat = ActorMaterializer()
@@ -41,13 +42,19 @@ class CheckingCallSpec extends WordSpecLike with Matchers with BalancesProtocols
   val config = hostConfig._1
   val baseURL = clientConfig.baseURL
   val badBaseURL = baseURL.dropRight(1)
-
   val timeout = Timeout(3000 millis)
-
   def partial = typedQueryResponse(
           baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
   def badPartial = typedQueryResponse(
           badBaseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
+
+  before {
+      val id = 1L 
+      val responseFuture = partial(GetAccountBalances(id))
+
+      whenReady(responseFuture, Timeout(120000 millis)) { result => }    
+  }
+
   "A CheckingCallClient" should {
     "get balances for id 1" in {
       val id = 1L 

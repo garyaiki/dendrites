@@ -19,10 +19,11 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Flow}
-import akka.stream.testkit.scaladsl.{ TestSink, TestSource}
+import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import java.util.concurrent.Executors
-import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
+import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext
 import scala.math.BigDecimal.double2bigDecimal
@@ -34,7 +35,8 @@ import org.gs.http.{caseClassToGetQuery, typedQueryResponse}
   *
   * @author Gary Struthers
   */
-class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesProtocols {
+class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfter
+    with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   implicit val ec: ExecutionContext = system.dispatcher
   override implicit val mat = ActorMaterializer()
@@ -46,7 +48,18 @@ class MoneyMarketCallFlowSpec extends WordSpecLike with Matchers with BalancesPr
   def sink = TestSink.probe[Either[String, AnyRef]]
   val mmcf = new MoneyMarketCallFlow
   val testFlow = source.via(mmcf.flow).toMat(sink)(Keep.both)
-  
+
+  before { // init connection pool 
+    val id = 1L
+    val clientConfig = new MoneyMarketBalancesClientConfig()
+    val baseURL = clientConfig.baseURL
+    def partial = typedQueryResponse(
+            baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapMoneyMarket) _
+      val responseFuture = partial(GetAccountBalances(id))
+
+      whenReady(responseFuture, Timeout(120000 millis)) { result => }    
+  }
+
   "A MoneyMarketCallFlowClient" should {
     "get balances for id 1" in {
       val id = 1L

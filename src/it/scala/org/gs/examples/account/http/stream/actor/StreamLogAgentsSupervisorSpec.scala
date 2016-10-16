@@ -17,8 +17,7 @@ package org.gs.examples.account.http.stream.actor
 import akka.actor.{ActorSystem, Props}
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
-import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
-import com.twitter.algebird.{AveragedValue, CMSHasher, DecayedValue, DecayedValueMonoid, HLL, QTreeSemigroup}
+import com.twitter.algebird.{AveragedValue, QTreeSemigroup}
 import com.twitter.algebird.CMSHasherImplicits._
 import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
@@ -26,17 +25,24 @@ import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.reflect.runtime.universe.TypeTag
 import org.gs.aggregator.mean
-import org.gs.algebird.AlgebirdConfigurer
-import org.gs.algebird.BigDecimalField
+import org.gs.algebird.{AlgebirdConfigurer, BigDecimalField}
 import org.gs.algebird.cmsHasherBigDecimal
 import org.gs.algebird.agent.Agents
 import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
 import org.gs.examples.account.{GetCustomerAccountBalances, Savings}
+import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances}
+import org.gs.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
+import org.gs.http.{caseClassToGetQuery, typedQueryResponse}
 
 /** Parent Supervisor creates child supervisor of parallel HTTP stream and actor with parallel
   * Agents stream
+  * 
+  * @note Http connection pool may not be initialized, so a dummy call is made in before.
+  * @note Balances server has the default 4 max connections, so Thread.sleep is called after request
+  * @note Thread.sleep may be called if agent hasn't been updated due to contention from other tests
   */
-class StreamLogAgentsSupervisorSpec extends WordSpecLike with Matchers with BeforeAndAfter {
+class StreamLogAgentsSupervisorSpec extends WordSpecLike with Matchers with BeforeAndAfter
+        with BalancesProtocols {
 
   implicit val system = ActorSystem("dendrites")
   implicit val ec = system.dispatcher
@@ -55,31 +61,35 @@ class StreamLogAgentsSupervisorSpec extends WordSpecLike with Matchers with Befo
   }
 
   before {
+    val id = 1L
+    val clientConfig = new CheckingBalancesClientConfig()
+    val baseURL = clientConfig.baseURL
+    def partial = typedQueryResponse(
+            baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
+
+    val responseFuture = partial(GetAccountBalances(id))
+
+    whenReady(responseFuture, Timeout(60000 millis)) { result => }
+  }
+
+  "A StreamLogAgentsSupervisor of BigDecimals" should {
+    "update all agents and return their latest values" in {
       val level = AlgebirdConfigurer.qTreeLevel
       implicit val qtSG = new QTreeSemigroup[BigDecimal](level)
       agents = new Agents[BigDecimal]("test BigDecimal approximators agents")
       val props = StreamLogAgentsSupervisor.props[BigDecimal](agents)
       val supervisor = system.actorOf(props)
       supervisor ! GetCustomerAccountBalances(1, Set(Savings))
-      Thread.sleep(8000)//tests complete before agent updates
-  }
-
-  "A StreamLogAgentsSupervisor of BigDecimals" should {
-    "update all agents and return their latest values" in {
+      Thread.sleep(20000)//tests complete before agent updates
       val avgAgent = agents.avgAgent
       whenReady(avgAgent.agent.future(), futureTimeout) { result =>
+        logger.debug("StreamLogAgents test 1st try"+ java.util.Calendar.getInstance().getTime())
         var count = result.count
         if(count > 0) testAvgVal(result) else {
-          Thread.sleep(8000)//tests complete before agent updates
+          Thread.sleep(60000)//tests complete before agent updates
           whenReady(avgAgent.agent.future(), futureTimeout) { result =>
-            count = result.count
-            if(count > 0) testAvgVal(result) else {
-              Thread.sleep(8000)//tests complete before agent updates
-              whenReady(avgAgent.agent.future(), futureTimeout) { result =>
-                count = result.count
-                testAvgVal(result)
-              }
-            }
+            logger.debug("StreamLogAgents test 2nd try"+ java.util.Calendar.getInstance().getTime())
+            testAvgVal(result)
           }
         }
       }
