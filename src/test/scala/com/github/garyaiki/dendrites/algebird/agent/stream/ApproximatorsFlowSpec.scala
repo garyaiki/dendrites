@@ -14,7 +14,6 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.algebird.agent.stream
 
-
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
@@ -23,15 +22,14 @@ import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.twitter.algebird.CMSHasherImplicits._
 import com.twitter.algebird._
 import org.scalatest.{Matchers,WordSpecLike}
-import org.scalatest._
 import org.scalatest.Matchers._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
-import com.github.garyaiki.dendrites.aggregator._
+import com.github.garyaiki.dendrites.algebird.AlgebirdConfigurer
+import com.github.garyaiki.dendrites.algebird.BigDecimalField
 import com.github.garyaiki.dendrites.algebird._
 import com.github.garyaiki.dendrites.algebird.agent.Agents
 import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
-import com.github.garyaiki.dendrites.algebird.agent.stream.ApproximatorsFlow
 
 /**
   *

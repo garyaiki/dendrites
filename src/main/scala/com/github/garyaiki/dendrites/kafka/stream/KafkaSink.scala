@@ -19,25 +19,14 @@ import akka.event.LoggingAdapter
 import akka.stream.{ActorAttributes, Attributes, Inlet, SinkShape, Supervision}
 import akka.stream.ActorAttributes.SupervisionStrategy
 import akka.stream.scaladsl.Sink
-import akka.stream.stage.{AsyncCallback,
-      GraphStage,
-      GraphStageLogic,
-      InHandler,
-      TimerGraphStageLogic}
+import akka.stream.stage.{AsyncCallback, GraphStage, GraphStageLogic,InHandler,TimerGraphStageLogic}
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord, RecordMetadata}
 import org.apache.kafka.common.KafkaException
 import org.apache.kafka.common.errors.{CorruptRecordException, // Retriable exceptions
-  InvalidMetadataException,
-  NotEnoughReplicasAfterAppendException,
-  NotEnoughReplicasException,
-  OffsetOutOfRangeException,
-  TimeoutException,
-  UnknownTopicOrPartitionException,
-  RetriableException}
+  InvalidMetadataException, NotEnoughReplicasAfterAppendException, NotEnoughReplicasException,
+  OffsetOutOfRangeException, TimeoutException, UnknownTopicOrPartitionException, RetriableException}
 import org.apache.kafka.common.errors.{InvalidTopicException, // Stopping exceptions
-  OffsetMetadataTooLarge,
-  RecordBatchTooLargeException,
-  RecordTooLargeException,
+  OffsetMetadataTooLarge, RecordBatchTooLargeException, RecordTooLargeException,
   UnknownServerException}
 import scala.util.control.NonFatal
 import com.github.garyaiki.dendrites.kafka.ProducerConfig

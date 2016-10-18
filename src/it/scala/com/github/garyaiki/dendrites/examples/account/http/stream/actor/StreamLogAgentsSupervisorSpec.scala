@@ -18,17 +18,12 @@ import akka.actor.{ActorSystem, Props}
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import com.twitter.algebird.{AveragedValue, QTreeSemigroup}
-
-import com.github.garyaiki.dendrites.examples.account.http.stream.actor.StreamLogAgentsSupervisor;
 import com.twitter.algebird.CMSHasherImplicits._
 import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
-
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
-
 import scala.reflect.runtime.universe.TypeTag
-
 import com.github.garyaiki.dendrites.aggregator.mean
 import com.github.garyaiki.dendrites.algebird.{AlgebirdConfigurer, BigDecimalField}
 import com.github.garyaiki.dendrites.algebird.cmsHasherBigDecimal
@@ -36,7 +31,8 @@ import com.github.garyaiki.dendrites.algebird.agent.Agents
 import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
 import com.github.garyaiki.dendrites.examples.account.{GetCustomerAccountBalances, Savings}
 import com.github.garyaiki.dendrites.examples.account.{CheckingAccountBalances, GetAccountBalances}
-import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
+import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols,
+  CheckingBalancesClientConfig}
 import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQueryResponse}
 
 /** Parent Supervisor creates child supervisor of parallel HTTP stream and actor with parallel

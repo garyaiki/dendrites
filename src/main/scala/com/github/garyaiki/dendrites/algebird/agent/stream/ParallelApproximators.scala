@@ -18,25 +18,14 @@ import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
 import akka.stream.{FlowShape, Graph, Materializer, OverflowStrategy, UniformFanOutShape}
-import akka.stream.scaladsl.{Broadcast,
-  Flow,
-  GraphDSL,
-  Keep,
-  RunnableGraph,
-  Sink,
-  Source,
-  SourceQueueWithComplete,
-  ZipWith,
-  ZipWith5}
+import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Keep, RunnableGraph, Sink, Source,
+  SourceQueueWithComplete, ZipWith, ZipWith5}
 import akka.stream.scaladsl.GraphDSL.Implicits._
 import com.twitter.algebird.{AveragedValue, CMS, CMSHasher, DecayedValue, HLL, QTree}
 import scala.concurrent.Future
 import scala.reflect.runtime.universe.TypeTag
-import com.github.garyaiki.dendrites.algebird.agent.{AveragedAgent,
-  CountMinSketchAgent,
-  DecayedValueAgent,
-  HyperLogLogAgent,
-  QTreeAgent}
+import com.github.garyaiki.dendrites.algebird.agent.{AveragedAgent, CountMinSketchAgent,
+  DecayedValueAgent, HyperLogLogAgent, QTreeAgent}
 import com.github.garyaiki.dendrites.algebird.stream.{CreateCMSFlow, CreateHLLFlow}
 import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
 
@@ -74,11 +63,11 @@ class ParallelApproximators[A: HyperLogLogLike: Numeric: CMSHasher: QTreeLike: T
   (implicit val system: ActorSystem, logger: LoggingAdapter, val materializer: Materializer) {
 
   // Zip input agent update Futures, waits for all to complete
-  def zipper: ZipWith5[Future[AveragedValue], Future[CMS[A]], Future[Seq[DecayedValue]], Future[HLL], Future[QTree[A]], (Future[AveragedValue], Future[CMS[A]], Future[Seq[DecayedValue]], Future[HLL], Future[QTree[A]])] = ZipWith((in0: Future[AveragedValue],
-                        in1: Future[CMS[A]],
-                        in2: Future[Seq[DecayedValue]],
-                        in3: Future[HLL],
-                        in4: Future[QTree[A]]) => (in0, in1, in2, in3, in4))
+  def zipper: ZipWith5[Future[AveragedValue], Future[CMS[A]], Future[Seq[DecayedValue]],
+                Future[HLL], Future[QTree[A]], (Future[AveragedValue], Future[CMS[A]],
+                Future[Seq[DecayedValue]], Future[HLL], Future[QTree[A]])] =
+    ZipWith((in0: Future[AveragedValue], in1: Future[CMS[A]], in2: Future[Seq[DecayedValue]],
+      in3: Future[HLL], in4: Future[QTree[A]]) => (in0, in1, in2, in3, in4))
 
   // Graph to broadcast to update agent composite sinks
   val approximators = GraphDSL.create() { implicit builder =>

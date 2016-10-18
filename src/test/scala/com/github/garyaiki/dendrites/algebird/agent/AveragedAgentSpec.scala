@@ -2,19 +2,14 @@
   */
 package com.github.garyaiki.dendrites.algebird.agent
 
-import com.github.garyaiki.dendrites.algebird.agent.AveragedAgent;
 import com.twitter.algebird._
-
-import com.github.garyaiki.dendrites.aggregator._
-import com.github.garyaiki.dendrites.algebird._
-import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
-import org.scalatest.{ Matchers, WordSpecLike }
-import org.scalatest._
+import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
-
 import scala.concurrent.ExecutionContext.Implicits.global
+import com.github.garyaiki.dendrites.algebird.avg
+import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
 
 /**
   *

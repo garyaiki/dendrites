@@ -20,21 +20,15 @@ import akka.event.Logging
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Keep}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-
 import java.util.concurrent.Executors
 import org.scalatest.{Matchers, WordSpecLike}
-
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.time.SpanSugar._
-
-import com.github.garyaiki.dendrites.http.stream.TypedQueryFlow;
-import com.github.garyaiki.dendrites.http.stream.TypedQueryResponseFlow;
-import com.github.garyaiki.dendrites.http.stream.TypedResponseFlow;
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.math.BigDecimal.double2bigDecimal
 import com.github.garyaiki.dendrites.examples.account.{ CheckingAccountBalances, GetAccountBalances}
-import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
+import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols,
+  CheckingBalancesClientConfig}
 import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQueryResponse}
 
 /**

@@ -1,11 +1,8 @@
 package com.github.garyaiki.dendrites.algebird
 
 import com.twitter.algebird.{DecayedValueMonoid, HyperLogLogAggregator, HyperLogLogMonoid}
-import org.scalatest.{ WordSpecLike, Matchers }
-import org.scalatest._
+import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.Matchers._
-
-import com.github.garyaiki.dendrites.algebird.AlgebirdConfigurer;
 
 class AlgebirdConfigurerSpec extends WordSpecLike {
   "An AlgebirdConfigurer CountMinSketch" should {

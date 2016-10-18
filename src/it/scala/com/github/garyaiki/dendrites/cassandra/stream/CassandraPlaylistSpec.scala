@@ -27,21 +27,10 @@ import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
 import scala.concurrent.ExecutionContext
 import com.github.garyaiki.dendrites.cassandra.{Playlists, PlaylistSongConfig}
-
 import com.github.garyaiki.dendrites.cassandra.Playlists._
-
-import com.github.garyaiki.dendrites.cassandra.stream.CassandraPaging;
-import com.github.garyaiki.dendrites.cassandra.stream.CassandraQuery;
-import com.github.garyaiki.dendrites.cassandra.stream.CassandraSink;
-import com.github.garyaiki.dendrites.cassandra.{close,
-                         connect,
-                         createCluster,
-                         createLoadBalancingPolicy,
-                         createSchema,
-                         dropSchema,
-                         initLoadBalancingPolicy,
-                         logMetadata,
-                         registerQueryLogger}
+import com.github.garyaiki.dendrites.cassandra.{close, connect, createCluster,
+  createLoadBalancingPolicy, createSchema, dropSchema, initLoadBalancingPolicy, logMetadata,
+  registerQueryLogger}
 
 class CassandraPlaylistSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   implicit val system = ActorSystem("dendrites")

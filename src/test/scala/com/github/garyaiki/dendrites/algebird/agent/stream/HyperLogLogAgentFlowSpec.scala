@@ -21,21 +21,15 @@ import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.twitter.algebird.{HLL, HyperLogLogAggregator, HyperLogLogMonoid}
 import org.scalatest.{Matchers, WordSpecLike}
-
-import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
 import com.github.garyaiki.dendrites.algebird.AlgebirdConfigurer
-import com.github.garyaiki.dendrites.algebird.stream.CreateHLLFlow
 import com.github.garyaiki.dendrites.algebird.agent.HyperLogLogAgent
+import com.github.garyaiki.dendrites.algebird.stream.CreateHLLFlow
 import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
-
-import com.github.garyaiki.dendrites.algebird.agent.stream.HyperLogLogAgentFlow;
 
 /**
   *

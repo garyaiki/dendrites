@@ -22,20 +22,16 @@ import akka.stream.scaladsl.{Flow, Keep}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.twitter.algebird.{AveragedValue, HLL}
 import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
-
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
-
 import scala.concurrent.ExecutionContext
 import com.github.garyaiki.dendrites.algebird.stream.{avgFlow, CreateHLLFlow, maxFlow, minFlow}
 import com.github.garyaiki.dendrites.examples.account.{extractBalancesVals, GetAccountBalances}
-import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
+import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols,
+  CheckingBalancesClientConfig}
 import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQueryResponse}
-
 import com.github.garyaiki.dendrites.examples.account.stream.extractBalancesFlow
-
-import com.github.garyaiki.dendrites.examples.account.http.stream.ParallelCallFlow;
 
 /**
   *

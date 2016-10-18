@@ -20,9 +20,7 @@ import akka.stream.{ActorAttributes, Attributes, Outlet, SourceShape, Supervisio
 import akka.stream.ActorAttributes.SupervisionStrategy
 import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler, TimerGraphStageLogic}
 import akka.stream.scaladsl.Source
-import org.apache.kafka.clients.consumer.{Consumer,
-  ConsumerRecords,
-  CommitFailedException,
+import org.apache.kafka.clients.consumer.{Consumer, ConsumerRecords, CommitFailedException,
   InvalidOffsetException}
 import org.apache.kafka.common.KafkaException
 import org.apache.kafka.common.errors.{AuthorizationException, WakeupException}

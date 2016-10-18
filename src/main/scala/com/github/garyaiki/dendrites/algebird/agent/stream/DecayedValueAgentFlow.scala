@@ -87,7 +87,7 @@ object DecayedValueAgentFlow {
     * @param dvAgent Akka Agent accumulates DecayedValues
     * @param time function that adds time value, needed by DecayedValue
     * @return Sink that accepts Seq[A]
-    */  
+    */
   def compositeSink[A: TypeTag: Numeric](dvAgent: DecayedValueAgent,
               time:A => Double): Sink[Seq[A], NotUsed] = {
     compositeFlow(dvAgent, time).to(Sink.ignore)

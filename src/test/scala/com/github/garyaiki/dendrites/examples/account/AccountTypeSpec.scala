@@ -16,12 +16,7 @@ package com.github.garyaiki.dendrites.examples.account
 
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
-import com.github.garyaiki.dendrites.filters._
 import com.github.garyaiki.dendrites.examples.fixtures.AccountTypesBuilder
-
-import com.github.garyaiki.dendrites.examples.account.Checking;
-import com.github.garyaiki.dendrites.examples.account.MoneyMarket;
-import com.github.garyaiki.dendrites.examples.account.Savings;
 
 /**
   * @author Gary Struthers

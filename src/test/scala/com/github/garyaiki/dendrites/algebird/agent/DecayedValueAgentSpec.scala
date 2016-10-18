@@ -14,19 +14,14 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.algebird.agent
 
-import com.github.garyaiki.dendrites.algebird.agent.DecayedValueAgent;
 import com.twitter.algebird._
-
-import com.github.garyaiki.dendrites._
-import com.github.garyaiki.dendrites.algebird._
-import com.github.garyaiki.dendrites.fixtures.TrigUtils
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
-
 import scala.concurrent.ExecutionContext.Implicits.global
+import com.github.garyaiki.dendrites.fixtures.TrigUtils
 
 /** @author garystruthers
   *

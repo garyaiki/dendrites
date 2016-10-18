@@ -15,12 +15,7 @@ limitations under the License.
 package com.github.garyaiki.dendrites.examples.account.http.stream.actor
 
 import akka.NotUsed
-import akka.actor.{Actor,
-  ActorLogging,
-  ActorRef,
-  ActorSystem,
-  Props,
-  OneForOneStrategy,
+import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props, OneForOneStrategy,
   SupervisorStrategy}
 import akka.actor.SupervisorStrategy.{Escalate, Restart, Resume, Stop}
 import akka.event.LoggingAdapter
@@ -78,7 +73,7 @@ class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLik
       agents.qtAgent,
       nowMillis[A])
   val source = Source.queue[Seq[AnyRef]](10, OverflowStrategy.fail)
-  val resultsRunnable = source//.map { elem => log.debug("Source queue elem{}", elem); elem }
+  val resultsRunnable = source // .map { elem => log.debug("Source queue elem{}", elem); elem }
   .via(extractBalancesFlow)
   .via(agentsFlow)
   .to(Sink.ignore)
@@ -91,7 +86,7 @@ class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLik
   var results: ActorRef = null
 
   override def preStart() = {
-    log.debug("preStart:{} sink:{} streamSuper:{}", this.toString(), resultsName, streamSuperName)    
+    log.debug("preStart:{} sink:{} streamSuper:{}", this.toString(), resultsName, streamSuperName)   
     // create children here
     val resultsProps = CallStream.props[Seq[AnyRef]](resultsRunnable)
     results = context.actorOf(resultsProps, resultsName)

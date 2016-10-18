@@ -20,37 +20,19 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-import com.datastax.driver.core.{BoundStatement,
-  Cluster,
-  Host,
-  HostDistance,
-  PoolingOptions,
-  PreparedStatement,
-  ResultSet,
-  Row,
-  Session}
+import com.datastax.driver.core.{BoundStatement, Cluster, Host, HostDistance, PoolingOptions,
+  PreparedStatement, ResultSet, Row, Session}
 import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy, RetryPolicy}
 import java.util.{HashSet => JHashSet, UUID}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
 import scala.concurrent.ExecutionContext
 import com.github.garyaiki.dendrites.cassandra.{PlaylistSongConfig, Songs}
-
 import com.github.garyaiki.dendrites.cassandra.Playlists._
 import com.github.garyaiki.dendrites.cassandra.Songs._
-
-import com.github.garyaiki.dendrites.cassandra.stream.CassandraPaging;
-import com.github.garyaiki.dendrites.cassandra.stream.CassandraQuery;
-import com.github.garyaiki.dendrites.cassandra.stream.CassandraSink;
-import com.github.garyaiki.dendrites.cassandra.{close,
-                         connect,
-                         createCluster,
-                         createLoadBalancingPolicy,
-                         createSchema,
-                         dropSchema,
-                         initLoadBalancingPolicy,
-                         logMetadata,
-                         registerQueryLogger}
+import com.github.garyaiki.dendrites.cassandra.{close, connect, createCluster,
+  createLoadBalancingPolicy, createSchema, dropSchema, initLoadBalancingPolicy, logMetadata,
+  registerQueryLogger}
 
 class CassandraSongSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   implicit val system = ActorSystem("dendrites")

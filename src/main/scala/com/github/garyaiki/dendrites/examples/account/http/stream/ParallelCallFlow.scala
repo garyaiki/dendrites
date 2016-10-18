@@ -49,13 +49,13 @@ import com.github.garyaiki.dendrites.stream.logLeftRightFlow
   * @author Gary Struthers
   */
 class ParallelCallFlow(implicit val ec: ExecutionContext,
-                       system: ActorSystem,
-                       logger: LoggingAdapter,
-                       val materializer: Materializer) {
+    system: ActorSystem,
+    logger: LoggingAdapter,
+    val materializer: Materializer) {
 
   def zipper = ZipWith((in0: Either[String, AnyRef],
-                        in1: Either[String, AnyRef],
-                        in2: Either[String, AnyRef]) => (in0, in1, in2))
+    in1: Either[String, AnyRef],
+    in2: Either[String, AnyRef]) => (in0, in1, in2))
 
   val ccf = new CheckingCallFlow
   val mmcf = new MoneyMarketCallFlow

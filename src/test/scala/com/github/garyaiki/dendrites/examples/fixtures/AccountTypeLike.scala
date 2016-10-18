@@ -19,30 +19,10 @@ import scala.math.BigDecimal.int2bigDecimal
 import scala.math.BigInt.int2bigInt
 import com.github.garyaiki.dendrites.examples._
 import com.github.garyaiki.dendrites.fixtures.CaseClassLike
-import com.github.garyaiki.dendrites.fixtures.{KeyEithDouble,
-    KeyEithFloat,
-    KeyOptBigInt,
-    KeyFloat,
-    KeyBoolean,
-    KeyEithBigDec,
-    KeyEithBool,
-    KeyDouble,
-    KeyBigInt,
-    KeyEithLong,
-    KeyOptStr,
-    KeyOptInt,
-    KeyOptBool,
-    KeyBigDecimal,
-    KeyString,
-    KeyEithStr,
-    KeyEithInt,
-    KeyOptDouble,
-    KeyOptLong,
-    KeyEithBigInt,
-    KeyOptFloat,
-    KeyLong,
-    KeyInt,
-    KeyOptBigDec}
+import com.github.garyaiki.dendrites.fixtures.{KeyEithDouble, KeyEithFloat, KeyOptBigInt,
+  KeyFloat, KeyBoolean, KeyEithBigDec, KeyEithBool, KeyDouble, KeyBigInt, KeyEithLong, KeyOptStr,
+  KeyOptInt, KeyOptBool, KeyBigDecimal, KeyString, KeyEithStr, KeyEithInt, KeyOptDouble, KeyOptLong,
+  KeyEithBigInt, KeyOptFloat, KeyLong, KeyInt, KeyOptBigDec}
 
 @implicitNotFound(msg = "Cannot find AccountTypeLike type class for ${A}")
 trait AccountTypeLike[A, B] {

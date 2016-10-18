@@ -18,13 +18,9 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.stream.ActorMaterializer
 import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
-
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
-
-import com.github.garyaiki.dendrites.examples.account.http.CheckingBalancesClientConfig;
-
 import scala.math.BigDecimal.double2bigDecimal
 import scala.concurrent.ExecutionContext
 import com.github.garyaiki.dendrites.examples.account.{CheckingAccountBalances, GetAccountBalances}

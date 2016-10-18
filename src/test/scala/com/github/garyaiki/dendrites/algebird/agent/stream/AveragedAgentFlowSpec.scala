@@ -19,19 +19,14 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-
-import com.github.garyaiki.dendrites.algebird.agent.stream.AveragedAgentFlow;
 import com.twitter.algebird.AveragedValue
-
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
 import com.github.garyaiki.dendrites.aggregator.mean
 import com.github.garyaiki.dendrites.algebird.avg
 import com.github.garyaiki.dendrites.algebird.agent.AveragedAgent

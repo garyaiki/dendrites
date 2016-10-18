@@ -20,20 +20,17 @@ import akka.event.Logging
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Flow}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-
 import java.util.concurrent.Executors
 import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
-
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
-
-import com.github.garyaiki.dendrites.examples.account.http.stream.MoneyMarketCallFlow;
-
 import scala.concurrent.ExecutionContext
 import scala.math.BigDecimal.double2bigDecimal
-import com.github.garyaiki.dendrites.examples.account.{GetAccountBalances, MoneyMarketAccountBalances}
-import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols, MoneyMarketBalancesClientConfig}
+import com.github.garyaiki.dendrites.examples.account.{GetAccountBalances,
+  MoneyMarketAccountBalances}
+import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols,
+  MoneyMarketBalancesClientConfig}
 import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQueryResponse}
 
 /**

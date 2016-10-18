@@ -15,6 +15,7 @@ limitations under the License.
 package com.github.garyaiki.dendrites.algebird.fixtures
 
 import org.scalatest.{TestSuite, TestSuiteMixin}
+import scala.language.postfixOps
 import util.Random
 import com.github.garyaiki.dendrites.fixtures.SysProcessUtils
 import com.github.garyaiki.dendrites.algebird.createBF

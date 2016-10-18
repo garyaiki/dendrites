@@ -14,33 +14,25 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.algebird.agent.stream
 
-
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Keep, Source, Sink}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.twitter.algebird.{QTree, QTreeSemigroup}
-
-import com.github.garyaiki.dendrites.algebird.agent.stream.DecayedValueAgentFlow;
-import com.github.garyaiki.dendrites.algebird.agent.stream.ParallelApproximators;
 import com.twitter.algebird.CMSHasherImplicits._
 import com.twitter.algebird._
 import org.scalatest.{Matchers, WordSpecLike}
-
 import org.scalatest.Matchers._
-import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.{ExecutionContext, Future}
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 import scala.reflect.runtime.universe.TypeTag
-
 import com.github.garyaiki.dendrites.aggregator.mean
-import com.github.garyaiki.dendrites.aggregator._
+import com.github.garyaiki.dendrites.algebird.AlgebirdConfigurer
 import com.github.garyaiki.dendrites.algebird._
 import com.github.garyaiki.dendrites.algebird.agent.Agents
 import com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike

@@ -77,7 +77,7 @@ class CassandraSink(session: Session)(implicit val ec: ExecutionContext, logger:
             }
             failCallback.invoke(t)
           }
-        }  
+        }
       }
 
       setHandler(in, new InHandler {
