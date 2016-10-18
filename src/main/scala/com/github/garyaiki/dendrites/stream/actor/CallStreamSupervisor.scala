@@ -15,12 +15,7 @@ limitations under the License.
 package com.github.garyaiki.dendrites.stream.actor
 
 import akka.NotUsed
-import akka.actor.{Actor,
-  ActorLogging,
-  ActorRef,
-  OneForOneStrategy,
-  Props,
-  SupervisorStrategy}
+import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, Props, SupervisorStrategy}
 import akka.actor.SupervisorStrategy.{Escalate, Restart, Stop}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, OverflowStrategy}
 import akka.stream.OverflowStrategy.fail

@@ -19,8 +19,7 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.stream.{FlowShape, Materializer, UniformFanOutShape}
 import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, ZipWith}
 import scala.concurrent.ExecutionContext
-import com.github.garyaiki.dendrites.stream.leftRightFlow
-import com.github.garyaiki.dendrites.stream.logLeftRightFlow
+import com.github.garyaiki.dendrites.stream.{leftRightFlow, logLeftRightFlow}
 
 /** Create Graph that calls Checking, MoneyMarket, Savings services in parallel, waits for them all
   * then groups failures and successes
@@ -49,9 +48,9 @@ import com.github.garyaiki.dendrites.stream.logLeftRightFlow
   * @author Gary Struthers
   */
 class ParallelCallFlow(implicit val ec: ExecutionContext,
-    system: ActorSystem,
-    logger: LoggingAdapter,
-    val materializer: Materializer) {
+  system: ActorSystem,
+  logger: LoggingAdapter,
+  val materializer: Materializer) {
 
   def zipper = ZipWith((in0: Either[String, AnyRef],
     in1: Either[String, AnyRef],

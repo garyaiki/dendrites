@@ -59,7 +59,7 @@ object AveragedAgentFlow {
 
   /** Compose avgFlow & AveragedAgentFlow
     *
-    *  @tparam A is a Numeric with a TypeTag
+    * @tparam A is a Numeric with a TypeTag
     * @param avgAgent Akka Agent accumulates AveragedValue
     * @return Future for Agents updated value
     */

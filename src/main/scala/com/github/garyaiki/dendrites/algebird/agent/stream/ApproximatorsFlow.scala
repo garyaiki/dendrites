@@ -22,11 +22,8 @@ import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, ZipWith, ZipWith5}
 import akka.stream.scaladsl.GraphDSL.Implicits._
 import com.twitter.algebird.{AveragedValue, CMS, CMSHasher, DecayedValue, HLL, QTree}
 import scala.reflect.runtime.universe.TypeTag
-import com.github.garyaiki.dendrites.algebird.agent.{AveragedAgent,
-  CountMinSketchAgent,
-  DecayedValueAgent,
-  HyperLogLogAgent,
-  QTreeAgent}
+import com.github.garyaiki.dendrites.algebird.agent.{AveragedAgent, CountMinSketchAgent,
+  DecayedValueAgent, HyperLogLogAgent, QTreeAgent}
 import com.github.garyaiki.dendrites.algebird.stream.{CreateCMSFlow, CreateHLLFlow, ZipTimeFlow}
 import com.github.garyaiki.dendrites.algebird.stream.avgFlow
 import com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike
@@ -55,20 +52,21 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike
   * @author Gary Struthers
   */
 class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
-    avgAgent: AveragedAgent,
-    cmsAgent: CountMinSketchAgent[A],
-    dcaAgent: DecayedValueAgent,
-    hllAgent: HyperLogLogAgent,
-    qtrAgent: QTreeAgent[A])
+  avgAgent: AveragedAgent,
+  cmsAgent: CountMinSketchAgent[A],
+  dcaAgent: DecayedValueAgent,
+  hllAgent: HyperLogLogAgent,
+  qtrAgent: QTreeAgent[A])
   (implicit val system: ActorSystem, logger: LoggingAdapter, val materializer: Materializer) {
 
   // Zip input agent update Futures, waits for all to complete
   def zipper: ZipWith5[AveragedValue, CMS[A], Seq[DecayedValue], HLL, QTree[A],
-          (AveragedValue, CMS[A], Seq[DecayedValue], HLL, QTree[A])] = ZipWith((in0: AveragedValue,
-                        in1: CMS[A],
-                        in2: Seq[DecayedValue],
-                        in3: HLL,
-                        in4: QTree[A]) => (in0, in1, in2, in3, in4))
+    (AveragedValue, CMS[A], Seq[DecayedValue], HLL, QTree[A])] =
+    ZipWith((in0: AveragedValue,
+      in1: CMS[A],
+      in2: Seq[DecayedValue],
+      in3: HLL,
+      in4: QTree[A]) => (in0, in1, in2, in3, in4))
 
   // Agent update functions, partially applied so they can be passed to mapAsync
   val avgAgentAlter = avgAgent.alter _

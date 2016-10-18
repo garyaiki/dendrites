@@ -40,9 +40,9 @@ import com.github.garyaiki.dendrites.http.typedQuery
   *
   */
 class TypedQueryFlow(baseURL: StringBuilder,
-        reqPath: String,
-        ccToGet:(Product, String) => StringBuilder)
-        (implicit val system: ActorSystem, logger: LoggingAdapter, val materializer: Materializer) {
+  reqPath: String,
+  ccToGet:(Product, String) => StringBuilder)
+  (implicit val system: ActorSystem, logger: LoggingAdapter, val materializer: Materializer) {
 
   def partial: Product => Future[HttpResponse] = typedQuery(baseURL, reqPath, ccToGet) _ // curried
 

@@ -74,7 +74,8 @@ package object http {
     * @return config plus ip address and port number
     */
   def getHostConfig(ipPath: String, portPath: String, config: Config = ConfigFactory.load()):
-            (Config, String, Int) = {
+    (Config, String, Int) = {
+
     val ip = config.getString(ipPath)
     val port = config.getInt(portPath)
     (config, ip, port)
@@ -88,7 +89,7 @@ package object http {
     * @return URL string for host/path
     */
   def configBaseUrl(pathPath: String, hostConfig: (Config, String, Int), scheme: String = "http"):
-          StringBuilder = {
+    StringBuilder = {
     val config = hostConfig._1
     val ip = hostConfig._2
     val port = hostConfig._3
@@ -109,7 +110,7 @@ package object http {
     val domainPattern = """[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}""".r
     val ipPattern = """\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}""".r
     val goodDomain = if (domainPattern.findFirstIn(domain).isDefined ||
-        ipPattern.findFirstIn(domain).isDefined) true else false
+      ipPattern.findFirstIn(domain).isDefined) true else false
     require(goodDomain, s"domain:$domain looks invalid")
     val portRange = 0 to 65536
     require(portRange.contains(port), s"port:$port must be ${portRange.start} to ${portRange.end}")
@@ -156,10 +157,10 @@ package object http {
     * @return Future[HttpResponse]
     */
   def typedQuery(baseURL: StringBuilder,
-                 requestPath: String,
-                 ccToGet:(Product, String) => StringBuilder)
-                (cc: Product)
-                (implicit system: ActorSystem, materializer: Materializer): Future[HttpResponse] = {
+    requestPath: String,
+    ccToGet:(Product, String) => StringBuilder)
+    (cc: Product)
+    (implicit system: ActorSystem, materializer: Materializer): Future[HttpResponse] = {
     val balancesQuery = ccToGet(cc, requestPath)
     val uriS = (baseURL ++ balancesQuery).mkString
 
@@ -181,13 +182,13 @@ package object http {
     * @return Future[Either[String, AnyRef]]
     */
   def typedResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
-                    mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
-        (response: HttpResponse)
-        (implicit ec: ExecutionContext,
-         system: ActorSystem,
-         logger: LoggingAdapter,
-         materializer: Materializer):
-                   Future[Either[String, AnyRef]] = {
+    mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
+    (response: HttpResponse)
+    (implicit ec: ExecutionContext,
+      system: ActorSystem,
+      logger: LoggingAdapter,
+      materializer: Materializer):
+    Future[Either[String, AnyRef]] = {
       response.status match {
         case OK => {
           val st = response.entity.contentType.mediaType.subType
@@ -220,13 +221,13 @@ package object http {
     * @return Future[Either[String, AnyRef]]
     */
 def typedFutureResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
-                        mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
-      (caller: Future[HttpResponse])
-      (implicit ec: ExecutionContext,
-       system: ActorSystem,
-       logger: LoggingAdapter,
-       materializer: Materializer):
-                    Future[Either[String, AnyRef]] = {
+  mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
+  (caller: Future[HttpResponse])
+  (implicit ec: ExecutionContext,
+    system: ActorSystem,
+    logger: LoggingAdapter,
+    materializer: Materializer):
+  Future[Either[String, AnyRef]] = {
 
     caller.flatMap { response => typedResponse(mapLeft, mapRight)(response) }
   }
@@ -247,16 +248,16 @@ def typedFutureResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
     * @return Future[Either[String, AnyRef]]
     */
   def typedQueryResponse(baseURL: StringBuilder,
-               requestPath: String,
-               ccToGet:(Product, String) => StringBuilder,
-               mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
-               mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
-              (cc: Product)
-              (implicit ec: ExecutionContext,
-               system: ActorSystem,
-               logger: LoggingAdapter,
-               materializer: Materializer):
-               Future[Either[String, AnyRef]] = {
+    requestPath: String,
+    ccToGet:(Product, String) => StringBuilder,
+    mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
+    mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
+    (cc: Product)
+    (implicit ec: ExecutionContext,
+      system: ActorSystem,
+      logger: LoggingAdapter,
+      materializer: Materializer):
+    Future[Either[String, AnyRef]] = {
     val callFuture = typedQuery(baseURL, requestPath, ccToGet)(cc)
     typedFutureResponse(mapLeft, mapRight)(callFuture)
   }

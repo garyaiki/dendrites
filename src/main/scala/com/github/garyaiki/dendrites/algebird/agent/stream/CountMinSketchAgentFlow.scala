@@ -21,7 +21,8 @@ import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.twitter.algebird.{CMS, CMSHasher}
 import scala.concurrent.Future
 import scala.reflect.runtime.universe.TypeTag
-import com.github.garyaiki.dendrites.algebird.{createCMSMonoid, cmsHasherBigDecimal, cmsHasherDouble, cmsHasherFloat}
+import com.github.garyaiki.dendrites.algebird.{createCMSMonoid, cmsHasherBigDecimal,
+  cmsHasherDouble, cmsHasherFloat}
 import com.github.garyaiki.dendrites.algebird.agent.CountMinSketchAgent
 import com.github.garyaiki.dendrites.algebird.stream.CreateCMSFlow
 

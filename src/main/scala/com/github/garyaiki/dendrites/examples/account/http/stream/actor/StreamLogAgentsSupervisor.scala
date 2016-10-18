@@ -31,7 +31,8 @@ import com.github.garyaiki.dendrites.algebird.agent.Agents
 import com.github.garyaiki.dendrites.algebird.agent.stream.ParallelApproximators
 import com.github.garyaiki.dendrites.algebird.agent.stream.DecayedValueAgentFlow.nowMillis
 import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
-import com.github.garyaiki.dendrites.examples.account.{GetAccountBalances, GetCustomerAccountBalances}
+import com.github.garyaiki.dendrites.examples.account.{GetAccountBalances,
+  GetCustomerAccountBalances}
 import com.github.garyaiki.dendrites.examples.account.stream.extractBalancesFlow
 import com.github.garyaiki.dendrites.stream.actor.CallStream
 import com.github.garyaiki.dendrites.stream.actor.CallStream.props
@@ -62,16 +63,16 @@ import StreamLogAgentsSupervisor.ResultsActor
   *
   */
 class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLike: TypeTag]
-        (agents: Agents[A])
-        (implicit val system: ActorSystem, logger: LoggingAdapter, val mat: Materializer)
-        extends Actor with ActorLogging {
+  (agents: Agents[A])
+  (implicit val system: ActorSystem, logger: LoggingAdapter, val mat: Materializer)
+  extends Actor with ActorLogging {
 
   val agentsFlow = ParallelApproximators.compositeFlow(agents.avgAgent,
-      agents.cmsAgent,
-      agents.dcaAgent,
-      agents.hllAgent,
-      agents.qtAgent,
-      nowMillis[A])
+    agents.cmsAgent,
+    agents.dcaAgent,
+    agents.hllAgent,
+    agents.qtAgent,
+    nowMillis[A])
   val source = Source.queue[Seq[AnyRef]](10, OverflowStrategy.fail)
   val resultsRunnable = source // .map { elem => log.debug("Source queue elem{}", elem); elem }
   .via(extractBalancesFlow)

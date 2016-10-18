@@ -42,11 +42,11 @@ import com.github.garyaiki.dendrites.http.typedResponse
   *
   */
 class TypedResponseFlow(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
-                         mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
-        (implicit val ec: ExecutionContext,
-         system: ActorSystem,
-         logger: LoggingAdapter,
-         val materializer: Materializer) {
+  mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
+  (implicit val ec: ExecutionContext,
+    system: ActorSystem,
+    logger: LoggingAdapter,
+    val materializer: Materializer) {
 
   def partial: HttpResponse => Future[Either[String, AnyRef]] =
         typedResponse(mapLeft, mapRight) _ // curried

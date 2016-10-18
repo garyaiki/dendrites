@@ -16,8 +16,8 @@ package com.github.garyaiki.dendrites
 
 import _root_.akka.actor.ActorSystem
 import _root_.akka.event.Logging
-import com.datastax.driver.core.{BatchStatement, BoundStatement, CloseFuture, Cluster, Host}
-import com.datastax.driver.core.{Metadata, QueryLogger, PreparedStatement, ResultSet, Row, Session}
+import com.datastax.driver.core.{BatchStatement, BoundStatement, CloseFuture, Cluster, Host,
+  Metadata, QueryLogger, PreparedStatement, ResultSet, Row, Session}
 import com.datastax.driver.core.policies.{DCAwareRoundRobinPolicy, DefaultRetryPolicy,
   LoadBalancingPolicy, LoggingRetryPolicy, ReconnectionPolicy, RetryPolicy}
 import com.google.common.util.concurrent.ListenableFuture
