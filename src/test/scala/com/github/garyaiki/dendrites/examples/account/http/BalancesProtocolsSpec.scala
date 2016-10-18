@@ -12,13 +12,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.examples.account.http
+package com.github.garyaiki.dendrites.examples.account.http
 
 import akka.actor.{ActorSystem}
 import akka.stream.ActorMaterializer
 import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.Matchers._
-import org.gs.examples.account.{CheckingAccountBalances,
+import com.github.garyaiki.dendrites.examples.account.{CheckingAccountBalances,
       GetAccountBalances,
       MoneyMarketAccountBalances,
       SavingsAccountBalances}

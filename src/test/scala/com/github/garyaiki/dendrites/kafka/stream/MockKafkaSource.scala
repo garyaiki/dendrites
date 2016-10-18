@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.kafka.stream
+package com.github.garyaiki.dendrites.kafka.stream
 
 import akka.NotUsed
 import akka.event.LoggingAdapter
@@ -21,14 +21,20 @@ import akka.stream.ActorAttributes.SupervisionStrategy
 import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler, TimerGraphStageLogic}
 import akka.stream.scaladsl.Source
 import org.apache.kafka.clients.consumer.{CommitFailedException, InvalidOffsetException}
+
 import org.apache.kafka.common.KafkaException
 import org.apache.kafka.common.errors.{AuthorizationException, WakeupException}
+
 import scala.concurrent.duration._
 import scala.util.control.NonFatal
-import org.gs.concurrent.calculateDelay
+
+import com.github.garyaiki.dendrites.concurrent.calculateDelay
+
+import com.github.garyaiki.dendrites.kafka.stream.KafkaSource.decider;
+
 import KafkaSource.decider
 
-/** A mock version of [[org.gs.kafka.stream.KafkaSource]] to test KafkaSource's exception handling
+/** A mock version of [[com.github.garyaiki.dendrites.kafka.stream.KafkaSource]] to test KafkaSource's exception handling
   *
   * @tparam V value
   * @iter input values

@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs
+package com.github.garyaiki.dendrites
 
 import _root_.akka.actor.ActorSystem
 import _root_.akka.event.LoggingAdapter
@@ -170,7 +170,7 @@ package object http {
     *
     * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.model.HttpResponse HttpResponse]]
     * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.unmarshalling.Unmarshal Unmarshal]]
-    * @example [[org.gs.examples.account.http.actor.CheckingAccountClient]]
+    * @example [[com.github.garyaiki.dendrites.examples.account.http.actor.CheckingAccountClient]]
     *
     * @param mapLeft plain text response to Left
     * @param mapRight json response to Right
@@ -209,7 +209,7 @@ package object http {
     *
     * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.model.HttpResponse HttpResponse]]
     * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.unmarshalling.Unmarshal Unmarshal]]
-    * @example [[org.gs.examples.account.http.actor.CheckingAccountClient]]
+    * @example [[com.github.garyaiki.dendrites.examples.account.http.actor.CheckingAccountClient]]
     *
     * @param mapLeft plain text response to Left
     * @param mapRight json response to Right

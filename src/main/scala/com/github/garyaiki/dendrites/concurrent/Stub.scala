@@ -1,3 +1,3 @@
-package org.gs.concurrent
+package com.github.garyaiki.dendrites.concurrent
 
 trait Stub

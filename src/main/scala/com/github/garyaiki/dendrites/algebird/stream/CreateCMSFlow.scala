@@ -12,12 +12,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.stream
+package com.github.garyaiki.dendrites.algebird.stream
 
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.twitter.algebird.{CMS, CMSHasher, CMSMonoid}
-import org.gs.algebird.{createCMSMonoid, createCountMinSketch}
+import com.github.garyaiki.dendrites.algebird.{createCMSMonoid, createCountMinSketch}
 
 /** Flow to create CMS from Seq[K]
   *

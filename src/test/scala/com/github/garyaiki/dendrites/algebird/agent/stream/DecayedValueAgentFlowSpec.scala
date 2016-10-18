@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.agent.stream
+package com.github.garyaiki.dendrites.algebird.agent.stream
 
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
@@ -20,17 +20,22 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.twitter.algebird.{DecayedValue, DecayedValueMonoid}
+
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import org.gs.algebird.AlgebirdConfigurer
-import org.gs.algebird.agent.DecayedValueAgent
-import org.gs.algebird.stream.ZipTimeFlow
-import org.gs.fixtures.TrigUtils
+
+import com.github.garyaiki.dendrites.algebird.AlgebirdConfigurer
+import com.github.garyaiki.dendrites.algebird.agent.DecayedValueAgent
+import com.github.garyaiki.dendrites.algebird.stream.ZipTimeFlow
+import com.github.garyaiki.dendrites.fixtures.TrigUtils
+
+import com.github.garyaiki.dendrites.algebird.agent.stream.DecayedValueAgentFlow;
 
 /**
   * @author Gary Struthers

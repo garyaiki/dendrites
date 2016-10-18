@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.fixtures
+package com.github.garyaiki.dendrites.fixtures
 
 import scala.io.Source
 import scala.language.postfixOps

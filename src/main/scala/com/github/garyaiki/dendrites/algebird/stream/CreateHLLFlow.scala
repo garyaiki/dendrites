@@ -12,14 +12,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.stream
+package com.github.garyaiki.dendrites.algebird.stream
 
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.twitter.algebird.{HLL, HyperLogLogAggregator}
-import org.gs.algebird.createHLL
-import org.gs.algebird.AlgebirdConfigurer.hyperLogLogBits
-import org.gs.algebird.typeclasses.HyperLogLogLike
+import com.github.garyaiki.dendrites.algebird.createHLL
+import com.github.garyaiki.dendrites.algebird.AlgebirdConfigurer.hyperLogLogBits
+import com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike
 
 /** Flow to create HLL from Seq[A]
   *

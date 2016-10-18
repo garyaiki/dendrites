@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.examples.account.http.stream.actor
+package com.github.garyaiki.dendrites.examples.account.http.stream.actor
 
 import akka.NotUsed
 import akka.actor.{Actor,
@@ -39,8 +39,8 @@ import akka.stream.scaladsl.Flow
 import java.util.MissingResourceException
 import scala.concurrent.duration._
 import scala.reflect.runtime.universe._
-import org.gs.examples.account.http.stream.ParallelCallFlow
-import org.gs.stream.actor.{CallStream, OtherActor}
+import com.github.garyaiki.dendrites.examples.account.http.stream.ParallelCallFlow
+import com.github.garyaiki.dendrites.stream.actor.{CallStream, OtherActor}
 import ParallelCallSupervisor.SinkActor
 
 /** Creates CallStream Actor with a RunnablaGraph composite flow of parallelCallFlow

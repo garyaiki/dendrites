@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.examples.account.http
+package com.github.garyaiki.dendrites.examples.account.http
 
 import akka.actor.ActorSystem
 import akka.event.Logging
@@ -20,10 +20,10 @@ import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 
-/** Server for integration tests under `org.gs.examples`
+/** Server for integration tests under `com.github.garyaiki.dendrites.examples`
   * @note Sometimes tests fail when run together, this seems to be a Scalatest issue, rerun
   * failed test individually.
-  * @see [[org.gs.examples.account.http.BalancesService]]
+  * @see [[com.github.garyaiki.dendrites.examples.account.http.BalancesService]]
   *
   * In a terminal window
   * {{{
@@ -33,7 +33,7 @@ import com.typesafe.config.ConfigFactory
   * }}}
   * In another terminal window
   * {{{
-  * > it:testOnly org.gs.examples.*
+  * > it:testOnly com.github.garyaiki.dendrites.examples.*
   * ...
   * [info] ScalaTest
   * [info] Run completed in 7 seconds, 744 milliseconds.

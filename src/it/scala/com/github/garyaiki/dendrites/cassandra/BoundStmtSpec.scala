@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.cassandra
+package com.github.garyaiki.dendrites.cassandra
 
 import akka.actor.ActorSystem
 import com.datastax.driver.core.{BoundStatement, Cluster, PreparedStatement, ResultSet, Session}
@@ -20,8 +20,8 @@ import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy
 import java.util.{HashSet => JHashSet, UUID}
 import scala.concurrent.ExecutionContext
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
-import org.gs.cassandra.Playlists._
-import org.gs.cassandra.Songs._
+import com.github.garyaiki.dendrites.cassandra.Playlists._
+import com.github.garyaiki.dendrites.cassandra.Songs._
 
 class BoundStmtSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   implicit val system = ActorSystem("dendrites")

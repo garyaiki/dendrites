@@ -12,12 +12,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.agent
+package com.github.garyaiki.dendrites.algebird.agent
 
 import akka.agent.Agent
 import com.twitter.algebird.{DecayedValue, DecayedValueMonoid}
 import scala.concurrent.{ExecutionContext, Future}
-import org.gs.algebird.toDecayedValues
+import com.github.garyaiki.dendrites.algebird.toDecayedValues
 
 /** Akka Agent for concurrently updating DecayedValue
   *
@@ -28,7 +28,7 @@ import org.gs.algebird.toDecayedValues
   * @param ec implicit execution context for future
   * @param monoid implicit DecayedValueMonoid to scan from initial value
   *
-  * @example [[org.gs.algebird.agent.stream.DecayedValueAgentFlow]]
+  * @example [[com.github.garyaiki.dendrites.algebird.agent.stream.DecayedValueAgentFlow]]
   * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]
   * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValue DecayedValue]]
   * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValueMonoid DecayedValueMonoid]]

@@ -1,4 +1,4 @@
-package org.gs.algebird.agent
+package com.github.garyaiki.dendrites.algebird.agent
 
 import com.twitter.algebird.CMSHasherImplicits._
 import org.scalatest.{ Matchers, WordSpecLike }
@@ -7,8 +7,8 @@ import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext.Implicits.global
-import org.gs.algebird.{createCMSMonoid, createCountMinSketch} 
-import org.gs.fixtures.TestValuesBuilder
+import com.github.garyaiki.dendrites.algebird.{createCMSMonoid, createCountMinSketch} 
+import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
 
 class CountMinSketchAgentSpec extends WordSpecLike with Matchers with TestValuesBuilder {
   implicit val m = createCMSMonoid[Long]()

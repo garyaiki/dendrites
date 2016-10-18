@@ -1,3 +1,3 @@
-package org.gs.aggregator
+package com.github.garyaiki.dendrites.aggregator
 
 trait Stub

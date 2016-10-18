@@ -1,12 +1,12 @@
 /**
   */
-package org.gs.algebird
+package com.github.garyaiki.dendrites.algebird
 
 import org.scalatest.FlatSpecLike
 import org.scalatest.Matchers._
-import org.gs.algebird.fixtures.BloomFilterBuilder
-import org.gs.algebird._
-import org.gs._
+import com.github.garyaiki.dendrites.algebird.fixtures.BloomFilterBuilder
+import com.github.garyaiki.dendrites.algebird._
+import com.github.garyaiki.dendrites._
 import com.twitter.algebird._
 
 /** @author garystruthers

@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.agent.stream
+package com.github.garyaiki.dendrites.algebird.agent.stream
 
 import akka.NotUsed
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
@@ -21,11 +21,11 @@ import akka.stream.scaladsl.{Flow, Sink}
 import com.twitter.algebird.{HLL, HyperLogLogAggregator, HyperLogLogMonoid}
 import scala.concurrent.Future
 import scala.reflect.runtime.universe.TypeTag
-import org.gs.algebird.createHLL
-import org.gs.algebird.AlgebirdConfigurer.hyperLogLogBits
-import org.gs.algebird.agent.HyperLogLogAgent
-import org.gs.algebird.stream.CreateHLLFlow
-import org.gs.algebird.typeclasses.HyperLogLogLike
+import com.github.garyaiki.dendrites.algebird.createHLL
+import com.github.garyaiki.dendrites.algebird.AlgebirdConfigurer.hyperLogLogBits
+import com.github.garyaiki.dendrites.algebird.agent.HyperLogLogAgent
+import com.github.garyaiki.dendrites.algebird.stream.CreateHLLFlow
+import com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike
 
 /** Flow to update HyperLogLogAgent Agent
   *
@@ -64,7 +64,7 @@ object HyperLogLogAgentFlow {
     * @tparam A is a HyperLogLogLike with a TypeTag
     * @param hllAgent Akka Agent accumulates HLL values
     * @return Future for Agents updated value
-    * @see [[org.gs.algebird.typeclasses.HyperLogLogLike]]
+    * @see [[com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike]]
     */
   def compositeFlow[A: TypeTag: HyperLogLogLike](hllAgent: HyperLogLogAgent):
           Flow[Seq[A], Future[HLL], NotUsed] = {
@@ -79,7 +79,7 @@ object HyperLogLogAgentFlow {
     * @tparam A is a HyperLogLogLike with a TypeTag
     * @param hllAgent Akka Agent accumulates HLL values
     * @return Sink that accepts Seq[A]
-    * @see [[org.gs.algebird.typeclasses.HyperLogLogLike]]
+    * @see [[com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike]]
     */
   def compositeSink[A: TypeTag: HyperLogLogLike](hllAgent: HyperLogLogAgent): Sink[Seq[A], NotUsed] = {
     compositeFlow(hllAgent).to(Sink.ignore)

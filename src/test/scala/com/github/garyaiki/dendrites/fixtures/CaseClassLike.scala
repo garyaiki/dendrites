@@ -1,6 +1,6 @@
 /**
   */
-package org.gs.fixtures
+package com.github.garyaiki.dendrites.fixtures
 
 import annotation.implicitNotFound
 import scala.BigDecimal

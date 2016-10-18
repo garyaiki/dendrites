@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.http.stream
+package com.github.garyaiki.dendrites.http.stream
 
 import akka.NotUsed
 import akka.actor.ActorSystem
@@ -21,7 +21,7 @@ import akka.http.scaladsl.model.HttpResponse
 import akka.stream.Materializer
 import akka.stream.scaladsl.Flow
 import scala.concurrent.Future
-import org.gs.http.typedQuery
+import com.github.garyaiki.dendrites.http.typedQuery
 
 /** Send query to Http service. typedQuery builds a GET request and calls the server,
   * typedQuery is a curried function, only its initial argument list is passed here, the stream

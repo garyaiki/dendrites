@@ -1,6 +1,6 @@
 /**
   */
-package org.gs.algebird
+package com.github.garyaiki.dendrites.algebird
 
 import language.postfixOps
 import util.Random
@@ -8,9 +8,9 @@ import com.twitter.algebird._
 import com.twitter.algebird.CMSHasherImplicits._
 import org.scalatest.FlatSpecLike
 import org.scalatest.Matchers._
-import org.gs._
-import org.gs.algebird._
-import org.gs.fixtures.InetAddressesBuilder
+import com.github.garyaiki.dendrites._
+import com.github.garyaiki.dendrites.algebird._
+import com.github.garyaiki.dendrites.fixtures.InetAddressesBuilder
 
 /** @author garystruthers
   *

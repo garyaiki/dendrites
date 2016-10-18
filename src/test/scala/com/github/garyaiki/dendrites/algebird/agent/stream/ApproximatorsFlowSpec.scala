@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.stream
+package com.github.garyaiki.dendrites.algebird.agent.stream
 
 
 import akka.actor.ActorSystem
@@ -27,11 +27,11 @@ import org.scalatest._
 import org.scalatest.Matchers._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
-import org.gs.aggregator._
-import org.gs.algebird._
-import org.gs.algebird.agent.Agents
-import org.gs.fixtures.TestValuesBuilder
-import org.gs.algebird.agent.stream.ApproximatorsFlow
+import com.github.garyaiki.dendrites.aggregator._
+import com.github.garyaiki.dendrites.algebird._
+import com.github.garyaiki.dendrites.algebird.agent.Agents
+import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
+import com.github.garyaiki.dendrites.algebird.agent.stream.ApproximatorsFlow
 
 /**
   *

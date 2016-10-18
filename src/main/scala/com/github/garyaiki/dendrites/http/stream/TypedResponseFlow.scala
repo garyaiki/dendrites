@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.http.stream
+package com.github.garyaiki.dendrites.http.stream
 
 import akka.NotUsed
 import akka.actor.ActorSystem
@@ -24,7 +24,7 @@ import akka.stream.{ActorAttributes, Materializer, Supervision}
 import akka.stream.ActorAttributes.SupervisionStrategy
 import akka.stream.scaladsl.Flow
 import scala.concurrent.{ExecutionContext, Future}
-import org.gs.http.typedResponse
+import com.github.garyaiki.dendrites.http.typedResponse
 
 /** Map HttpResponse to Future[Either] Left for errors, Right case class for good result
   *

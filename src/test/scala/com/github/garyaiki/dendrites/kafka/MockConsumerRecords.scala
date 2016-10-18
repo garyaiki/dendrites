@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.kafka
+package com.github.garyaiki.dendrites.kafka
 
 import java.util.{ArrayList, HashMap, List => JList}
 import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords}

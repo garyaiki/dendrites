@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.kafka
+package com.github.garyaiki.dendrites.kafka
 
 import java.lang.{Long => JLong}
 import java.util.{ArrayList, List => JList}
@@ -22,7 +22,7 @@ import org.apache.kafka.common.TopicPartition
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 import scala.collection.JavaConverters._
 import scala.collection.mutable.HashMap
-import org.gs.concurrent.calculateDelay
+import com.github.garyaiki.dendrites.concurrent.calculateDelay
 
 /** Create MockConsumer, initilize with test topics, partitions, and ConsumerRecords. Subscribe to
   * test topics

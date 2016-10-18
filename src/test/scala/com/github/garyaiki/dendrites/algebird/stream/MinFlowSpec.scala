@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.stream
+package com.github.garyaiki.dendrites.algebird.stream
 
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
@@ -20,9 +20,9 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import org.scalatest.{Matchers, WordSpecLike}
-import org.gs.algebird.min
-import org.gs.fixtures.TestValuesBuilder
-import org.gs.stream.{collectRightFlow, flattenFlow}
+import com.github.garyaiki.dendrites.algebird.min
+import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
+import com.github.garyaiki.dendrites.stream.{collectRightFlow, flattenFlow}
 
 /** @author Gary Struthers
   *

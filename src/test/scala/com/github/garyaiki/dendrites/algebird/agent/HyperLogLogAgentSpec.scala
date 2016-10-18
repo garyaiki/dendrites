@@ -1,6 +1,6 @@
 /**
   */
-package org.gs.algebird.agent
+package com.github.garyaiki.dendrites.algebird.agent
 
 import com.twitter.algebird.{HyperLogLogAggregator, HyperLogLogMonoid}
 import org.scalatest.{ Matchers, WordSpecLike }
@@ -8,9 +8,13 @@ import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
+
 import scala.concurrent.ExecutionContext.Implicits.global
-import org.gs.algebird.{AlgebirdConfigurer, createHLL}
-import org.gs.fixtures.TestValuesBuilder
+import com.github.garyaiki.dendrites.algebird.{AlgebirdConfigurer, createHLL}
+
+import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
+
+import com.github.garyaiki.dendrites.algebird.agent.HyperLogLogAgent;
 
 /**
   *

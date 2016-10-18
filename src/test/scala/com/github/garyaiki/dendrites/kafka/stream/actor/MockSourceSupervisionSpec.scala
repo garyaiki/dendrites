@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.kafka.stream.actor
+package com.github.garyaiki.dendrites.kafka.stream.actor
 
 import akka.actor.{ActorSystem}
 import akka.event.{Logging, LoggingAdapter}
@@ -24,9 +24,9 @@ import akka.testkit.{TestKit}
 import java.util.MissingResourceException
 import org.scalatest.{Matchers, WordSpecLike}
 import scala.collection.mutable.ArrayBuffer
-import org.gs.examples.account.GetAccountBalances
-import org.gs.stream.actor.CallStreamSupervisor
-import org.gs.stream.actor.CallStreamSupervisor.props
+import com.github.garyaiki.dendrites.examples.account.GetAccountBalances
+import com.github.garyaiki.dendrites.stream.actor.CallStreamSupervisor
+import com.github.garyaiki.dendrites.stream.actor.CallStreamSupervisor.props
 
 /**
   *

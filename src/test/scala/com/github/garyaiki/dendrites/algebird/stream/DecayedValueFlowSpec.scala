@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.stream
+package com.github.garyaiki.dendrites.algebird.stream
 
 import akka.NotUsed
 import akka.actor.ActorSystem
@@ -24,8 +24,8 @@ import com.twitter.algebird.DecayedValue
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
 import scala.collection.immutable.Range
-import org.gs.algebird.{AlgebirdConfigurer, toDecayedValues}
-import org.gs.fixtures.TrigUtils
+import com.github.garyaiki.dendrites.algebird.{AlgebirdConfigurer, toDecayedValues}
+import com.github.garyaiki.dendrites.fixtures.TrigUtils
 
 /**
   *

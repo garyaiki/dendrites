@@ -12,15 +12,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.examples.account.http.stream
+package com.github.garyaiki.dendrites.examples.account.http.stream
 
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.{FlowShape, Materializer, UniformFanOutShape}
 import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, ZipWith}
 import scala.concurrent.ExecutionContext
-import org.gs.stream.leftRightFlow
-import org.gs.stream.logLeftRightFlow
+import com.github.garyaiki.dendrites.stream.leftRightFlow
+import com.github.garyaiki.dendrites.stream.logLeftRightFlow
 
 /** Create Graph that calls Checking, MoneyMarket, Savings services in parallel, waits for them all
   * then groups failures and successes

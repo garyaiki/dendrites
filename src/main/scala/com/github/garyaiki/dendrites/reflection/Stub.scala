@@ -1,3 +1,3 @@
-package org.gs.reflection
+package com.github.garyaiki.dendrites.reflection
 
 trait Stub

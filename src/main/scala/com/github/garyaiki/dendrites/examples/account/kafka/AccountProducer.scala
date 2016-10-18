@@ -12,13 +12,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.examples.account.kafka
+package com.github.garyaiki.dendrites.examples.account.kafka
 
 import com.typesafe.config.ConfigFactory
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
-import org.gs.concurrent.calculateDelay
-import org.gs.kafka.ProducerConfig
-import org.gs.kafka.createProducer
+import com.github.garyaiki.dendrites.concurrent.calculateDelay
+import com.github.garyaiki.dendrites.kafka.ProducerConfig
+import com.github.garyaiki.dendrites.kafka.createProducer
 
 /** Create KafkaProducer configured for GetAccountBalances
   *

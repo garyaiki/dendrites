@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.cassandra.stream
+package com.github.garyaiki.dendrites.cassandra.stream
 
 import akka.NotUsed
 import akka.actor.ActorSystem
@@ -34,10 +34,15 @@ import java.util.{HashSet => JHashSet, UUID}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
 import scala.concurrent.ExecutionContext
-import org.gs.cassandra.{PlaylistSongConfig, Songs}
-import org.gs.cassandra.Playlists._
-import org.gs.cassandra.Songs._
-import org.gs.cassandra.{close,
+import com.github.garyaiki.dendrites.cassandra.{PlaylistSongConfig, Songs}
+
+import com.github.garyaiki.dendrites.cassandra.Playlists._
+import com.github.garyaiki.dendrites.cassandra.Songs._
+
+import com.github.garyaiki.dendrites.cassandra.stream.CassandraPaging;
+import com.github.garyaiki.dendrites.cassandra.stream.CassandraQuery;
+import com.github.garyaiki.dendrites.cassandra.stream.CassandraSink;
+import com.github.garyaiki.dendrites.cassandra.{close,
                          connect,
                          createCluster,
                          createLoadBalancingPolicy,

@@ -12,15 +12,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.examples.account.kafka
+package com.github.garyaiki.dendrites.examples.account.kafka
 
 import com.typesafe.config.ConfigFactory
 import org.apache.kafka.clients.consumer.Consumer
 import scala.collection.JavaConverters._
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
-import org.gs.concurrent.calculateDelay
-import org.gs.kafka.ConsumerConfig
-import org.gs.kafka.createConsumer
+import com.github.garyaiki.dendrites.concurrent.calculateDelay
+import com.github.garyaiki.dendrites.kafka.ConsumerConfig
+import com.github.garyaiki.dendrites.kafka.createConsumer
 
 /** Configure and create KafkaConsumer, calculateDelay constant args, subscribe to account topic
   *

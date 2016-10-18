@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.agent.stream
+package com.github.garyaiki.dendrites.algebird.agent.stream
 
 import akka.NotUsed
 import akka.actor.ActorSystem
@@ -22,14 +22,14 @@ import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, ZipWith, ZipWith5}
 import akka.stream.scaladsl.GraphDSL.Implicits._
 import com.twitter.algebird.{AveragedValue, CMS, CMSHasher, DecayedValue, HLL, QTree}
 import scala.reflect.runtime.universe.TypeTag
-import org.gs.algebird.agent.{AveragedAgent,
+import com.github.garyaiki.dendrites.algebird.agent.{AveragedAgent,
   CountMinSketchAgent,
   DecayedValueAgent,
   HyperLogLogAgent,
   QTreeAgent}
-import org.gs.algebird.stream.{CreateCMSFlow, CreateHLLFlow, ZipTimeFlow}
-import org.gs.algebird.stream.avgFlow
-import org.gs.algebird.typeclasses.HyperLogLogLike
+import com.github.garyaiki.dendrites.algebird.stream.{CreateCMSFlow, CreateHLLFlow, ZipTimeFlow}
+import com.github.garyaiki.dendrites.algebird.stream.avgFlow
+import com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike
 
 /** Update Algebird approximators concurrently, Input Seq[A] broadcast it to 5 Algebird Agents then
   * zip their latest values

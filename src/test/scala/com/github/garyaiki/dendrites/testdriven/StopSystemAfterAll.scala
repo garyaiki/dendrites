@@ -1,4 +1,4 @@
-package org.gs.testdriven
+package com.github.garyaiki.dendrites.testdriven
 
 import org.scalatest.{Suite, BeforeAndAfterAll}
 import akka.testkit.TestKit

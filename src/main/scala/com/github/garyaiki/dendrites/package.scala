@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org
+package com.github.garyaiki
 
 import java.util.Properties
 
@@ -48,7 +48,7 @@ import java.util.Properties
   * }}}
   * @author Gary Struthers
   */
-package object gs {
+package object dendrites {
 
   /** Extract case class elements into a Map
     *

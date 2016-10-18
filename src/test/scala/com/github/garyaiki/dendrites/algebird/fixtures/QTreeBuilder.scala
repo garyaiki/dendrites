@@ -12,13 +12,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.fixtures
+package com.github.garyaiki.dendrites.algebird.fixtures
 
 import com.twitter.algebird.QTreeSemigroup
 import org.scalatest.{Outcome, TestSuite, TestSuiteMixin}
-import org.gs.algebird.BigDecimalField
-import org.gs.algebird.buildQTree
-import org.gs.fixtures.TestValuesBuilder
+import com.github.garyaiki.dendrites.algebird.BigDecimalField
+import com.github.garyaiki.dendrites.algebird.buildQTree
+import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
 
 /**
   *

@@ -12,12 +12,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.fixtures
+package com.github.garyaiki.dendrites.algebird.fixtures
 
 import org.scalatest.{TestSuite, TestSuiteMixin}
 import util.Random
-import org.gs.fixtures.SysProcessUtils
-import org.gs.algebird.createBF
+import com.github.garyaiki.dendrites.fixtures.SysProcessUtils
+import com.github.garyaiki.dendrites.algebird.createBF
 
 /**
   *

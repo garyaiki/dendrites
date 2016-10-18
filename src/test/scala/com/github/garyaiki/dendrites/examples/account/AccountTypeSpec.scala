@@ -12,12 +12,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.examples.account
+package com.github.garyaiki.dendrites.examples.account
 
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
-import org.gs.filters._
-import org.gs.examples.fixtures.AccountTypesBuilder
+import com.github.garyaiki.dendrites.filters._
+import com.github.garyaiki.dendrites.examples.fixtures.AccountTypesBuilder
+
+import com.github.garyaiki.dendrites.examples.account.Checking;
+import com.github.garyaiki.dendrites.examples.account.MoneyMarket;
+import com.github.garyaiki.dendrites.examples.account.Savings;
 
 /**
   * @author Gary Struthers

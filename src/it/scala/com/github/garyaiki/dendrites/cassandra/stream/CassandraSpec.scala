@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.cassandra.stream
+package com.github.garyaiki.dendrites.cassandra.stream
 
 import akka.actor.ActorSystem
 import com.datastax.driver.core.{BoundStatement, Cluster, PreparedStatement, ResultSet, Session}
@@ -23,10 +23,10 @@ import com.datastax.driver.core.policies.{DefaultRetryPolicy,
 import java.util.{HashSet => JHashSet, UUID}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.concurrent.ExecutionContext
-import org.gs.cassandra.{Playlists, PlaylistSongConfig, Songs}
-import org.gs.cassandra.Playlists._
-import org.gs.cassandra.Songs._
-import org.gs.cassandra.{close,
+import com.github.garyaiki.dendrites.cassandra.{Playlists, PlaylistSongConfig, Songs}
+import com.github.garyaiki.dendrites.cassandra.Playlists._
+import com.github.garyaiki.dendrites.cassandra.Songs._
+import com.github.garyaiki.dendrites.cassandra.{close,
                          connect,
                          createCluster,
                          createLoadBalancingPolicy,
@@ -35,7 +35,7 @@ import org.gs.cassandra.{close,
                          executeBoundStmt,
                          initLoadBalancingPolicy,
                          logMetadata}
-import org.gs.cassandra.registerQueryLogger
+import com.github.garyaiki.dendrites.cassandra.registerQueryLogger
 
 class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   implicit val system = ActorSystem("dendrites")

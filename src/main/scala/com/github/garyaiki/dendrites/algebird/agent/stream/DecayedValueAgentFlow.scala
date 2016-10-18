@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.agent.stream
+package com.github.garyaiki.dendrites.algebird.agent.stream
 
 import akka.NotUsed
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
@@ -22,8 +22,8 @@ import com.twitter.algebird.DecayedValue
 import java.time.Instant
 import scala.concurrent.Future
 import scala.reflect.runtime.universe.TypeTag
-import org.gs.algebird.agent.DecayedValueAgent
-import org.gs.algebird.stream.ZipTimeFlow
+import com.github.garyaiki.dendrites.algebird.agent.DecayedValueAgent
+import com.github.garyaiki.dendrites.algebird.stream.ZipTimeFlow
 
 /** Flow to update DecayedValue Agent
   *

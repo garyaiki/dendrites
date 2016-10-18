@@ -12,12 +12,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.fixtures
+package com.github.garyaiki.dendrites.fixtures
 
 import org.scalatest.{Outcome, TestSuite, TestSuiteMixin}
 import scala.annotation.implicitNotFound
 import scala.collection.immutable.NumericRange
-import org.gs.filters.extractElementByIndex
+import com.github.garyaiki.dendrites.filters.extractElementByIndex
 
 /**
   *

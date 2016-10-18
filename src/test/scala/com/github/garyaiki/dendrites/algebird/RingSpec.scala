@@ -1,10 +1,10 @@
 /**
   */
-package org.gs.algebird
+package com.github.garyaiki.dendrites.algebird
 
 import org.scalatest.FlatSpecLike
-import org.gs.filters._
-import org.gs.fixtures.TestValuesBuilder
+import com.github.garyaiki.dendrites.filters._
+import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
 
 /** @author garystruthers
   *

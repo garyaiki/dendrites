@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.agent
+package com.github.garyaiki.dendrites.algebird.agent
 
 import akka.agent.Agent
 import com.twitter.algebird.{HLL, HyperLogLogAggregator, HyperLogLogMonoid}
@@ -27,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
   * @param monoid implicit HyperLogLogMonoid for zero value and adding HLLs, 12 bits for 1% accuracy
   * @param agg implicit HyperLogLogAggregator to add HLLs, 12 bits for 1% accuracy
   *
-  * @example [[org.gs.algebird.agent.stream.HyperLogLogAgentFlow]]
+  * @example [[com.github.garyaiki.dendrites.algebird.agent.stream.HyperLogLogAgentFlow]]
   * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]
   * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
   * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HyperLogLogAggregator HyperLogLogAggregator]]

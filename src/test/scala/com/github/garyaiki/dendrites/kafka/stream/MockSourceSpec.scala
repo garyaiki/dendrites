@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.kafka.stream
+package com.github.garyaiki.dendrites.kafka.stream
 
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
@@ -23,7 +23,7 @@ import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import org.gs.kafka.MockConsumerConfig
+import com.github.garyaiki.dendrites.kafka.MockConsumerConfig
 
 /** Test a Kafka MockConsumer in a Source 
  	*

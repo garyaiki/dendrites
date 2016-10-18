@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.examples.account.http.stream.actor
+package com.github.garyaiki.dendrites.examples.account.http.stream.actor
 
 import akka.NotUsed
 import akka.actor.{Actor,
@@ -31,16 +31,16 @@ import com.twitter.algebird.CMSHasherImplicits._
 import java.util.MissingResourceException
 import scala.concurrent.duration._
 import scala.reflect.runtime.universe.TypeTag
-import org.gs.algebird.cmsHasherBigDecimal
-import org.gs.algebird.agent.Agents
-import org.gs.algebird.agent.stream.ParallelApproximators
-import org.gs.algebird.agent.stream.DecayedValueAgentFlow.nowMillis
-import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
-import org.gs.examples.account.{GetAccountBalances, GetCustomerAccountBalances}
-import org.gs.examples.account.stream.extractBalancesFlow
-import org.gs.stream.actor.CallStream
-import org.gs.stream.actor.CallStream.props
-import org.gs.stream.actor.OtherActor
+import com.github.garyaiki.dendrites.algebird.cmsHasherBigDecimal
+import com.github.garyaiki.dendrites.algebird.agent.Agents
+import com.github.garyaiki.dendrites.algebird.agent.stream.ParallelApproximators
+import com.github.garyaiki.dendrites.algebird.agent.stream.DecayedValueAgentFlow.nowMillis
+import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
+import com.github.garyaiki.dendrites.examples.account.{GetAccountBalances, GetCustomerAccountBalances}
+import com.github.garyaiki.dendrites.examples.account.stream.extractBalancesFlow
+import com.github.garyaiki.dendrites.stream.actor.CallStream
+import com.github.garyaiki.dendrites.stream.actor.CallStream.props
+import com.github.garyaiki.dendrites.stream.actor.OtherActor
 import ParallelCallSupervisor.props
 import ParallelCallSupervisor.SinkActor
 import StreamLogAgentsSupervisor.ResultsActor

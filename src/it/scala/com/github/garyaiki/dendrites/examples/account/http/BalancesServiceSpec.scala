@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.examples.account.http
+package com.github.garyaiki.dendrites.examples.account.http
 
 import akka.event.NoLogging
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
@@ -22,9 +22,9 @@ import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.stream.ActorMaterializer
 import org.scalatest.{Matchers, WordSpec}
 import scala.math.BigDecimal.double2bigDecimal
-import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances,
+import com.github.garyaiki.dendrites.examples.account.{CheckingAccountBalances, GetAccountBalances,
   MoneyMarketAccountBalances, SavingsAccountBalances}
-import org.gs.http.caseClassToGetQuery
+import com.github.garyaiki.dendrites.http.caseClassToGetQuery
 
 /**
   *

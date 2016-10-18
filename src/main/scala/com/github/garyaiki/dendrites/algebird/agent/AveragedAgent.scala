@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.agent
+package com.github.garyaiki.dendrites.algebird.agent
 
 import akka.agent.Agent
 import com.twitter.algebird.{AveragedGroup, AveragedValue}
@@ -25,7 +25,7 @@ import scala.concurrent.{ExecutionContext, Future}
   * @param init optional initial AveragedValue
   * @param ec implicit ExecutionContext
   *
-  * @example [[org.gs.algebird.agent.stream.AveragedAgentFlow]]
+  * @example [[com.github.garyaiki.dendrites.algebird.agent.stream.AveragedAgentFlow]]
   * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]
   * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
   * @author Gary Struthers

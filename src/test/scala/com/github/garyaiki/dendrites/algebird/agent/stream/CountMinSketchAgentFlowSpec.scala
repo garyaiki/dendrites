@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.agent.stream
+package com.github.garyaiki.dendrites.algebird.agent.stream
 
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
@@ -20,18 +20,23 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.twitter.algebird.{CMS, CMSHasher, CMSMonoid}
+
+import com.github.garyaiki.dendrites.algebird.agent.stream.CountMinSketchAgentFlow;
 import com.twitter.algebird.CMSHasherImplicits._
+
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import org.gs.algebird.createCMSMonoid
-import org.gs.algebird.agent.CountMinSketchAgent
-import org.gs.algebird.stream.CreateCMSFlow
-import org.gs.fixtures.TestValuesBuilder
+
+import com.github.garyaiki.dendrites.algebird.createCMSMonoid
+import com.github.garyaiki.dendrites.algebird.agent.CountMinSketchAgent
+import com.github.garyaiki.dendrites.algebird.stream.CreateCMSFlow
+import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
 
 /**
   * @author Gary Struthers

@@ -1,4 +1,4 @@
-package org.gs
+package com.github.garyaiki.dendrites
 
 import java.util.Properties
 import org.scalatest.WordSpecLike

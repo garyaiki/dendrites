@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.examples.account
+package com.github.garyaiki.dendrites.examples.account
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
@@ -27,7 +27,7 @@ import akka.stream.scaladsl.Flow
   *    .via(extractBalancesFlow)
   *    .toMat(sink2)(Keep.both).run()
   * }}}
-  * @see [[org.gs.examples.account]] package object for the functions these Flows wrap
+  * @see [[com.github.garyaiki.dendrites.examples.account]] package object for the functions these Flows wrap
   * @author Gary Struthers
   */
 package object stream {
@@ -36,7 +36,7 @@ package object stream {
     *
     * @tparam A value type in AccBalances
     * @return just the As
-    * @see [[org.gs.examples.account]]
+    * @see [[com.github.garyaiki.dendrites.examples.account]]
     */
     def extractBalancesFlow[A]: Flow[Seq[AnyRef], Seq[A], NotUsed] =
             Flow[Seq[AnyRef]].map(extractBalancesVals[A])

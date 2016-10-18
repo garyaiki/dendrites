@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.kafka
+package com.github.garyaiki.dendrites.kafka
 
 import akka.actor.ActorSystem
 import akka.event.Logging
@@ -25,7 +25,7 @@ import org.scalatest.Matchers._
 import scala.io.Source._
 import scala.collection.immutable.{Iterable, Seq}
 import scala.concurrent.duration.MILLISECONDS
-import org.gs._
+import com.github.garyaiki.dendrites._
 
 
 /** 

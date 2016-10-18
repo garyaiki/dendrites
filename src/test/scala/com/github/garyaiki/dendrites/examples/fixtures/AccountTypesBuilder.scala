@@ -12,15 +12,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.examples.fixtures
+package com.github.garyaiki.dendrites.examples.fixtures
 
 import scala.collection.immutable.Range
 import scala.math.Numeric.BigDecimalAsIfIntegral
 import org.scalatest.{Outcome, TestSuite, TestSuiteMixin}
 import scala.annotation.implicitNotFound
-import org.gs.examples.account.AccBalances
-import org.gs.examples.account.AccountType
-import org.gs.examples.account.accountTypes
+import com.github.garyaiki.dendrites.examples.account.AccBalances
+import com.github.garyaiki.dendrites.examples.account.AccountType
+import com.github.garyaiki.dendrites.examples.account.accountTypes
 
 /**
   * @author Gary Struthers

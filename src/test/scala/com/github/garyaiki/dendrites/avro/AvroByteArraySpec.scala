@@ -12,13 +12,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.avro
+package com.github.garyaiki.dendrites.avro
 
 import org.apache.avro.generic.{GenericDatumReader, GenericRecord}
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
 import scala.io.Source._
-import org.gs.examples.account.GetAccountBalances
+import com.github.garyaiki.dendrites.examples.account.GetAccountBalances
 
 /**
   *

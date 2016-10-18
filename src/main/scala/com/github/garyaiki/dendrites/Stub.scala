@@ -1,3 +1,3 @@
-package org.gs
+package com.github.garyaiki.dendrites
 
 trait Stub

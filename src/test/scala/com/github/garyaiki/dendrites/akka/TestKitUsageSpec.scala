@@ -1,4 +1,4 @@
-package org.gs.akka
+package com.github.garyaiki.dendrites.akka
 
 import scala.util.Random
 import org.scalatest.BeforeAndAfterAll

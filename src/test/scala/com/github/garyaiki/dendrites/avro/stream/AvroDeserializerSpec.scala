@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.avro.stream
+package com.github.garyaiki.dendrites.avro.stream
 
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
@@ -23,10 +23,10 @@ import org.apache.avro.generic.{GenericDatumReader, GenericRecord}
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
 import scala.io.Source._
-import org.gs._
-import org.gs.avro._
-import org.gs.examples.account.GetAccountBalances
-import org.gs.examples.account.avro._
+import com.github.garyaiki.dendrites._
+import com.github.garyaiki.dendrites.avro._
+import com.github.garyaiki.dendrites.examples.account.GetAccountBalances
+import com.github.garyaiki.dendrites.examples.account.avro._
 
 /**
   *

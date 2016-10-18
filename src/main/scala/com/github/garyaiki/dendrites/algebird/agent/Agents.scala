@@ -12,13 +12,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.agent
+package com.github.garyaiki.dendrites.algebird.agent
 
 import com.twitter.algebird.{CMSHasher, DecayedValue, DecayedValueMonoid, HLL, QTreeSemigroup}
 import scala.concurrent.ExecutionContext
 import scala.reflect.runtime.universe.TypeTag
-import org.gs.algebird.AlgebirdConfigurer
-import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
+import com.github.garyaiki.dendrites.algebird.AlgebirdConfigurer
+import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
 
 
 /** Create Agents for Algebird AveragedValue, CountMinSketch, DecayedValue, HyperLogLog, QTree

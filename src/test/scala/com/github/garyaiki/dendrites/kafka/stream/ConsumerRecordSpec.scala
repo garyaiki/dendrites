@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.kafka.stream
+package com.github.garyaiki.dendrites.kafka.stream
 
 import akka.NotUsed
 import akka.actor.ActorSystem
@@ -25,7 +25,7 @@ import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords}
 import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.Matchers._
 import scala.collection.immutable.Queue
-import org.gs.kafka.MockConsumerRecords
+import com.github.garyaiki.dendrites.kafka.MockConsumerRecords
 
 class ConsumerRecordSpec extends WordSpecLike with MockConsumerRecords {
   implicit val system = ActorSystem("dendrites")

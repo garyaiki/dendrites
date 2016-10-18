@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.examples.account.http.stream
+package com.github.garyaiki.dendrites.examples.account.http.stream
 
 import akka.NotUsed
 import akka.actor.ActorSystem
@@ -22,15 +22,20 @@ import akka.stream.scaladsl.{Flow, Keep}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.twitter.algebird.{AveragedValue, HLL}
 import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
+
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
+
 import scala.concurrent.ExecutionContext
-import org.gs.algebird.stream.{avgFlow, CreateHLLFlow, maxFlow, minFlow}
-import org.gs.examples.account.{extractBalancesVals, GetAccountBalances}
-import org.gs.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
-import org.gs.http.{caseClassToGetQuery, typedQueryResponse}
-import org.gs.examples.account.stream.extractBalancesFlow
+import com.github.garyaiki.dendrites.algebird.stream.{avgFlow, CreateHLLFlow, maxFlow, minFlow}
+import com.github.garyaiki.dendrites.examples.account.{extractBalancesVals, GetAccountBalances}
+import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
+import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQueryResponse}
+
+import com.github.garyaiki.dendrites.examples.account.stream.extractBalancesFlow
+
+import com.github.garyaiki.dendrites.examples.account.http.stream.ParallelCallFlow;
 
 /**
   *

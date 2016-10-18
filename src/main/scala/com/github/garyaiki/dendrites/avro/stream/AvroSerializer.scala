@@ -12,12 +12,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.avro.stream
+package com.github.garyaiki.dendrites.avro.stream
 
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import org.apache.avro.Schema
-import org.gs.avro.loadSchema
+import com.github.garyaiki.dendrites.avro.loadSchema
 
 /** Flow serializes a case class. Read Avro schema, pass it and a case class to f, push serialized
   * object

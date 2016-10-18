@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.kafka.stream
+package com.github.garyaiki.dendrites.kafka.stream
 
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
@@ -43,12 +43,12 @@ import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.collection.immutable.{Iterable, Seq}
-import org.gs.avro.ccToByteArray
-import org.gs.avro.stream.{AvroDeserializer, AvroSerializer}
-import org.gs.examples.account.GetAccountBalances
-import org.gs.examples.account.avro.genericRecordToGetAccountBalances
-import org.gs.examples.account.kafka.AccountProducer
-import org.gs.kafka.MockProducerConfig
+import com.github.garyaiki.dendrites.avro.ccToByteArray
+import com.github.garyaiki.dendrites.avro.stream.{AvroDeserializer, AvroSerializer}
+import com.github.garyaiki.dendrites.examples.account.GetAccountBalances
+import com.github.garyaiki.dendrites.examples.account.avro.genericRecordToGetAccountBalances
+import com.github.garyaiki.dendrites.examples.account.kafka.AccountProducer
+import com.github.garyaiki.dendrites.kafka.MockProducerConfig
 
 /** Test KafkaSink Supervision. KafkaSink companion object defines a Supervision Decider. Custom
   * AkkaStream stages can use Akka Supervision but they must provide customized ways to handle

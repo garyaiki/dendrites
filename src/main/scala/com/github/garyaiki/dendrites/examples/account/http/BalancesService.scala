@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.examples.account.http
+package com.github.garyaiki.dendrites.examples.account.http
 
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
@@ -25,7 +25,7 @@ import akka.stream.Materializer
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import spray.json.DefaultJsonProtocol
-import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances,
+import com.github.garyaiki.dendrites.examples.account.{CheckingAccountBalances, GetAccountBalances,
     MoneyMarketAccountBalances, SavingsAccountBalances}
 
 /** Map json <=> case classes to Either Right on success, String to Left on failure
@@ -116,7 +116,7 @@ trait BalancesService extends BalancesProtocols {
   }
 
   val routes = {
-    logRequestResult("org.gs.examples.account.http.balancesServer") {
+    logRequestResult("com.github.garyaiki.dendrites.examples.account.http.balancesServer") {
 
       path("account" / "balances" / "checking" / "GetAccountBalances") {
         parameter('id.as[Long]) { id =>

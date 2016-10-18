@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.kafka.stream
+package com.github.garyaiki.dendrites.kafka.stream
 
 import akka.NotUsed
 import akka.event.LoggingAdapter
@@ -25,6 +25,7 @@ import akka.stream.stage.{AsyncCallback,
     InHandler,
     TimerGraphStageLogic}
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord, RecordMetadata}
+
 import org.apache.kafka.common.KafkaException
 import org.apache.kafka.common.errors.{CorruptRecordException, // Retriable exceptions
   InvalidMetadataException,
@@ -39,11 +40,14 @@ import org.apache.kafka.common.errors.{InvalidTopicException, //Stopping excepti
   RecordBatchTooLargeException,
   RecordTooLargeException,
   UnknownServerException}
-import scala.util.control.NonFatal
-import org.gs.kafka.ProducerConfig
-import org.gs.kafka.stream.KafkaSink.decider
 
-/** A copy of [[org.gs.kafka.stream.KafkaSink]] modified to inject exceptions into Kafka Producer
+import scala.util.control.NonFatal
+
+import com.github.garyaiki.dendrites.kafka.ProducerConfig
+
+import com.github.garyaiki.dendrites.kafka.stream.KafkaSink.decider;
+
+/** A copy of [[com.github.garyaiki.dendrites.kafka.stream.KafkaSink]] modified to inject exceptions into Kafka Producer
   * asynchronous callback
   *
   * @tparam K Kafka ProducerRecord key

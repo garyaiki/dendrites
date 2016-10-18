@@ -12,27 +12,32 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.examples.account.http.stream.actor
+package com.github.garyaiki.dendrites.examples.account.http.stream.actor
 
 import akka.actor.{ActorSystem, Props}
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import com.twitter.algebird.{AveragedValue, QTreeSemigroup}
+
+import com.github.garyaiki.dendrites.examples.account.http.stream.actor.StreamLogAgentsSupervisor;
 import com.twitter.algebird.CMSHasherImplicits._
 import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
+
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
+
 import scala.reflect.runtime.universe.TypeTag
-import org.gs.aggregator.mean
-import org.gs.algebird.{AlgebirdConfigurer, BigDecimalField}
-import org.gs.algebird.cmsHasherBigDecimal
-import org.gs.algebird.agent.Agents
-import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
-import org.gs.examples.account.{GetCustomerAccountBalances, Savings}
-import org.gs.examples.account.{CheckingAccountBalances, GetAccountBalances}
-import org.gs.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
-import org.gs.http.{caseClassToGetQuery, typedQueryResponse}
+
+import com.github.garyaiki.dendrites.aggregator.mean
+import com.github.garyaiki.dendrites.algebird.{AlgebirdConfigurer, BigDecimalField}
+import com.github.garyaiki.dendrites.algebird.cmsHasherBigDecimal
+import com.github.garyaiki.dendrites.algebird.agent.Agents
+import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
+import com.github.garyaiki.dendrites.examples.account.{GetCustomerAccountBalances, Savings}
+import com.github.garyaiki.dendrites.examples.account.{CheckingAccountBalances, GetAccountBalances}
+import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
+import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQueryResponse}
 
 /** Parent Supervisor creates child supervisor of parallel HTTP stream and actor with parallel
   * Agents stream

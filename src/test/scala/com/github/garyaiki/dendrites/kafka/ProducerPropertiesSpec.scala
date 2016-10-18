@@ -12,13 +12,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.kafka
+package com.github.garyaiki.dendrites.kafka
 
 import java.util.Properties
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
-import org.gs._
+import com.github.garyaiki.dendrites._
 
 
 class ProducerPropertiesSpec extends WordSpecLike {

@@ -12,17 +12,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.agent
+package com.github.garyaiki.dendrites.algebird.agent
 
+import com.github.garyaiki.dendrites.algebird.agent.DecayedValueAgent;
 import com.twitter.algebird._
-import org.gs._
-import org.gs.algebird._
-import org.gs.fixtures.TrigUtils
+
+import com.github.garyaiki.dendrites._
+import com.github.garyaiki.dendrites.algebird._
+import com.github.garyaiki.dendrites.fixtures.TrigUtils
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /** @author garystruthers

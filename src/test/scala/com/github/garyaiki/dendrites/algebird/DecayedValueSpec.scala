@@ -1,11 +1,11 @@
 /**
   */
-package org.gs.algebird
+package com.github.garyaiki.dendrites.algebird
 
 import com.twitter.algebird._
-import org.gs._
-import org.gs.algebird._
-import org.gs.fixtures.{ TestValuesBuilder, TrigUtils }
+import com.github.garyaiki.dendrites._
+import com.github.garyaiki.dendrites.algebird._
+import com.github.garyaiki.dendrites.fixtures.{ TestValuesBuilder, TrigUtils }
 import org.scalatest.FlatSpecLike
 
 /** @author garystruthers

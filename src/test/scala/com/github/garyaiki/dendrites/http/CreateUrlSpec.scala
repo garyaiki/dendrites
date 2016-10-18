@@ -1,6 +1,6 @@
 /**
   */
-package org.gs.http
+package com.github.garyaiki.dendrites.http
 
 import org.scalatest.{ FlatSpec, Matchers }
 

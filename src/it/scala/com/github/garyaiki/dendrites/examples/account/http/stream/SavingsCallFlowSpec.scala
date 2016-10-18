@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.examples.account.http.stream
+package com.github.garyaiki.dendrites.examples.account.http.stream
 
 import akka.NotUsed
 import akka.actor.ActorSystem
@@ -21,14 +21,18 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Flow}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
+
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
+
+import com.github.garyaiki.dendrites.examples.account.http.stream.SavingsCallFlow;
+
 import scala.concurrent.ExecutionContext
 import scala.math.BigDecimal.double2bigDecimal
-import org.gs.examples.account.{GetAccountBalances, SavingsAccountBalances}
-import org.gs.examples.account.http.{BalancesProtocols, SavingsBalancesClientConfig}
-import org.gs.http.{caseClassToGetQuery, typedQueryResponse}
+import com.github.garyaiki.dendrites.examples.account.{GetAccountBalances, SavingsAccountBalances}
+import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols, SavingsBalancesClientConfig}
+import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQueryResponse}
 
 /**
   *

@@ -1,3 +1,3 @@
-package org.gs.examples.account.avro
+package com.github.garyaiki.dendrites.examples.account.avro
 
 trait Stub

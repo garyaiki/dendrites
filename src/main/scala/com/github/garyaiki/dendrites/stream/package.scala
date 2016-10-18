@@ -12,14 +12,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs
+package com.github.garyaiki.dendrites
 
 import _root_.akka.NotUsed
 import _root_.akka.event.LoggingAdapter
 import _root_.akka.stream.scaladsl.Flow
 import scala.collection.mutable.ArrayBuffer
-import org.gs.filters.filterRight
-import org.gs.algebird.typeclasses.QTreeLike
+import com.github.garyaiki.dendrites.filters.filterRight
+import com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike
 
 /** Akka Stream Flows
   *

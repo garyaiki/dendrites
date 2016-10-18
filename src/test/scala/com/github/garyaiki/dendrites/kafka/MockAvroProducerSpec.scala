@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.kafka
+package com.github.garyaiki.dendrites.kafka
 
 import akka.actor.ActorSystem
 import akka.event.{LoggingAdapter, Logging}
@@ -20,8 +20,8 @@ import java.util.concurrent.{Future => JFuture}
 import org.apache.kafka.clients.producer.{Callback, MockProducer, ProducerRecord, RecordMetadata}
 import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.Matchers._
-import org.gs.avro.{byteArrayToGenericRecord, ccToByteArray, loadSchema}
-import org.gs.examples.account.GetAccountBalances
+import com.github.garyaiki.dendrites.avro.{byteArrayToGenericRecord, ccToByteArray, loadSchema}
+import com.github.garyaiki.dendrites.examples.account.GetAccountBalances
 
 /** Test a Kafka MockConsumer in a Source
   *

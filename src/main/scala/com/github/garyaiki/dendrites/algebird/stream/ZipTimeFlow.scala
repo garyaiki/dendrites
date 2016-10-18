@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.stream
+package com.github.garyaiki.dendrites.algebird.stream
 
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
@@ -21,7 +21,7 @@ import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
   *
   * @tparam A Numeric
   * @param f produces time, arg:A is ignore-able
-  * @example [[org.gs.algebird.agent.stream.DecayedValueAgentFlow]]
+  * @example [[com.github.garyaiki.dendrites.algebird.agent.stream.DecayedValueAgentFlow]]
   * @author Gary Struthers
   */
 class ZipTimeFlow[A: Numeric](f: A => Double)

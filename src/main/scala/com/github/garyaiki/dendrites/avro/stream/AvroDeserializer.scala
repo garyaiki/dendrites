@@ -12,13 +12,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.avro.stream
+package com.github.garyaiki.dendrites.avro.stream
 
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import org.apache.avro.generic.GenericRecord
 import org.apache.avro.Schema
-import org.gs.avro.{byteArrayToGenericRecord, loadSchema}
+import com.github.garyaiki.dendrites.avro.{byteArrayToGenericRecord, loadSchema}
 
 /** Maps a byteArray first to an Avro GenericRecord, then maps the GenericRecord to a case class
   *

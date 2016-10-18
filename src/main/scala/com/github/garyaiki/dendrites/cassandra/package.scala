@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs
+package com.github.garyaiki.dendrites
 
 import _root_.akka.actor.ActorSystem
 import _root_.akka.event.Logging
@@ -31,7 +31,7 @@ import java.util.{Collection => JCollection, Date => JDate, HashSet => JHashSet,
 import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
-import org.gs.concurrent.listenableFutureToScala
+import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
 
 /** Common functions for Cassandra Java Driver
   *
@@ -281,7 +281,7 @@ package object cassandra {
 
   /** Asynchronously execute a BoundStatement but getUninterruptibly blocks, use blocking-dispatcher
     *
-    * [[org.gs.cassandra.stream.CassandraSink]] shows fully asynchronous executeAsync with Future
+    * [[com.github.garyaiki.dendrites.cassandra.stream.CassandraSink]] shows fully asynchronous executeAsync with Future
     *
     * @param session
     * @param bndStmt with values previously bound

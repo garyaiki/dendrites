@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.cassandra.stream
+package com.github.garyaiki.dendrites.cassandra.stream
 
 import akka.NotUsed
 import akka.event.LoggingAdapter
@@ -24,7 +24,7 @@ import com.google.common.util.concurrent.ListenableFuture
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
-import org.gs.concurrent.listenableFutureToScala
+import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
 
 /** Execute Cassandra BoundStatement queries that return Rows. Values bound in previous stage.
   * BoundStatements can be for different queries.

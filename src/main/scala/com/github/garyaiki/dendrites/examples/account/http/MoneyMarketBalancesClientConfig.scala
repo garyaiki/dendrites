@@ -12,11 +12,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.examples.account.http
+package com.github.garyaiki.dendrites.examples.account.http
 
 import akka.util.Timeout
 import scala.concurrent.duration.MILLISECONDS
-import org.gs.http.{configBaseUrl, configRequestPath, getHostConfig}
+import com.github.garyaiki.dendrites.http.{configBaseUrl, configRequestPath, getHostConfig}
 
 /** Read config for Money Market Balances Client
   *

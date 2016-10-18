@@ -12,12 +12,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.agent
+package com.github.garyaiki.dendrites.algebird.agent
 
 import akka.agent.Agent
 import com.twitter.algebird.{CMS, CMSHasher}
 import scala.concurrent.{ExecutionContext, Future}
-import org.gs.algebird.createCMSMonoid
+import com.github.garyaiki.dendrites.algebird.createCMSMonoid
 
 /** Akka Agent for concurrently updating CountMinSketch
   *
@@ -26,7 +26,7 @@ import org.gs.algebird.createCMSMonoid
   * @param name Agent name
   * @param ec implicit ExecutionContext
   *
-  * @example [[org.gs.algebird.agent.stream.CountMinSketchAgentFlow]]
+  * @example [[com.github.garyaiki.dendrites.algebird.agent.stream.CountMinSketchAgentFlow]]
   * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]
   * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSHasher CMSHasher]]
   * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]

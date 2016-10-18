@@ -12,15 +12,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.agent
+package com.github.garyaiki.dendrites.algebird.agent
 
 import akka.agent.Agent
 import com.twitter.algebird.{QTree, QTreeSemigroup}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.runtime.universe.TypeTag
-import org.gs.algebird.{buildQTree, buildQTrees}
-import org.gs.algebird.AlgebirdConfigurer.qTreeLevel
-import org.gs.algebird.typeclasses.QTreeLike
+import com.github.garyaiki.dendrites.algebird.{buildQTree, buildQTrees}
+import com.github.garyaiki.dendrites.algebird.AlgebirdConfigurer.qTreeLevel
+import com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike
 
 /** Akka Agent for concurrently updating Qtree
   *
@@ -31,7 +31,7 @@ import org.gs.algebird.typeclasses.QTreeLike
   * @param ec implicit execution context for future
   * @param sg implicit QTreeSemigroup for adding
   *
-  * @example [[org.gs.algebird.agent.stream.QTreeAgentFlow]]
+  * @example [[com.github.garyaiki.dendrites.algebird.agent.stream.QTreeAgentFlow]]
   * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]
   * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]
   * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTreeSemigroup QTreeSemigroup]]

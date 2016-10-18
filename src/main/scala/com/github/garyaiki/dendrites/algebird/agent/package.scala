@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird
+package com.github.garyaiki.dendrites.algebird
 
 /** Akka [[http://doc.akka.io/api/akka/2.4/#akka.agent.Agent Agent]] for concurrently updating and
   * accessing [[https://github.com/twitter/algebird/wiki Algebird]] approximate data structures

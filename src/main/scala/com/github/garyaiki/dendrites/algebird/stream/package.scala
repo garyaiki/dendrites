@@ -12,13 +12,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird
+package com.github.garyaiki.dendrites.algebird
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.twitter.algebird.{Approximate, AveragedValue, HLL, QTree}
 import scala.reflect.runtime.universe.TypeTag
-import org.gs.algebird.typeclasses.QTreeLike
+import com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike
 
 /** Akka Stream Flows for Algebird hashing and aggregating functions
   *
@@ -30,11 +30,11 @@ import org.gs.algebird.typeclasses.QTreeLike
   * DecayedValue uses these value/time pairs
   *
   * == AveragedValue ==
-  * Average sequence of Numerics Flow `org.gs.algebird.stream.AveragedFlowSpec`
+  * Average sequence of Numerics Flow `com.github.garyaiki.dendrites.algebird.stream.AveragedFlowSpec`
   * {{{
   * val avg: FlowShape[Seq[A], AveragedValue] = builder.add(avgFlow)
   * }}}
-  * Sum AveragedValues sequences to AveragedValue `org.gs.algebird.stream.SumAveragedFlowSpec`
+  * Sum AveragedValues sequences to AveragedValue `com.github.garyaiki.dendrites.algebird.stream.SumAveragedFlowSpec`
   * {{{
   * val (pub, sub) = TestSource.probe[Seq[BigDecimal]]
   *  .via(avgBDFlow.grouped(2))
@@ -42,7 +42,7 @@ import org.gs.algebird.typeclasses.QTreeLike
   *  .toMat(TestSink.probe[AveragedValue])(Keep.both)
   *  .run()
   * }}}
-  * == Hyper Log Log == `org.gs.algebird.stream.HyperLogLogFlowSpec`
+  * == Hyper Log Log == `com.github.garyaiki.dendrites.algebird.stream.HyperLogLogFlowSpec`
   * Estimate size of Hyper Log Log
   * {{{
   * val (pub, sub) = TestSource.probe[HLL]
@@ -71,21 +71,21 @@ import org.gs.algebird.typeclasses.QTreeLike
   *  .toMat(TestSink.probe[Approximate[Long]])(Keep.both)
   *  .run()
   * }}}
-  * == Max value in a sequence == `org.gs.algebird.stream.MaxFlowSpec`
+  * == Max value in a sequence == `com.github.garyaiki.dendrites.algebird.stream.MaxFlowSpec`
   * {{{
   * val (pub, sub) = TestSource.probe[Seq[BigDecimal]]
   *  .via(maxFlow)
   *  .toMat(TestSink.probe[BigDecimal])(Keep.both)
   *  .run()
   }}}
-  * == Min value in a sequence == `org.gs.algebird.stream.MinFlowSpec`
+  * == Min value in a sequence == `com.github.garyaiki.dendrites.algebird.stream.MinFlowSpec`
   * {{{
   * val (pub, sub) = TestSource.probe[Seq[BigInt]]
   *  .via(minFlow)
   *  .toMat(TestSink.probe[BigInt])(Keep.both)
   *  .run()
   * }}}
-  * == QTree == `org.gs.algebird.stream.QTreeFlowSpec`
+  * == QTree == `com.github.garyaiki.dendrites.algebird.stream.QTreeFlowSpec`
   * Find max value in a QTree
   * {{{
   * def sourceBI = TestSource.probe[QTree[BigInt]]
@@ -140,7 +140,7 @@ import org.gs.algebird.typeclasses.QTreeLike
   *  .toMat(sinkDD)(Keep.both)
   *  .run()
   * }}}
-  * @see [[org.gs.algebird]] package object for the functions these Flows wrap
+  * @see [[com.github.garyaiki.dendrites.algebird]] package object for the functions these Flows wrap
   * @author Gary Struthers
   */
 package object stream {
@@ -273,7 +273,7 @@ package object stream {
     * @tparam A QTreeLike typeclass that construct QTree[A]
     * @return max
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
-    * @see [[org.gs.algebird.typeclasses.QTreeLike]]
+    * @see [[com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike]]
     * @see [[http://doc.akka.io/api/akka/current/#akka.stream.scaladsl.Flow Flow]]
     */
   def qTreeMaxFlow[A: QTreeLike]: Flow[QTree[A], Double, NotUsed] = Flow[QTree[A]].map(_.upperBound)
@@ -284,7 +284,7 @@ package object stream {
     * @return min
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
-    * @see [[org.gs.algebird.typeclasses.QTreeLike]]
+    * @see [[com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike]]
     * @see [[http://doc.akka.io/api/akka/current/#akka.stream.scaladsl.Flow Flow]]
     */
   def qTreeMinFlow[A: QTreeLike]: Flow[QTree[A], Double, NotUsed] = Flow[QTree[A]].map(_.lowerBound)
@@ -294,7 +294,7 @@ package object stream {
     * @tparam A QTreeLike typeclass that construct QTree[A]
     * @return lower, upper bounds
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
-    * @see [[org.gs.algebird.typeclasses.QTreeLike]]
+    * @see [[com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike]]
     * @see [[http://doc.akka.io/api/akka/current/#akka.stream.scaladsl.Flow Flow]]
     */
   def firstQuartileFlow[A: QTreeLike]: Flow[QTree[A], (Double, Double), NotUsed] = {
@@ -306,7 +306,7 @@ package object stream {
     * @tparam A QTreeLike typeclass that construct QTree[A]
     * @return lower, upper bounds
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
-    * @see [[org.gs.algebird.typeclasses.QTreeLike]]
+    * @see [[com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike]]
     * @see [[http://doc.akka.io/api/akka/current/#akka.stream.scaladsl.Flow Flow]]
     */
   def secondQuartileFlow[A: QTreeLike]: Flow[QTree[A], (Double, Double), NotUsed] = {
@@ -318,7 +318,7 @@ package object stream {
     * @tparam A QTreeLike typeclass that construct QTree[A]
     * @return lower, upper bounds
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
-    * @see [[org.gs.algebird.typeclasses.QTreeLike]]
+    * @see [[com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike]]
     * @see [[http://doc.akka.io/api/akka/current/#akka.stream.scaladsl.Flow Flow]]
     */
   def thirdQuartileFlow[A: QTreeLike]: Flow[QTree[A], (Double, Double), NotUsed] = {

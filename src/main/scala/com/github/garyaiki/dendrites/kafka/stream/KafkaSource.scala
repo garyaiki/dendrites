@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.kafka.stream
+package com.github.garyaiki.dendrites.kafka.stream
 
 import akka.NotUsed
 import akka.event.LoggingAdapter
@@ -29,8 +29,8 @@ import org.apache.kafka.common.errors.{AuthorizationException, WakeupException}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import scala.util.control.NonFatal
-import org.gs.concurrent.calculateDelay
-import org.gs.kafka.ConsumerConfig
+import com.github.garyaiki.dendrites.concurrent.calculateDelay
+import com.github.garyaiki.dendrites.kafka.ConsumerConfig
 
 /** Source stage that reads from Kafka
   *

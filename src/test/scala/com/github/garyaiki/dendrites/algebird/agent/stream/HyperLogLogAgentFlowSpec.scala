@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.algebird.agent.stream
+package com.github.garyaiki.dendrites.algebird.agent.stream
 
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
@@ -21,16 +21,21 @@ import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.twitter.algebird.{HLL, HyperLogLogAggregator, HyperLogLogMonoid}
 import org.scalatest.{Matchers, WordSpecLike}
+
 import org.scalatest._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import org.gs.algebird.AlgebirdConfigurer
-import org.gs.algebird.stream.CreateHLLFlow
-import org.gs.algebird.agent.HyperLogLogAgent
-import org.gs.fixtures.TestValuesBuilder
+
+import com.github.garyaiki.dendrites.algebird.AlgebirdConfigurer
+import com.github.garyaiki.dendrites.algebird.stream.CreateHLLFlow
+import com.github.garyaiki.dendrites.algebird.agent.HyperLogLogAgent
+import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
+
+import com.github.garyaiki.dendrites.algebird.agent.stream.HyperLogLogAgentFlow;
 
 /**
   *

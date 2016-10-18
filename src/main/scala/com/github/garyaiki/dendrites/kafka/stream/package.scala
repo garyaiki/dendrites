@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.kafka
+package com.github.garyaiki.dendrites.kafka
 
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, UnzipWith, UnzipWith2, UnzipWithApply}
@@ -84,7 +84,7 @@ package object stream {
   /** Flow to map ConsumerRecords to a Queue of ConsumerRecord. This allows a Stream to pull
     * one ConsumerRecord at a time
     *
-    * @see [[org.gs.examples.account]]
+    * @see [[com.github.garyaiki.dendrites.examples.account]]
     *
     * @tparam K key type
     * @tparam V value type
@@ -121,7 +121,7 @@ package object stream {
     * @tparam K key type
     * @tparam V value type
     * @return a tuple2 of queues of ConsumerRecord
-    * @see [[org.gs.examples.account]]
+    * @see [[com.github.garyaiki.dendrites.examples.account]]
     */
   def dualConsumerRecordsFlow[K, V]: Flow[ConsumerRecords[K, V],
             (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]), NotUsed] =
@@ -159,7 +159,7 @@ package object stream {
     * @tparam K key type
     * @tparam V value type
     * @return a tuple3 of queues of ConsumerRecord
-    * @see [[org.gs.examples.account]]
+    * @see [[com.github.garyaiki.dendrites.examples.account]]
     */
   def tripleConsumerRecordsFlow[K, V]: Flow[ConsumerRecords[K, V],
             (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]),

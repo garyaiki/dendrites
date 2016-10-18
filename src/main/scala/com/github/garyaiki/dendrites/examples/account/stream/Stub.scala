@@ -1,3 +1,3 @@
-package org.gs.examples.account.stream
+package com.github.garyaiki.dendrites.examples.account.stream
 
 trait Stub

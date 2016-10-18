@@ -15,14 +15,14 @@ limitations under the License.
 /** @see http://en.wikipedia.org/wiki/Interquartile_mean
   * @see http://en.wikipedia.org/wiki/Interquartile_range
   */
-package org.gs.algebird
+package com.github.garyaiki.dendrites.algebird
 
 import com.twitter.algebird._
 import org.scalatest.FlatSpecLike
 import org.scalatest.Matchers._
-import org.gs._
-import org.gs.algebird._
-import org.gs.algebird.fixtures.QTreeBuilder
+import com.github.garyaiki.dendrites._
+import com.github.garyaiki.dendrites.algebird._
+import com.github.garyaiki.dendrites.algebird.fixtures.QTreeBuilder
 
 /**
   * 

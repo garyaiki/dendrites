@@ -12,12 +12,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.kafka
+package com.github.garyaiki.dendrites.kafka
 
 import org.apache.kafka.clients.producer.MockProducer
 import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSerializer}
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
-import org.gs.concurrent.calculateDelay
+import com.github.garyaiki.dendrites.concurrent.calculateDelay
 
 object MockProducerConfig extends ProducerConfig[String, Array[Byte]] {
   val topic = "akkaKafka"

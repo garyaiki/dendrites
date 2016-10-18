@@ -12,24 +12,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs
+package com.github.garyaiki.dendrites
 
 import com.twitter.algebird.{Approximate, AveragedValue, AveragedGroup, Averager, BF, BloomFilter,
   CMS, CMSHasher, CMSMonoid, DecayedValue, DecayedValueMonoid, Field, Functor, Group, HLL,
   HyperLogLogAggregator, IntRing, LongRing, MaxAggregator, MinAggregator, Monoid, NumericRing,
   QTree, QTreeSemigroup, Ring, Semigroup}
-import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
+import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
 
 /** Aggregation functions for Twitter Algebird.
   *
   * Algebird provides implicit implementations of common types which are imported here. Class
-  * extraction methods in [[org.gs]] can be used to extract a field from your case classes and tuples.
+  * extraction methods in [[com.github.garyaiki.dendrites]] can be used to extract a field from your case classes and tuples.
   * When the extracted field is an already supported type, you don't have to write custom Algebird
   * classes.
   *
   * == AveragedValue ==
   *
-  * Average a Sequence of values `org.gs.algebird.AveragedSpec`
+  * Average a Sequence of values `com.github.garyaiki.dendrites.algebird.AveragedSpec`
   * {{{
   * val bigDecimals: Seq[BigDecimal]
   * val avg0 = avg(bigDecimals)
@@ -45,12 +45,12 @@ import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
   * == BloomFilter ==
   * Fast find if a word is in a dictionary
   * OSX has dictionaries you can use to create BloomFilters
-  * `org.gs.fixtures.SysProcessUtils` for Paths to properNames, connectives, and words and
+  * `com.github.garyaiki.dendrites.fixtures.SysProcessUtils` for Paths to properNames, connectives, and words and
   * functions to read their words
-  * `org.gs.algebird.fixtures.BloomFilterBuilder` for creation of BloomFilters for these
+  * `com.github.garyaiki.dendrites.algebird.fixtures.BloomFilterBuilder` for creation of BloomFilters for these
   * dictionaries and select test words for them.
   *
-  * Create a BloomFilter for OSX words dictionary `org.gs.algebird.BloomFilterSpec`
+  * Create a BloomFilter for OSX words dictionary `com.github.garyaiki.dendrites.algebird.BloomFilterSpec`
   * {{{
   * val falsePositivepProb: Double = 0.01
   * val words = readWords(wordsPath)
@@ -74,8 +74,8 @@ import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
   * }}}
   * == CountMinSketch ==
   *
-  * Test data is IP addresses repeated a random number of times `org.gs.algebird.CountMinSketchSpec`
-  * Estimate total number of elements seen so far `org.gs.fixtures.InetAddressesBuilder`
+  * Test data is IP addresses repeated a random number of times `com.github.garyaiki.dendrites.algebird.CountMinSketchSpec`
+  * Estimate total number of elements seen so far `com.github.garyaiki.dendrites.fixtures.InetAddressesBuilder`
   * {{{
   * val addrs = inetAddresses(ipRange)
   * val longZips = inetToLongZip(addrs)
@@ -106,9 +106,9 @@ import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
   * == DecayedValue ==
   *
   * Test data is a sine wave with a value for each of 360 degrees with a corresponding time value
-  * The idea is a rising and falling value over a year `org.gs.fixtures.TrigUtils`
+  * The idea is a rising and falling value over a year `com.github.garyaiki.dendrites.fixtures.TrigUtils`
   *
-  * Moving average from the initial value to specified index `org.gs.algebird.DecayedValueSpec`
+  * Moving average from the initial value to specified index `com.github.garyaiki.dendrites.algebird.DecayedValueSpec`
   * {{{
   * val sines = genSineWave(100, 0 to 360)
   * val days = Range.Double(0.0, 361.0, 1.0)
@@ -124,7 +124,7 @@ import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
   *
   * == HyperLogLog ==
   *
-  * Create a HLL from a sequence of Int `org.gs.algebird.HyperLogLogSpec`
+  * Create a HLL from a sequence of Int `com.github.garyaiki.dendrites.algebird.HyperLogLogSpec`
   * {{{
   * implicit val ag = HyperLogLogAggregator(12)
   * val ints: Seq[Int]
@@ -165,13 +165,13 @@ import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
   *
   * == QTree ==
   *
-  * Build QTree from a Sequence `org.gs.algebird.fixtures.QTreeBuilder`
+  * Build QTree from a Sequence `com.github.garyaiki.dendrites.algebird.fixtures.QTreeBuilder`
   * {{{
   * val level = 5
   * implicit val qtBDSemigroup = new QTreeSemigroup[BigDecimal](level)
   * val qtBD = buildQTree[BigDecimal](bigDecimals)
   * }}}
-  * Get its InterQuartileMean `org.gs.algebird.QTreeSpec`
+  * Get its InterQuartileMean `com.github.garyaiki.dendrites.algebird.QTreeSpec`
   * {{{
   * val iqm = qtBD.interQuartileMean
   * // iqm._1 lower bound
@@ -202,7 +202,7 @@ import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
   *
   * == Max Min ==
   * For Sequence types that have a Semigroup, Monoid and Ordering
-  * Get Max element of a sequence. `org.gs.algebird.MaxSpec`
+  * Get Max element of a sequence. `com.github.garyaiki.dendrites.algebird.MaxSpec`
   * {{{
   * val iqm = qtBD.interQuartileMean
   *
@@ -214,7 +214,7 @@ import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
   * val max3 = max(filterRight(eithBigInts)
   * }}}
   *
-  * Get Min element of a sequence. `org.gs.algebird.MinSpec`
+  * Get Min element of a sequence. `com.github.garyaiki.dendrites.algebird.MinSpec`
   * {{{
   * val bigDecimals: Seq[BigDecimal]
   * val min = min(bigDecimals)
@@ -225,7 +225,7 @@ import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
   * }}}
   *
   * == Semigroup ==
-  * Plus function obeys associative law `org.gs.algebird.SemigroupSpec`
+  * Plus function obeys associative law `com.github.garyaiki.dendrites.algebird.SemigroupSpec`
   * Sum elements of a sequence that may be empty.
   * {{{
   * val bigDecimals: Seq[BigDecimal]
@@ -237,7 +237,7 @@ import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
   * }}}
   *
   * == Monoid ==
-  * Extends Semigroup with a zero element `org.gs.algebird.MonoidSpec`
+  * Extends Semigroup with a zero element `com.github.garyaiki.dendrites.algebird.MonoidSpec`
   * Sum sequence elements for a type that has a zero under addition.
   * {{{
   * val doubles: Seq[Double]
@@ -249,7 +249,7 @@ import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
   * }}}
   *
   * == Group ==
-  * Extends Monoid with minus, negate operators `org.gs.algebird.GroupSpec`
+  * Extends Monoid with minus, negate operators `com.github.garyaiki.dendrites.algebird.GroupSpec`
   * Negate a value
   * {{{
   * val float = 3131.7f
@@ -272,7 +272,7 @@ import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
   *
   * == Ring ==
   * Extends Group with times, product and one identity under multiplication
-  * Multiply a value by another `org.gs.algebird.RingSpec`
+  * Multiply a value by another `com.github.garyaiki.dendrites.algebird.RingSpec`
   * {{{
   * val float = 3131.7f
   * val prod = times(float, 1.7f)
@@ -293,7 +293,7 @@ import org.gs.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
   * }}}
   *
   * == Field ==
-  * Extends Ring with inverse, div  `org.gs.algebird.FieldSpec`
+  * Extends Ring with inverse, div  `com.github.garyaiki.dendrites.algebird.FieldSpec`
   * Invert a value a -> 1/a
   * {{{
   * val float = 3131.7f
@@ -722,7 +722,7 @@ package object algebird {
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HyperLogLogAggregator HyperLogLogAggregator]]
-    * @see [[org.gs.algebird.typeclasses.HyperLogLogLike]]
+    * @see [[com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike]]
     */
   def createHLL[A: HyperLogLogLike](xs: Seq[A])(
     implicit ev: HyperLogLogLike[A], agg: HyperLogLogAggregator): HLL = ev(xs)
@@ -762,7 +762,7 @@ package object algebird {
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTreeSemigroup QTreeSemigroup]]
-    * @see [[org.gs.algebird.typeclasses.QTreeLike]]
+    * @see [[com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike]]
     */
   def buildQTree[A: QTreeLike](vals: Seq[A])(implicit ev: QTreeLike[A], sg: QTreeSemigroup[A]):
       QTree[A] = vals.map { ev(_) }.reduce { sg.plus(_, _) }

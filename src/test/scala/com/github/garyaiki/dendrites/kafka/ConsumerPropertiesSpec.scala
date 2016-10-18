@@ -1,10 +1,10 @@
-package org.gs.kafka
+package com.github.garyaiki.dendrites.kafka
 
 import java.util.Properties
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
-import org.gs.loadProperties
+import com.github.garyaiki.dendrites.loadProperties
 
 /**
   *

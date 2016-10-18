@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.gs.examples.account.http.stream
+package com.github.garyaiki.dendrites.examples.account.http.stream
 
 import akka.NotUsed
 import akka.actor.ActorSystem
@@ -20,10 +20,10 @@ import akka.event.LoggingAdapter
 import akka.stream.{ActorAttributes, Materializer}
 import akka.stream.scaladsl.Flow
 import scala.concurrent.ExecutionContext
-import org.gs.examples.account.http.{BalancesProtocols, MoneyMarketBalancesClientConfig}
-import org.gs.http.caseClassToGetQuery
-import org.gs.http.stream.{TypedQueryFlow, TypedQueryResponseFlow, TypedResponseFlow}
-import org.gs.http.stream.TypedResponseFlow.decider
+import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols, MoneyMarketBalancesClientConfig}
+import com.github.garyaiki.dendrites.http.caseClassToGetQuery
+import com.github.garyaiki.dendrites.http.stream.{TypedQueryFlow, TypedQueryResponseFlow, TypedResponseFlow}
+import com.github.garyaiki.dendrites.http.stream.TypedResponseFlow.decider
 
 /** Call Money Market Balances service. Build a GET request, call the server,
   * mapPlain maps a failure, mapMoneyMarket maps good result.
