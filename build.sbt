@@ -22,7 +22,7 @@ lazy val commonSettings = Seq(
 lazy val akkaV = "2.4.11"
 lazy val scalaTestV = "3.0.0"
 lazy val algebirdV = "0.12.1"
-lazy val cassandraDriverV = "3.1.0"
+lazy val cassandraDriverV = "3.1.1"
 lazy val root = (project in file(".")).
   configs(IntegrationTest).
 	settings(commonSettings: _*).
