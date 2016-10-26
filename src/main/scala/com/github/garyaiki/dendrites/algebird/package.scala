@@ -45,12 +45,13 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTre
   * == BloomFilter ==
   * Fast find if a word is in a dictionary
   * OSX has dictionaries you can use to create BloomFilters
-  * `com.github.garyaiki.dendrites.fixtures.SysProcessUtils` for Paths to properNames, connectives, and words and
-  * functions to read their words
-  * `com.github.garyaiki.dendrites.algebird.fixtures.BloomFilterBuilder` for creation of BloomFilters for these
-  * dictionaries and select test words for them.
+  * `com.github.garyaiki.dendrites.fixtures.SysProcessUtils` for Paths to properNames, connectives,
+  * words and functions to read them
+  * `com.github.garyaiki.dendrites.algebird.fixtures.BloomFilterBuilder`
+  * for creation of BloomFilters for these dictionaries and select test words for them.
   *
-  * Create a BloomFilter for OSX words dictionary `com.github.garyaiki.dendrites.algebird.BloomFilterSpec`
+  * Create a BloomFilter for OSX words dictionary
+  * `com.github.garyaiki.dendrites.algebird.BloomFilterSpec`
   * {{{
   * val falsePositivepProb: Double = 0.01
   * val words = readWords(wordsPath)
@@ -74,8 +75,10 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTre
   * }}}
   * == CountMinSketch ==
   *
-  * Test data is IP addresses repeated a random number of times `com.github.garyaiki.dendrites.algebird.CountMinSketchSpec`
-  * Estimate total number of elements seen so far `com.github.garyaiki.dendrites.fixtures.InetAddressesBuilder`
+  * Test data is IP addresses repeated a random number of times
+  * `com.github.garyaiki.dendrites.algebird.CountMinSketchSpec`
+  * Estimate total number of elements seen so far
+  * `com.github.garyaiki.dendrites.fixtures.InetAddressesBuilder`
   * {{{
   * val addrs = inetAddresses(ipRange)
   * val longZips = inetToLongZip(addrs)
@@ -106,9 +109,11 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTre
   * == DecayedValue ==
   *
   * Test data is a sine wave with a value for each of 360 degrees with a corresponding time value
-  * The idea is a rising and falling value over a year `com.github.garyaiki.dendrites.fixtures.TrigUtils`
+  * The idea is a rising and falling value over a year
+  * `com.github.garyaiki.dendrites.fixtures.TrigUtils`
   *
-  * Moving average from the initial value to specified index `com.github.garyaiki.dendrites.algebird.DecayedValueSpec`
+  * Moving average from the initial value to specified index
+  * `com.github.garyaiki.dendrites.algebird.DecayedValueSpec`
   * {{{
   * val sines = genSineWave(100, 0 to 360)
   * val days = Range.Double(0.0, 361.0, 1.0)

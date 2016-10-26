@@ -15,8 +15,7 @@ limitations under the License.
 package com.github.garyaiki.dendrites.cassandra
 
 import com.datastax.driver.core.{BoundStatement, PreparedStatement, ResultSet, Row, Session}
-import com.weather.scalacass._
-import com.weather.scalacass.ScalaCass._
+import com.weather.scalacass.syntax._
 import java.util.UUID
 import scala.collection.JavaConverters._
 
