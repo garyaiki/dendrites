@@ -69,7 +69,7 @@ class KafkaSourceSupervisionSpec extends WordSpecLike with Matchers {
 
     "retry CommitFailedException until > maxBackoff" in {
       val iter: Iterator[String] = nums.toIterator
-      val source = MockKafkaSource[String](iter, new CommitFailedException("test"))
+      val source = MockKafkaSource[String](iter, new CommitFailedException())
       val error = source.runWith(TestSink.probe[String])
       .request(10)
       .expectError()
