@@ -4,13 +4,19 @@ A Scala library for building Reactive systems with Akka Streams, HTTP, Actors, a
 
 See the [Wiki](https://github.com/garyaiki/dendrites/wiki) for an introduction and overview.
 ### Build from source
+##### Java 8 sdk required
+[download sdk](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+##### Scala 2.11 required
+[downlod scala](http://www.scala-lang.org/download/)
 ##### Clone dendrites source from Github
 [cloning-a-repository](https://help.github.com/articles/cloning-a-repository/)
 
 In a terminal window
 
 `$ git help clone`
-##### sbt
+##### Build and test with sbt
+[download sbt](http://www.scala-sbt.org/download.html)
+
 [sbt's Documentation](http://www.scala-sbt.org/documentation.html)
 
 [sbt version](https://github.com/garyaiki/dendrites/blob/master/project/build.properties)
@@ -44,6 +50,28 @@ In a terminal window `cd` to the directory.
 `> help update` Resolves and optionally retrieves dependencies, producing a report.
 
 `> help dependencyTree` Prints an ascii tree of all the dependencies to the console
+##### Build and test with Maven
+In a terminal window
+
+`$ mvn clean`
+
+`$ mvn compile`
+
+`$ mvn install`
+### Download jar
+[Maven home page](https://maven.apache.org/index.html)
+
+[dendtites](http://mvnrepository.com/artifact/com.github.garyaiki) jar will soon be on Maven Central
+
+    `<!-- https://mvnrepository.com/artifact/com.github.garyaiki/dendrites_2.11 -->
+    <dependency>
+        <groupId>com.github.garyaiki</groupId>
+        <artifactId>dendrites_2.11</artifactId>
+        <version>0.4.0</version>
+    </dependency>
+`
+
+
 
 ### Kafka
 [Kafka's Documentation](http://kafka.apache.org/documentation)
@@ -96,6 +124,19 @@ In a 3rd Terminal window in the kafka directory
 
 Shell prompt after creation
 
+##### Run integration tests
+Kafka server must be running and have `account-topic`
+
+In terminal window with sbt running
+
+`> it:compile`
+
+`> it:testOnly com.github.garyaiki.dendrites.kafka.KafkaProducerConsumerSpec`
+
+`> it:testOnly com.github.garyaiki.dendrites.kafka.AvroKafkaProducerConsumerSpec`
+
+`> it:testOnly com.github.garyaiki.dendrites.kafka.stream.KafkaStreamSpec`
+
 ##### Delete topic, stop Kafka server, stop Zookeeper
 First, delete topic
 
@@ -130,5 +171,23 @@ In a Terminal window `cd` to cassandra directory
 `bin/cassandra -f`
 
 Cassandra will run in the foreground
+##### Run integration tests
+Cassandra must be running
+
+In terminal window with sbt running
+
+`> it:compile`
+
+`> it:testOnly com.github.garyaiki.dendrites.cassandra.BoundStmtSpec`
+
+`> it:testOnly com.github.garyaiki.dendrites.cassandra.stream.CassandraSongSpec`
+
+`> it:testOnly com.github.garyaiki.dendrites.cassandra.stream.CassandraPlaylistSpec`
+
+`> it:testOnly com.github.garyaiki.dendrites.cassandra.stream.CassandraSpec`
 #### Stop Cassandra
+After running integration tests, exit sbt to close its connection to Cassandra
+
+Then kill it
+
 Cntrl-C

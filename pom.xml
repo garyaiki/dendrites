@@ -1,20 +1,23 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.gs</groupId>
-    <artifactId>dendrites_2.11</artifactId>
-    <packaging>jar</packaging>
-    <description>Scala Akka Stream stages, reactive streams, examples</description>
-    <version>0.4.0</version>
-    <name>dendrites</name>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.github.garyaiki</groupId>
+  <artifactId>dendrites_2.11</artifactId>
+  <version>0.4.0</version>
+  <name>dendrites</name>
+  <description>Scala Akka Stream stages, reactive streams, examples</description>
+  <packaging>jar</packaging>
 	<url>https://github.com/garyaiki/dendrites</url>
+  <organization>
+    <name>com.github.garyaiki</name>
+  </organization>
 	<licenses>
 		<license>
 			<name>Apache 2.0 License</name>
 			<url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
 			<distribution>repo</distribution>
 		</license>
-  	</licenses>
+  </licenses>
 	<developers>
 		<developer>
 			<id>garyaiki</id>
@@ -23,6 +26,16 @@
 			<url>https://github.com/garyaiki</url>
 		</developer>
 	</developers>
+  <scm>
+    <url>https://github.com/garyaiki/dendrites</url>
+    <connection>scm:git:git://github.com/garyaiki/dendrites.git</connection>
+    <developerConnection>scm:git:git@github.com:garyaiki/dendrites.git</developerConnection>
+  </scm>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <scala.version>2.11.8</scala.version>
+      <java.version>1.8</java.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.scala-lang</groupId>
@@ -196,23 +209,59 @@
         </repository>
     </repositories>
 	<build>
+    <directory>target</directory>
+    <outputDirectory>target/scala-2.11/classes</outputDirectory>
+    <testOutputDirectory>target/scala-2.11/test-classes</testOutputDirectory>
+	  <sourceDirectory>src/main/scala</sourceDirectory>
+    <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
+    <testSourceDirectory>src/test/scala</testSourceDirectory>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+    </testResources>
 		<!-- To define the plugin version in your parent POM -->
 		<pluginManagement>
 			<plugins>
-				<plugin>
-					<groupId>net.alchim31.maven</groupId>
-					<artifactId>scala-maven-plugin</artifactId>
-					<version>3.2.1</version>
-				</plugin>
 			</plugins>
 		</pluginManagement>
 		<!-- To use the plugin goals in your POM or parent POM -->
 		<plugins>
-			<plugin>
-				<groupId>net.alchim31.maven</groupId>
-				<artifactId>scala-maven-plugin</artifactId>
-				<version>3.2.1</version>
-			</plugin>
+        <plugin>
+          <groupId>net.alchim31.maven</groupId>
+          <artifactId>scala-maven-plugin</artifactId>
+          <version>3.2.1</version>
+          <executions>
+            <execution>
+              <phase>compile</phase>
+              <goals>
+                <goal>compile</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.5.1</version>
+          <configuration>
+            <source>${java.version}</source>
+            <target>${java.version}</target>
+          </configuration>
+          <executions>
+            <execution>
+              <phase>compile</phase>
+              <goals>
+                <goal>compile</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
 		</plugins>
 	</build>
 	<reporting>
@@ -224,15 +273,4 @@
 			</plugin>
 		</plugins>
 	</reporting>
-	<organization>
-		<name>com.github.garyaiki</name>
-	</organization>
-	<scm>
-		<url>https://github.com/garyaiki/dendrites</url>
-		<connection>scm:git:git://github.com/garyaiki/dendrites.git</connection>
-		<developerConnection>scm:git:git@github.com:garyaiki/dendrites.git</developerConnection>
-	</scm>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
 </project>
