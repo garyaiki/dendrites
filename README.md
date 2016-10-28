@@ -57,6 +57,8 @@ In a terminal window
 
 `$ mvn compile`
 
+`$ mvn scala:testCompile`
+
 `$ mvn install`
 ### Download jar
 [Maven home page](https://maven.apache.org/index.html)
