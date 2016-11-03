@@ -19,7 +19,8 @@ lazy val commonSettings = Seq(
 	version := "0.4.0",
 	scalaVersion := "2.11.8"
 )
-lazy val akkaV = "2.4.11"
+lazy val akkaV = "2.4.12"
+lazy val akkaHttpV = "2.4.11"
 lazy val scalaTestV = "3.0.0"
 lazy val algebirdV = "0.12.1"
 lazy val cassandraDriverV = "3.1.1"
@@ -39,11 +40,11 @@ lazy val root = (project in file(".")).
 		   "com.typesafe.akka" %% "akka-agent" % akkaV, 
 		   "com.typesafe.akka" %% "akka-testkit" % akkaV % "it,test",
 			 "com.typesafe.akka" %% "akka-stream" % akkaV,
-			 "com.typesafe.akka" %% "akka-http-core" % akkaV,
-       "com.typesafe.akka" %% "akka-http-experimental" % akkaV,
+			 "com.typesafe.akka" %% "akka-http-core" % akkaHttpV,
+       "com.typesafe.akka" %% "akka-http-experimental" % akkaHttpV,
 			 "com.typesafe.akka" %% "akka-stream-testkit" % akkaV % "it,test",
-       "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaV,
-			 "com.typesafe.akka" %% "akka-http-testkit" % akkaV % "it,test",
+       "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaHttpV,
+			 "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpV % "it,test",
 		   "com.twitter" %% "algebird" % algebirdV,
 		   "com.twitter" %% "algebird-core" % algebirdV,
 		   "com.twitter" %% "algebird-test" % algebirdV % "it,test",
