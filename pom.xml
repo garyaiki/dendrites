@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.garyaiki</groupId>
   <artifactId>dendrites_2.11</artifactId>
-  <version>0.4.0</version>
+  <version>0.4.1</version>
   <name>dendrites</name>
   <description>Scala Akka Stream stages, reactive streams, examples</description>
   <packaging>jar</packaging>
@@ -199,17 +199,11 @@
 	      <name>Central Repository</name>
 	      <url>https://repo.maven.apache.org/maven2</url>
 	    </repository>
-        <repository>
-            <id>typesafereleases</id>
-            <name>typesafe-releases</name>
-            <url>http://repo.typesafe.com/typesafe/releases/</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
-          <id>jcenter</id>
-          <url>http://jcenter.bintray.com</url>
-          <layout>default</layout>
-        </repository>
+      <repository>
+        <id>jcenter</id>
+        <url>http://jcenter.bintray.com</url>
+        <layout>default</layout>
+      </repository>
     </repositories>
 	<build>
     <directory>target</directory>
@@ -241,9 +235,23 @@
           <version>3.2.1</version>
           <executions>
             <execution>
+              <id>add-source</id>
+              <phase>generate-sources</phase>
+              <goals>
+                <goal>add-source</goal>
+              </goals>
+            </execution>
+            <execution>
               <phase>compile</phase>
               <goals>
                 <goal>compile</goal>
+                <goal>testCompile</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>attach-javadocs</id>
+              <goals>
+                <goal>doc-jar</goal>
               </goals>
             </execution>
           </executions>
@@ -293,7 +301,45 @@
 		    </execution>
 		  </executions>
 		</plugin>
-		</plugins>
+		<plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-source-plugin</artifactId>
+      <version>3.0.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+    </plugin>
+	  <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-gpg-plugin</artifactId>
+      <version>1.5</version>
+      <executions>
+        <execution>
+          <id>sign-artifacts</id>
+          <phase>verify</phase>
+          <goals>
+            <goal>sign</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+    <plugin>
+      <groupId>org.sonatype.plugins</groupId>
+      <artifactId>nexus-staging-maven-plugin</artifactId>
+      <version>1.6.7</version>
+      <extensions>true</extensions>
+      <configuration>
+        <serverId>ossrh</serverId>
+        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+        <autoReleaseAfterClose>true</autoReleaseAfterClose>
+      </configuration>
+    </plugin>
+	</plugins>
 	</build>
 	<reporting>
 		<plugins>
@@ -304,4 +350,14 @@
 			</plugin>
 		</plugins>
 	</reporting>
+	<distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
 </project>

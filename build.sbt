@@ -16,7 +16,7 @@ mappings in packageBin in Compile += (baseDirectory.value / "LICENSE.md") -> "de
 
 lazy val commonSettings = Seq(
 	organization := "com.github.garyaiki",
-	version := "0.4.0",
+	version := "0.4.1",
 	scalaVersion := "2.11.8"
 )
 lazy val akkaV = "2.4.12"

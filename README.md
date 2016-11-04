@@ -62,22 +62,25 @@ In a dendrites directory terminal window
 `$ mvn test`
 
 `$ mvn install`
+
+`$ mvn source:jar`
+
+`$ mvn scala:doc-jar`
 #### Download jar from Maven Central
 
-
 [dendtites](http://mvnrepository.com/artifact/com.github.garyaiki) jar will soon be on Maven Central
-
+###### sbt
 Add dependency in sbt `build.sbt`
 
-`libraryDependencies += "com.github.garyaiki" % "dendrites_2.11" % "0.4.0"`
-
+`libraryDependencies += "com.github.garyaiki" % "dendrites_2.11" % "0.4.1"`
+###### Maven
 Add dependency in Maven `pom.xml`
 
     `<!-- https://mvnrepository.com/artifact/com.github.garyaiki/dendrites_2.11 -->
     <dependency>
         <groupId>com.github.garyaiki</groupId>
         <artifactId>dendrites_2.11</artifactId>
-        <version>0.4.0</version>
+        <version>0.4.1</version>
     </dependency>
 `
 
