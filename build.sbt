@@ -16,11 +16,11 @@ mappings in packageBin in Compile += (baseDirectory.value / "LICENSE.md") -> "de
 
 lazy val commonSettings = Seq(
 	organization := "com.github.garyaiki",
-	version := "0.4.1",
+	version := "0.4.2",
 	scalaVersion := "2.11.8"
 )
-lazy val akkaV = "2.4.12"
-lazy val akkaHttpV = "2.4.11"
+lazy val akkaV = "2.4.14"
+lazy val akkaHttpV = "10.0.0"
 lazy val scalaTestV = "3.0.0"
 lazy val algebirdV = "0.12.1"
 lazy val cassandraDriverV = "3.1.1"
@@ -41,9 +41,9 @@ lazy val root = (project in file(".")).
 		   "com.typesafe.akka" %% "akka-testkit" % akkaV % "it,test",
 			 "com.typesafe.akka" %% "akka-stream" % akkaV,
 			 "com.typesafe.akka" %% "akka-http-core" % akkaHttpV,
-       "com.typesafe.akka" %% "akka-http-experimental" % akkaHttpV,
+       "com.typesafe.akka" %% "akka-http" % akkaHttpV,
 			 "com.typesafe.akka" %% "akka-stream-testkit" % akkaV % "it,test",
-       "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaHttpV,
+       "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpV,
 			 "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpV % "it,test",
 		   "com.twitter" %% "algebird" % algebirdV,
 		   "com.twitter" %% "algebird-core" % algebirdV,
