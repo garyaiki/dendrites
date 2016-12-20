@@ -62,11 +62,8 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
   // Zip input agent update Futures, waits for all to complete
   def zipper: ZipWith5[AveragedValue, CMS[A], Seq[DecayedValue], HLL, QTree[A],
     (AveragedValue, CMS[A], Seq[DecayedValue], HLL, QTree[A])] =
-    ZipWith((in0: AveragedValue,
-      in1: CMS[A],
-      in2: Seq[DecayedValue],
-      in3: HLL,
-      in4: QTree[A]) => (in0, in1, in2, in3, in4))
+    ZipWith((in0: AveragedValue, in1: CMS[A], in2: Seq[DecayedValue], in3: HLL, in4: QTree[A]) =>
+      (in0, in1, in2, in3, in4))
 
   // Agent update functions, partially applied so they can be passed to mapAsync
   val avgAgentAlter = avgAgent.alter _
@@ -87,6 +84,7 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
   def hllAgflow: Flow[HLL, HLL, NotUsed] = Flow[HLL].mapAsync(1)(hllAgentAlter)
 
   def qtrAgFlow: Flow[Seq[A], QTree[A], NotUsed] = Flow[Seq[A]].mapAsync(1)(qtrAgentAlter)
+
   val days = Range.Double(0.0, 361.0, 1.0)
   def nextTime[T](it: Iterator[Double])(x: T): Double = it.next
   val curriedNextTime = nextTime[A](days.iterator) _

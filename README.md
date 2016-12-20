@@ -68,7 +68,7 @@ In a dendrites directory terminal window
 `$ mvn scala:doc-jar`
 #### Download jar from Maven Central
 
-[dendtites](http://mvnrepository.com/artifact/com.github.garyaiki) jar will soon be on Maven Central
+[dendtites](http://mvnrepository.com/artifact/com.github.garyaiki)
 ###### sbt
 Add dependency in sbt `build.sbt`
 

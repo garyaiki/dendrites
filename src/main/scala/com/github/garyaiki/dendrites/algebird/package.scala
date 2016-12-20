@@ -634,6 +634,7 @@ package object algebird {
     CMSHasherArrayByte.contramap((d: Double) => doubleToArrayBytes(d))
 
   def floatToArrayBytes(f: Float): Array[Byte] = doubleToArrayBytes(f.toDouble)
+
   implicit val cmsHasherFloat: CMSHasher[Float] =
     CMSHasherArrayByte.contramap((f: Float) => floatToArrayBytes(f))
 
@@ -656,8 +657,8 @@ package object algebird {
     * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     */
   def createCMSMonoid[K: Ordering: CMSHasher](
-          eps: Double = 0.001, delta: Double = 1E-10, seed: Int = 1): CMSMonoid[K] =
-                                                new CMSMonoid[K](eps, delta, seed)
+        eps: Double = 0.001, delta: Double = 1E-10, seed: Int = 1): CMSMonoid[K] =
+          new CMSMonoid[K](eps, delta, seed)
 
   /** Create a CMS
     *
@@ -770,7 +771,7 @@ package object algebird {
     * @see [[com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike]]
     */
   def buildQTree[A: QTreeLike](vals: Seq[A])(implicit ev: QTreeLike[A], sg: QTreeSemigroup[A]):
-      QTree[A] = vals.map { ev(_) }.reduce { sg.plus(_, _) }
+      QTree[A] = vals.map(ev(_)).reduce(sg.plus(_, _))
 
   /** Sum a Sequence of QTrees
     *

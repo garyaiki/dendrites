@@ -45,12 +45,12 @@
         <dependency>
             <groupId>org.scalactic</groupId>
             <artifactId>scalactic_2.11</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_2.11</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -62,33 +62,33 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.1.7</version>
+            <version>1.1.8</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-actor_2.11</artifactId>
-            <version>2.4.14</version>
+            <version>2.4.16</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-slf4j_2.11</artifactId>
-            <version>2.4.14</version>
+            <version>2.4.16</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-agent_2.11</artifactId>
-            <version>2.4.14</version>
+            <version>2.4.16</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-testkit_2.11</artifactId>
-            <version>2.4.14</version>
+            <version>2.4.16</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-stream_2.11</artifactId>
-            <version>2.4.14</version>
+            <version>2.4.16</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
@@ -103,7 +103,7 @@
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-stream-testkit_2.11</artifactId>
-            <version>2.4.14</version>
+            <version>2.4.16</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -120,17 +120,17 @@
         <dependency>
             <groupId>com.twitter</groupId>
             <artifactId>algebird_2.11</artifactId>
-            <version>0.12.1</version>
+            <version>0.12.2</version>
         </dependency>
         <dependency>
             <groupId>com.twitter</groupId>
             <artifactId>algebird-core_2.11</artifactId>
-            <version>0.12.1</version>
+            <version>0.12.2</version>
         </dependency>
         <dependency>
             <groupId>com.twitter</groupId>
             <artifactId>algebird-test_2.11</artifactId>
-            <version>0.12.1</version>
+            <version>0.12.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -157,17 +157,17 @@
         <dependency>
             <groupId>com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
-            <version>3.1.1</version>
+            <version>3.1.2</version>
         </dependency>
         <dependency>
             <groupId>com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-mapping</artifactId>
-            <version>3.1.1</version>
+            <version>3.1.2</version>
         </dependency>
         <dependency>
             <groupId>com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-extras</artifactId>
-            <version>3.1.1</version>
+            <version>3.1.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.avro</groupId>

@@ -39,9 +39,9 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike
   * @author Gary sStruthers
   */
 class QTreeAgent[A: QTreeLike : TypeTag](
-    val name: String = "",
-    level: Int = qTreeLevel,
-    xs: Option[Seq[A]] = None)
+  val name: String = "",
+  level: Int = qTreeLevel,
+  xs: Option[Seq[A]] = None)
   (implicit ec: ExecutionContext, sg: QTreeSemigroup[A]) {
 
   val zero: QTree[A] = implicitly[QTreeLike[A]].apply(sg.underlyingMonoid.zero)

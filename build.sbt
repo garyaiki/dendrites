@@ -19,11 +19,11 @@ lazy val commonSettings = Seq(
 	version := "0.4.2",
 	scalaVersion := "2.11.8"
 )
-lazy val akkaV = "2.4.14"
+lazy val akkaV = "2.4.16"
 lazy val akkaHttpV = "10.0.0"
-lazy val scalaTestV = "3.0.0"
-lazy val algebirdV = "0.12.1"
-lazy val cassandraDriverV = "3.1.1"
+lazy val scalaTestV = "3.0.1"
+lazy val algebirdV = "0.12.2"
+lazy val cassandraDriverV = "3.1.2"
 lazy val root = (project in file(".")).
   configs(IntegrationTest).
 	settings(commonSettings: _*).
@@ -31,34 +31,34 @@ lazy val root = (project in file(".")).
 	settings(
 		name := "dendrites",
 		libraryDependencies ++= Seq(
-		  "org.scalactic" %% "scalactic" % "3.0.0",
+			"org.scalactic" %% "scalactic" % scalaTestV,
 			"org.scalatest" %% "scalatest" % scalaTestV % "it,test",
-		   "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
-       "ch.qos.logback" % "logback-classic" % "1.1.7",
-		   "com.typesafe.akka" %% "akka-actor" % akkaV,
-  	   "com.typesafe.akka" %% "akka-slf4j" % akkaV,
-		   "com.typesafe.akka" %% "akka-agent" % akkaV, 
-		   "com.typesafe.akka" %% "akka-testkit" % akkaV % "it,test",
-			 "com.typesafe.akka" %% "akka-stream" % akkaV,
-			 "com.typesafe.akka" %% "akka-http-core" % akkaHttpV,
-       "com.typesafe.akka" %% "akka-http" % akkaHttpV,
-			 "com.typesafe.akka" %% "akka-stream-testkit" % akkaV % "it,test",
-       "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpV,
-			 "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpV % "it,test",
-		   "com.twitter" %% "algebird" % algebirdV,
-		   "com.twitter" %% "algebird-core" % algebirdV,
-		   "com.twitter" %% "algebird-test" % algebirdV % "it,test",
-		   "io.spray" %% "spray-json" % "1.3.2",
-		   "commons-io" % "commons-io" % "2.5" % "it,test",
-			 "com.chuusai" %% "shapeless" % "2.3.2",
-			 "org.apache.kafka" % "kafka-clients" % "0.10.1.0",
-			 "com.datastax.cassandra" % "cassandra-driver-core" % cassandraDriverV,
-			 "com.datastax.cassandra" % "cassandra-driver-mapping" % cassandraDriverV,
-			 "com.datastax.cassandra" % "cassandra-driver-extras" % cassandraDriverV,
-			 "org.apache.avro" % "avro" % "1.8.1",
-			 "com.google.guava" % "guava" % "19.0",
-			 "com.google.code.findbugs" % "jsr305" % "3.0.1",
-			 "com.github.thurstonsand" %% "scalacass" % "0.6.11"
+			"org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
+			"ch.qos.logback" % "logback-classic" % "1.1.8",
+			"com.typesafe.akka" %% "akka-actor" % akkaV,
+			"com.typesafe.akka" %% "akka-slf4j" % akkaV,
+			"com.typesafe.akka" %% "akka-agent" % akkaV, 
+			"com.typesafe.akka" %% "akka-testkit" % akkaV % "it,test",
+			"com.typesafe.akka" %% "akka-stream" % akkaV,
+			"com.typesafe.akka" %% "akka-http-core" % akkaHttpV,
+			"com.typesafe.akka" %% "akka-http" % akkaHttpV,
+			"com.typesafe.akka" %% "akka-stream-testkit" % akkaV % "it,test",
+			"com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpV,
+			"com.typesafe.akka" %% "akka-http-testkit" % akkaHttpV % "it,test",
+			"com.twitter" %% "algebird" % algebirdV,
+			"com.twitter" %% "algebird-core" % algebirdV,
+			"com.twitter" %% "algebird-test" % algebirdV % "it,test",
+			"io.spray" %% "spray-json" % "1.3.2",
+			"commons-io" % "commons-io" % "2.5" % "it,test",
+			"com.chuusai" %% "shapeless" % "2.3.2",
+			"org.apache.kafka" % "kafka-clients" % "0.10.1.0",
+			"com.datastax.cassandra" % "cassandra-driver-core" % cassandraDriverV,
+			"com.datastax.cassandra" % "cassandra-driver-mapping" % cassandraDriverV,
+			"com.datastax.cassandra" % "cassandra-driver-extras" % cassandraDriverV,
+			"org.apache.avro" % "avro" % "1.8.1",
+			"com.google.guava" % "guava" % "19.0",
+			"com.google.code.findbugs" % "jsr305" % "3.0.1",
+			"com.github.thurstonsand" %% "scalacass" % "0.6.11"
 		),
 		javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
 		scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-feature"),
@@ -70,13 +70,4 @@ lazy val root = (project in file(".")).
 		(scalastyleConfig in Test) := baseDirectory.value / "scalastyle-test-config.xml"                                                                                                                  
 	).
 	settings(site.settings : _*)
-
-
-
-
-
-
-
-
-
 

@@ -36,15 +36,13 @@ import com.github.garyaiki.dendrites.algebird.createCMSMonoid
 class CountMinSketchAgent[K: Ordering: CMSHasher](val name: String = "")
   (implicit ec: ExecutionContext) {
 
-  implicit val m = createCMSMonoid[K]()
-  val agent = Agent(m.zero)
+  val zero = createCMSMonoid[K]().zero
+  val agent = Agent(zero)
 
   /** Update agent with sequence of CMS[K]
     *
     * @param other CMS
     * @return future of combined CMS after this and all pending updates
     */
-  def alter(cms: CMS[K]): Future[CMS[K]] = {
-    agent alter (oldState => oldState ++ cms)
-  }
+  def alter(cms: CMS[K]): Future[CMS[K]] = agent alter (oldState => oldState ++ cms)
 }

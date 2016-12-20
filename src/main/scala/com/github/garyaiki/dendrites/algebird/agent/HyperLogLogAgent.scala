@@ -47,7 +47,5 @@ class HyperLogLogAgent(val name: String = "", init: Option[HLL] = None)
     * @param hll HyperLogLog
     * @return future of new HLL after this and all pending updates
     */
-  def alter(hll: HLL): Future[HLL] = {
-    agent alter (oldState => oldState + hll)
-  }
+  def alter(hll: HLL): Future[HLL] = agent alter (oldState => oldState + hll)
 }
