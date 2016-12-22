@@ -25,11 +25,9 @@ import com.github.garyaiki.dendrites.http.{configBaseUrl, configRequestPath, get
   */
 class SavingsBalancesClientConfig() {
 
-  val hostConfig = getHostConfig("dendrites.savings-balances.http.interface",
-    "dendrites.savings-balances.http.port")
+  val hostConfig = getHostConfig("dendrites.savings-balances.http.interface", "dendrites.savings-balances.http.port")
   val config = hostConfig._1
   val baseURL = configBaseUrl("dendrites.savings-balances.http.path", hostConfig)
   val requestPath = configRequestPath("dendrites.savings-balances.http.requestPath", config)
-  val timeout = new Timeout(config.getInt("dendrites.savings-balances.http.millis"),
-      MILLISECONDS)
+  val timeout = new Timeout(config.getInt("dendrites.savings-balances.http.millis"), MILLISECONDS)
 }

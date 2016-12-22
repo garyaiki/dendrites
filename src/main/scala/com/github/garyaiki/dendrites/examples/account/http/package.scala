@@ -26,6 +26,7 @@ package com.github.garyaiki.dendrites.examples.account
   *   }
   * }
   * }}}
+  *
   * @author Gary Struthers
   *
   */

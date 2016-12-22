@@ -62,7 +62,7 @@ package object concurrent {
     * @return completed Scala Future
     */
   def listenableFutureToScala[T](lf: ListenableFuture[T]): Future[T] = {
-    val p = Promise[T]()
+    val p = Promise[T]
     Futures.addCallback(lf, new FutureCallback[T] {
       def onFailure(t: Throwable): Unit = p failure t
       def onSuccess(result: T): Unit    = p success result
@@ -83,16 +83,16 @@ package object concurrent {
     *
     */
   def calculateDelay(
-    minBackoff:   FiniteDuration,
-    maxBackoff:   FiniteDuration,
+    minBackoff: FiniteDuration,
+    maxBackoff: FiniteDuration,
     randomFactor: Double)(retryCount: Int): FiniteDuration = {
-    val rnd = 1.0 + ThreadLocalRandom.current().nextDouble() * randomFactor
+      val rnd = 1.0 + ThreadLocalRandom.current().nextDouble * randomFactor
       if (retryCount >= 30) // Duration overflow protection
         maxBackoff
       else
         maxBackoff.min(minBackoff * math.pow(2, retryCount)) * rnd match {
           case f: FiniteDuration ⇒ f
-            case _               ⇒ maxBackoff
+            case _ ⇒ maxBackoff
         }
     }
 }

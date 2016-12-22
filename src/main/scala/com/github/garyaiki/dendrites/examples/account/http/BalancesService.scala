@@ -17,7 +17,7 @@ package com.github.garyaiki.dendrites.examples.account.http
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.http.scaladsl.client.RequestBuilding
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.{sprayJsonMarshaller, sprayJsonUnmarshaller}
 import akka.http.scaladsl.model.HttpEntity
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.unmarshalling.Unmarshal
@@ -25,8 +25,10 @@ import akka.stream.Materializer
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import spray.json.DefaultJsonProtocol
-import com.github.garyaiki.dendrites.examples.account.{CheckingAccountBalances, GetAccountBalances,
-    MoneyMarketAccountBalances, SavingsAccountBalances}
+import com.github.garyaiki.dendrites.examples.account.{CheckingAccountBalances,
+  GetAccountBalances,
+  MoneyMarketAccountBalances,
+  SavingsAccountBalances}
 
 /** Map json <=> case classes to Either Right on success, String to Left on failure
   *
@@ -58,9 +60,7 @@ trait BalancesProtocols extends DefaultJsonProtocol {
     * @see [[http://doc.akka.io/api/akka/current/#akka.http.scaladsl.unmarshalling.Unmarshaller$$NoContentException$ NoContentException]]
     * @throws NoContentException
     */
-  def mapPlain(entity: HttpEntity): Future[Left[String, Nothing]] = {
-    Unmarshal(entity).to[String].map(Left(_))
-  }
+  def mapPlain(entity: HttpEntity): Future[Left[String, Nothing]] = Unmarshal(entity).to[String].map(Left(_))
 
   /** Unmarshall HttpEntity result
     * @param entity
@@ -125,20 +125,20 @@ trait BalancesService extends BalancesProtocols {
           }
         }
       } ~
-        path("account" / "balances" / "mm" / "GetAccountBalances") {
-          parameter('id.as[Long]) { id =>
-            complete {
-              fetchMMBalances(id)
-            }
-          }
-        } ~
-        path("account" / "balances" / "savings" / "GetAccountBalances") {
-          parameter('id.as[Long]) { id =>
-            complete {
-              fetchSavingsBalances(id)
-            }
+      path("account" / "balances" / "mm" / "GetAccountBalances") {
+        parameter('id.as[Long]) { id =>
+          complete {
+            fetchMMBalances(id)
           }
         }
+      } ~
+      path("account" / "balances" / "savings" / "GetAccountBalances") {
+        parameter('id.as[Long]) { id =>
+          complete {
+            fetchSavingsBalances(id)
+          }
+        }
+      }
     }
   }
 }

@@ -30,6 +30,5 @@ class MoneyMarketBalancesClientConfig() {
   val config = hostConfig._1
   val baseURL = configBaseUrl("dendrites.money-market-balances.http.path", hostConfig)
   val requestPath = configRequestPath("dendrites.money-market-balances.http.requestPath", config)
-  val timeout = new Timeout(config.getInt("dendrites.money-market-balances.http.millis"),
-      MILLISECONDS)
+  val timeout = new Timeout(config.getInt("dendrites.money-market-balances.http.millis"), MILLISECONDS)
 }

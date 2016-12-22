@@ -26,7 +26,13 @@ import org.apache.avro.generic.GenericRecord
   */
 package object avro {
 
-    def genericRecordToGetAccountBalances(record: GenericRecord): GetAccountBalances = {
+  /** Avro GenericRecord is mapped to a Scala class by getting a record field by name then passing it to
+    * the Scala classes' constructor
+   	*
+   	* @param record Avro GenericRecord
+    * @return Scala class with GenericRecord values
+    */
+  def genericRecordToGetAccountBalances(record: GenericRecord): GetAccountBalances = {
       val obj = record.get("id")
       val l:Long = obj.asInstanceOf[Number].longValue
       GetAccountBalances(l)

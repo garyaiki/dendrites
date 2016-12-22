@@ -15,7 +15,8 @@ limitations under the License.
 package com.github.garyaiki.dendrites.examples
 
 import scala.collection.immutable.Set
-import scala.reflect.runtime.universe._
+import scala.reflect.runtime.universe.TypeTag
+import scala.reflect.runtime.universe.typeOf
 
 /** Functions for AccountType, the case objects that distinguish them and AccountBallances, their
   * optional list of account ids and balances
@@ -61,6 +62,7 @@ package object account {
   def isAccountType(e: Any): Boolean = e.isInstanceOf[AccountType]
 
   /** Extract the 'A' balance values from AccBalances[A]
+    *
     * @param e Product is a supertype of AccBalances[A], throw exception if it isn't
     * @return List[List[A] call flatten to get List[A]
     */
@@ -74,6 +76,7 @@ package object account {
   }
 
   /** Extract List[A] balances from AccountBalances
+    *
     * @param accountBalances is a Seq of subTypes of AccountBalances
     * @return Seq[List[Product]] call flatten to get List[A]
     */
@@ -87,6 +90,7 @@ package object account {
   }
 
   /** Extract balances from Seq[AccountBalances]
+    *
     * @param accountBalances is a Seq of subTypes of AccountBalances
     * @return Seq[Product]
     */

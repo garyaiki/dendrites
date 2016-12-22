@@ -14,7 +14,7 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.examples.account
 
-import scala.reflect.runtime.universe._
+import scala.reflect.runtime.universe.TypeTag
 
 /** Example objects for pattern matching and value objects
   *
@@ -27,6 +27,7 @@ case object MoneyMarket extends AccountType
 
 case class GetAccountBalances(id: Long)
 case class GetCustomerAccountBalances(id: Long, accountTypes: Set[AccountType])
+
 sealed trait AccountBalances extends Product
 case class CheckingAccountBalances[A: TypeTag](balances: AccBalances[A]) extends AccountBalances
 case class MoneyMarketAccountBalances[A: TypeTag](balances: AccBalances[A]) extends AccountBalances

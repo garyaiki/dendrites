@@ -28,13 +28,13 @@ import com.typesafe.config.ConfigFactory
   * In a terminal window
   * {{{
   * $ sbt
-  * ...
+  *
   * > run
   * }}}
   * In another terminal window
   * {{{
   * > it:testOnly com.github.garyaiki.dendrites.examples.*
-  * ...
+  *
   * [info] ScalaTest
   * [info] Run completed in 7 seconds, 744 milliseconds.
   * [info] Total number of tests run: 75
