@@ -28,7 +28,7 @@ import scala.collection.mutable.ArrayBuffer
   * @author Gary Struthers
   */
 class CassandraPaging(pageSize: Int)(implicit logger: LoggingAdapter)
-    extends GraphStage[FlowShape[ResultSet, Seq[Row]]]{
+  extends GraphStage[FlowShape[ResultSet, Seq[Row]]]{
 
   val in = Inlet[ResultSet]("CassandraPaging.in")
   val out = Outlet[Seq[Row]]("CassandraPaging.out")

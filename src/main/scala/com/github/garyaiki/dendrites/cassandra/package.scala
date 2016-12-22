@@ -107,7 +107,6 @@ package object cassandra {
     * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/Cluster.Builder.html Builder]]
     * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/Cluster.html Cluster]]
     * @see [[https://docs.oracle.com/javase/8/docs/api/java/lang/IllegalArgumentException.html IllegalArgumentException]]
-    *
     */
   def createCluster(node: String): Cluster = Cluster.builder().addContactPoint(node).build()
 
@@ -119,7 +118,6 @@ package object cassandra {
     *
     * @see [[https://docs.oracle.com/javase/8/docs/api/index.html?java/net/InetAddress.html InetAddress]]
     * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/policies/RetryPolicy.html RetryPolicy]]
-    *
     */
   def createCluster(nodes: JCollection[InetAddress], policy: RetryPolicy): Cluster = {
     Cluster.builder().addContactPoints(nodes).withRetryPolicy(policy).build()
@@ -135,14 +133,12 @@ package object cassandra {
     * @return Cluster
     *
     * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/policies/ExponentialReconnectionPolicy.html ExponentialReconnectionPolicy]]
-    *
     */
-  def createCluster(nodes: JCollection[InetAddress], policy: RetryPolicy, reC: ReconnectionPolicy):
-          Cluster = {
-            Cluster.builder().addContactPoints(nodes)
-              .withRetryPolicy(policy)
-              .withReconnectionPolicy(reC)
-              .build()
+  def createCluster(nodes: JCollection[InetAddress], policy: RetryPolicy, reC: ReconnectionPolicy): Cluster = {
+    Cluster.builder().addContactPoints(nodes)
+      .withRetryPolicy(policy)
+      .withReconnectionPolicy(reC)
+      .build()
   }
 
   /** Log cluster's metadata. ForDebugging
@@ -162,12 +158,9 @@ package object cassandra {
   def logMetadata(cluster: Cluster): Unit = {
     val metadata = cluster.getMetadata()
     logger.debug(s"Connected to cluster:${metadata.getClusterName}")
-    val hosts = metadata.getAllHosts()
+    val hosts = metadata.getAllHosts
     val it = hosts.iterator()
-    while(it.hasNext()) {
-      val h = it.next()
-      logger.debug(s"Datacenter:${h.getDatacenter()} host:${h.getAddress} rack:${h.getRack()}")
-    }
+    it.foreach(h => logger.debug(s"Datacenter:${h.getDatacenter()} host:${h.getAddress} rack:${h.getRack()}"))
   }
 
   /** Enable logging of RegularStatement, BoundStatement, BatchStatement queries
@@ -216,7 +209,7 @@ package object cassandra {
     *
     */
   def initLoadBalancingPolicy(cluster: Cluster, ldBalPolicy: LoadBalancingPolicy): Unit = {
-    val hosts = cluster.getMetadata().getAllHosts()
+    val hosts = cluster.getMetadata().getAllHosts
     ldBalPolicy.init(cluster, hosts)
   }
 
@@ -259,7 +252,7 @@ package object cassandra {
   def createSchema(session: Session, schema: String, strategy: String, repCount: Int): ResultSet = {
     val rsf = session.executeAsync("CREATE KEYSPACE IF NOT EXISTS " + schema + " WITH replication"
         + "= {'class': '" + strategy + "', 'replication_factor':" + repCount + "};")
-    rsf.getUninterruptibly()
+    rsf.getUninterruptibly
   }
 
   /** Create a PreparedStatement to return all rows of a table
@@ -291,7 +284,7 @@ package object cassandra {
     */
   def executeBoundStmt(session: Session, bndStmt: BoundStatement): ResultSet = {
     val resultSetFuture = session.executeAsync(bndStmt)
-    resultSetFuture.getUninterruptibly()
+    resultSetFuture.getUninterruptibly
   }
 
   /** Get every row in a result set
@@ -325,8 +318,7 @@ package object cassandra {
     * @see [[http://google.github.io/guava/releases/19.0/api/docs/com/google/common/util/concurrent/ListenableFuture.html ListenableFuture]]
     *
     */
-  def close(session: Session, cluster: Cluster, force: Boolean = false)
-          (implicit ec: ExecutionContext): Unit = {
+  def close(session: Session, cluster: Cluster, force: Boolean = false)(implicit ec: ExecutionContext): Unit = {
     val sessCloseF = session.closeAsync()
     val clusCloseF = cluster.closeAsync()
     if(force) {

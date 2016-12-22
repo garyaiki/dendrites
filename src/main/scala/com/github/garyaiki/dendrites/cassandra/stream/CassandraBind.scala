@@ -29,8 +29,7 @@ import com.datastax.driver.core.{BoundStatement, PreparedStatement}
   * @author Gary Struthers
   */
 class CassandraBind[A](stmt: PreparedStatement, f:(PreparedStatement, A) => BoundStatement)
-        (implicit logger: LoggingAdapter)
-    extends GraphStage[FlowShape[A, BoundStatement]]{
+    (implicit logger: LoggingAdapter) extends GraphStage[FlowShape[A, BoundStatement]]{
 
   val in = Inlet[A]("CassandraBind.in")
   val out = Outlet[BoundStatement]("CassandraBind.out")

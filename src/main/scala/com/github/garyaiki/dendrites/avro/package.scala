@@ -93,8 +93,7 @@ package object avro {
     * @param genericRecord Avro GenericRecord containing case class data
     * @return byteArray for Kafka ByteArraySerializer
     */
-  def toByteArray(writer: GenericDatumWriter[GenericRecord])(
-        genericRecord: GenericRecord): Array[Byte] = {
+  def toByteArray(writer: GenericDatumWriter[GenericRecord])(genericRecord: GenericRecord): Array[Byte] = {
     val os = new ByteArrayOutputStream()
     try {
       val encoder = EncoderFactory.get().binaryEncoder(os, null)

@@ -61,8 +61,7 @@ class CassandraSink(session: Session)(implicit val ec: ExecutionContext, logger:
 
       def executeStmt(stmt: BoundStatement): Unit = {
         val resultSetFuture = session.executeAsync(stmt)
-        val scalaRSF = listenableFutureToScala[ResultSet](
-                resultSetFuture.asInstanceOf[ListenableFuture[ResultSet]])
+        val scalaRSF = listenableFutureToScala[ResultSet](resultSetFuture.asInstanceOf[ListenableFuture[ResultSet]])
         scalaRSF.onComplete {
           case Success(rs) => {
             val successCallback = getAsyncCallback{ (_: Unit) => pull(in) }
@@ -97,8 +96,7 @@ object CassssandraSink {
     * @param session Cassandra Session
     * @return Sink[BoundStatement, NotUsed]
     */
-  def apply(session: Session)(implicit ec: ExecutionContext,
-              logger: LoggingAdapter): Sink[BoundStatement, NotUsed] = {
+  def apply(session: Session)(implicit ec: ExecutionContext, logger: LoggingAdapter): Sink[BoundStatement, NotUsed] = {
     Sink.fromGraph(new CassandraSink(session))
   }
 }

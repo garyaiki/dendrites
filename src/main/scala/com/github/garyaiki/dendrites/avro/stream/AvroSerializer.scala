@@ -28,8 +28,7 @@ import com.github.garyaiki.dendrites.avro.loadSchema
   * @param serialization function
   * @author Gary Struthers
   */
-class AvroSerializer[A <: Product, B](filename: String, f:(Schema, A) => B)
-    extends GraphStage[FlowShape[A, B]] {
+class AvroSerializer[A <: Product, B](filename: String, f:(Schema, A) => B) extends GraphStage[FlowShape[A, B]] {
   val in = Inlet[A]("GenericSerializer.in")
   val out = Outlet[B]("GenericSerializer.out")
 

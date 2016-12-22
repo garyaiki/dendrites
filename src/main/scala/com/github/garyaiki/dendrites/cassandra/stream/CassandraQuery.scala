@@ -43,8 +43,8 @@ import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
   *
   * @author Gary Struthers
   */
-class CassandraQuery(session: Session, fetchSize: Int = 0)(implicit val ec: ExecutionContext,
-            logger: LoggingAdapter) extends GraphStage[FlowShape[BoundStatement, ResultSet]]{
+class CassandraQuery(session: Session, fetchSize: Int = 0)(implicit val ec: ExecutionContext, logger: LoggingAdapter)
+  extends GraphStage[FlowShape[BoundStatement, ResultSet]] {
 
   val in = Inlet[BoundStatement]("CassandraQuery.in")
   val out = Outlet[ResultSet]("CassandraQuery.out")
@@ -59,8 +59,7 @@ class CassandraQuery(session: Session, fetchSize: Int = 0)(implicit val ec: Exec
 
       def executeStmt(stmt: BoundStatement): Unit = {
         val resultSetFuture = session.executeAsync(stmt)
-        val scalaRSF = listenableFutureToScala[ResultSet](
-                resultSetFuture.asInstanceOf[ListenableFuture[ResultSet]])
+        val scalaRSF = listenableFutureToScala[ResultSet](resultSetFuture.asInstanceOf[ListenableFuture[ResultSet]])
         scalaRSF.onComplete {
           case Success(rs) => {
             val successCallback = getAsyncCallback{ (_: Unit) => push(out, rs) }
@@ -103,8 +102,8 @@ object CassandraQuery {
     * @param fetchSize limits how many results retrieved simultaneously, 0 means use default size
     * @return Flow[BoundStatement, ResultSet, NotUsed]
     */
-  def apply(session: Session, fetchSize: Int = 0)(implicit ec: ExecutionContext,
-              logger: LoggingAdapter): Flow[BoundStatement, ResultSet, NotUsed] = {
+  def apply(session: Session, fetchSize: Int = 0)(implicit ec: ExecutionContext, logger: LoggingAdapter):
+      Flow[BoundStatement, ResultSet, NotUsed] = {
     Flow.fromGraph(new CassandraQuery(session, fetchSize))
   }
 }
