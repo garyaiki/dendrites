@@ -93,12 +93,12 @@
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-http-core_2.11</artifactId>
-            <version>10.0.0</version>
+            <version>10.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-http_2.11</artifactId>
-            <version>10.0.0</version>
+            <version>10.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
@@ -109,12 +109,12 @@
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-http-spray-json_2.11</artifactId>
-            <version>10.0.0</version>
+            <version>10.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-http-testkit_2.11</artifactId>
-            <version>10.0.0</version>
+            <version>10.0.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
