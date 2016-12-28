@@ -241,6 +241,39 @@ Sometimes, some of these tests fail because Balances Server has the default limi
 Kill it in the terminal window running Balances Server
 
 Ctrl-C
+
+### Typesafe Config
+[Typesafe Config user guide](https://github.com/typesafehub/config)
+
+[Akka config user guide](http://doc.akka.io/docs/akka/2.4/general/configuration.html)
+
+Each configuration in `/src/main/resources/reference.conf` can be overridden by your `application.conf`.
+
+The `akka` section is for logging and has Akka specific settings
+
+Under the `dendrites` section
+
+`algebird` has default settings for CountMinSketch, DecayedValue, HyperLogLog, and QTree
+
+`blocking-dispatcher` configures a thread pool to be used when there are blocking calls
+
+These other sections are examples, you don't have to override them.
+`checking-balances`, `money-market-balances`, and `savings-balances` are example http client configurations
+
+`kafka` is an example topic configuration
+
+`cassandra` is an example configuration
+
+###Logback configuration
+
+[Logback configuration guide](http://logback.qos.ch/manual/configuration.html)
+
+Logging configuration for running dendrites tests is in `/src/main/resources/logback.xml`
+
+Application Logback configuration is done separately.
+
+[Logging Separation](http://logback.qos.ch/manual/loggingSeparation.html)
+
 ### License
 dendrites is Open Source and available under the Apache 2 License.
 
