@@ -17,7 +17,7 @@ package com.github.garyaiki.dendrites
 import _root_.akka.actor.ActorSystem
 import _root_.akka.event.LoggingAdapter
 import _root_.akka.http.scaladsl.Http
-import _root_.akka.http.scaladsl.model.{HttpEntity, HttpResponse, HttpRequest}
+import _root_.akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse}
 import _root_.akka.http.scaladsl.model.StatusCodes.{BadRequest, OK}
 import _root_.akka.http.scaladsl.unmarshalling.Unmarshal
 import _root_.akka.stream.Materializer
@@ -73,8 +73,7 @@ package object http {
     * @param config
     * @return config plus ip address and port number
     */
-  def getHostConfig(ipPath: String, portPath: String, config: Config = ConfigFactory.load()):
-    (Config, String, Int) = {
+  def getHostConfig(ipPath: String, portPath: String, config: Config = ConfigFactory.load()): (Config, String, Int) = {
 
     val ip = config.getString(ipPath)
     val port = config.getInt(portPath)
@@ -83,17 +82,16 @@ package object http {
 
   /** Get path from Config append to host URL
     *
-    * @param pathPath config key
+    * @param pathConfig config key
     * @param hostConfig config plus ip address and port number
     * @param scheme "http" (default) or "https"
     * @return URL string for host/path
     */
-  def configBaseUrl(pathPath: String, hostConfig: (Config, String, Int), scheme: String = "http"):
-    StringBuilder = {
+  def configBaseUrl(pathConfig: String, hostConfig: (Config, String, Int), scheme: String = "http"): StringBuilder = {
     val config = hostConfig._1
     val ip = hostConfig._2
     val port = hostConfig._3
-    val path = config.getString(pathPath)
+    val path = config.getString(pathConfig)
     createUrl(scheme, ip, port, path)
   }
 
@@ -109,8 +107,8 @@ package object http {
     require(scheme == "http" || scheme == "https", s"scheme:$scheme must be http or https")
     val domainPattern = """[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}""".r
     val ipPattern = """\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}""".r
-    val goodDomain = if (domainPattern.findFirstIn(domain).isDefined ||
-      ipPattern.findFirstIn(domain).isDefined) true else false
+    val goodDomain = if (domainPattern.findFirstIn(domain).isDefined || ipPattern.findFirstIn(domain).isDefined) true
+      else false
     require(goodDomain, s"domain:$domain looks invalid")
     val portRange = 0 to 65536
     require(portRange.contains(port), s"port:$port must be ${portRange.start} to ${portRange.end}")
@@ -137,9 +135,7 @@ package object http {
     val sb = new StringBuilder(requestPath)
     sb.append('?')
     val fields = ccToMap(cc).filterKeys(_ != "$outer")
-    fields.foreach{
-      case (key, value) => sb.append(key).append('=').append(value).append('&')
-    }
+    fields.foreach{ case (key, value) => sb.append(key).append('=').append(value).append('&') }
     if(sb.last == '&') sb.setLength(sb.length() - 1)
     sb
   }
@@ -156,9 +152,7 @@ package object http {
     * @param materializer implicit Materializer
     * @return Future[HttpResponse]
     */
-  def typedQuery(baseURL: StringBuilder,
-    requestPath: String,
-    ccToGet:(Product, String) => StringBuilder)
+  def typedQuery(baseURL: StringBuilder, requestPath: String, ccToGet:(Product, String) => StringBuilder)
     (cc: Product)
     (implicit system: ActorSystem, materializer: Materializer): Future[HttpResponse] = {
     val balancesQuery = ccToGet(cc, requestPath)
@@ -184,10 +178,7 @@ package object http {
   def typedResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
     mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
     (response: HttpResponse)
-    (implicit ec: ExecutionContext,
-      system: ActorSystem,
-      logger: LoggingAdapter,
-      materializer: Materializer):
+    (implicit ec: ExecutionContext, system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
     Future[Either[String, AnyRef]] = {
       response.status match {
         case OK => {
@@ -220,14 +211,11 @@ package object http {
     * @param materializer implicit Materializer
     * @return Future[Either[String, AnyRef]]
     */
-def typedFutureResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
-  mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
-  (caller: Future[HttpResponse])
-  (implicit ec: ExecutionContext,
-    system: ActorSystem,
-    logger: LoggingAdapter,
-    materializer: Materializer):
-  Future[Either[String, AnyRef]] = {
+  def typedFutureResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
+    mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
+    (caller: Future[HttpResponse])
+    (implicit ec: ExecutionContext, system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
+    Future[Either[String, AnyRef]] = {
 
     caller.flatMap { response => typedResponse(mapLeft, mapRight)(response) }
   }
@@ -253,12 +241,9 @@ def typedFutureResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
     mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
     mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
     (cc: Product)
-    (implicit ec: ExecutionContext,
-      system: ActorSystem,
-      logger: LoggingAdapter,
-      materializer: Materializer):
+    (implicit ec: ExecutionContext, system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
     Future[Either[String, AnyRef]] = {
-    val callFuture = typedQuery(baseURL, requestPath, ccToGet)(cc)
-    typedFutureResponse(mapLeft, mapRight)(callFuture)
+      val callFuture = typedQuery(baseURL, requestPath, ccToGet)(cc)
+      typedFutureResponse(mapLeft, mapRight)(callFuture)
   }
 }

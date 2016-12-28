@@ -15,8 +15,7 @@ limitations under the License.
 package com.github.garyaiki.dendrites.examples.account.http.stream.actor
 
 import akka.NotUsed
-import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props, OneForOneStrategy,
-  SupervisorStrategy}
+import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props, OneForOneStrategy, SupervisorStrategy}
 import akka.actor.SupervisorStrategy.{Escalate, Restart, Resume, Stop}
 import akka.event.LoggingAdapter
 import akka.stream.{Materializer, OverflowStrategy}
@@ -31,12 +30,10 @@ import com.github.garyaiki.dendrites.algebird.agent.Agents
 import com.github.garyaiki.dendrites.algebird.agent.stream.ParallelApproximators
 import com.github.garyaiki.dendrites.algebird.agent.stream.DecayedValueAgentFlow.nowMillis
 import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
-import com.github.garyaiki.dendrites.examples.account.{GetAccountBalances,
-  GetCustomerAccountBalances}
+import com.github.garyaiki.dendrites.examples.account.{GetAccountBalances, GetCustomerAccountBalances}
 import com.github.garyaiki.dendrites.examples.account.stream.extractBalancesFlow
-import com.github.garyaiki.dendrites.stream.actor.CallStream
+import com.github.garyaiki.dendrites.stream.actor.{CallStream, OtherActor}
 import com.github.garyaiki.dendrites.stream.actor.CallStream.props
-import com.github.garyaiki.dendrites.stream.actor.OtherActor
 import ParallelCallSupervisor.props
 import ParallelCallSupervisor.SinkActor
 import StreamLogAgentsSupervisor.ResultsActor
@@ -62,10 +59,8 @@ import StreamLogAgentsSupervisor.ResultsActor
   * @author Gary Struthers
   *
   */
-class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLike: TypeTag]
-  (agents: Agents[A])
-  (implicit val system: ActorSystem, logger: LoggingAdapter, val mat: Materializer)
-  extends Actor with ActorLogging {
+class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLike: TypeTag](agents: Agents[A])
+  (implicit val system: ActorSystem, logger: LoggingAdapter, val mat: Materializer) extends Actor with ActorLogging {
 
   val agentsFlow = ParallelApproximators.compositeFlow(agents.avgAgent,
     agents.cmsAgent,

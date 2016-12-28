@@ -15,12 +15,17 @@ limitations under the License.
 package com.github.garyaiki.dendrites.examples.account.http.stream.actor
 
 import akka.NotUsed
-import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, Props, Stash,
-  SupervisorStrategy, Terminated}
+import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, Props, Stash, SupervisorStrategy, Terminated}
 import akka.actor.SupervisorStrategy.{Escalate, Restart, Resume, Stop}
-import akka.http.scaladsl.model.{EntityStreamException, EntityStreamSizeException,
-  IllegalHeaderException, IllegalRequestException, IllegalResponseException,
-  IllegalUriException, InvalidContentLengthException, ParsingException, RequestTimeoutException}
+import akka.http.scaladsl.model.{EntityStreamException,
+  EntityStreamSizeException,
+  IllegalHeaderException,
+  IllegalRequestException,
+  IllegalResponseException,
+  IllegalUriException,
+  InvalidContentLengthException,
+  ParsingException,
+  RequestTimeoutException}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, OverflowStrategy}
 import akka.stream.OverflowStrategy.fail
 import akka.stream.scaladsl.Flow
@@ -48,8 +53,7 @@ import ParallelCallSupervisor.SinkActor
   * @param initSinkActor: SinkActor case class with ActorRef, name
   * @author Gary Struthers
   */
-class ParallelCallSupervisor[A <: Product: TypeTag](initSink: SinkActor) extends
-        Actor with Stash with ActorLogging {
+class ParallelCallSupervisor[A <: Product: TypeTag](initSink: SinkActor) extends Actor with Stash with ActorLogging {
 
   implicit val system = context.system
   implicit val ec = system.dispatcher
@@ -128,7 +132,7 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSink: SinkActor) extends
       context.become(waiting)
       log.warning("sinkActor {} terminated", sink)
     }
-    case x: A ⇒ callStream forward x
+    case x: A ⇒ callStream forward x //@TODO match generic type in receive
   }
 
   /** waiting Receive state.

@@ -20,11 +20,9 @@ import akka.event.LoggingAdapter
 import akka.stream.{ActorAttributes, Materializer}
 import akka.stream.scaladsl.Flow
 import scala.concurrent.ExecutionContext
-import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols,
-  MoneyMarketBalancesClientConfig}
+import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols, MoneyMarketBalancesClientConfig}
 import com.github.garyaiki.dendrites.http.caseClassToGetQuery
-import com.github.garyaiki.dendrites.http.stream.{TypedQueryFlow, TypedQueryResponseFlow,
-  TypedResponseFlow}
+import com.github.garyaiki.dendrites.http.stream.{TypedQueryFlow, TypedQueryResponseFlow, TypedResponseFlow}
 import com.github.garyaiki.dendrites.http.stream.TypedResponseFlow.decider
 
 /** Call Money Market Balances service. Build a GET request, call the server,

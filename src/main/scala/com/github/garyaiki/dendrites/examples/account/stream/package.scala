@@ -38,6 +38,5 @@ package object stream {
     * @return just the As
     * @see [[com.github.garyaiki.dendrites.examples.account]]
     */
-    def extractBalancesFlow[A]: Flow[Seq[AnyRef], Seq[A], NotUsed] =
-            Flow[Seq[AnyRef]].map(extractBalancesVals[A])
+    def extractBalancesFlow[A]: Flow[Seq[AnyRef], Seq[A], NotUsed] = Flow[Seq[AnyRef]].map(extractBalancesVals[A])
 }
