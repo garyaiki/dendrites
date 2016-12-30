@@ -39,6 +39,7 @@ package object reflection {
     * @see [[http://docs.scala-lang.org/overviews/reflection/thread-safety.html reflection thread-safety]]
     * @see [[http://docs.scala-lang.org/overviews/reflection/overview.html reflection overview]]
     */
-  def weakParamInfo[T](x: T)(implicit tag: WeakTypeTag[T]): List[Type] =
-    tag.tpe match { case TypeRef(_, _, args) => args }
+  def weakParamInfo[T](x: T)(implicit tag: WeakTypeTag[T]): List[Type] = tag.tpe match {
+    case TypeRef(_, _, args) => args
+  }
 }

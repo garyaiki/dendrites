@@ -20,8 +20,7 @@ import akka.stream.{ActorAttributes, Attributes, Outlet, SourceShape, Supervisio
 import akka.stream.ActorAttributes.SupervisionStrategy
 import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler, TimerGraphStageLogic}
 import akka.stream.scaladsl.Source
-import org.apache.kafka.clients.consumer.{Consumer, ConsumerRecords, CommitFailedException,
-  InvalidOffsetException}
+import org.apache.kafka.clients.consumer.{CommitFailedException, Consumer, ConsumerRecords, InvalidOffsetException}
 import org.apache.kafka.common.KafkaException
 import org.apache.kafka.common.errors.{AuthorizationException, WakeupException}
 import scala.concurrent.ExecutionContext
@@ -64,7 +63,7 @@ import com.github.garyaiki.dendrites.kafka.ConsumerConfig
   * @author Gary Struthers
   */
 class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logger: LoggingAdapter)
-            extends GraphStage[SourceShape[ConsumerRecords[K, V]]]{
+  extends GraphStage[SourceShape[ConsumerRecords[K, V]]]{
 
   val out = Outlet[ConsumerRecords[K, V]](s"KafkaSource")
   override val shape = SourceShape(out)
@@ -80,7 +79,7 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
     new TimerGraphStageLogic(shape) {
 
       private def decider = inheritedAttributes.get[SupervisionStrategy].map(_.decider).
-          getOrElse(Supervision.stoppingDecider)
+        getOrElse(Supervision.stoppingDecider)
 
       var kafkaConsumer: Consumer[K, V] = null
       var retries = 0
@@ -89,9 +88,7 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
       var waitForTimer: Boolean = false
       var needCommit = false
 
-      override def preStart(): Unit = {
-        kafkaConsumer = consumerConfig.createAndSubscribe()
-      }
+      override def preStart(): Unit = kafkaConsumer = consumerConfig.createAndSubscribe()
 
       def myHandler(): Unit = {
         if(!waitForTimer) {
@@ -101,16 +98,15 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
               needCommit = false
             }
             val records = kafkaConsumer poll(consumerConfig.timeout) // blocking
-            if(!records.isEmpty()) { // don't push if no record available
+            if(!records.isEmpty) { // don't push if no record available
               push(out, records)
               needCommit = true
-            } else logger.debug("KafkaSource records isEmpty {}", records.isEmpty())
+            } else logger.debug("KafkaSource records isEmpty {}", records.isEmpty)
             retries = 0
           } catch {
             case NonFatal(e) => decider(e) match {
-              case Supervision.Stop => {
-                failStage(e)
-              }
+              case Supervision.Stop => failStage(e)
+
               case Supervision.Resume => {
                 val duration = curriedDelay(retries)
                 if(duration < maxDuration) {
@@ -124,11 +120,8 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
           }
         }
       }
-      setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          myHandler()
-        }
-      })
+
+      setHandler(out, new OutHandler { override def onPull(): Unit = myHandler() })
 
       override protected def onTimer(timerKey: Any): Unit = {
         retries += 1
@@ -156,9 +149,9 @@ object KafkaSource {
     * @param implicit logger
     * @return Source[ConsumerRecords[K, V], NotUsed]
     */
-  def apply[K, V](consumer: ConsumerConfig[K, V])
-          (implicit ec: ExecutionContext, logger: LoggingAdapter):
-                Source[ConsumerRecords[K, V], NotUsed] = {
+  def apply[K, V](consumer: ConsumerConfig[K, V])(implicit ec: ExecutionContext, logger: LoggingAdapter):
+    Source[ConsumerRecords[K, V], NotUsed] = {
+
     val source = Source.fromGraph(new KafkaSource[K, V](consumer))
     source.withAttributes(ActorAttributes.supervisionStrategy(decider))
   }

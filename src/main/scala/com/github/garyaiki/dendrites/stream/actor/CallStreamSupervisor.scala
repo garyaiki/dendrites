@@ -32,8 +32,7 @@ import scala.reflect.runtime.universe.typeOf
   * @param rg: RunnableGraph[SourceQueueWithComplete[A]]
   * @author Gary Struthers
   */
-class CallStreamSupervisor[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]])
-        extends Actor with ActorLogging {
+class CallStreamSupervisor[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) extends Actor with ActorLogging {
 
   implicit val system = context.system
   implicit val ec = system.dispatcher
@@ -46,7 +45,7 @@ class CallStreamSupervisor[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete
   var callStream: ActorRef = null
 
   override def preStart() = {
-    log.debug("preStart {} callStream:{}", this.toString(), callStreamName)
+    log.debug("preStart {} callStream:{}", this.toString, callStreamName)
     // create children here
     val props = CallStream.props[A](rg)
     callStream = context.actorOf(props, callStreamName)
@@ -71,13 +70,10 @@ class CallStreamSupervisor[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete
         super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => SupervisorStrategy.Escalate)
     }
 
-  def receive = {
-    case x: A ⇒ callStream forward x
-  }
+  def receive = { case x: A ⇒ callStream forward x  }
 }
 
 object CallStreamSupervisor {
-  def props[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]): Props =
-    Props(new CallStreamSupervisor[A](rg))
+  def props[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]): Props = Props(new CallStreamSupervisor[A](rg))
 }
 

@@ -64,7 +64,7 @@ package object stream {
   def queueRecords[K, V](it: Iterator[ConsumerRecord[K, V]]): Queue[ConsumerRecord[K, V]] = {
     val queue = Queue.newBuilder[ConsumerRecord[K, V]]
     it foreach(cr => queue += cr)
-    queue.result()
+    queue.result
   }
 
   /** KafkaConsumer poll returns ConsumerRecords, extract each ConsumerRecord and queue them. The
@@ -77,7 +77,7 @@ package object stream {
     * @return records in a queue
     */
   def extractRecords[K, V](records: ConsumerRecords[K,V]): Queue[ConsumerRecord[K, V]] = {
-    val it = records.iterator().asScala
+    val it = records.iterator.asScala
     queueRecords[K, V](it)
   }
 
@@ -91,7 +91,7 @@ package object stream {
     * @return a queue of ConsumerRecord
     */
   def consumerRecordsFlow[K, V]: Flow[ConsumerRecords[K, V], Queue[ConsumerRecord[K, V]], NotUsed] =
-          Flow[ConsumerRecords[K, V]].map(extractRecords[K, V])
+    Flow[ConsumerRecords[K, V]].map(extractRecords[K, V])
 
   /** Like extract records but unzips them into 2 queues of ConsumerRecord, separated by partition
     * Use this when there are 2 topic partitions to be processed separately
@@ -101,12 +101,13 @@ package object stream {
     * @param records ConsumerRecords returned from Kafka consumer poll
     * @return tuple2 of queue of ConsumerRecord
     */
-  def tuple2PartitionQs[K, V](records: ConsumerRecords[K,V]):
-          (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]) = {
-    val partitions = records.partitions()
-    require(partitions.size() == 2)
+  def tuple2PartitionQs[K, V](records: ConsumerRecords[K,V]): (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]])
+    = {
+
+    val partitions = records.partitions
+    require(partitions.size == 2)
     val buff = new ArrayBuffer[TopicPartition](2)
-    val it = partitions.iterator().asScala
+    val it = partitions.iterator.asScala
     it foreach(tp => buff += tp)
     val l0 = records.records(buff(0))
     val ab0 = l0.asScala
@@ -124,8 +125,8 @@ package object stream {
     * @see [[com.github.garyaiki.dendrites.examples.account]]
     */
   def dualConsumerRecordsFlow[K, V]: Flow[ConsumerRecords[K, V],
-            (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]), NotUsed] =
-          Flow[ConsumerRecords[K, V]].map(tuple2PartitionQs[K, V])
+    (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]), NotUsed] =
+      Flow[ConsumerRecords[K, V]].map(tuple2PartitionQs[K, V])
 
   /** Like extract records but unzips them into 3 queues of ConsumerRecord, separated by partition
     * Use this when there are 3 topic partitions to be processed separately
@@ -136,12 +137,12 @@ package object stream {
     * @return tuple3 of queue of ConsumerRecord
     */
   def tuple3PartitionQs[K, V](records: ConsumerRecords[K,V]):
-          (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]) =
-          {
-    val partitions = records.partitions()
-    require(partitions.size() == 3)
+    (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]) = {
+
+    val partitions = records.partitions
+    require(partitions.size == 3)
     val buff = new ArrayBuffer[TopicPartition](3)
-    val it = partitions.iterator().asScala
+    val it = partitions.iterator.asScala
     it foreach(tp => buff += tp)
 
     val l0 = records.records(buff(0))
@@ -162,15 +163,13 @@ package object stream {
     * @see [[com.github.garyaiki.dendrites.examples.account]]
     */
   def tripleConsumerRecordsFlow[K, V]: Flow[ConsumerRecords[K, V],
-            (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]),
-                NotUsed] = Flow[ConsumerRecords[K, V]].map(tuple3PartitionQs[K, V])
+    (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]), NotUsed] =
+      Flow[ConsumerRecords[K, V]].map(tuple3PartitionQs[K, V])
 
   /** Map a ConsumerRecord to just its value */
-  def extractValue[K, V](record: ConsumerRecord[K,V]): V = {
-    record.value()
-  }
+  def extractValue[K, V](record: ConsumerRecord[K,V]): V = record.value
 
   /** Flow to Map a ConsumerRecord to just its value */
   def consumerRecordValueFlow[K, V]: Flow[ConsumerRecord[K, V], V, NotUsed] =
-        Flow[ConsumerRecord[K, V]].map(extractValue[K, V])
+    Flow[ConsumerRecord[K, V]].map(extractValue[K, V])
 }

@@ -56,8 +56,7 @@ import com.github.garyaiki.dendrites.kafka.ProducerConfig
   *
   * @author Gary Struthers
   */
-class KafkaSink[K, V](prod: ProducerConfig[K, V])(implicit logger: LoggingAdapter)
-    extends GraphStage[SinkShape[V]] {
+class KafkaSink[K, V](prod: ProducerConfig[K, V])(implicit logger: LoggingAdapter) extends GraphStage[SinkShape[V]] {
 
   val producer = prod.producer
   val in = Inlet[V](s"KafkaSink")
@@ -160,8 +159,7 @@ object KafkaSink {
     * @param implicit logger
     * @return Sink[V, NotUsed]
     */
-  def apply[K, V](producer: ProducerConfig[K, V])(implicit logger: LoggingAdapter):
-          Sink[V, NotUsed] = {
+  def apply[K, V](producer: ProducerConfig[K, V])(implicit logger: LoggingAdapter): Sink[V, NotUsed] = {
     val sink = Sink.fromGraph(new KafkaSink[K, V](producer))
     sink.withAttributes(ActorAttributes.supervisionStrategy(decider))
   }

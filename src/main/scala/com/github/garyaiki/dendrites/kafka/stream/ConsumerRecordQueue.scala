@@ -29,8 +29,7 @@ import scala.collection.immutable.Queue
   *
   * @author Gary Struthers
   */
-class ConsumerRecordQueue[K, V]() extends
-    GraphStage[FlowShape[Queue[ConsumerRecord[K, V]], ConsumerRecord[K, V]]] {
+class ConsumerRecordQueue[K, V]() extends GraphStage[FlowShape[Queue[ConsumerRecord[K, V]], ConsumerRecord[K, V]]] {
 
   val in = Inlet[Queue[ConsumerRecord[K, V]]] ("QueueConsumerRecord.in")
   val out = Outlet[ConsumerRecord[K, V]]("ConsumerRecord.out")

@@ -60,8 +60,7 @@ package object stream {
     * @tparam A elements that extend Ordering
     * @return values
     */
-  def flattenFlow[A: Ordering]: Flow[Seq[Option[A]], Seq[A], NotUsed] =
-          Flow[Seq[Option[A]]].map(_.flatten)
+  def flattenFlow[A: Ordering]: Flow[Seq[Option[A]], Seq[A], NotUsed] = Flow[Seq[Option[A]]].map(_.flatten)
 
   /** Flow to collect the Right side value from a sequence of Either
     *
@@ -71,7 +70,7 @@ package object stream {
     * @return value contained in Right
     */
   def collectRightFlow[A, B]: Flow[Seq[Either[A, B]], Seq[B], NotUsed] =
-          Flow[Seq[Either[A, B]]].collect(PartialFunction(filterRight))
+    Flow[Seq[Either[A, B]]].collect(PartialFunction(filterRight))
 
   /** Accept Rights, log Lefts */
   def filterRightLogLeft[A, B](in: Either[A, B])(implicit logger: LoggingAdapter): Boolean =
@@ -86,7 +85,7 @@ package object stream {
     * @return tuple2 all error strings and all success results
     */
   def tuple3LeftRight(in: (Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef])):
-          (Seq[String], Seq[AnyRef]) = {
+    (Seq[String], Seq[AnyRef]) = {
 
     val lefts = new ArrayBuffer[String]()
     val rights = new ArrayBuffer[AnyRef]()
@@ -110,18 +109,16 @@ package object stream {
     * @return mapped tuple2
     */
   def leftRightFlow: Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef]),
-          (Seq[String], Seq[AnyRef]), NotUsed] =
-    Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef])].
-    map(tuple3LeftRight)
+    (Seq[String], Seq[AnyRef]), NotUsed] =
+    Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef])].map(tuple3LeftRight)
 
   /** Map tuple3 from Zip stage to log failure and pass success results
     *
     * @param in tuple3 the result from 3 parallel calls
     * @return success results
     */
-  def tuple3LogLeftRight(
-      in: (Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef]))
-      (implicit logger: LoggingAdapter): Seq[AnyRef] = {
+  def tuple3LogLeftRight(in: (Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef]))
+    (implicit logger: LoggingAdapter): Seq[AnyRef] = {
 
     val rights = new ArrayBuffer[AnyRef]()
     in._1 match {
@@ -144,8 +141,6 @@ package object stream {
     * @return Seq[AnyRef]
     */
   def logLeftRightFlow(implicit logger: LoggingAdapter):
-          Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef]),
-            Seq[AnyRef], NotUsed] =
-    Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef])].
-    map(tuple3LogLeftRight)
+    Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef]), Seq[AnyRef], NotUsed] =
+      Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef])].map(tuple3LogLeftRight)
 }

@@ -33,7 +33,7 @@ import com.github.garyaiki.dendrites.algebird.stream.avgFlow
   * @author Gary Struthers
   */
 class SpyFlow[A](name: String, var pulls: Int, var pushes: Int)(implicit logger: LoggingAdapter)
-        extends GraphStage[FlowShape[A, A]] {
+  extends GraphStage[FlowShape[A, A]] {
 
   logger.debug("spyFlow:{} init pulls:{} pushes{}", name, pulls, pushes)
 

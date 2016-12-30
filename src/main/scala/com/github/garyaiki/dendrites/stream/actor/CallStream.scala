@@ -48,13 +48,11 @@ import CallStream.CompleteMessage
   * @see [[http://doc.akka.io/api/akka/2.4/#akka.stream.javadsl.SourceQueueWithComplete SourceQueueWithComplete]]
   * @author Gary Struthers
   */
-class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) extends Actor
-        with ActorLogging {
+class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) extends Actor with ActorLogging {
 
   implicit val system = context.system
   import system.dispatcher
-  final implicit val materializer: ActorMaterializer =
-    ActorMaterializer(ActorMaterializerSettings(system))
+  final implicit val materializer: ActorMaterializer = ActorMaterializer(ActorMaterializerSettings(system))
 
   var rgMaterialized: SourceQueueWithComplete[A] = null
 
@@ -66,8 +64,7 @@ class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) exte
 
   /** Complete the stream */
   override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
-    log.error(reason, "preRestart due to {} when processing {}",
-        reason.getMessage, message.getOrElse(""))
+    log.error(reason, "preRestart due to {} when processing {}", reason.getMessage, message.getOrElse(""))
     rgMaterialized.complete()
     super.preRestart(reason, message)
   }
@@ -108,12 +105,10 @@ class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) exte
     */
   def receive = {
 
-    case CompleteMessage => {
-      log.debug("receive CompleteMessage from {}", sender)
-    }
-    case y: QueueOfferResult => {
-      offerResultHandler(y)
-    }
+    case CompleteMessage => log.debug("receive CompleteMessage from {}", sender)
+
+    case y: QueueOfferResult => offerResultHandler(y)
+
     case s: StatusFailure => {
       val t = s.cause
       log.error(t, "receive StatusFailure: enqueue:{} ex:{}", t.getMessage, t.getClass.getName)
@@ -121,14 +116,12 @@ class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) exte
     }
 
     case m: A => {
-          log.debug("receive msg:{} class:{}", m, m.getClass().getName)
-          val offerFuture: Future[QueueOfferResult] = rgMaterialized.offer(m)
-          offerFuture pipeTo self
+      log.debug("receive msg:{} class:{}", m, m.getClass.getName)
+      val offerFuture: Future[QueueOfferResult] = rgMaterialized.offer(m)
+      offerFuture pipeTo self
     }
 
-    case everythingElse => {
-      log.warning("receive unknown message {}", everythingElse)
-    }
+    case everythingElse => log.warning("receive unknown message {}", everythingElse)
   }
 }
 
@@ -143,14 +136,12 @@ object CallStream {
     * @param flow Akka stream Flow
     * @return Props to create actor
     */
-  def props[A: TypeTag](runnable: RunnableGraph[SourceQueueWithComplete[A]]): Props = {
-    Props(new CallStream[A](runnable))
-  }
+  def props[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]): Props = Props(new CallStream[A](rg))
 
   def props[A: TypeTag](sinkRef: ActorRef, flow: Flow[A, Seq[AnyRef], NotUsed]): Props = {
     val source = Source.queue[A](1, OverflowStrategy.fail)
     val sink = Sink.actorRef(sinkRef, CompleteMessage)
-    val runnable: RunnableGraph[SourceQueueWithComplete[A]] = source.via(flow).to(sink)
-    Props(new CallStream[A](runnable))
+    val rg: RunnableGraph[SourceQueueWithComplete[A]] = source.via(flow).to(sink)
+    Props(new CallStream[A](rg))
   }
 }
