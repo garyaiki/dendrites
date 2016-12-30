@@ -73,7 +73,7 @@ package object http {
     * @param config
     * @return config plus ip address and port number
     */
-  def getHostConfig(ipPath: String, portPath: String, config: Config = ConfigFactory.load()): (Config, String, Int) = {
+  def getHostConfig(ipPath: String, portPath: String, config: Config = ConfigFactory.load): (Config, String, Int) = {
 
     val ip = config.getString(ipPath)
     val port = config.getInt(portPath)
@@ -153,8 +153,7 @@ package object http {
     * @return Future[HttpResponse]
     */
   def typedQuery(baseURL: StringBuilder, requestPath: String, ccToGet:(Product, String) => StringBuilder)
-    (cc: Product)
-    (implicit system: ActorSystem, materializer: Materializer): Future[HttpResponse] = {
+    (cc: Product)(implicit system: ActorSystem, materializer: Materializer): Future[HttpResponse] = {
     val balancesQuery = ccToGet(cc, requestPath)
     val uriS = (baseURL ++ balancesQuery).mkString
 

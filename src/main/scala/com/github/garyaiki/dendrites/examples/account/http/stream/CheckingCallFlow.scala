@@ -33,8 +33,8 @@ import com.github.garyaiki.dendrites.http.stream.TypedResponseFlow.decider
   */
 class CheckingCallFlow(implicit ec: ExecutionContext,
   val system: ActorSystem,
-  logger: LoggingAdapter,
-  val mat: Materializer) extends BalancesProtocols {
+  log: LoggingAdapter,
+  val mat: Materializer)  extends BalancesProtocols {
 
   val clientConfig = new CheckingBalancesClientConfig()
   val baseURL = clientConfig.baseURL

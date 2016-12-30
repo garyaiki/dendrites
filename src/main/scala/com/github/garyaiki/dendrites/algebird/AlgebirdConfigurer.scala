@@ -14,7 +14,7 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.algebird
 
-import com.typesafe.config.{ Config, ConfigFactory }
+import com.typesafe.config.{Config, ConfigFactory}
 import com.twitter.algebird.{DecayedValueMonoid, HyperLogLogAggregator, HyperLogLogMonoid}
 
 /** Factory for Algebird configured constants
@@ -23,7 +23,7 @@ import com.twitter.algebird.{DecayedValueMonoid, HyperLogLogAggregator, HyperLog
   *
   */
 object AlgebirdConfigurer {
-  val config = ConfigFactory.load()
+  val config = ConfigFactory.load
   val countMinSketchDelta = config.getNumber("dendrites.algebird.countMinSketch.delta")
   val countMinSketchEPS = config.getDouble("dendrites.algebird.countMinSketch.eps")
   val countMinSketchSeed = config.getInt("dendrites.algebird.countMinSketch.seed")

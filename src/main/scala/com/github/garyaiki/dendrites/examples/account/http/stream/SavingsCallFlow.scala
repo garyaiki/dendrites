@@ -31,10 +31,8 @@ import com.github.garyaiki.dendrites.http.stream.TypedResponseFlow.decider
   * @author Gary Struthers
   *
   */
-class SavingsCallFlow(implicit ec: ExecutionContext,
-  val system: ActorSystem,
-  logger: LoggingAdapter,
-  val mat: Materializer) extends BalancesProtocols {
+class SavingsCallFlow(implicit ec: ExecutionContext, val system: ActorSystem, log: LoggingAdapter, val mat: Materializer)
+  extends BalancesProtocols {
 
   val clientConfig = new SavingsBalancesClientConfig()
   val hostConfig = clientConfig.hostConfig

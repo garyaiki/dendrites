@@ -82,7 +82,7 @@ class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLik
   var results: ActorRef = null
 
   override def preStart() = {
-    log.debug("preStart:{} sink:{} streamSuper:{}", this.toString(), resultsName, streamSuperName)   
+    log.debug("preStart:{} sink:{} streamSuper:{}", this.toString, resultsName, streamSuperName)   
     // create children here
     val resultsProps = CallStream.props[Seq[AnyRef]](resultsRunnable)
     results = context.actorOf(resultsProps, resultsName)
@@ -121,6 +121,6 @@ object StreamLogAgentsSupervisor {
   case class ResultsActor(override val ref: ActorRef, override val name: String) extends OtherActor
 
   def props[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLike: TypeTag](agents: Agents[A])
-          (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer) =
+    (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer) =
     Props(new StreamLogAgentsSupervisor[A](agents))
 }

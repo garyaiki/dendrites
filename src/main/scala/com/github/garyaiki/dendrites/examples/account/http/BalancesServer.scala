@@ -53,7 +53,7 @@ object BalancesServer extends App with BalancesService {
   override implicit val executor = system.dispatcher
   override implicit val mat = ActorMaterializer()
 
-  val config = ConfigFactory.load()
+  val config = ConfigFactory.load
   val logger = Logging(system, getClass)
 
   Http().bindAndHandle(routes, config.getString("balancesIP"), config.getInt("balancesPort"))

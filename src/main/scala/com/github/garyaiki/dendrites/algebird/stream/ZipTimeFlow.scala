@@ -24,15 +24,13 @@ import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
   * @example [[com.github.garyaiki.dendrites.algebird.agent.stream.DecayedValueAgentFlow]]
   * @author Gary Struthers
   */
-class ZipTimeFlow[A: Numeric](f: A => Double)
-        extends GraphStage[FlowShape[Seq[A], Seq[(Double, Double)]]] {
+class ZipTimeFlow[A: Numeric](f: A => Double) extends GraphStage[FlowShape[Seq[A], Seq[(Double, Double)]]] {
 
   val in = Inlet[Seq[A]]("ZipTimeFlow in")
   val out = Outlet[Seq[(Double, Double)]]("ZipTimeFlow out")
   override val shape = FlowShape.of(in, out)
 
-  def toZipTime(xs: Seq[A]): Seq[(Double, Double)] =
-    xs.map(x => (x.asInstanceOf[Number].doubleValue(), f(x)))// Instant.now.toEpochMilli.toDouble))
+  def toZipTime(xs: Seq[A]): Seq[(Double, Double)] = xs.map(x => (x.asInstanceOf[Number].doubleValue, f(x)))
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
@@ -44,9 +42,7 @@ class ZipTimeFlow[A: Numeric](f: A => Double)
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          pull(in)
-        }
+        override def onPull(): Unit = pull(in)
       })
     }
   }

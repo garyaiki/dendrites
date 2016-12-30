@@ -58,7 +58,7 @@ class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) exte
 
   /** Materialize the RunnableGraph */
   override def preStart() = {
-    log.debug("preStart:{}", this.toString())
+    log.debug("preStart:{}", this.toString)
     rgMaterialized = rg.run
   }
 

@@ -80,7 +80,7 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSink: SinkActor) extends
   }
 
   override def preStart() = {
-    log.debug("preStart:{} callStream:{} sink:{}", this.toString(), callStreamName, sink.name)
+    log.debug("preStart:{} callStream:{} sink:{}", this.toString, callStreamName, sink.name)
     // create children here
     callStream = createCallStream(sink.ref)
   }
@@ -170,7 +170,6 @@ object ParallelCallSupervisor {
 
   case class SinkActor(override val ref: ActorRef, override val name: String) extends OtherActor
 
-  def props[A <: Product: TypeTag](sinkActor: SinkActor): Props =
-    Props(new ParallelCallSupervisor[A](sinkActor))
+  def props[A <: Product: TypeTag](sinkActor: SinkActor): Props = Props(new ParallelCallSupervisor[A](sinkActor))
 }
 

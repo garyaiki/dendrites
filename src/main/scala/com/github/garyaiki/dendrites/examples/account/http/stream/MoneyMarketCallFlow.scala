@@ -32,9 +32,9 @@ import com.github.garyaiki.dendrites.http.stream.TypedResponseFlow.decider
   *
   */
 class MoneyMarketCallFlow(implicit ec: ExecutionContext,
-  val system: ActorSystem,
-  logger: LoggingAdapter,
-  val mat: Materializer) extends BalancesProtocols {
+    val system: ActorSystem,
+    log: LoggingAdapter,
+    val mat: Materializer) extends BalancesProtocols {
 
   val clientConfig = new MoneyMarketBalancesClientConfig()
   val hostConfig = clientConfig.hostConfig

@@ -14,10 +14,9 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites
 
-import com.twitter.algebird.{Approximate, AveragedValue, AveragedGroup, Averager, BF, BloomFilter,
-  CMS, CMSHasher, CMSMonoid, DecayedValue, DecayedValueMonoid, Field, Functor, Group, HLL,
-  HyperLogLogAggregator, IntRing, LongRing, MaxAggregator, MinAggregator, Monoid, NumericRing,
-  QTree, QTreeSemigroup, Ring, Semigroup}
+import com.twitter.algebird.{Approximate, AveragedGroup, AveragedValue, Averager, BF, BloomFilter, CMS, CMSHasher,
+  CMSMonoid, DecayedValue, DecayedValueMonoid, Field, Functor, Group, HLL, HyperLogLogAggregator, IntRing, LongRing,
+  MaxAggregator, MinAggregator, Monoid, NumericRing, QTree, QTreeSemigroup, Ring, Semigroup}
 import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
 
 /** Aggregation functions for Twitter Algebird.
@@ -571,8 +570,7 @@ package object algebird {
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Averager$ Averager]]
     */
   def avg[A: Numeric](xs: Seq[A]): AveragedValue = {
-    val at = andThen[A, Double, AveragedValue](xs)(implicitly[Numeric[A]].toDouble)(
-      Averager.prepare(_))
+    val at = andThen[A, Double, AveragedValue](xs)(implicitly[Numeric[A]].toDouble)(Averager.prepare(_))
     at.reduce(AveragedGroup.plus(_, _))
   }
 
@@ -584,9 +582,7 @@ package object algebird {
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedGroup$ AveragedGroup]]
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
     */
-  def sumAverageValues(xs: Seq[AveragedValue]): AveragedValue = {
-    xs.reduce(AveragedGroup.plus(_, _))
-  }
+  def sumAverageValues(xs: Seq[AveragedValue]): AveragedValue = xs.reduce(AveragedGroup.plus(_, _))
 
   /** Create BloomFilter configure and load it from a Seq of words
     *
@@ -630,17 +626,14 @@ package object algebird {
     java.nio.ByteBuffer.allocate(8).putLong(l).array()
   }
 
-  implicit val cmsHasherDouble: CMSHasher[Double] =
-    CMSHasherArrayByte.contramap((d: Double) => doubleToArrayBytes(d))
+  implicit val cmsHasherDouble: CMSHasher[Double] = CMSHasherArrayByte.contramap((d: Double) => doubleToArrayBytes(d))
 
   def floatToArrayBytes(f: Float): Array[Byte] = doubleToArrayBytes(f.toDouble)
 
-  implicit val cmsHasherFloat: CMSHasher[Float] =
-    CMSHasherArrayByte.contramap((f: Float) => floatToArrayBytes(f))
+  implicit val cmsHasherFloat: CMSHasher[Float] = CMSHasherArrayByte.contramap((f: Float) => floatToArrayBytes(f))
 
   /** Double.NEGATIVE_INFINITY or Double.POSITIVE_INFINITY when > Double */
-  def bigDecimalToArrayBytes(bd: BigDecimal): Array[Byte] =
-    doubleToArrayBytes(bd.toDouble)
+  def bigDecimalToArrayBytes(bd: BigDecimal): Array[Byte] = doubleToArrayBytes(bd.toDouble)
 
   implicit val cmsHasherBigDecimal: CMSHasher[BigDecimal] =
     CMSHasherArrayByte.contramap((bd: BigDecimal) => bigDecimalToArrayBytes(bd))
@@ -656,53 +649,51 @@ package object algebird {
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSMonoid CMSMonoid]]
     * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     */
-  def createCMSMonoid[K: Ordering: CMSHasher](
-        eps: Double = 0.001, delta: Double = 1E-10, seed: Int = 1): CMSMonoid[K] =
-          new CMSMonoid[K](eps, delta, seed)
+  def createCMSMonoid[K: Ordering: CMSHasher](eps: Double = 0.001, delta: Double = 1E-10, seed: Int = 1): CMSMonoid[K] =
+    new CMSMonoid[K](eps, delta, seed)
 
   /** Create a CMS
     *
     * @tparam K elements which are implicitly Ordering[K] and CMSHasher[K]
     * @param xs data
-    * @param monoid implicit CMSMonoid for K
+    * @param m implicit CMSMonoid for K
     * @return CMS for data
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSHasher CMSHasher]]
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSMonoid CMSMonoid]]
     * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     */
-  def createCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])(implicit monoid: CMSMonoid[K]):
-      CMS[K] = monoid.create(xs)
+  def createCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])(implicit m: CMSMonoid[K]):CMS[K] = m.create(xs)
 
   /** Sum a Sequence of CMS
     *
     * @tparam K elements which are implicitly Ordering[K] and CMSHasher[K]
     * @param xs Sequence of CMS
-    * @param monoid
+    * @param m
     * @return CMS as the sum of Sequence of CMS
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSHasher CMSHasher]]
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSMonoid CMSMonoid]]
     * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     */
-  def sumCountMinSketch[K: Ordering: CMSHasher](xs: Seq[CMS[K]])(implicit monoid: CMSMonoid[K]):
-      CMS[K] = xs.reduce(monoid.plus(_, _))
+  def sumCountMinSketch[K: Ordering: CMSHasher](xs: Seq[CMS[K]])(implicit m: CMSMonoid[K]): CMS[K] =
+    xs.reduce(m.plus(_, _))
 
   /** Turn a sequence of value, time tuples into a seq of DecayedValues
     *
     * @param xs sequence of value, time tuples
     * @param halfLife to scale value based on time
     * @param last is initial element, if None use implicit monoid.zero
-    * @param monoid implicit DecayedValueMonoid used to scan from initial value
+    * @param m implicit DecayedValueMonoid used to scan from initial value
     * @return seq of DecayedValues
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValue DecayedValue]]
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValueMonoid DecayedValueMonoid]]
     */
-  def toDecayedValues(halfLife: Double, last: Option[DecayedValue] = None)
-      (xs: Seq[(Double, Double)])(implicit monoid: DecayedValueMonoid): Seq[DecayedValue] = {
+  def toDecayedValues(halfLife: Double, last: Option[DecayedValue] = None)(xs: Seq[(Double, Double)])
+    (implicit m: DecayedValueMonoid): Seq[DecayedValue] = {
     val z = last match {
-      case None    => monoid.zero
+      case None    => m.zero
       case Some(x) => x
     }
 
@@ -713,7 +704,7 @@ package object algebird {
         case _ if (time < halfLife) => time
         case _                      => halfLife
       }
-      monoid.plus(previous, DecayedValue.build(value, time, d))
+      m.plus(previous, DecayedValue.build(value, time, d))
     }
     xs.scanLeft(z)(op)
   }
@@ -730,8 +721,8 @@ package object algebird {
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HyperLogLogAggregator HyperLogLogAggregator]]
     * @see [[com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike]]
     */
-  def createHLL[A: HyperLogLogLike](xs: Seq[A])(
-    implicit ev: HyperLogLogLike[A], agg: HyperLogLogAggregator): HLL = ev(xs)
+  def createHLL[A: HyperLogLogLike](xs: Seq[A])(implicit ev: HyperLogLogLike[A], agg: HyperLogLogAggregator): HLL =
+    ev(xs)
 
   /** Map Sequence of HyperLogLogs to Sequence of Approximate
     *
@@ -751,12 +742,9 @@ package object algebird {
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Approximate Approximate]]
     */
-  def sumHLLApproximateSizes(xs: Seq[HLL]): Approximate[Long] = {
-    xs.reduce(_ + _).approximateSize
-  }
+  def sumHLLApproximateSizes(xs: Seq[HLL]): Approximate[Long] = xs.reduce(_ + _).approximateSize
 
-  def buildQTrees[A: QTreeLike](vals: Seq[A])(implicit ev: QTreeLike[A]): Seq[QTree[A]] =
-    vals.map(ev(_))
+  def buildQTrees[A: QTreeLike](vals: Seq[A])(implicit ev: QTreeLike[A]): Seq[QTree[A]] = vals.map(ev(_))
 
   /** Build a QTree from a Seq
     *
@@ -770,8 +758,8 @@ package object algebird {
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTreeSemigroup QTreeSemigroup]]
     * @see [[com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike]]
     */
-  def buildQTree[A: QTreeLike](vals: Seq[A])(implicit ev: QTreeLike[A], sg: QTreeSemigroup[A]):
-      QTree[A] = vals.map(ev(_)).reduce(sg.plus(_, _))
+  def buildQTree[A: QTreeLike](vals: Seq[A])(implicit ev: QTreeLike[A], sg: QTreeSemigroup[A]): QTree[A] =
+    vals.map(ev(_)).reduce(sg.plus(_, _))
 
   /** Sum a Sequence of QTrees
     *
@@ -784,6 +772,6 @@ package object algebird {
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTreeSemigroup QTreeSemigroup]]
     */
-  def sumQTrees[A: QTreeSemigroup](qTrees: Seq[QTree[A]])(implicit sg: QTreeSemigroup[A]):
-      QTree[A] = qTrees.reduce(sg.plus(_, _))
+  def sumQTrees[A: QTreeSemigroup](qTrees: Seq[QTree[A]])(implicit sg: QTreeSemigroup[A]): QTree[A] =
+    qTrees.reduce(sg.plus(_, _))
 }

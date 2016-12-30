@@ -86,7 +86,7 @@ package object concurrent {
     minBackoff: FiniteDuration,
     maxBackoff: FiniteDuration,
     randomFactor: Double)(retryCount: Int): FiniteDuration = {
-      val rnd = 1.0 + ThreadLocalRandom.current().nextDouble * randomFactor
+      val rnd = 1.0 + ThreadLocalRandom.current.nextDouble * randomFactor
       if (retryCount >= 30) // Duration overflow protection
         maxBackoff
       else
