@@ -86,9 +86,7 @@ class CassandraQuery(session: Session, fetchSize: Int = 0)(implicit val ec: Exec
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          pull(in)
-        }
+        override def onPull(): Unit = pull(in)
       })
     }
   }
@@ -103,7 +101,7 @@ object CassandraQuery {
     * @return Flow[BoundStatement, ResultSet, NotUsed]
     */
   def apply(session: Session, fetchSize: Int = 0)(implicit ec: ExecutionContext, logger: LoggingAdapter):
-      Flow[BoundStatement, ResultSet, NotUsed] = {
+    Flow[BoundStatement, ResultSet, NotUsed] = {
     Flow.fromGraph(new CassandraQuery(session, fetchSize))
   }
 }

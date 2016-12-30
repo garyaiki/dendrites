@@ -16,10 +16,10 @@ package com.github.garyaiki.dendrites
 
 import _root_.akka.actor.ActorSystem
 import _root_.akka.event.Logging
-import com.datastax.driver.core.{BatchStatement, BoundStatement, CloseFuture, Cluster, Host,
-  Metadata, QueryLogger, PreparedStatement, ResultSet, Row, Session}
-import com.datastax.driver.core.policies.{DCAwareRoundRobinPolicy, DefaultRetryPolicy,
-  LoadBalancingPolicy, LoggingRetryPolicy, ReconnectionPolicy, RetryPolicy}
+import com.datastax.driver.core.{BatchStatement, BoundStatement, CloseFuture, Cluster, Host, Metadata, QueryLogger,
+  PreparedStatement, ResultSet, Row, Session}
+import com.datastax.driver.core.policies.{DCAwareRoundRobinPolicy, DefaultRetryPolicy, LoadBalancingPolicy,
+  LoggingRetryPolicy, ReconnectionPolicy, RetryPolicy}
 import com.google.common.util.concurrent.ListenableFuture
 import com.typesafe.config.ConfigFactory
 import java.net.InetAddress
@@ -129,16 +129,13 @@ package object cassandra {
     *
     * @param nodes Cassandra nodes
     * @param policy RetryPolicy
-    * @param reC: ReconnectionPolicy
+    * @param recP: ReconnectionPolicy
     * @return Cluster
     *
     * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/policies/ExponentialReconnectionPolicy.html ExponentialReconnectionPolicy]]
     */
-  def createCluster(nodes: JCollection[InetAddress], policy: RetryPolicy, reC: ReconnectionPolicy): Cluster = {
-    Cluster.builder().addContactPoints(nodes)
-      .withRetryPolicy(policy)
-      .withReconnectionPolicy(reC)
-      .build()
+  def createCluster(nodes: JCollection[InetAddress], policy: RetryPolicy, recP: ReconnectionPolicy): Cluster = {
+    Cluster.builder().addContactPoints(nodes).withRetryPolicy(policy).withReconnectionPolicy(recP).build()
   }
 
   /** Log cluster's metadata. ForDebugging
@@ -156,11 +153,11 @@ package object cassandra {
     * @see [[https://docs.oracle.com/javase/8/docs/api/java/lang/IllegalStateException.html IllegalStateException]]
     */
   def logMetadata(cluster: Cluster): Unit = {
-    val metadata = cluster.getMetadata()
+    val metadata = cluster.getMetadata
     logger.debug(s"Connected to cluster:${metadata.getClusterName}")
     val hosts = metadata.getAllHosts
-    val it = hosts.iterator()
-    it.foreach(h => logger.debug(s"Datacenter:${h.getDatacenter()} host:${h.getAddress} rack:${h.getRack()}"))
+    val it = hosts.iterator
+    it.foreach(h => logger.debug(s"Datacenter:${h.getDatacenter} host:${h.getAddress} rack:${h.getRack}"))
   }
 
   /** Enable logging of RegularStatement, BoundStatement, BatchStatement queries
@@ -174,11 +171,7 @@ package object cassandra {
     *
     */
   def registerQueryLogger(cluster: Cluster): Unit = {
-    val queryLogger = QueryLogger.builder()
-    .withConstantThreshold(10000)
-    .withMaxQueryStringLength(256)
-    .build()
-
+    val queryLogger = QueryLogger.builder().withConstantThreshold(10000).withMaxQueryStringLength(256).build()
     cluster.register(queryLogger)
   }
 
@@ -209,7 +202,7 @@ package object cassandra {
     *
     */
   def initLoadBalancingPolicy(cluster: Cluster, ldBalPolicy: LoadBalancingPolicy): Unit = {
-    val hosts = cluster.getMetadata().getAllHosts
+    val hosts = cluster.getMetadata.getAllHosts
     ldBalPolicy.init(cluster, hosts)
   }
 
@@ -292,7 +285,7 @@ package object cassandra {
     * @param resultSet
     * @return Seq[Row]
     */
-  def getAllRows(resultSet: ResultSet): Seq[Row] = resultSet.all().toSeq
+  def getAllRows(resultSet: ResultSet): Seq[Row] = resultSet.all.toSeq
 
   /** drop schema (keyspace)
     *
@@ -304,9 +297,7 @@ package object cassandra {
     * @throws QueryValidationException - query is invalid,syntax error, unauthorized
     *
     */
-  def dropSchema(session: Session, schema: String): Unit = {
-    session.execute("DROP KEYSPACE IF EXISTS " + schema)
-  }
+  def dropSchema(session: Session, schema: String): Unit = session.execute("DROP KEYSPACE IF EXISTS " + schema)
 
   /** Asynchronously close Session and Cluster. Converts Cassandra's Java Futures into Scala Futures
     *
@@ -328,12 +319,12 @@ package object cassandra {
     val scalaSessF = listenableFutureToScala[Unit](sessCloseF.asInstanceOf[ListenableFuture[Unit]])
     scalaSessF onComplete {
       case Success(x) => logger.debug("session closed")
-      case Failure(t) => logger.error(t, "session closed failed {}", t.getMessage())
+      case Failure(t) => logger.error(t, "session closed failed {}", t.getMessage)
     }
     val scalaClusF = listenableFutureToScala[Unit](clusCloseF.asInstanceOf[ListenableFuture[Unit]])
     scalaClusF onComplete {
       case Success(x) => logger.debug("cluster closed")
-      case Failure(t) => logger.error(t, "failed cluster close {}", t.getMessage())
+      case Failure(t) => logger.error(t, "failed cluster close {}", t.getMessage)
     }
   }
 }

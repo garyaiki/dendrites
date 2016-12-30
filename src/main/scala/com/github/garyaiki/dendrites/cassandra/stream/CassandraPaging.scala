@@ -23,12 +23,11 @@ import scala.collection.mutable.ArrayBuffer
 
 /** Send a Page of specified number of Rows from a ResultSet
   *
-  * @param pageSize number of Rows to send downstream
+  * @param size number of Rows to send downstream
   * @param logger implicit LoggingAdapter
   * @author Gary Struthers
   */
-class CassandraPaging(pageSize: Int)(implicit logger: LoggingAdapter)
-  extends GraphStage[FlowShape[ResultSet, Seq[Row]]]{
+class CassandraPaging(size: Int)(implicit logger: LoggingAdapter) extends GraphStage[FlowShape[ResultSet, Seq[Row]]]{
 
   val in = Inlet[ResultSet]("CassandraPaging.in")
   val out = Outlet[Seq[Row]]("CassandraPaging.out")
@@ -45,15 +44,15 @@ class CassandraPaging(pageSize: Int)(implicit logger: LoggingAdapter)
       var it: Iterator[Row] = Iterator.empty
 
       def pageRows(): Seq[Row] = {
-        val pageIt = it.take(pageSize)
+        val pageIt = it.take(size)
         if(it.isEmpty) it = Iterator.empty
         pageIt.toSeq
       }
 
       setHandler(in, new InHandler {
         override def onPush(): Unit = {
-          it = grab(in).iterator()
-          push(out, pageRows())
+          it = grab(in).iterator
+          push(out, pageRows)
         }
       })
 
@@ -62,7 +61,7 @@ class CassandraPaging(pageSize: Int)(implicit logger: LoggingAdapter)
           if(it.isEmpty) {
             pull(in)
           } else {
-            push(out, pageRows())
+            push(out, pageRows)
           }
         }
       })

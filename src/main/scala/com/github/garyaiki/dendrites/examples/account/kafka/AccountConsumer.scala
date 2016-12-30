@@ -27,7 +27,7 @@ import com.github.garyaiki.dendrites.kafka.createConsumer
   * @author Gary Struthers
   */
 object AccountConsumer extends ConsumerConfig[String, Array[Byte]] {
-  val config = ConfigFactory.load()
+  val config = ConfigFactory.load
   val topic = config getString("dendrites.kafka.account.topic")
   val topics = List(topic).asJava
   val timeout = config getLong("dendrites.kafka.account.poll-timeout")

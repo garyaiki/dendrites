@@ -7,16 +7,15 @@ Introductory documentation is on the [Wiki](https://github.com/garyaiki/dendrite
 Requires Java 8 
 [download sdk](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) and
 Scala 2.11 
-[downlod scala](http://www.scala-lang.org/download/)
+[download scala](http://www.scala-lang.org/download/)
 
 Clone or download dendrites from Github, see 
 [cloning-a-repository](https://help.github.com/articles/cloning-a-repository/)
 
 ##### Build and test with sbt
-dendrites sbt [version](https://github.com/garyaiki/dendrites/blob/master/project/build.properties), download [sbt](http://www.scala-sbt.org/download.html), sbt's [documentation](http://www.scala-sbt.org/documentation.html)
+[version](https://github.com/garyaiki/dendrites/blob/master/project/build.properties),  [download](http://www.scala-sbt.org/download.html),  [documentation](http://www.scala-sbt.org/documentation.html)
 
-
-###### sbt commands
+###### commands
 In a terminal window `cd` to the dendrites directory.
 
 `$ sbt` launch sbt, returns `>` prompt
@@ -51,7 +50,8 @@ In a terminal window `cd` to the dendrites directory.
 ##### Build and test with Maven
 Maven [home page](https://maven.apache.org/index.html)
 
-In a dendrites directory terminal window
+###### commands
+In a terminal window `cd` to the dendrites directory.
 
 `$ mvn clean`
 
@@ -66,9 +66,10 @@ In a dendrites directory terminal window
 `$ mvn source:jar`
 
 `$ mvn scala:doc-jar`
-#### Download jar from Maven Central
+#### Add dendrites to your project
+##### Download dendrites jar from Maven Central
 
-[dendtites](http://mvnrepository.com/artifact/com.github.garyaiki)
+[dendrites](http://mvnrepository.com/artifact/com.github.garyaiki)
 ###### sbt
 Add dependency in sbt `build.sbt`
 
@@ -84,7 +85,7 @@ Add dependency in Maven `pom.xml`
     </dependency>
 `
 
-#### Kafka
+#### Kafka local installation, configuration, and dendrites integration tests
 Kafka's [documentation](http://kafka.apache.org/documentation)
 ##### Install server
 [Download](http://kafka.apache.org/downloads) Kafka for Scala version 2.11
@@ -101,12 +102,11 @@ Optionally, create or replace symbolic link
 Edit configuration in Kafka install directory `/config/server.properties`
 
 ###### Optional settings for development
-You may want to delete topics. In `Server Basics` un-comment
+For development, you will want to delete topics. In `Server Basics` un-comment
 
 `delete.topic.enable=true`
 
-To advertise the broker in a local install. In `Socket Server Settings`
-add
+To advertise the broker in a local install. In `Socket Server Settings` add
 
 `listeners=PLAINTEXT://localhost:9092`
 
@@ -114,12 +114,12 @@ add
 
 `host.name=localhost`
 
-To shorten log retention hours. In `Log Retention Policy`
+In production, log retention hours are 168 (1 week). For development you can shorten them to 1. In `Log Retention Policy`
 
 `log.retention.hours=1`
 ##### Install Kafka Java Driver
 Add dependencies to driver jars. sbt and Maven dependency settings are under
-kafka-clients [repo page](http://mvnrepository.com/artifact/org.apache.kafka/kafka-clients)
+kafka-clients [Maven repository page](http://mvnrepository.com/artifact/org.apache.kafka/kafka-clients)
 ##### Configure driver's Kafka Consumer
 Put a Consumer Config properties file on your classpath. See Kafka's [New Consumer Configs](http://kafka.apache.org/documentation#newconsumerconfigs) documentation and a dendrites [example](https://github.com/garyaiki/dendrites/blob/master/src/main/resources/kafkaConsumer.properties). KafkaSource requires `enable.auto.commit=false` for stream backpressure to control commit. To pass this configuration to KafkaSource, create a subclass of [ConsumerConfig](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/kafka/ConsumerConfig.scala). See this [example](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/examples/account/kafka/AccountConsumer.scala)
 ##### Configure driver's Kafka Producer
@@ -143,10 +143,10 @@ In a 3rd Terminal window in the same directory
 
 `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic account-topic`
 
-Shell prompt after topic creation
+It completes in a few seconds.
 
 ##### Run integration tests
-Kafka server must be running and have `account-topic`
+Kafka server must be running and have an `account-topic`
 
 In dendrites directory terminal window with sbt running
 
@@ -158,20 +158,18 @@ In dendrites directory terminal window with sbt running
 
 `> it:testOnly com.github.garyaiki.dendrites.kafka.stream.KafkaStreamSpec`
 
-##### Delete topic, stop Kafka server, stop Zookeeper
+##### After testing, delete topic, stop Kafka server, stop Zookeeper
 First, delete topic
 
 `bin/kafka-topics.sh --delete --zookeeper localhost:2181 --topic account-topic`
 
-Give Kafka and Zookeeper a few seconds. Then Stop Kafka
+Give Kafka and Zookeeper a few seconds. Then stop Kafka
 
 `bin/kafka-server-stop.sh`
 
-Give Zookeeper a few seconds. Then Stop it too
+Give Zookeeper a few seconds. Then stop it too
 
 `bin/zookeeper-server-stop.sh`
-
-
 
 #### Cassandra
 Cassandra [documentation](http://www.planetcassandra.org/apache-cassandra-documentation/)
@@ -188,7 +186,7 @@ Optionally, create or replace symbolic link
 ##### Configure Cassandra
 For development, default configuration can be used.
 ##### Install Cassandra Java Driver
-Add dependencies to `cassandra-driver-core`, `cassandra-driver-mapping`, `cassandra-driver-extras`. Driver jars with sbt and Maven dependency settings are under Datastax Cassandra [repo page](http://mvnrepository.com/artifact/com.datastax.cassandra) 
+Add dependencies to `cassandra-driver-core`, `cassandra-driver-mapping`, `cassandra-driver-extras`. Driver jars with sbt and Maven dependency settings are under Datastax Cassandra [Maven repository page](http://mvnrepository.com/artifact/com.datastax.cassandra) 
 ##### Configure Cassandra Client
 dendrites example Cassandra configuration setup can be used, but doesn't have to be. [Example values](https://github.com/garyaiki/dendrites/blob/master/src/main/resources/reference.conf) are in `resource.conf` under `dendrites/cassandra`. You can override these in your `application.conf`. [CassandraConfig](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/cassandra/CassandraConfig.scala) is a trait you can use in an object or class. [PlayListSongConfig](https://github.com/garyaiki/dendrites/blob/master/src/it/scala/com/github/garyaiki/dendrites/cassandra/PlaylistSongConfig.scala) is an example.
 ##### Run Cassandra
@@ -214,7 +212,7 @@ In a dendrites directory terminal window with sbt running
 ##### Stop Cassandra
 After running integration tests, exit sbt to close its connection to Cassandra. If you kill Cassandra while sbt is still running after the tests it will keep trying to reconnect to Cassandra.
 
-Then kill it in the terminal window running Cassandra
+Then, in the terminal window running Cassandra
 
 Ctrl-C
 #### Akka Http
@@ -222,13 +220,13 @@ Akka Http [documentation](http://doc.akka.io/docs/akka-http/current/scala.html)
 
 `Balances Server` is an example server that handles requests from integration tests under `src/it/scala`
 ##### Run Balances Server
-In a dendrites directory terminal window with sbt running
+The HTTP integration tests need Balances Server running to handle HTTP requests. You can open a 2nd dendrites directory terminal window and start sbt in this window just to run the server.
 
 `> run` Runs `Balances Server` an Http server
 ##### Run integration tests
 Balances Server must be running
 
-In a dendrites directory terminal window with sbt running
+In the dendrites directory terminal window used to compile and run tests with sbt running
 
 `> it:compile`
 
@@ -236,20 +234,21 @@ In a dendrites directory terminal window with sbt running
 
 `> it:testOnly com.github.garyaiki.dendrites.examples.account.http.*`
 
-Sometimes, some of these tests fail because Balances Server has the default limit of 4 concurrent requests and tests are running in parallel and may not get time on the server. If this happens, re-run the failed tests one at a time.
+Sometimes, some of these tests fail because Balances Server has a default limit of 4 concurrent requests and tests are running in parallel and may not get time on the server. If this happens, re-run the failed tests one at a time.
 ##### Stop Balances Server
-Kill it in the terminal window running Balances Server
+In the terminal window running Balances Server
 
 Ctrl-C
 
 ### Typesafe Config
-[Typesafe Config user guide](https://github.com/typesafehub/config)
+dendrites uses Typesafe Config. Traits with names ending in `Config` define configuration properties for components. This mediates configuration from usage, so you may use these traits with different configuration sources.
 
+[Typesafe Config user guide](https://github.com/typesafehub/config),
 [Akka config user guide](http://doc.akka.io/docs/akka/2.4/general/configuration.html)
 
 Each configuration in `/src/main/resources/reference.conf` can be overridden by your `application.conf`.
 
-The `akka` section is for logging and has Akka specific settings
+The `akka` section is for logging and has Akka specific logging settings
 
 Under the `dendrites` section
 
@@ -257,14 +256,14 @@ Under the `dendrites` section
 
 `blocking-dispatcher` configures a thread pool to be used when there are blocking calls
 
-These other sections are examples, you don't have to override them.
+These other sections are examples, that don't need to be overriden.
 `checking-balances`, `money-market-balances`, and `savings-balances` are example http client configurations
 
 `kafka` is an example topic configuration
 
 `cassandra` is an example configuration
 
-###Logback configuration
+### Logback configuration
 
 [Logback configuration guide](http://logback.qos.ch/manual/configuration.html)
 

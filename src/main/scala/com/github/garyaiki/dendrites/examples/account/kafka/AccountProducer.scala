@@ -25,7 +25,7 @@ import com.github.garyaiki.dendrites.kafka.createProducer
   */
 object AccountProducer extends ProducerConfig[String, Array[Byte]] {
 
-  val config = ConfigFactory.load()
+  val config = ConfigFactory.load
   val topic = config.getString("dendrites.kafka.account.topic")
   val key = config.getString("dendrites.kafka.account.key")
   val producer = createProducer[Key, Value]("kafkaProducer.properties")

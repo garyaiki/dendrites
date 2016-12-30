@@ -81,9 +81,7 @@ package object avro {
     */
   def ccToGenericRecord[A <: Product](gRecord: GenericData.Record)(cc: A): Unit = {
     val kvMap = ccToMap(cc)
-    kvMap foreach {
-      case (key, value) => gRecord.put(key, value)
-    }
+    kvMap foreach { case (key, value) => gRecord.put(key, value) }
   }
 
   /** Create encoded ByteArray from GenericDatumWriter and GenericRecord
@@ -96,10 +94,10 @@ package object avro {
   def toByteArray(writer: GenericDatumWriter[GenericRecord])(genericRecord: GenericRecord): Array[Byte] = {
     val os = new ByteArrayOutputStream()
     try {
-      val encoder = EncoderFactory.get().binaryEncoder(os, null)
+      val encoder = EncoderFactory.get.binaryEncoder(os, null)
       writer.write(genericRecord, encoder)
       encoder.flush()
-      os.toByteArray()
+      os.toByteArray
     }
     finally {
       os.close()
@@ -115,7 +113,7 @@ package object avro {
   def byteArrayToGenericRecord(schema: Schema, bytes: Array[Byte]): GenericRecord = {
     val reader = new GenericDatumReader[GenericRecord](schema)
     val in = new ByteArrayInputStream(bytes)
-    val decoder = DecoderFactory.get().binaryDecoder(in, null)
+    val decoder = DecoderFactory.get.binaryDecoder(in, null)
     reader.read(null, decoder)
   }
 }

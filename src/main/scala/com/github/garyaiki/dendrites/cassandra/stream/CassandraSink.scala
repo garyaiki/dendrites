@@ -42,7 +42,7 @@ import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
   * @author Gary Struthers
   */
 class CassandraSink(session: Session)(implicit val ec: ExecutionContext, logger: LoggingAdapter)
-    extends GraphStage[SinkShape[BoundStatement]] {
+  extends GraphStage[SinkShape[BoundStatement]] {
 
   val in = Inlet[BoundStatement]("CassandraSink.in")
   override val shape: SinkShape[BoundStatement] = SinkShape(in)
@@ -55,9 +55,7 @@ class CassandraSink(session: Session)(implicit val ec: ExecutionContext, logger:
     new GraphStageLogic(shape) {
 
       /** start backpressure in custom Sink */
-      override def preStart(): Unit = {
-        pull(in)
-      }
+      override def preStart(): Unit = pull(in)
 
       def executeStmt(stmt: BoundStatement): Unit = {
         val resultSetFuture = session.executeAsync(stmt)
