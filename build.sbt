@@ -31,7 +31,6 @@ lazy val root = (project in file(".")).
 	settings(
 		name := "dendrites",
 		libraryDependencies ++= Seq(
-			"org.scalactic" %% "scalactic" % scalaTestV,
 			"org.scalatest" %% "scalatest" % scalaTestV % "it,test",
 			"org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
 			"ch.qos.logback" % "logback-classic" % "1.1.8",
@@ -47,7 +46,6 @@ lazy val root = (project in file(".")).
 			"com.typesafe.akka" %% "akka-http-testkit" % akkaHttpV % "it,test",
 			"com.twitter" %% "algebird" % algebirdV,
 			"com.twitter" %% "algebird-core" % algebirdV,
-			"com.twitter" %% "algebird-test" % algebirdV % "it,test",
 			"io.spray" %% "spray-json" % "1.3.2",
 			"commons-io" % "commons-io" % "2.5" % "it,test",
 			"com.chuusai" %% "shapeless" % "2.3.2",

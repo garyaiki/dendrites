@@ -43,11 +43,6 @@
             <version>2.11.8</version>
         </dependency>
         <dependency>
-            <groupId>org.scalactic</groupId>
-            <artifactId>scalactic_2.11</artifactId>
-            <version>3.0.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_2.11</artifactId>
             <version>3.0.1</version>
@@ -126,12 +121,6 @@
             <groupId>com.twitter</groupId>
             <artifactId>algebird-core_2.11</artifactId>
             <version>0.12.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.twitter</groupId>
-            <artifactId>algebird-test_2.11</artifactId>
-            <version>0.12.2</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.spray</groupId>
