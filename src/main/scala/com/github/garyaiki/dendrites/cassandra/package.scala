@@ -243,8 +243,8 @@ package object cassandra {
     *
     */
   def createSchema(session: Session, schema: String, strategy: String, repCount: Int): ResultSet = {
-    val rsf = session.executeAsync("CREATE KEYSPACE IF NOT EXISTS " + schema + " WITH replication"
-        + "= {'class': '" + strategy + "', 'replication_factor':" + repCount + "};")
+    val rsf = session.executeAsync("CREATE KEYSPACE IF NOT EXISTS " + schema + " WITH replication" + 
+      "= {'class': '" + strategy + "', 'replication_factor':" + repCount + "};")
     rsf.getUninterruptibly
   }
 
@@ -258,7 +258,7 @@ package object cassandra {
     * @throws NoHostAvailableException - no host can be contacted
     */
   def selectAll(session: Session, schema: String, table: String): PreparedStatement = {
-      session.prepare("SELECT * FROM " + schema + "." + table + ";")
+    session.prepare("SELECT * FROM " + schema + "." + table + ";")
   }
 
   /** Asynchronously execute a BoundStatement but getUninterruptibly blocks, use blocking-dispatcher

@@ -17,7 +17,7 @@ package com.github.garyaiki.dendrites.kafka
 import akka.actor.ActorSystem
 import akka.event.Logging
 import com.typesafe.config.ConfigFactory
-import java.util.ArrayList
+import java.util.{ArrayList, UUID}
 import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.clients.consumer.{ConsumerRecord, KafkaConsumer}
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord, RecordMetadata}
@@ -43,7 +43,7 @@ class AvroKafkaProducerConsumerSpec extends WordSpecLike with BeforeAndAfterAll 
   val topic = "avroTest-topic"
   val topics = new ArrayList[String]()
   topics.add(topic)
-  val key = config.getString("dendrites.kafka.account.key")
+  val key = UUID.randomUUID.toString
   val schema = loadSchema("getAccountBalances.avsc")
   val gab = GetAccountBalances(1L)
   var producer: KafkaProducer[String, Array[Byte]] = null

@@ -58,9 +58,8 @@ object Songs {
     * @return prepared statement
     */
   def songsPrepInsert(session: Session, schema: String): PreparedStatement = {
-    session.prepare("INSERT INTO " + schema + "." + table +
-          " (id, title, album, artist, tags) " +
-          "VALUES (?,?,?,?,?);")    
+    session.prepare("INSERT INTO " + schema + "." + table + " (id, title, album, artist, tags) " +
+      "VALUES (?,?,?,?,?);")    
   }
 
   /** Tell DB to prepare a query by id Song statement. Do this once.
@@ -70,7 +69,7 @@ object Songs {
     * @return prepared statement
     */ 
   def songsPrepQuery(session: Session, schema: String): PreparedStatement = {
-      session.prepare("SELECT * FROM " + schema + "." + table + " WHERE id=?;")
+    session.prepare("SELECT * FROM " + schema + "." + table + " WHERE id=?;")
   }
 
   case class Song(id: UUID, title: String, album: String, artist: String, tags: Set[String])
@@ -86,9 +85,8 @@ object Songs {
     val songsBndStmt = new BoundStatement(insert)
     val songsTags = new JHashSet[String]()
     val it = song.tags.iterator
-    while(it.hasNext) {
-      songsTags.add(it.next())
-    }
+    it foreach(tag => songsTags.add(tag))
+
     songsBndStmt.bind(song.id,song.title,song.album,song.artist,songsTags)
   }
 
@@ -109,11 +107,7 @@ object Songs {
     * @param row
     * @return case class
     */
-  def rowToSong(row: Row): Song = {
-    row.as[Song]
-  }
+  def rowToSong(row: Row): Song = row.as[Song]
 
-  def rowsToSongs(rows: Seq[Row]): Seq[Song] = {
-    rows.map { x => rowToSong(x) }
-  }
+  def rowsToSongs(rows: Seq[Row]): Seq[Song] = rows.map { x => rowToSong(x) }
 }

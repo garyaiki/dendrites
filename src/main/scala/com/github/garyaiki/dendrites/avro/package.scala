@@ -98,8 +98,7 @@ package object avro {
       writer.write(genericRecord, encoder)
       encoder.flush()
       os.toByteArray
-    }
-    finally {
+    } finally {
       os.close()
     }
   }

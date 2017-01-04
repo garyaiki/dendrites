@@ -39,8 +39,7 @@ import scala.collection.mutable.ArrayBuffer
   * {{{
   * val kafkaSource = KafkaSource[String, Array[Byte]](accountConsumerConfig)
   * val consumerRecordQueue = new ConsumerRecordQueue[String, Array[Byte]]()
-  * val deserializer = new AvroDeserializer("getAccountBalances.avsc",
-  *         genericRecordToGetAccountBalances)
+  * val deserializer = new AvroDeserializer("getAccountBalances.avsc", genericRecordToGetAccountBalances)
   * val streamFuture = kafkaSource
   *     .via(consumerRecordsFlow[String, Array[Byte]])
   *     .via(consumerRecordQueue)
@@ -49,8 +48,8 @@ import scala.collection.mutable.ArrayBuffer
   *     .runWith(Sink.fold(0){(sum, _) => sum + 1})
   * }}}
   * @author Gary Struthers
-  * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/ConsumerRecords.html ConsumerRecords]]
-  * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/ConsumerRecord.html ConsumerRecord]]
+  * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/clients/consumer/ConsumerRecords.html ConsumerRecords]]
+  * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/clients/consumer/ConsumerRecord.html ConsumerRecord]]
   */
 package object stream {
 
@@ -98,21 +97,18 @@ package object stream {
     *
     * @tparam K key type
     * @tparam V value type
-    * @param records ConsumerRecords returned from Kafka consumer poll
+    * @param crs ConsumerRecords returned from Kafka consumer poll
     * @return tuple2 of queue of ConsumerRecord
     */
-  def tuple2PartitionQs[K, V](records: ConsumerRecords[K,V]): (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]])
-    = {
+  def tuple2PartitionQs[K, V](crs: ConsumerRecords[K,V]): (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]) = {
 
-    val partitions = records.partitions
+    val partitions = crs.partitions
     require(partitions.size == 2)
     val buff = new ArrayBuffer[TopicPartition](2)
     val it = partitions.iterator.asScala
     it foreach(tp => buff += tp)
-    val l0 = records.records(buff(0))
-    val ab0 = l0.asScala
-    val l1 = records.records(buff(1))
-    val ab1 = l1.asScala
+    val ab0 = crs.records(buff(0)).asScala
+    val ab1 = crs.records(buff(1)).asScala
     (queueRecords(ab0.iterator), queueRecords(ab1.iterator))
   }
 
@@ -133,24 +129,21 @@ package object stream {
     *
     * @tparam K key type
     * @tparam V value type
-    * @param records ConsumerRecords returned from Kafka consumer poll
+    * @param crs ConsumerRecords returned from Kafka consumer poll
     * @return tuple3 of queue of ConsumerRecord
     */
-  def tuple3PartitionQs[K, V](records: ConsumerRecords[K,V]):
+  def tuple3PartitionQs[K, V](crs: ConsumerRecords[K,V]):
     (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]) = {
 
-    val partitions = records.partitions
+    val partitions = crs.partitions
     require(partitions.size == 3)
     val buff = new ArrayBuffer[TopicPartition](3)
     val it = partitions.iterator.asScala
     it foreach(tp => buff += tp)
 
-    val l0 = records.records(buff(0))
-    val ab0 = l0.asScala
-    val l1 = records.records(buff(1))
-    val ab1 = l1.asScala
-    val l2 = records.records(buff(2))
-    val ab2 = l2.asScala
+    val ab0 = crs.records(buff(0)).asScala
+    val ab1 = crs.records(buff(1)).asScala
+    val ab2 = crs.records(buff(2)).asScala
     (queueRecords(ab0.iterator), queueRecords(ab1.iterator), queueRecords(ab2.iterator))
   }
 
@@ -166,10 +159,10 @@ package object stream {
     (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]), NotUsed] =
       Flow[ConsumerRecords[K, V]].map(tuple3PartitionQs[K, V])
 
-  /** Map a ConsumerRecord to just its value */
-  def extractValue[K, V](record: ConsumerRecord[K,V]): V = record.value
-
+  /** Map a ConsumerRecord to just its value 
+  def extractValue[K, V](record: ConsumerRecord[K,V]): V = record.value //@TODO delete
+*/
   /** Flow to Map a ConsumerRecord to just its value */
   def consumerRecordValueFlow[K, V]: Flow[ConsumerRecord[K, V], V, NotUsed] =
-    Flow[ConsumerRecord[K, V]].map(extractValue[K, V])
+    Flow[ConsumerRecord[K, V]].map(r => r.value)
 }

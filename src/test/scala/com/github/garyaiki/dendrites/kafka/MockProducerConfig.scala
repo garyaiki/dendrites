@@ -14,14 +14,17 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.kafka
 
+import java.util.UUID
 import org.apache.kafka.clients.producer.MockProducer
 import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSerializer}
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 import com.github.garyaiki.dendrites.concurrent.calculateDelay
 
 object MockProducerConfig extends ProducerConfig[String, Array[Byte]] {
+
+  override def generateKey() = UUID.randomUUID.toString
+
   val topic = "akkaKafka"
-  val key = topic + "Key"
   val autoComplete = true // When false must call completeNext or errorNext for each record
   val minDuration = FiniteDuration(100, MILLISECONDS)
   val maxDuration = FiniteDuration(1000, MILLISECONDS)

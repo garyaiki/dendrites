@@ -22,8 +22,8 @@ import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 
 import com.github.garyaiki.dendrites.kafka.stream.KafkaSource.decider;
 import com.typesafe.config.ConfigFactory
+import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
-
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
 import org.scalatest.time.SpanSugar._
@@ -109,14 +109,12 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
       val sink = KafkaSink[String, Array[Byte]](ap)
       val source = Source[GetAccountBalances](iter)
       source.via(serializer).runWith(sink)
-      
+
       val dispatcher = ActorAttributes.dispatcher("dendrites.blocking-dispatcher")
 
-      val kafkaSource = KafkaSource[String, Array[Byte]](accountConsumerConfig)
-              .withAttributes(dispatcher)
+      val kafkaSource = KafkaSource[String, Array[Byte]](accountConsumerConfig).withAttributes(dispatcher)
       val consumerRecordQueue = new ConsumerRecordQueue[String, Array[Byte]]()
-      val deserializer = new AvroDeserializer("getAccountBalances.avsc",
-            genericRecordToGetAccountBalances)
+      val deserializer = new AvroDeserializer("getAccountBalances.avsc", genericRecordToGetAccountBalances)
       val streamFuture = kafkaSource
           .via(consumerRecordsFlow[String, Array[Byte]])
           .via(consumerRecordQueue)

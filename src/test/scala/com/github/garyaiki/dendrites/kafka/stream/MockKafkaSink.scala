@@ -74,7 +74,7 @@ class MockKafkaSink[K, V](prod: ProducerConfig[K, V], testException: RuntimeExce
     new TimerGraphStageLogic(shape) {
 
       private def decider = inheritedAttributes.get[SupervisionStrategy].map(_.decider).
-          getOrElse(Supervision.stoppingDecider)
+        getOrElse(Supervision.stoppingDecider)
 
       var retries = 0
       val maxDuration = prod.maxDuration
@@ -82,9 +82,7 @@ class MockKafkaSink[K, V](prod: ProducerConfig[K, V], testException: RuntimeExce
       var waitForTimer: Boolean = false
 
       /** pull initializes stream requests */
-      override def preStart(): Unit = {
-        pull(in)
-      }
+      override def preStart(): Unit = pull(in)
 
       /** exception handler for producer send's callback */
       def asyncExceptions(pRecord: ProducerRecord[K, V], callback: Callback)(e: Exception): Unit = {
@@ -115,7 +113,7 @@ class MockKafkaSink[K, V](prod: ProducerConfig[K, V], testException: RuntimeExce
         override def onPush(): Unit = {
           if(!waitForTimer) {
             val item = grab(in)
-            val producerRecord = new ProducerRecord[K, V](prod.topic, prod.key, item)
+            val producerRecord = new ProducerRecord[K, V](prod.topic, prod.generateKey(), item)
             var errorCallback: AsyncCallback[Exception] = null
             val pullCallback = getAsyncCallback{ (_: Unit) => pull(in) }
             val kafkaCallback = new Callback() {
@@ -158,8 +156,8 @@ object MockKafkaSink {
  		* @param implicit logger
   	* @return Sink[V, NotUsed]
   	*/
-  def apply[K, V](producer: ProducerConfig[K, V], testException: RuntimeException)
-          (implicit logger: LoggingAdapter): Sink[V, NotUsed] = {
+  def apply[K, V](producer: ProducerConfig[K, V], testException: RuntimeException)(implicit logger: LoggingAdapter):
+      Sink[V, NotUsed] = {
     val sink = Sink.fromGraph(new MockKafkaSink[K, V](producer, testException))
     sink.withAttributes(ActorAttributes.supervisionStrategy(decider))
   }

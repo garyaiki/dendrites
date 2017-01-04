@@ -28,9 +28,8 @@ import scala.collection.immutable.Iterable
 import scala.concurrent.ExecutionContext
 import com.github.garyaiki.dendrites.cassandra.{Playlists, PlaylistSongConfig}
 import com.github.garyaiki.dendrites.cassandra.Playlists._
-import com.github.garyaiki.dendrites.cassandra.{close, connect, createCluster,
-  createLoadBalancingPolicy, createSchema, dropSchema, initLoadBalancingPolicy, logMetadata,
-  registerQueryLogger}
+import com.github.garyaiki.dendrites.cassandra.{close, connect, createCluster, createLoadBalancingPolicy, createSchema,
+  dropSchema, initLoadBalancingPolicy, logMetadata, registerQueryLogger}
 
 class CassandraPlaylistSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   implicit val system = ActorSystem("dendrites")
@@ -70,8 +69,7 @@ class CassandraPlaylistSpec extends WordSpecLike with Matchers with BeforeAndAft
     "insert Playlists " in {
       val iter = Iterable(playlists.toSeq:_*)
       val source = Source[Playlist](iter)
-      val bndStmt = new CassandraBind(Playlists.playlistsPrepInsert(session, schema),
-              playlistToBndInsert)
+      val bndStmt = new CassandraBind(Playlists.playlistsPrepInsert(session, schema), playlistToBndInsert)
       val sink = new CassandraSink(session)
       source.via(bndStmt).runWith(sink)
     }
@@ -79,12 +77,10 @@ class CassandraPlaylistSpec extends WordSpecLike with Matchers with BeforeAndAft
 
   "query a Playlist" in {
       val source = TestSource.probe[UUID]
-      val bndStmt = new CassandraBind(Playlists.playlistsPrepQuery(session, schema),
-              playlistToBndQuery)
+      val bndStmt = new CassandraBind(Playlists.playlistsPrepQuery(session, schema), playlistToBndQuery)
       val query = new CassandraQuery(session)
       val paging = new CassandraPaging(10)
-      def toPlaylists: Flow[Seq[Row], Seq[Playlist], NotUsed] =
-            Flow[Seq[Row]].map(Playlists.rowsToPlaylists)
+      def toPlaylists: Flow[Seq[Row], Seq[Playlist], NotUsed] = Flow[Seq[Row]].map(Playlists.rowsToPlaylists)
 
       def sink = TestSink.probe[Seq[Playlist]]
       val (pub, sub) = source.via(bndStmt)

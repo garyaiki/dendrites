@@ -52,8 +52,7 @@ import com.github.garyaiki.dendrites.kafka.ConsumerConfig
   * {{{
   *   val dispatcher = ActorAttributes.dispatcher("dendrites.blocking-dispatcher")
   *
-  *   val kafkaSource = KafkaSource[String, Array[Byte]](accountConsumerConfig)
-  *           .withAttributes(dispatcher)
+  *   val kafkaSource = KafkaSource[String, Array[Byte]](accountConsumerConfig).withAttributes(dispatcher)
   * }}}
   *
   * @tparam K Kafka key
@@ -158,11 +157,11 @@ object KafkaSource {
 
   /** Supervision strategy
     *
-    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/CommitFailedException.html CommitFailedException]]
-    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/WakeupException.html WakeupException]]
-    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/AuthorizationException.html AuthorizationException]]
-    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/InvalidOffsetException.html InvalidOffsetException]]
-    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/KafkaException.html KafkaException]]
+    * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/clients/consumer/CommitFailedException.html CommitFailedException]]
+    * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/common/errors/WakeupException.html WakeupException]]
+    * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/common/errors/AuthorizationException.html AuthorizationException]]
+    * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/clients/consumer/InvalidOffsetException.html InvalidOffsetException]]
+    * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/common/KafkaException.html KafkaException]]
     */
   def decider: Supervision.Decider = {
     case _: CommitFailedException => Supervision.Resume // Can't commit current poll

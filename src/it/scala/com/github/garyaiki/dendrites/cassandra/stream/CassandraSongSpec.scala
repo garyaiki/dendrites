@@ -30,9 +30,8 @@ import scala.concurrent.ExecutionContext
 import com.github.garyaiki.dendrites.cassandra.{PlaylistSongConfig, Songs}
 import com.github.garyaiki.dendrites.cassandra.Playlists._
 import com.github.garyaiki.dendrites.cassandra.Songs._
-import com.github.garyaiki.dendrites.cassandra.{close, connect, createCluster,
-  createLoadBalancingPolicy, createSchema, dropSchema, initLoadBalancingPolicy, logMetadata,
-  registerQueryLogger}
+import com.github.garyaiki.dendrites.cassandra.{close, connect, createCluster, createLoadBalancingPolicy, createSchema,
+  dropSchema, initLoadBalancingPolicy, logMetadata, registerQueryLogger}
 
 class CassandraSongSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   implicit val system = ActorSystem("dendrites")
@@ -72,7 +71,7 @@ class CassandraSongSpec extends WordSpecLike with Matchers with BeforeAndAfterAl
     val strategy = myConfig.replicationStrategy
     val createSchemaRS = createSchema(session, schema, strategy, 3)
     val songTRS = Songs.createTable(session, schema)
-    songId = UUID.fromString("756716f7-2e54-4715-9f00-91dcbea6cf50")
+    songId = UUID.randomUUID()//.fromString("756716f7-2e54-4715-9f00-91dcbea6cf50")
     song = Song(songId,"La Petite Tonkinoise","Bye Bye Blackbird","Joséphine Baker",songsTags)
     songs = Seq(song)
     songIds = Seq(songId)

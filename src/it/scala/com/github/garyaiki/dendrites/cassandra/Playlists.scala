@@ -56,9 +56,8 @@ object Playlists {
     * @return prepared statement
     */
   def playlistsPrepInsert(session: Session, schema: String): PreparedStatement = {
-    session.prepare("INSERT INTO " + schema + "." + table +
-        " (id, title, album, artist, song_id) " +
-        "VALUES (?,?,?,?,?);")
+    session.prepare("INSERT INTO " + schema + "." + table + " (id, title, album, artist, song_id) " +
+      "VALUES (?,?,?,?,?);")
   }
 
   /** Tell Cassandra DB to prepare a query by id Playlist statement. Do this once.
@@ -68,7 +67,7 @@ object Playlists {
     * @return prepared statement
     */  
   def playlistsPrepQuery(session: Session, schema: String): PreparedStatement = {
-      session.prepare("SELECT * FROM " + schema + "." + table + " WHERE id=?;")
+    session.prepare("SELECT * FROM " + schema + "." + table + " WHERE id=?;")
   }
 
   case class Playlist(id: UUID, title: String, album: String, artist: String, songId: UUID)
@@ -109,7 +108,5 @@ object Playlists {
              row.as[UUID]("song_id"))
   }
 
-  def rowsToPlaylists(rows: Seq[Row]): Seq[Playlist] = {
-    rows.map { x => rowToPlaylist(x) }
-  }
+  def rowsToPlaylists(rows: Seq[Row]): Seq[Playlist] = rows.map { x => rowToPlaylist(x) }
 }

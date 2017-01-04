@@ -64,8 +64,7 @@ class KafkaSink[K, V](prod: ProducerConfig[K, V])(implicit logger: LoggingAdapte
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new TimerGraphStageLogic(shape) {
 
-      def decider = inheritedAttributes.get[SupervisionStrategy].map(_.decider).
-          getOrElse(Supervision.stoppingDecider)
+      def decider = inheritedAttributes.get[SupervisionStrategy].map(_.decider).getOrElse(Supervision.stoppingDecider)
 
       var retries = 0
       val maxDuration = prod.maxDuration
@@ -73,9 +72,7 @@ class KafkaSink[K, V](prod: ProducerConfig[K, V])(implicit logger: LoggingAdapte
       var waitForTimer: Boolean = false
 
       /** pull initializes stream requests */
-      override def preStart(): Unit = {
-        pull(in)
-      }
+      override def preStart(): Unit = pull(in)
 
       /** exception handler for producer send's callback */
       def asyncExceptions(pRecord: ProducerRecord[K, V], callback: Callback)(e: Exception): Unit = {
@@ -106,7 +103,7 @@ class KafkaSink[K, V](prod: ProducerConfig[K, V])(implicit logger: LoggingAdapte
         override def onPush(): Unit = {
           if(!waitForTimer) {
             val item = grab(in)
-            val producerRecord = new ProducerRecord[K, V](prod.topic, prod.key, item)
+            val producerRecord = new ProducerRecord[K, V](prod.topic, prod.generateKey, item)
             var errorCallback: AsyncCallback[Exception] = null
             val pullCallback = getAsyncCallback{ (_: Unit) => pull(in) }
             val kafkaCallback = new Callback() {
@@ -127,7 +124,7 @@ class KafkaSink[K, V](prod: ProducerConfig[K, V])(implicit logger: LoggingAdapte
         timerKey match {
           case (pRec: ProducerRecord[K, V], callback: Callback) => producer send(pRec, callback)
           case x => throw new IllegalArgumentException(
-              s"expected (ProducerRecord[K, V], Callback)) received:${x.toString()}")
+            s"expected (ProducerRecord[K, V], Callback)) received:${x.toString()}")
         }
       }
     }
@@ -166,20 +163,20 @@ object KafkaSink {
 
   /** Supervision strategy
     *
-    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/InvalidTopicException.html InvalidTopicException]]
-    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/OffsetMetadataTooLarge.html OffsetMetadataTooLarge]]
-    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/RecordBatchTooLargeException.html RecordBatchTooLargeException]]
-    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/RecordTooLargeException.html RecordTooLargeException]]
-    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/UnknownServerException.html UnknownServerException]]
+    * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/common/errors/InvalidTopicException.html InvalidTopicException]]
+    * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/common/errors/OffsetMetadataTooLarge.html OffsetMetadataTooLarge]]
+    * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/common/errors/RecordBatchTooLargeException.html RecordBatchTooLargeException]]
+    * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/common/errors/RecordTooLargeException.html RecordTooLargeException]]
+    * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/common/errors/UnknownServerException.html UnknownServerException]]
     * Retriable exceptions (transient, may be covered by increasing #.retries):
-    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/CorruptRecordException.html CorruptRecordException]]
-    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/InvalidMetadataException.html InvalidMetadataException]]
-    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/NotEnoughReplicasAfterAppendException.html NotEnoughReplicasAfterAppendException]]
+    * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/common/errors/CorruptRecordException.html CorruptRecordException]]
+    * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/common/errors/InvalidMetadataException.html InvalidMetadataException]]
+    * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/common/errors/NotEnoughReplicasAfterAppendException.html NotEnoughReplicasAfterAppendException]]
     * NotEnoughReplicasAfterAppendException @note retries cause duplicates
-    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/NotEnoughReplicasException.html NotEnoughReplicasException]]
-    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/OffsetOutOfRangeException.html OffsetOutOfRangeException]]
-    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/TimeoutException.html TimeoutException]]
-    * @see [[http://kafka.apache.org/0100/javadoc/org/apache/kafka/common/errors/UnknownTopicOrPartitionException.html UnknownTopicOrPartitionException]]
+    * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/common/errors/NotEnoughReplicasException.html NotEnoughReplicasException]]
+    * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/clients/consumer/OffsetOutOfRangeException.html OffsetOutOfRangeException]]
+    * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/common/errors/TimeoutException.html TimeoutException]]
+    * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/common/errors/UnknownTopicOrPartitionException.html UnknownTopicOrPartitionException]]
     */
   def decider: Supervision.Decider = {
     case _: CorruptRecordException => Supervision.Resume

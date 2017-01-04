@@ -15,6 +15,7 @@ limitations under the License.
 package com.github.garyaiki.dendrites.examples.account.kafka
 
 import com.typesafe.config.ConfigFactory
+import java.util.UUID
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 import com.github.garyaiki.dendrites.concurrent.calculateDelay
 import com.github.garyaiki.dendrites.kafka.ProducerConfig
@@ -25,9 +26,10 @@ import com.github.garyaiki.dendrites.kafka.createProducer
   */
 object AccountProducer extends ProducerConfig[String, Array[Byte]] {
 
+  override def generateKey = UUID.randomUUID.toString
+
   val config = ConfigFactory.load
   val topic = config.getString("dendrites.kafka.account.topic")
-  val key = config.getString("dendrites.kafka.account.key")
   val producer = createProducer[Key, Value]("kafkaProducer.properties")
   val min = config getInt("dendrites.kafka.account.min-backoff")
   val minDuration = FiniteDuration(min, MILLISECONDS)

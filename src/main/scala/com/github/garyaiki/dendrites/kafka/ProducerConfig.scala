@@ -30,6 +30,8 @@ trait ProducerConfig[K, V] {
   type Key = K
   type Value = V
 
+  def generateKey(): K
+
   val minDuration: FiniteDuration // min poll, commit backoff
   val maxDuration: FiniteDuration // max poll, commit backoff
   val randomFactor: Double // random delay factor between 0.0, 1.0
@@ -37,5 +39,4 @@ trait ProducerConfig[K, V] {
 
   val producer: Producer[K, V]
   val topic: String
-  val key: Key
 }
