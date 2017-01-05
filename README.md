@@ -20,9 +20,9 @@ In a terminal window `cd` to the dendrites directory.
 
 `$ sbt` launch sbt, returns `>` prompt
 
-`> exit` quit sbt
-
 `> help` list available help
+
+`> update` Resolves and optionally retrieves dependencies.
 
 `> clean` Deletes files produced by the build under `target` directory
 
@@ -44,28 +44,30 @@ In a terminal window `cd` to the dendrites directory.
 
 `> scalastyle` Run scalastyle on source code under `src/main/scala`
 
-`> update` Resolves and optionally retrieves dependencies.
-
 `> dependencyTree` Prints an ascii tree of all the dependencies to the console
+
+`> exit` quit sbt
 ##### Build and test with Maven
 Maven [home page](https://maven.apache.org/index.html)
 
 ###### commands
 In a terminal window `cd` to the dendrites directory.
 
-`$ mvn clean`
+`$ mvn dependency:resolve` Resolves and optionally retrieves dependencies.
 
-`$ mvn compile`
+`$ mvn clean` Deletes files produced by the build under `target` directory
 
-`$ mvn scala:testCompile`
+`$ mvn compile` Compiles sources under `src/main/scala`
 
-`$ mvn test`
+`$ mvn scala:testCompile` Compiles unit test sources under `src/test/scala`
 
-`$ mvn install`
+`$ mvn test` Executes unit tests.
 
-`$ mvn source:jar`
+`$ mvn install` Install the package in local repository, for use as in other projects locally.
 
-`$ mvn scala:doc-jar`
+`$ mvn source:jar` Bundle the main sources of the project into a jar archive.
+
+`$ mvn scala:doc-jar` Generate Scaladocs in a jar
 #### Add dendrites to your project
 ##### Download dendrites jar from Maven Central
 
@@ -92,11 +94,11 @@ Kafka's [documentation](http://kafka.apache.org/documentation)
 
 Extract files
 
-`tar -xvf kafka_2.11-0.10.1.0.tar`
+`tar -xvf kafka_2.11-0.10.1.1.tar`
 
 Optionally, create or replace symbolic link
 
-`ln -nsf kafka_2.11-0.10.1.0 kafka`
+`ln -nsf kafka_2.11-0.10.1.1 kafka`
 
 ##### Configure server
 Edit configuration in Kafka install directory `/config/server.properties`
