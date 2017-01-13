@@ -15,7 +15,6 @@ limitations under the License.
 package com.github.garyaiki.dendrites.algebird.agent.stream
 
 import akka.NotUsed
-import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
 import akka.stream.{FlowShape, Graph, Materializer, OverflowStrategy, UniformFanOutShape}
 import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Keep, RunnableGraph, Sink, Source,
@@ -48,7 +47,6 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTre
   * @param hllAgent: HyperLogLogAgent
   * @param qtrAgent: QTreeAgent
   * @param time function generates time as doubles for DecayedValue
-  * @param system implicit ActorSystem
   * @param logger implicit LoggingAdapter
   * @param materializer implicit Materializer
   * @author Gary Struthers
@@ -60,7 +58,7 @@ class ParallelApproximators[A: HyperLogLogLike: Numeric: CMSHasher: QTreeLike: T
     hllAgent: HyperLogLogAgent,
     qtAgent: QTreeAgent[A],
     time:A => Double)
-  (implicit val system: ActorSystem, logger: LoggingAdapter, val materializer: Materializer) {
+  (implicit val logger: LoggingAdapter, val materializer: Materializer) {
 
   // Zip input agent update Futures, waits for all to complete
   def zipper: ZipWith5[Future[AveragedValue], Future[CMS[A]], Future[Seq[DecayedValue]],
@@ -109,12 +107,8 @@ object ParallelApproximators {
     hllAgent: HyperLogLogAgent,
     qtAgent: QTreeAgent[A],
     time:A => Double)
-    (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
-            Graph[FlowShape[Seq[A], (Future[AveragedValue],
-                                              Future[CMS[A]],
-                                              Future[Seq[DecayedValue]],
-                                              Future[HLL],
-                                              Future[QTree[A]])], NotUsed] = {
+    (implicit logger: LoggingAdapter, materializer: Materializer): Graph[FlowShape[Seq[A], (Future[AveragedValue],
+      Future[CMS[A]], Future[Seq[DecayedValue]], Future[HLL], Future[QTree[A]])], NotUsed] = {
     val pa = new ParallelApproximators[A](avgAgent,
         cmsAgent,
         dvAgent,
@@ -142,7 +136,7 @@ object ParallelApproximators {
     hllAgent: HyperLogLogAgent,
     qtAgent: QTreeAgent[A],
     time:A => Double)
-    (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
+    (implicit logger: LoggingAdapter, materializer: Materializer):
         Sink[Seq[A], NotUsed] = {
 
       val composite = compositeFlow[A](avgAgent, cmsAgent, dvAgent, hllAgent, qtAgent, time)
@@ -169,7 +163,7 @@ object ParallelApproximators {
     hllAgent: HyperLogLogAgent,
     qtAgent: QTreeAgent[A],
     time:A => Double)
-    (implicit system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
+    (implicit logger: LoggingAdapter, materializer: Materializer):
             RunnableGraph[SourceQueueWithComplete[Seq[A]]] = {
     val source = Source.queue[Seq[A]](10, OverflowStrategy.fail)
     val composite = compositeFlow[A](avgAgent, cmsAgent, dvAgent, hllAgent, qtAgent, time)

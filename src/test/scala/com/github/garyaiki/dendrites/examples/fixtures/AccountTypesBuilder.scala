@@ -37,13 +37,11 @@ trait AccountTypesBuilder extends TestSuiteMixin { this: TestSuite =>
   val balancesRange = Range.BigDecimal(start, end, step)
   val acTypes = accountTypes.toIndexedSeq
 
-  def makeBalances(): IndexedSeq[(Long, BigDecimal)] = {
-    for {
+  def makeBalances(): IndexedSeq[(Long, BigDecimal)] = for {
       id <- idRange
       balances <- balancesRange
     } yield (id, balances)
-  }
-  
+
   def makeAccountBalances(): IndexedSeq[AccBalances[BigDecimal]] = {
     def applyType(): AccountType = {
       import scala.util.Random
@@ -59,12 +57,13 @@ trait AccountTypesBuilder extends TestSuiteMixin { this: TestSuite =>
     accs.toIndexedSeq
   }
 
-  val accountBalances: IndexedSeq[AccBalances[BigDecimal]] = makeAccountBalances()
+  val accountBalances: IndexedSeq[AccBalances[BigDecimal]] = makeAccountBalances
   val accIdBals = accountBalances.flatten // Can't directly flatten Vector of List
   val accIds = for {
     i <- accIdBals
     j <- i
   } yield j._1
+
   val accVals = for {
     i <- accIdBals
     j <- i

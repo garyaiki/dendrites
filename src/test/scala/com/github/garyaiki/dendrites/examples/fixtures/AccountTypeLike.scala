@@ -105,32 +105,26 @@ object AccountTypeLike {
     def apply(k: Char): KeyOptStr = KeyOptStr(k.toString, Some(exStr(k)))
   }
 
-  implicit object CaseClassLikeEithBigDec extends
-      CaseClassLike[Either[String, BigDecimal], KeyEithBigDec] {
+  implicit object CaseClassLikeEithBigDec extends CaseClassLike[Either[String, BigDecimal], KeyEithBigDec] {
     def apply(k: Char): KeyEithBigDec = KeyEithBigDec(k.toString, Right(BigDecimal(k.toInt)))
   }
 
-  implicit object CaseClassLikeEithBigInt extends
-      CaseClassLike[Either[String, BigInt], KeyEithBigInt] {
+  implicit object CaseClassLikeEithBigInt extends CaseClassLike[Either[String, BigInt], KeyEithBigInt] {
     def apply(k: Char): KeyEithBigInt = KeyEithBigInt(k.toString, Right(BigInt(k.toInt)))
   }
 
-  implicit object CaseClassLikeEithBool extends
-      CaseClassLike[Either[String, Boolean], KeyEithBool] {
+  implicit object CaseClassLikeEithBool extends CaseClassLike[Either[String, Boolean], KeyEithBool] {
     def apply(k: Char): KeyEithBool = KeyEithBool(k.toString, Right(altTF(k)))
   }
 
-  implicit object CaseClassLikeEithDouble extends
-      CaseClassLike[Either[String, Double], KeyEithDouble] {
+  implicit object CaseClassLikeEithDouble extends CaseClassLike[Either[String, Double], KeyEithDouble] {
     def apply(k: Char): KeyEithDouble = KeyEithDouble(k.toString, Right(exDouble(k)))
   }
-  implicit object CaseClassLikeEithFloat extends
-      CaseClassLike[Either[String, Float], KeyEithFloat] {
+  implicit object CaseClassLikeEithFloat extends CaseClassLike[Either[String, Float], KeyEithFloat] {
     def apply(k: Char): KeyEithFloat = KeyEithFloat(k.toString, Right(exFloat(k)))
   }
 
-  implicit object CaseClassLikeEithInt extends
-      CaseClassLike[Either[String, Int], KeyEithInt] {
+  implicit object CaseClassLikeEithInt extends CaseClassLike[Either[String, Int], KeyEithInt] {
     def apply(k: Char): KeyEithInt = KeyEithInt(k.toString, Right(k.toInt))
   }
 

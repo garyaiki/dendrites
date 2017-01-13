@@ -17,14 +17,12 @@ import scala.language.postfixOps
 /**
  * a Test to show some TestKit examples
 */
-class TestKitUsageSpec
-  extends TestKit(ActorSystem("TestKitUsageSpec",
-    ConfigFactory.parseString(TestKitUsageSpec.config)))
-  with DefaultTimeout with ImplicitSender
-  with WordSpecLike with Matchers with BeforeAndAfterAll {
-  
+class TestKitUsageSpec extends TestKit(ActorSystem("TestKitUsageSpec",
+  ConfigFactory.parseString(TestKitUsageSpec.config))) with DefaultTimeout with ImplicitSender with WordSpecLike
+    with Matchers with BeforeAndAfterAll {
+
   val echoRef = system.actorOf(TestActors.echoActorProps)
-  
+
   import TestKitUsageSpec._
 
   val forwardRef = system.actorOf(Props(classOf[ForwardingActor], testActor))
@@ -34,7 +32,7 @@ class TestKitUsageSpec
   val headList = immutable.Seq().padTo(randomHead, "0")
   val tailList = immutable.Seq().padTo(randomTail, "1")
   val seqRef = system.actorOf(Props(classOf[SequencingActor], testActor, headList, tailList))
-  
+
   override def afterAll {
     shutdown()
   }
@@ -47,7 +45,7 @@ class TestKitUsageSpec
       }
     }
   }
-  
+
   "A ForwardingActor" should {
     "Forward a message it receives" in {
       within(500 millis) {
@@ -106,7 +104,7 @@ object TestKitUsageSpec {
   } """
   /**
    * An Actor that forwards every message to a next Actor
-		*/
+    */
   class ForwardingActor(next: ActorRef) extends Actor {
     def receive = {
       case msg => next ! msg
@@ -114,7 +112,7 @@ object TestKitUsageSpec {
   }
   /**
    * An Actor that only forwards certain messages to a next Actor
-		*/
+    */
   class FilteringActor(next: ActorRef) extends Actor {
     def receive = {
       case msg: String => next ! msg

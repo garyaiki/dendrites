@@ -92,8 +92,7 @@ import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
   * }}}
   */
 package object cassandra {
-  implicit val system = ActorSystem("dendrites")
-  implicit val logger = Logging(system, getClass)
+  implicit val logger = Logging(ActorSystem("dendrites"), getClass)
 
   /** Create single node Cassandra Cluster.
     *
@@ -243,7 +242,7 @@ package object cassandra {
     *
     */
   def createSchema(session: Session, schema: String, strategy: String, repCount: Int): ResultSet = {
-    val rsf = session.executeAsync("CREATE KEYSPACE IF NOT EXISTS " + schema + " WITH replication" + 
+    val rsf = session.executeAsync("CREATE KEYSPACE IF NOT EXISTS " + schema + " WITH replication" +
       "= {'class': '" + strategy + "', 'replication_factor':" + repCount + "};")
     rsf.getUninterruptibly
   }

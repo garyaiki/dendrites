@@ -177,7 +177,7 @@ package object http {
   def typedResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
     mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
     (response: HttpResponse)
-    (implicit ec: ExecutionContext, system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
+    (implicit ec: ExecutionContext, logger: LoggingAdapter, materializer: Materializer):
     Future[Either[String, AnyRef]] = {
       response.status match {
         case OK => {
@@ -205,7 +205,6 @@ package object http {
     * @param mapLeft plain text response to Left
     * @param mapRight json response to Right
     * @param caller future returned by query in 2nd arg list so it can be curried
-    * @param system implicit ActorSystem
     * @param logger implicit LoggingAdapter
     * @param materializer implicit Materializer
     * @return Future[Either[String, AnyRef]]
@@ -213,7 +212,7 @@ package object http {
   def typedFutureResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
     mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
     (caller: Future[HttpResponse])
-    (implicit ec: ExecutionContext, system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
+    (implicit ec: ExecutionContext, logger: LoggingAdapter, materializer: Materializer):
     Future[Either[String, AnyRef]] = {
 
     caller.flatMap { response => typedResponse(mapLeft, mapRight)(response) }

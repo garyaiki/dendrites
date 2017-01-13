@@ -49,7 +49,7 @@ import com.typesafe.config.ConfigFactory
   *
   */
 object BalancesServer extends App with BalancesService {
-  override implicit val system = ActorSystem("dendrites")
+  implicit val system = ActorSystem("dendrites")
   override implicit val executor = system.dispatcher
   override implicit val mat = ActorMaterializer()
 

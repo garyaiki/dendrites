@@ -18,22 +18,35 @@ import org.apache.avro.generic.{GenericDatumReader, GenericRecord}
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
 import scala.io.Source._
-import com.github.garyaiki.dendrites.examples.account.GetAccountBalances
-
+import com.github.garyaiki.dendrites.examples.account.{GetAccountBalances, GetCustomerAccountBalances}
+import com.github.garyaiki.dendrites.examples.account.avro.genericRecordToGetAccountBalances
 /**
   *
   * @author Gary Struthers
   *
   */
 class AvroByteArraySpec extends WordSpecLike {
-
+/*
   def genericRecordToGetAccountBalances(record: GenericRecord): GetAccountBalances = {
       val obj = record.get("id")
       val l:Long = obj.asInstanceOf[Number].longValue
       GetAccountBalances(l)
-  }
+  }*/
   "An AvroByteArray" should {
-    "serialize a case class from a schema and deserialize it back" in {
+    "serialize a GetAccountBalances case class from a schema and deserialize it back" in {
+      val schema = loadSchema("getAccountBalances.avsc")
+      val gab = GetAccountBalances(1L)
+      val bytes = ccToByteArray(schema, gab)
+
+      bytes.length shouldBe 1
+      bytes(0).toString() shouldBe "2" // zigzag encoding
+
+      def record = byteArrayToGenericRecord(schema, bytes)
+      val gab2 = genericRecordToGetAccountBalances(record)
+
+      gab2 shouldBe gab
+    }
+    "serialize another GetAccountBalances case class from a schema and deserialize it back" in {
       val schema = loadSchema("getAccountBalances.avsc")
       val gab = GetAccountBalances(1L)
       val bytes = ccToByteArray(schema, gab)
@@ -47,4 +60,5 @@ class AvroByteArraySpec extends WordSpecLike {
       gab2 shouldBe gab
     }
   }
+
 }

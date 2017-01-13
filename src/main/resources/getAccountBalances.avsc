@@ -1,7 +1,11 @@
-{"namespace": "org.gs.examples.account",
- "type": "record",
- "name": "GetAccountBalances",
- "fields": [
-     {"name": "id", "type": "long"}
- ]
+{
+  "type": "record",
+  "name": "GetAccountBalances",
+  "namespace": "com.github.garyaiki.dendrites.examples.account",
+  "fields": [
+    {
+      "name": "id",
+      "type": "long"
+    }
+  ]
 }

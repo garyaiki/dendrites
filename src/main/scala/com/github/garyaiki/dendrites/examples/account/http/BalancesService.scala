@@ -14,7 +14,6 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.examples.account.http
 
-import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.http.scaladsl.client.RequestBuilding
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.{sprayJsonMarshaller, sprayJsonUnmarshaller}
@@ -41,7 +40,6 @@ trait BalancesProtocols extends DefaultJsonProtocol {
   implicit val moneyMarketAccountBalancesFormat = jsonFormat1(MoneyMarketAccountBalances[BigDecimal])
   implicit val savingsAccountBalancesFormat = jsonFormat1(SavingsAccountBalances[BigDecimal])
 
-  implicit val system: ActorSystem
   implicit val mat: Materializer
 
   /** Unmarshall HttpEntity result
@@ -87,7 +85,6 @@ trait BalancesProtocols extends DefaultJsonProtocol {
   *
   */
 trait BalancesService extends BalancesProtocols {
-  implicit val system: ActorSystem
   implicit def executor: ExecutionContextExecutor
   implicit val mat: Materializer
 

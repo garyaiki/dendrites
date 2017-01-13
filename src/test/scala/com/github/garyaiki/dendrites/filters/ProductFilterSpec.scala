@@ -32,35 +32,35 @@ class ProductFilterSpec extends WordSpecLike with TestValuesBuilder {
 
   "A Product Filter" should {
     "return all BigDecimal fields from a sequence of case classes" in {
-    	val filtered = filterProducts(mixCaseClasses, fieldFilter, isType[BigDecimal])
-    			val flat = filtered
-    			val dbug = filtered.find { x => !x.isInstanceOf[BigDecimal] }
-    	keyBigDecimal.size shouldBe filtered.size
-    	assert(filtered.forall(isType[BigDecimal]))
+      val filtered = filterProducts(mixCaseClasses, fieldFilter, isType[BigDecimal])
+      val flat = filtered
+      val dbug = filtered.find { x => !x.isInstanceOf[BigDecimal] }
+      keyBigDecimal.size shouldBe filtered.size
+      assert(filtered.forall(isType[BigDecimal]))
     }
   }
 
   it should {
     "return all BigInt fields from a sequence of case classes" in {
-    	val filtered = filterProducts(mixCaseClasses, fieldFilter, isType[BigInt])
-    	keyBigInt.size shouldBe filtered.size
-    	assert(filtered.forall(isType[BigInt]))
+      val filtered = filterProducts(mixCaseClasses, fieldFilter, isType[BigInt])
+      keyBigInt.size shouldBe filtered.size
+      assert(filtered.forall(isType[BigInt]))
     }
   }
 
   it should {
     "return all Boolean fields from a sequence of case classes" in {
-    	val filtered = filterProducts(mixCaseClasses, fieldFilter, isType[Boolean])
-    	keyBoolean.size shouldBe filtered.size
-    	assert(filtered.forall(isType[Boolean]))
+      val filtered = filterProducts(mixCaseClasses, fieldFilter, isType[Boolean])
+      keyBoolean.size shouldBe filtered.size
+      assert(filtered.forall(isType[Boolean]))
     }
   }
 
   it should {
     "return all Double fields from a sequence of case classes" in {
-    	val filtered = filterProducts(mixCaseClasses, fieldFilter, isType[Double])
-    	keyDouble.size shouldBe filtered.size
-    	assert(filtered.forall(isType[Double]))
+      val filtered = filterProducts(mixCaseClasses, fieldFilter, isType[Double])
+      keyDouble.size shouldBe filtered.size
+      assert(filtered.forall(isType[Double]))
     }
   }
 

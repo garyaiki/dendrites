@@ -15,7 +15,6 @@ limitations under the License.
 package com.github.garyaiki.dendrites.algebird.agent.stream
 
 import akka.NotUsed
-import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
 import akka.stream.{Materializer, FlowShape, UniformFanOutShape}
 import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, ZipWith, ZipWith5}
@@ -46,7 +45,6 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike
   * @param dcaAgent DecayedValueAgent
   * @param hllAgent HyperLogLogAgent
   * @param qtrAgent QTreeAgent
-  * @param system implicit ActorSystem
   * @param logger implicit LoggingAdapter
   * @param materializer implicit Materializer
   * @author Gary Struthers
@@ -57,7 +55,7 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
   dcaAgent: DecayedValueAgent,
   hllAgent: HyperLogLogAgent,
   qtrAgent: QTreeAgent[A])
-  (implicit val system: ActorSystem, logger: LoggingAdapter, val materializer: Materializer) {
+  (implicit val logger: LoggingAdapter, val materializer: Materializer) {
 
   // Zip input agent update Futures, waits for all to complete
   def zipper: ZipWith5[AveragedValue, CMS[A], Seq[DecayedValue], HLL, QTree[A],
