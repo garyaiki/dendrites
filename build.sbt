@@ -54,6 +54,7 @@ lazy val root = (project in file(".")).
 			"com.datastax.cassandra" % "cassandra-driver-mapping" % cassandraDriverV,
 			"com.datastax.cassandra" % "cassandra-driver-extras" % cassandraDriverV,
 			"org.apache.avro" % "avro" % "1.8.1",
+			"com.sksamuel.avro4s" % "avro4s-core_2.11" % "1.6.4",
 			"com.google.guava" % "guava" % "19.0",
 			"com.google.code.findbugs" % "jsr305" % "3.0.1",
 			"com.github.thurstonsand" %% "scalacass" % "0.6.11"

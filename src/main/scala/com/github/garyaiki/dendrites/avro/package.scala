@@ -1,23 +1,24 @@
 /** Copyright 2016 Gary Struthers
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+  * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package com.github.garyaiki.dendrites
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import org.apache.avro.Schema
 import org.apache.avro.generic.{GenericData, GenericDatumReader, GenericDatumWriter, GenericRecord}
-import org.apache.avro.io.{Decoder, DecoderFactory, Encoder, EncoderFactory}
+import org.apache.avro.specific.SpecificDatumWriter
+import org.apache.avro.io.{ Decoder, DecoderFactory, Encoder, EncoderFactory }
 import scala.io.Source
 import scala.io.Source.fromInputStream
 
@@ -36,13 +37,13 @@ import scala.io.Source.fromInputStream
   * Map bytearray to Avro GenericRecord
   * {{{
   * new GraphStageLogic(shape) {
-  *  setHandler(in, new InHandler {
-  *    override def onPush(): Unit = {
-  *      val bytes = grab(in)
-  *      val record = byteArrayToGenericRecord(schema, bytes)
-  *      push(out, f(record))
-  *    }
-  *  })
+  * setHandler(in, new InHandler {
+  *   override def onPush(): Unit = {
+  *     val bytes = grab(in)
+  *     val record = byteArrayToGenericRecord(schema, bytes)
+  *     push(out, f(record))
+  *   }
+  * })
   * }}}
   */
 package object avro {
@@ -81,7 +82,7 @@ package object avro {
     */
   def ccToGenericRecord[A <: Product](gRecord: GenericData.Record)(cc: A): Unit = {
     val kvMap = ccToMap(cc)
-    kvMap foreach { case (key, value) => gRecord.put(key, value) }
+    kvMap foreach { case (key, value) => gRecord.put(key, value)}
   }
 
   /** Create encoded ByteArray from GenericDatumWriter and GenericRecord

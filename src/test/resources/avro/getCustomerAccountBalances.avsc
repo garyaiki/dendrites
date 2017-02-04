@@ -1,0 +1,23 @@
+{
+  "type": "record",
+  "name": "GetCustomerAccountBalances",
+  "namespace": "com.github.garyaiki.dendrites.examples.account",
+  "fields": [
+    {
+      "name": "id",
+      "type": "long"
+    },
+    {
+      "name": "accountTypes",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "AccountType",
+          "fields": [
+          ]
+        }
+      }
+    }
+  ]
+}

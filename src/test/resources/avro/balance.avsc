@@ -1,0 +1,15 @@
+{
+  "type":"record",
+  "name":"Balance",
+  "namespace":"com.github.garyaiki.dendrites.examples.account.avro4s",
+  "fields":[
+    {
+      "name":"id",
+      "type":"long"
+    },
+    {
+      "name":"amount",
+      "type":{"type":"bytes","logicalType":"decimal","precision":8,"scale":2}
+    }
+  ]
+}

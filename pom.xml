@@ -168,6 +168,11 @@
             <version>1.8.1</version>
         </dependency>
         <dependency>
+            <groupId>com.sksamuel.avro4s</groupId>
+            <artifactId>avro4s-core_2.11</artifactId>
+            <version>1.6.4</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>19.0</version>

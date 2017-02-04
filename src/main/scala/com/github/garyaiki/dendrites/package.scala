@@ -55,8 +55,7 @@ package object dendrites {
     * @param cc case class (Product is super type)
     * @return map of field names and values
     */
-  def ccToMap(cc: Product): Map[String, Any] =
-    cc.getClass.getDeclaredFields.foldLeft(Map[String, Any]()) { (a, f) =>
+  def ccToMap(cc: Product): Map[String, Any] = cc.getClass.getDeclaredFields.foldLeft(Map[String, Any]()) { (a, f) =>
       f setAccessible(true) // to get product's private fields
       a + (f.getName -> f.get(cc))
   }

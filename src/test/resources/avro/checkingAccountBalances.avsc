@@ -1,0 +1,32 @@
+{
+  "type":"record",
+  "name":"CheckingAccountBalances",
+  "namespace":"com.github.garyaiki.dendrites.examples.account.avro4s",
+  "fields":[
+    {
+      "name":"balances",
+      "type":{
+        "type":"array",
+        "items":{
+          "type":"record",
+          "name":"Balance",
+          "fields":[
+            {
+              "name":"id",
+              "type":"long"
+            },
+            {
+              "name":"amount",
+              "type":{
+                "type":"bytes",
+                "logicalType":"decimal",
+                "precision":8,
+                "scale":2
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

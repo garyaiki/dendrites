@@ -41,8 +41,7 @@ import scala.reflect.runtime.universe.typeOf
   * }}}
   * Extract balances from Seq[AccountBalances]
   * {{{
-  * def exf: Flow[Seq[AnyRef], Seq[BigDecimal], NotUsed] =
-  *     Flow[Seq[AnyRef]].map(extractBalancesVals[BigDecimal])
+  * def exf: Flow[Seq[AnyRef], Seq[BigDecimal], NotUsed] = Flow[Seq[AnyRef]].map(extractBalancesVals[BigDecimal])
   * }}}
   * @author Gary Struthers
   */
