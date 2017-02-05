@@ -16,9 +16,9 @@ package com.github.garyaiki.dendrites.avro.stream
 
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
-import org.apache.avro.generic.GenericRecord
 import org.apache.avro.Schema
-import com.github.garyaiki.dendrites.avro.{byteArrayToGenericRecord, loadSchema}
+import org.apache.avro.generic.GenericRecord
+import com.github.garyaiki.dendrites.avro.byteArrayToGenericRecord
 
 /** Maps a byteArray first to an Avro GenericRecord, then maps the GenericRecord to a case class
   *
@@ -27,14 +27,13 @@ import com.github.garyaiki.dendrites.avro.{byteArrayToGenericRecord, loadSchema}
   * @param f user function copies values from Avro GenericRecord to case class
   * @author Gary Struthers
   */
-class AvroDeserializer[A <: Product](filename: String, f:(GenericRecord) => A)
+class AvroDeserializer[A <: Product](schema: Schema, f:(GenericRecord) => A)
     extends GraphStage[FlowShape[Array[Byte], A]] {
 
   val in = Inlet[Array[Byte]]("GenericSerializer.in")
   val out = Outlet[A]("GenericSerializer.out")
 
   override val shape = FlowShape.of(in, out)
-  val schema = loadSchema(filename)
 
   /** Deserialize bytearray to Avro GenericRecord on push
     *

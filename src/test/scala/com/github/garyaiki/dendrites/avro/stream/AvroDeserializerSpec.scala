@@ -19,14 +19,12 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
+import org.apache.avro.Schema
 import org.apache.avro.generic.{GenericDatumReader, GenericRecord}
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
-import scala.io.Source._
-import com.github.garyaiki.dendrites._
-import com.github.garyaiki.dendrites.avro._
 import com.github.garyaiki.dendrites.examples.account.GetAccountBalances
-import com.github.garyaiki.dendrites.examples.account.avro._
+import com.github.garyaiki.dendrites.examples.account.avro.AvroGetAccountBalances
 
 /**
   *
@@ -37,13 +35,14 @@ class AvroDeserializerSpec extends WordSpecLike {
   implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
+  val avroOps = AvroGetAccountBalances
+  val schema: Schema = avroOps.schemaFor(Some("/avro/"), "getAccountBalances.avsc")
 
   "An AvroDeserializer" should {
     "deserialize a case class from a schema and deserialize it back" in {
 
-      val serializer = new AvroSerializer("getAccountBalances.avsc", ccToByteArray)
-      val deserializer = new AvroDeserializer("getAccountBalances.avsc",
-              genericRecordToGetAccountBalances)
+      val serializer = new AvroSerializer(schema, avroOps.toBytes)
+      val deserializer = new AvroDeserializer(schema, avroOps.fromRecord)
       val (pub, sub) = TestSource.probe[GetAccountBalances]
         .via(serializer)
         .via(deserializer)

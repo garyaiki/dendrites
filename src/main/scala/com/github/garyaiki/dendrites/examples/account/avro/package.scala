@@ -24,8 +24,7 @@ import com.github.garyaiki.dendrites.avro.toByteArray
   *
   * Map Avro GenericRecord to GetAccountBalances
   * {{{
-  * val deserializer = new AvroDeserializer("getAccountBalances.avsc",
-  *      genericRecordToGetAccountBalances)
+  * val deserializer = new AvroDeserializer(schema, avroOps.fromRecord)
   * }}}
   */
 package object avro {

@@ -19,12 +19,13 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
+import org.apache.avro.Schema
 import org.apache.avro.generic.{GenericDatumReader, GenericRecord}
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
-import scala.io.Source._
-import com.github.garyaiki.dendrites.avro.{byteArrayToGenericRecord, ccToByteArray, loadSchema}
+import com.github.garyaiki.dendrites.avro.byteArrayToGenericRecord
 import com.github.garyaiki.dendrites.examples.account.GetAccountBalances
+import com.github.garyaiki.dendrites.examples.account.avro.AvroGetAccountBalances
 
 /**
   *
@@ -35,11 +36,13 @@ class AvroSerializerSpec extends WordSpecLike {
   implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
+  val avroOps = AvroGetAccountBalances
+  val schema: Schema = avroOps.schemaFor(Some("/avro/"), "getAccountBalances.avsc")
 
   "An AvroSerializer" should {
     "serialize a case class from a schema and deserialize it back" in {
 
-      val serializer = new AvroSerializer("getAccountBalances.avsc", ccToByteArray)
+      val serializer = new AvroSerializer(schema, avroOps.toBytes)
       val (pub, sub) = TestSource.probe[GetAccountBalances]
         .via(serializer)
         .toMat(TestSink.probe[Array[Byte]])(Keep.both)
@@ -53,8 +56,6 @@ class AvroSerializerSpec extends WordSpecLike {
 
       response.length shouldBe 1
       response(0).toString() shouldBe "2" // zigzag encoding
-
-      val schema = loadSchema("getAccountBalances.avsc")
 
       def record = byteArrayToGenericRecord(schema, response)
       val obj = record.get("id")

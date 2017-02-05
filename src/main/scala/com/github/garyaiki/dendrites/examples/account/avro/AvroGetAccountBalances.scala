@@ -3,26 +3,31 @@ package com.github.garyaiki.dendrites.examples.account.avro
 import org.apache.avro.Schema
 import org.apache.avro.generic.{GenericData, GenericDatumWriter, GenericRecord}
 import com.github.garyaiki.dendrites.ccToMap
-import com.github.garyaiki.dendrites.avro.Ops
+import com.github.garyaiki.dendrites.avro.AvroOps
 import com.github.garyaiki.dendrites.avro.{ccToGenericRecord, loadSchema, toByteArray}
 import com.github.garyaiki.dendrites.examples.account.{AccountType, GetAccountBalances}
 
-object AvroGetAccountBalances extends Ops[GetAccountBalances] {
+object AvroGetAccountBalances extends AvroOps[GetAccountBalances] {
 
-  def schemaFor(fileName: Option[String]): Schema = loadSchema("getAccountBalances.avsc")
-
-  def toRecord(gRecord: GenericData.Record)(caseClass: GetAccountBalances): Unit = {
-    ccToGenericRecord(gRecord)(caseClass)
+  def schemaFor(path: Option[String], fileName: String): Schema = path match {
+    case Some(p) => loadSchema(fileName, p)
+    case None    => loadSchema(fileName)
+    case _       => loadSchema("getAccountBalances.avsc", "/avro/")
   }
 
-  def toBytes(schema: Schema)(caseClass: GetAccountBalances): Array[Byte] = {
+  def toRecord(schema: Schema, caseClass: GetAccountBalances): GenericData.Record = {
     val record = new GenericData.Record(schema)
+    ccToGenericRecord(record)(caseClass)
+    record
+  }
+
+  def toBytes(schema: Schema, caseClass: GetAccountBalances): Array[Byte] = {
     val writer = new GenericDatumWriter[GenericRecord](schema)
-    toRecord(record)(caseClass)
+    val record = toRecord(schema, caseClass)
     toByteArray(writer)(record)
   }
 
-    /** Avro GenericRecord is mapped to a Scala class by getting a record field by name then passing it to
+  /** Avro GenericRecord is mapped to a Scala class by getting a record field by name then passing it to
     * the Scala classes' constructor
     *
     * @param record Avro GenericRecord

@@ -39,7 +39,7 @@ import scala.collection.mutable.ArrayBuffer
   * {{{
   * val kafkaSource = KafkaSource[String, Array[Byte]](accountConsumerConfig)
   * val consumerRecordQueue = new ConsumerRecordQueue[String, Array[Byte]]()
-  * val deserializer = new AvroDeserializer("getAccountBalances.avsc", genericRecordToGetAccountBalances)
+  * val deserializer = new AvroDeserializer(schema, avroOps.fromRecord)
   * val streamFuture = kafkaSource
   *     .via(consumerRecordsFlow[String, Array[Byte]])
   *     .via(consumerRecordQueue)
@@ -159,7 +159,7 @@ package object stream {
     (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]), NotUsed] =
       Flow[ConsumerRecords[K, V]].map(tuple3PartitionQs[K, V])
 
-  /** Map a ConsumerRecord to just its value 
+  /** Map a ConsumerRecord to just its value
   def extractValue[K, V](record: ConsumerRecord[K,V]): V = record.value //@TODO delete
 */
   /** Flow to Map a ConsumerRecord to just its value */

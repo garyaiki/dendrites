@@ -25,13 +25,13 @@ import AvroGetCustomerAccountBalances.{ fromRecord, schemaFor, toBytes, toRecord
   *
   */
 class AvroGetCustomerAccountBalancesSpec extends WordSpecLike {
-  val schema = schemaFor(None)
-  val curriedToBytes = toBytes(schema) _
+  val schema = schemaFor(Some("/avro/"), "getCustomerStringAccountBalances.avsc")
+
   "An AvroGetCustomerAccountBalances" should {
     "serialize a GetCustomerAccountBalances case class from a schema and deserialize it back" in {
 
       val gab = GetCustomerAccountBalances(1L, Set(Checking))
-      val bytes = curriedToBytes(gab)
+      val bytes = toBytes(schema, gab)
 
       bytes.length shouldBe 12
       bytes(0).toString shouldBe "2" // zigzag encoding
@@ -46,7 +46,7 @@ class AvroGetCustomerAccountBalancesSpec extends WordSpecLike {
     }
     "serialize another GetCustomerAccountBalances case class from a schema and deserialize it back" in {
       val gab = GetCustomerAccountBalances(1L, Set(Checking, MoneyMarket))
-      val bytes = curriedToBytes(gab)
+      val bytes = toBytes(schema, gab)
 
       bytes.length shouldBe 24
       bytes(0).toString shouldBe "2" // zigzag encoding

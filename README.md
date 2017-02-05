@@ -161,7 +161,11 @@ In dendrites directory terminal window with sbt running
 `> it:testOnly com.github.garyaiki.dendrites.kafka.stream.KafkaStreamSpec`
 
 ##### After testing, delete topic, stop Kafka server, stop Zookeeper
-First, delete topic
+First, list topics
+
+`bin/kafka-topics.sh --zookeeper localhost:2181 --list`
+
+Delete topic
 
 `bin/kafka-topics.sh --delete --zookeeper localhost:2181 --topic account-topic`
 

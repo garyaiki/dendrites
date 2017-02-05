@@ -20,9 +20,9 @@ import akka.stream.{ActorAttributes, ActorMaterializer}
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 
-import com.github.garyaiki.dendrites.kafka.stream.KafkaSource.decider;
 import com.typesafe.config.ConfigFactory
 import java.util.UUID
+import org.apache.avro.Schema
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures._
@@ -31,17 +31,16 @@ import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext
 import scala.collection.immutable.{Iterable, Seq}
 
-import com.github.garyaiki.dendrites.avro.ccToByteArray
 import com.github.garyaiki.dendrites.avro.stream.{AvroDeserializer, AvroSerializer}
 import com.github.garyaiki.dendrites.examples.account.GetAccountBalances
+import com.github.garyaiki.dendrites.examples.account.avro.AvroGetAccountBalances
 import com.github.garyaiki.dendrites.examples.account.avro.genericRecordToGetAccountBalances
 import com.github.garyaiki.dendrites.examples.account.kafka.{AccountConsumer, AccountProducer}
-
 import KafkaSource.decider
 
 /** Test integration of Kafka with Akka Streams. There are 2 multi-stage flows. The first stream
   * serializes case classes to Avro byteArrays then writes them to Kafka. The second stream reads
-  * those byteArrays from Kafka and deserializes them back to case classes. 
+  * those byteArrays from Kafka and deserializes them back to case classes.
   *
   * To write case classes to Kafka
   *
@@ -86,7 +85,8 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
   implicit val ec: ExecutionContext = system.dispatcher
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
-
+  val avroOps = AvroGetAccountBalances
+  val schema: Schema = avroOps.schemaFor(Some("/avro/"), "getAccountBalances.avsc")
   val ap = AccountProducer
   val accountConsumerConfig = AccountConsumer
 
@@ -105,7 +105,7 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
   "An KafkaStream" should {
     "serialize case classes then write them to Kafka" in {
 
-      val serializer = new AvroSerializer("getAccountBalances.avsc", ccToByteArray)
+      val serializer = new AvroSerializer(schema, avroOps.toBytes)
       val sink = KafkaSink[String, Array[Byte]](ap)
       val source = Source[GetAccountBalances](iter)
       source.via(serializer).runWith(sink)
@@ -114,7 +114,7 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
 
       val kafkaSource = KafkaSource[String, Array[Byte]](accountConsumerConfig).withAttributes(dispatcher)
       val consumerRecordQueue = new ConsumerRecordQueue[String, Array[Byte]]()
-      val deserializer = new AvroDeserializer("getAccountBalances.avsc", genericRecordToGetAccountBalances)
+      val deserializer = new AvroDeserializer(schema, avroOps.fromRecord)
       val streamFuture = kafkaSource
           .via(consumerRecordsFlow[String, Array[Byte]])
           .via(consumerRecordQueue)
@@ -131,6 +131,6 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
     val config = ConfigFactory.load()
     val closeTimeout = config.getLong("dendrites.kafka.account.close-timeout")
     Thread.sleep(closeTimeout)
-    ap.producer.close(closeTimeout, scala.concurrent.duration.MILLISECONDS)   
+    ap.producer.close(closeTimeout, scala.concurrent.duration.MILLISECONDS)
   }
 }
