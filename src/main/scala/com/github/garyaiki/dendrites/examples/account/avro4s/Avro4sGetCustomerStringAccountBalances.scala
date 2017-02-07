@@ -1,22 +1,26 @@
 package com.github.garyaiki.dendrites.examples.account.avro4s
 
-import com.sksamuel.avro4s.{AvroInputStream, AvroOutputStream, FromRecord, SchemaFor, ToRecord}
+import com.sksamuel.avro4s.{AvroInputStream, AvroOutputStream, AvroSchema, FromRecord, SchemaFor, ToRecord}
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
-import com.github.garyaiki.dendrites.avro4s.Ops
-import com.github.garyaiki.dendrites.examples.account.GetCustomerStringAccountBalances
+import org.apache.avro.Schema
+import com.github.garyaiki.dendrites.avro4s.Avro4sOps
 
-/** Functions for Avro serialization and deserialization
+/** GetCustomerStringAccountBalances serialize/deserialize with Avro4s.
   *
-  * accountTypes: Set[AccountType] doesn't map to Avro, so use GetCustomerStringAccountBalances with
-  * accountTypes: Seq[String]
   *
   * @author Gary Struthers
   */
-object Avro4sGetCustomerStringAccountBalances extends Ops[GetCustomerStringAccountBalances] {
-  /** case class only for ser/deSer */
+object Avro4sGetCustomerStringAccountBalances extends Avro4sOps[GetCustomerStringAccountBalances] {
   implicit val schemaFor = SchemaFor[GetCustomerStringAccountBalances]
-  implicit val fromRecord = FromRecord[GetCustomerStringAccountBalances]
   implicit val toRecord = ToRecord[GetCustomerStringAccountBalances]
+  implicit val fromRecord = FromRecord[GetCustomerStringAccountBalances]
+  val schema: Schema = AvroSchema[GetCustomerStringAccountBalances]
+
+  /** GetCustomerStringAccountBalances to Array[Byte]
+    *
+    * @param caseClass
+    * @return Array[Byte]
+    */
   def toBytes(caseClass: GetCustomerStringAccountBalances): Array[Byte] = {
     val baos = new ByteArrayOutputStream()
     val output = AvroOutputStream.binary[GetCustomerStringAccountBalances](baos)
@@ -25,6 +29,11 @@ object Avro4sGetCustomerStringAccountBalances extends Ops[GetCustomerStringAccou
     baos.toByteArray
   }
 
+  /** Array[Byte] to GetCustomerStringAccountBalances
+    *
+    * @param bytes
+    * @return GetCustomerStringAccountBalances
+    */
   def toCaseClass(bytes: Array[Byte]): GetCustomerStringAccountBalances = {
     val in = new ByteArrayInputStream(bytes)
     val input = AvroInputStream.binary[GetCustomerStringAccountBalances](in)

@@ -27,8 +27,6 @@ case object MoneyMarket extends AccountType
 case class GetAccountBalances(id: Long)
 
 case class GetCustomerAccountBalances(id: Long, accountTypes: Set[AccountType])
-/** alternative that's easy for Avro to serialize/deserialize */
-case class GetCustomerStringAccountBalances(id: Long, accountTypes: Set[String])
 
 sealed trait AccountBalances extends Product
 case class CheckingAccountBalances[A: TypeTag](balances: AccBalances[A]) extends AccountBalances

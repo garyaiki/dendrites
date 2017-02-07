@@ -26,12 +26,12 @@ import com.github.garyaiki.dendrites.examples.account.GetAccountBalances
 /** Test a Kafka MockConsumer in a Source
   *
   * @Note MockProducer is a singleton, call producer.clear() before and after tests
-  */ 
+  */
 class MockAvroProducerSpec extends WordSpecLike {
   implicit val system = ActorSystem("dendrites")
   implicit val logger = Logging(system, getClass)
 
-  val schema = loadSchema("getAccountBalances.avsc")
+  val schema = loadSchema("getAccountBalances.avsc", "/avro/")
   val gab = GetAccountBalances(1L)
 
   val mock = MockProducerConfig

@@ -25,12 +25,11 @@ import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import org.scalatest.Matchers._
 import scala.collection.immutable.{Iterable, Seq}
 import scala.concurrent.duration.MILLISECONDS
-import scala.io.Source._
 import com.github.garyaiki.dendrites.avro.{byteArrayToGenericRecord, ccToByteArray, loadSchema}
 import com.github.garyaiki.dendrites.examples.account.GetAccountBalances
 import com.github.garyaiki.dendrites.examples.account.avro.genericRecordToGetAccountBalances
 
-/** 
+/**
   *
   * @author Gary Struthers
   *
@@ -44,7 +43,7 @@ class AvroKafkaProducerConsumerSpec extends WordSpecLike with BeforeAndAfterAll 
   val topics = new ArrayList[String]()
   topics.add(topic)
   val key = UUID.randomUUID.toString
-  val schema = loadSchema("getAccountBalances.avsc")
+  val schema = loadSchema("getAccountBalances.avsc", "/avro/")
   val gab = GetAccountBalances(1L)
   var producer: KafkaProducer[String, Array[Byte]] = null
   var consumer: KafkaConsumer[String, Array[Byte]] = null
@@ -54,7 +53,6 @@ class AvroKafkaProducerConsumerSpec extends WordSpecLike with BeforeAndAfterAll 
     consumer = createConsumer[String, Array[Byte]]("testAvroKafkaConsumer.properties")
     consumer.subscribe(topics)
   }
-
 
   "A AvroKafkaProducerConsumer" should {
     "serialize a case class and send a message" in {
@@ -85,6 +83,6 @@ class AvroKafkaProducerConsumerSpec extends WordSpecLike with BeforeAndAfterAll 
     consumer.commitSync()
     consumer.close()
     producer.flush()
-    producer.close(timeout, MILLISECONDS)    
+    producer.close(timeout, MILLISECONDS)
   }
 }

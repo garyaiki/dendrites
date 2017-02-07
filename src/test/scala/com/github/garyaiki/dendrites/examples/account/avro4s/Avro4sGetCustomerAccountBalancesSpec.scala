@@ -19,8 +19,7 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
 import com.github.garyaiki.dendrites.avro.loadSchema
-import com.github.garyaiki.dendrites.examples.account.{Checking, MoneyMarket, GetCustomerAccountBalances,
-  GetCustomerStringAccountBalances, Savings }
+import com.github.garyaiki.dendrites.examples.account.{Checking, MoneyMarket, GetCustomerAccountBalances, Savings}
 import Avro4sGetCustomerAccountBalances.{toBytes, toCaseClass}
 import Avro4sGetCustomerStringAccountBalances.schemaFor
 

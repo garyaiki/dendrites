@@ -3,26 +3,24 @@ package com.github.garyaiki.dendrites.examples.account.avro4s
 import com.sksamuel.avro4s.{AvroInputStream, AvroOutputStream, AvroSchema, FromRecord, SchemaFor, ToSchema, ToRecord}
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import org.apache.avro.Schema
-import com.github.garyaiki.dendrites.avro4s.Ops
+import com.github.garyaiki.dendrites.avro4s.Avro4sOps
 
-/** Functions for Avro serialization and deserialization
+/** CheckingAccountOptBalances serialize/deserialize with Avro4s.
   *
-  * accountTypes: Set[AccountType] doesn't map to Avro, so use GetCustomerStringAccountBalances with
-  * accountTypes: Seq[String]
   *
   * @author Gary Struthers
   */
-object Avro4sCheckingAccountOptBalances  extends Ops[CheckingAccountOptBalances] {
-  implicit val schema = AvroSchema[CheckingAccountOptBalances]
-
-  /*implicit object BalanceToSchema extends ToSchema[Balance] {
-    override val schema: Schema = AvroSchema[Balance](Avro4sBalance.schemaFor)
-  }*/
+object Avro4sCheckingAccountOptBalances  extends Avro4sOps[CheckingAccountOptBalances] {
   implicit val schemaFor = SchemaFor[CheckingAccountOptBalances]
-
-  implicit val fromRecord = FromRecord[CheckingAccountOptBalances]
-
   implicit val toRecord = ToRecord[CheckingAccountOptBalances]
+  implicit val fromRecord = FromRecord[CheckingAccountOptBalances]  // Scala-ide shows error, No error in sbt, maven
+  val schema = AvroSchema[CheckingAccountOptBalances]
+
+  /** CheckingAccountOptBalances to Array[Byte]
+    *
+    * @param caseClass
+    * @return Array[Byte]
+    */
   def toBytes(caseClass: CheckingAccountOptBalances): Array[Byte] = {
     val baos = new ByteArrayOutputStream()
     val output = AvroOutputStream.binary[CheckingAccountOptBalances](baos)
@@ -31,6 +29,11 @@ object Avro4sCheckingAccountOptBalances  extends Ops[CheckingAccountOptBalances]
     baos.toByteArray
   }
 
+  /** Array[Byte] to CheckingAccountOptBalances
+    *
+    * @param bytes
+    * @return CheckingAccountOptBalances
+    */
   def toCaseClass(bytes: Array[Byte]): CheckingAccountOptBalances = {
     val in = new ByteArrayInputStream(bytes)
     val input = AvroInputStream.binary[CheckingAccountOptBalances](in)

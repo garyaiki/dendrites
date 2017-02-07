@@ -18,7 +18,6 @@ import com.sksamuel.avro4s.AvroSchema
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
 import com.github.garyaiki.dendrites.avro.loadSchema
-import com.github.garyaiki.dendrites.examples.account.GetCustomerStringAccountBalances
 import Avro4sGetCustomerStringAccountBalances.{schemaFor, toBytes, toCaseClass}
 
 /** @author Gary Struthers
@@ -26,7 +25,7 @@ import Avro4sGetCustomerStringAccountBalances.{schemaFor, toBytes, toCaseClass}
   */
 class Avro4sGetCustomerStringAccountBalancesSpec extends WordSpecLike {
 
-  val schema = loadSchema("GetCustomerStringAccountBalances.avsc", "/avro/")
+  val schema = loadSchema("getCustomerStringAccountBalances.avsc", "/avro/")
   "An Avro4sGetCustomerStringAccountBalances" should {
     "produce a schema matching file schema" in {
       AvroSchema[GetCustomerStringAccountBalances] shouldBe schema

@@ -26,7 +26,7 @@ import Avro4sGetAccountBalances.{schemaFor, toBytes, toCaseClass}
   */
 class Avro4sGetAccountBalancesSpec extends WordSpecLike {
 
-  val schema = loadSchema("GetAccountBalances.avsc")
+  val schema = loadSchema("getAccountBalances.avsc", "/avro/")
   "An Avro4sGetAccountBalances" should {
     "produce a schema" in {
       AvroSchema[GetAccountBalances] shouldBe schema

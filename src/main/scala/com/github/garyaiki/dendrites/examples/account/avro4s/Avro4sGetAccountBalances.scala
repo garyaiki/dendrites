@@ -1,14 +1,27 @@
 package com.github.garyaiki.dendrites.examples.account.avro4s
 
-import com.sksamuel.avro4s.{AvroInputStream, AvroOutputStream, FromRecord, SchemaFor, ToRecord}
+import com.sksamuel.avro4s.{AvroInputStream, AvroOutputStream, AvroSchema, FromRecord, SchemaFor, ToRecord}
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
-import com.github.garyaiki.dendrites.avro4s.Ops
+import org.apache.avro.Schema
+import com.github.garyaiki.dendrites.avro4s.Avro4sOps
 import com.github.garyaiki.dendrites.examples.account.GetAccountBalances
 
-object Avro4sGetAccountBalances extends Ops[GetAccountBalances] {
+/** GetAccountBalances serialize/deserialize with Avro4s.
+  *
+  *
+  * @author Gary Struthers
+  */
+object Avro4sGetAccountBalances extends Avro4sOps[GetAccountBalances] {
   implicit val schemaFor = SchemaFor[GetAccountBalances]
-  implicit val fromRecord = FromRecord[GetAccountBalances]
   implicit val toRecord = ToRecord[GetAccountBalances]
+  implicit val fromRecord = FromRecord[GetAccountBalances]
+  val schema: Schema = AvroSchema[GetAccountBalances]
+
+  /** GetAccountBalances to Array[Byte]
+    *
+    * @param caseClass
+    * @return Array[Byte]
+    */
   def toBytes(caseClass: GetAccountBalances): Array[Byte] = {
     val baos = new ByteArrayOutputStream()
     val output = AvroOutputStream.binary[GetAccountBalances](baos)
@@ -17,6 +30,11 @@ object Avro4sGetAccountBalances extends Ops[GetAccountBalances] {
     baos.toByteArray
   }
 
+  /** Array[Byte] to GetAccountBalances
+    *
+    * @param bytes
+    * @return GetAccountBalances
+    */
   def toCaseClass(bytes: Array[Byte]): GetAccountBalances = {
     val in = new ByteArrayInputStream(bytes)
     val input = AvroInputStream.binary[GetAccountBalances](in)
