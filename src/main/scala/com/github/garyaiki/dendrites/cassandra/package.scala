@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/** Copyright 2016 - 2017 Gary Struthers
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -107,7 +107,7 @@ package object cassandra {
     * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/Cluster.html Cluster]]
     * @see [[https://docs.oracle.com/javase/8/docs/api/java/lang/IllegalArgumentException.html IllegalArgumentException]]
     */
-  def createCluster(node: String): Cluster = Cluster.builder().addContactPoint(node).build()
+  def createCluster(node: String): Cluster = Cluster.builder.addContactPoint(node).build
 
   /** Create Cluster with multiple host nodes and a RetryPolicy
     *
@@ -119,7 +119,7 @@ package object cassandra {
     * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/policies/RetryPolicy.html RetryPolicy]]
     */
   def createCluster(nodes: JCollection[InetAddress], policy: RetryPolicy): Cluster = {
-    Cluster.builder().addContactPoints(nodes).withRetryPolicy(policy).build()
+    Cluster.builder.addContactPoints(nodes).withRetryPolicy(policy).build
   }
 
   /** Create Cluster with multiple host nodes, a RetryPolicy, and a ReconnectionPolicy
@@ -134,7 +134,7 @@ package object cassandra {
     * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/policies/ExponentialReconnectionPolicy.html ExponentialReconnectionPolicy]]
     */
   def createCluster(nodes: JCollection[InetAddress], policy: RetryPolicy, recP: ReconnectionPolicy): Cluster = {
-    Cluster.builder().addContactPoints(nodes).withRetryPolicy(policy).withReconnectionPolicy(recP).build()
+    Cluster.builder.addContactPoints(nodes).withRetryPolicy(policy).withReconnectionPolicy(recP).build
   }
 
   /** Log cluster's metadata. ForDebugging
@@ -170,7 +170,7 @@ package object cassandra {
     *
     */
   def registerQueryLogger(cluster: Cluster): Unit = {
-    val queryLogger = QueryLogger.builder().withConstantThreshold(10000).withMaxQueryStringLength(256).build()
+    val queryLogger = QueryLogger.builder.withConstantThreshold(10000).withMaxQueryStringLength(256).build
     cluster.register(queryLogger)
   }
 
@@ -182,7 +182,7 @@ package object cassandra {
     * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/policies/LoadBalancingPolicy.html LoadBalancingPolicy]]
     */
   def createLoadBalancingPolicy(localDc: String): LoadBalancingPolicy = {
-    DCAwareRoundRobinPolicy.builder().withLocalDc(localDc).build()
+    DCAwareRoundRobinPolicy.builder.withLocalDc(localDc).build
   }
 
   /** Initialize LoadBalancingPolicy
@@ -256,6 +256,7 @@ package object cassandra {
     *
     * @throws NoHostAvailableException - no host can be contacted
     */
+  @deprecated("May undepricate if issue fixed https://issues.apache.org/jira/browse/CASSANDRA-10786", "dendrites 0.5")
   def selectAll(session: Session, schema: String, table: String): PreparedStatement = {
     session.prepare("SELECT * FROM " + schema + "." + table + ";")
   }
@@ -265,7 +266,7 @@ package object cassandra {
     * [[com.github.garyaiki.dendrites.cassandra.stream.CassandraSink]] shows fully asynchronous executeAsync with Future
     *
     * @param session
-    * @param bndStmt with values previously bound
+    * @param bndStmt
     * @return ResultSet on Success
     *
     * @throws UnsupportedFeatureException - protocol version 1 and feature not supported
@@ -285,6 +286,27 @@ package object cassandra {
     * @return Seq[Row]
     */
   def getAllRows(resultSet: ResultSet): Seq[Row] = resultSet.all.toSeq
+
+  /** Handle conditional insert, update, delete. Conditional statements return a ResultSet with a single Row. If
+    * statement successfully applied rs.wasApplied is true. If failed, call a user defined function to log or throw an
+    * exception. Insert, update, delete statements that aren't conditional don't return a row
+    *
+    * @param rowAction
+    * @param rs
+    * @return Some[Row] if conditional statement failed
+    */
+  def getConditionalError(rowAction: Row => Unit)(rs: ResultSet): Option[Row] = {
+    if(rs.wasApplied) None else {
+      val one = rs.one
+      one match {
+        case null => None
+        case _ => {
+          rowAction(one)
+          Some(one)
+        }
+      }
+    }
+  }
 
   /** drop schema (keyspace)
     *

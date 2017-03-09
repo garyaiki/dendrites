@@ -17,7 +17,6 @@ package com.github.garyaiki.dendrites.cassandra
 import com.datastax.driver.core.{BoundStatement, PreparedStatement, ResultSet, Row, Session}
 import com.weather.scalacass.syntax._
 import java.util.{HashSet => JHashSet, UUID}
-import scala.collection.JavaConverters._
 
 /** Song is an example in Java Driver 3.0 reference doc. This provides Scala functions to create
   * a table, an insert PreparedStatement, a Query PreparedStatement, a case class, an insert
@@ -57,9 +56,9 @@ object Songs {
     * @param schema
     * @return prepared statement
     */
-  def songsPrepInsert(session: Session, schema: String): PreparedStatement = {
+  def prepInsert(session: Session, schema: String): PreparedStatement = {
     session.prepare("INSERT INTO " + schema + "." + table + " (id, title, album, artist, tags) " +
-      "VALUES (?,?,?,?,?);")    
+      "VALUES (?,?,?,?,?);")
   }
 
   /** Tell DB to prepare a query by id Song statement. Do this once.
@@ -67,21 +66,21 @@ object Songs {
     * @param session
     * @param schema
     * @return prepared statement
-    */ 
-  def songsPrepQuery(session: Session, schema: String): PreparedStatement = {
+    */
+  def prepQuery(session: Session, schema: String): PreparedStatement = {
     session.prepare("SELECT * FROM " + schema + "." + table + " WHERE id=?;")
   }
 
   case class Song(id: UUID, title: String, album: String, artist: String, tags: Set[String])
 
   /** Bind insert PreparedStatement to values of a case class. Does not execute. Song.tags is copied
-    * from Scala Set to Java HashSet in order to bind. 
+    * from Scala Set to Java HashSet in order to bind.
     *
     * @param insert PreparedStatement
     * @param playlst case class
     * @return BoundStatement ready to execute
     */
-  def songToBndInsert(insert: PreparedStatement, song: Song): BoundStatement = {
+  def bndInsert(insert: PreparedStatement, song: Song): BoundStatement = {
     val songsBndStmt = new BoundStatement(insert)
     val songsTags = new JHashSet[String]()
     val it = song.tags.iterator
@@ -96,7 +95,7 @@ object Songs {
     * @param playlst case class
     * @return BoundStatement ready to execute
     */
-  def songToBndQuery(query: PreparedStatement, songId: UUID): BoundStatement = {
+  def bndQuery(query: PreparedStatement, songId: UUID): BoundStatement = {
     val songBndStmt = new BoundStatement(query)
     songBndStmt.bind(songId)
   }
@@ -107,7 +106,7 @@ object Songs {
     * @param row
     * @return case class
     */
-  def rowToSong(row: Row): Song = row.as[Song]
+  def mapRow(row: Row): Song = row.as[Song]
 
-  def rowsToSongs(rows: Seq[Row]): Seq[Song] = rows.map { x => rowToSong(x) }
+  def mapRows(rows: Seq[Row]): Seq[Song] = rows.map { x => mapRow(x) }
 }

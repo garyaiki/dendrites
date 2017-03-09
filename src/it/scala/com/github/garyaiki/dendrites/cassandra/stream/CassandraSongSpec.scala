@@ -20,16 +20,15 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-import com.datastax.driver.core.{BoundStatement, Cluster, Host, HostDistance, PoolingOptions,
-  PreparedStatement, ResultSet, Row, Session}
-import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy, RetryPolicy}
-import java.util.{HashSet => JHashSet, UUID}
+import com.datastax.driver.core.{Cluster, ResultSet, Row, Session}
+import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy}
+import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
 import scala.concurrent.ExecutionContext
 import com.github.garyaiki.dendrites.cassandra.{PlaylistSongConfig, Songs}
-import com.github.garyaiki.dendrites.cassandra.Playlists._
-import com.github.garyaiki.dendrites.cassandra.Songs._
+import com.github.garyaiki.dendrites.cassandra.Playlists.Playlist
+import com.github.garyaiki.dendrites.cassandra.Songs.Song
 import com.github.garyaiki.dendrites.cassandra.{close, connect, createCluster, createLoadBalancingPolicy, createSchema,
   dropSchema, initLoadBalancingPolicy, logMetadata, registerQueryLogger}
 
@@ -57,21 +56,11 @@ class CassandraSongSpec extends WordSpecLike with Matchers with BeforeAndAfterAl
     logMetadata(cluster)
     registerQueryLogger(cluster)
     session = connect(cluster)
-    /* Debug PoolingOptions
-    var poolingOptions: PoolingOptions = cluster.getConfiguration().getPoolingOptions()
-    val metaData = cluster.getMetadata()
-    val hosts = metaData.getAllHosts()
-    val hostIter = hosts.iterator()
-    val host: Host = hostIter.next()
-    val distance = lbp.distance(host)//HostDistance
-    logger.debug("poolingOptions CoreConnectionsPerHost:{} MaxConnectionsPerHost:{}",
-        poolingOptions.getCoreConnectionsPerHost(distance),
-        poolingOptions.getMaxConnectionsPerHost(distance))
-    */
+
     val strategy = myConfig.replicationStrategy
     val createSchemaRS = createSchema(session, schema, strategy, 3)
     val songTRS = Songs.createTable(session, schema)
-    songId = UUID.randomUUID()//.fromString("756716f7-2e54-4715-9f00-91dcbea6cf50")
+    songId = UUID.randomUUID()
     song = Song(songId,"La Petite Tonkinoise","Bye Bye Blackbird","Joséphine Baker",songsTags)
     songs = Seq(song)
     songIds = Seq(songId)
@@ -81,7 +70,7 @@ class CassandraSongSpec extends WordSpecLike with Matchers with BeforeAndAfterAl
     "insert Songs " in {
       val iter = Iterable(songs.toSeq:_*)
       val source = Source[Song](iter)
-      val bndStmt = new CassandraBind(Songs.songsPrepInsert(session, schema), songToBndInsert)
+      val bndStmt = new CassandraBind(Songs.prepInsert(session, schema), Songs.bndInsert)
       val sink = new CassandraSink(session)
       source.via(bndStmt).runWith(sink)
     }
@@ -89,10 +78,10 @@ class CassandraSongSpec extends WordSpecLike with Matchers with BeforeAndAfterAl
 
   "query a Song" in {
       val source = TestSource.probe[UUID]
-      val bndStmt = new CassandraBind(Songs.songsPrepQuery(session, schema), songToBndQuery)
+      val bndStmt = new CassandraBind(Songs.prepQuery(session, schema), Songs.bndQuery)
       val query = new CassandraQuery(session)
       val paging = new CassandraPaging(10)
-      def toSongs: Flow[Seq[Row], Seq[Song], NotUsed] = Flow[Seq[Row]].map(Songs.rowsToSongs)
+      def toSongs: Flow[Seq[Row], Seq[Song], NotUsed] = Flow[Seq[Row]].map(Songs.mapRows)
 
       def sink = TestSink.probe[Seq[Song]]
       val (pub, sub) = source.via(bndStmt)

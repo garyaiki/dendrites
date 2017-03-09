@@ -15,13 +15,13 @@ limitations under the License.
 package com.github.garyaiki.dendrites.cassandra
 
 import akka.actor.ActorSystem
-import com.datastax.driver.core.{BoundStatement, Cluster, PreparedStatement, ResultSet, Session}
-import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy, RetryPolicy}
-import java.util.{HashSet => JHashSet, UUID}
+import com.datastax.driver.core.{Cluster, ResultSet, Session}
+import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy}
+import java.util.UUID
 import scala.concurrent.ExecutionContext
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
-import com.github.garyaiki.dendrites.cassandra.Playlists._
-import com.github.garyaiki.dendrites.cassandra.Songs._
+import com.github.garyaiki.dendrites.cassandra.Playlists.Playlist
+import com.github.garyaiki.dendrites.cassandra.Songs.Song
 
 class BoundStmtSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   implicit val system = ActorSystem("dendrites")
@@ -67,33 +67,33 @@ class BoundStmtSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   }
 
   "insert a Song" in {
-      val prepStmt = Songs.songsPrepInsert(session, schema)
-      val bndStmt = songToBndInsert(prepStmt, song)
+      val prepStmt = Songs.prepInsert(session, schema)
+      val bndStmt = Songs.bndInsert(prepStmt, song)
       val rs = executeBoundStmt(session, bndStmt)
       rs shouldBe a [ResultSet]
   }
 
   "insert a Playlist" in {
-      val prepStmt = Playlists.playlistsPrepInsert(session, schema)
-      val bndStmt = playlistToBndInsert(prepStmt, playlist)
+      val prepStmt = Playlists.prepInsert(session, schema)
+      val bndStmt = Playlists.bndInsert(prepStmt, playlist)
       val rs = executeBoundStmt(session, bndStmt)
       rs shouldBe a [ResultSet]
   }
 
   "query a Song" in {
-      val prepStmt = Songs.songsPrepQuery(session, schema)
-      val bndStmt = songToBndQuery(prepStmt, song.id)
+      val prepStmt = Songs.prepQuery(session, schema)
+      val bndStmt = Songs.bndQuery(prepStmt, song.id)
       val rs = executeBoundStmt(session, bndStmt)
       val row = rs.one()
-      rowToSong(row) shouldBe song
+      Songs.mapRow(row) shouldBe song
   }
 
   "query a Playlist" in {
-      val prepStmt = Playlists.playlistsPrepQuery(session, schema)
-      val bndStmt = playlistToBndQuery(prepStmt, plId)
+      val prepStmt = Playlists.prepQuery(session, schema)
+      val bndStmt = Playlists.bndQuery(prepStmt, plId)
       val rs = executeBoundStmt(session, bndStmt)
       val row = rs.one()
-      rowToPlaylist(row) shouldBe playlist
+      Playlists.mapRow(row) shouldBe playlist
   }
 
   override def afterAll() {

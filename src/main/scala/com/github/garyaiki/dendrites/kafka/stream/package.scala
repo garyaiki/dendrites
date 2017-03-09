@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/** Copyright 2016 - 2017 Gary Struthers
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@ limitations under the License.
 package com.github.garyaiki.dendrites.kafka
 
 import akka.NotUsed
-import akka.stream.scaladsl.{Flow, UnzipWith, UnzipWith2, UnzipWithApply}
+import akka.stream.scaladsl.Flow
 import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords}
 import org.apache.kafka.common.TopicPartition
 import scala.collection.immutable.Queue
@@ -159,9 +159,6 @@ package object stream {
     (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]), NotUsed] =
       Flow[ConsumerRecords[K, V]].map(tuple3PartitionQs[K, V])
 
-  /** Map a ConsumerRecord to just its value
-  def extractValue[K, V](record: ConsumerRecord[K,V]): V = record.value //@TODO delete
-*/
   /** Flow to Map a ConsumerRecord to just its value */
   def consumerRecordValueFlow[K, V]: Flow[ConsumerRecord[K, V], V, NotUsed] =
     Flow[ConsumerRecord[K, V]].map(r => r.value)

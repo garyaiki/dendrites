@@ -1,0 +1,22 @@
+{
+  "type":"record",
+  "name":"ShoppingCartCmd",
+  "namespace":"com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd",
+  "fields":[
+    {
+      "name":"action",
+      "type":"string"
+    },{
+      "name":"cartId",
+      "type":"string"
+    },{
+      "name":"ownerOrItem",
+      "type":"string"
+    },{
+      "name":"count",
+      "type":[
+        "null","int"
+      ]
+    }
+  ]
+}

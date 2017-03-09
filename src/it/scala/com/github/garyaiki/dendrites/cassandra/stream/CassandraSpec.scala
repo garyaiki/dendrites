@@ -15,18 +15,16 @@ limitations under the License.
 package com.github.garyaiki.dendrites.cassandra.stream
 
 import akka.actor.ActorSystem
-import com.datastax.driver.core.{BoundStatement, Cluster, PreparedStatement, ResultSet, Session}
-import com.datastax.driver.core.policies.{DefaultRetryPolicy, ExponentialReconnectionPolicy, LoggingRetryPolicy,
-  RetryPolicy}
-import java.util.{HashSet => JHashSet, UUID}
+import com.datastax.driver.core.{Cluster, ResultSet, Session}
+import com.datastax.driver.core.policies.{DefaultRetryPolicy, ExponentialReconnectionPolicy, LoggingRetryPolicy}
+import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.concurrent.ExecutionContext
 import com.github.garyaiki.dendrites.cassandra.{Playlists, PlaylistSongConfig, Songs}
-import com.github.garyaiki.dendrites.cassandra.Playlists._
-import com.github.garyaiki.dendrites.cassandra.Songs._
+import com.github.garyaiki.dendrites.cassandra.Playlists.Playlist
+import com.github.garyaiki.dendrites.cassandra.Songs.Song
 import com.github.garyaiki.dendrites.cassandra.{close, connect, createCluster, createLoadBalancingPolicy, createSchema,
-  dropSchema, executeBoundStmt, initLoadBalancingPolicy, logMetadata}
-import com.github.garyaiki.dendrites.cassandra.registerQueryLogger
+  dropSchema, executeBoundStmt, initLoadBalancingPolicy, logMetadata, registerQueryLogger}
 
 class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   implicit val system = ActorSystem("dendrites")
@@ -36,9 +34,9 @@ class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   var cluster: Cluster = null
   var session: Session = null
   val songsTags = Set[String]("jazz", "2013")
-  val songId = UUID.randomUUID()//.fromString("756716f7-2e54-4715-9f00-91dcbea6cf50")
+  val songId = UUID.randomUUID
   val song = Song(songId,"La Petite Tonkinoise","Bye Bye Blackbird","Joséphine Baker",songsTags)
-  val plId = UUID.randomUUID()//.fromString("2cc9ccb7-6221-4ccb-8387-f22b6a1b354d")
+  val plId = UUID.randomUUID
   val playlist = Playlist(plId,"La Petite Tonkinoise","Bye Bye Blackbird","Joséphine Baker",songId)
 
   override def beforeAll() {
@@ -69,33 +67,33 @@ class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   }
 
   "insert a Song" in {
-      val prepStmt = Songs.songsPrepInsert(session, schema)
-      val bndStmt = songToBndInsert(prepStmt, song)
+      val prepStmt = Songs.prepInsert(session, schema)
+      val bndStmt = Songs.bndInsert(prepStmt, song)
       val rs = executeBoundStmt(session, bndStmt)
       rs shouldBe a [ResultSet]
   }
 
   "insert a Playlist" in {
-      val prepStmt = Playlists.playlistsPrepInsert(session, schema)
-      val bndStmt = playlistToBndInsert(prepStmt, playlist)
+      val prepStmt = Playlists.prepInsert(session, schema)
+      val bndStmt = Playlists.bndInsert(prepStmt, playlist)
       val rs = executeBoundStmt(session, bndStmt)
       rs shouldBe a [ResultSet]
   }
 
   "query a Song" in {
-      val prepStmt = Songs.songsPrepQuery(session, schema)
-      val bndStmt = songToBndQuery(prepStmt, song.id)
+      val prepStmt = Songs.prepQuery(session, schema)
+      val bndStmt = Songs.bndQuery(prepStmt, song.id)
       val rs = executeBoundStmt(session, bndStmt)
       val row = rs.one()
-      rowToSong(row) shouldBe song
+      Songs.mapRow(row) shouldBe song
   }
 
   "query a Playlist" in {
-      val prepStmt = Playlists.playlistsPrepQuery(session, schema)
-      val bndStmt = playlistToBndQuery(prepStmt, plId)
+      val prepStmt = Playlists.prepQuery(session, schema)
+      val bndStmt = Playlists.bndQuery(prepStmt, plId)
       val rs = executeBoundStmt(session, bndStmt)
       val row = rs.one()
-      rowToPlaylist(row) shouldBe playlist
+      Playlists.mapRow(row) shouldBe playlist
   }
 
   override def afterAll() {

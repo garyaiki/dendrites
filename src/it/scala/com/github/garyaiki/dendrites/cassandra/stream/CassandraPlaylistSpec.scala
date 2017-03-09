@@ -20,14 +20,14 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-import com.datastax.driver.core.{BoundStatement, Cluster, PreparedStatement, ResultSet, Row,Session}
-import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy, RetryPolicy}
-import java.util.{HashSet => JHashSet, UUID}
+import com.datastax.driver.core.{Cluster, ResultSet, Row, Session}
+import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy}
+import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
 import scala.concurrent.ExecutionContext
 import com.github.garyaiki.dendrites.cassandra.{Playlists, PlaylistSongConfig}
-import com.github.garyaiki.dendrites.cassandra.Playlists._
+import com.github.garyaiki.dendrites.cassandra.Playlists.{bndInsert, bndQuery, Playlist}
 import com.github.garyaiki.dendrites.cassandra.{close, connect, createCluster, createLoadBalancingPolicy, createSchema,
   dropSchema, initLoadBalancingPolicy, logMetadata, registerQueryLogger}
 
@@ -69,7 +69,7 @@ class CassandraPlaylistSpec extends WordSpecLike with Matchers with BeforeAndAft
     "insert Playlists " in {
       val iter = Iterable(playlists.toSeq:_*)
       val source = Source[Playlist](iter)
-      val bndStmt = new CassandraBind(Playlists.playlistsPrepInsert(session, schema), playlistToBndInsert)
+      val bndStmt = new CassandraBind(Playlists.prepInsert(session, schema), bndInsert)
       val sink = new CassandraSink(session)
       source.via(bndStmt).runWith(sink)
     }
@@ -77,10 +77,10 @@ class CassandraPlaylistSpec extends WordSpecLike with Matchers with BeforeAndAft
 
   "query a Playlist" in {
       val source = TestSource.probe[UUID]
-      val bndStmt = new CassandraBind(Playlists.playlistsPrepQuery(session, schema), playlistToBndQuery)
+      val bndStmt = new CassandraBind(Playlists.prepQuery(session, schema), bndQuery)
       val query = new CassandraQuery(session)
       val paging = new CassandraPaging(10)
-      def toPlaylists: Flow[Seq[Row], Seq[Playlist], NotUsed] = Flow[Seq[Row]].map(Playlists.rowsToPlaylists)
+      def toPlaylists: Flow[Seq[Row], Seq[Playlist], NotUsed] = Flow[Seq[Row]].map(Playlists.mapRows)
 
       def sink = TestSink.probe[Seq[Playlist]]
       val (pub, sub) = source.via(bndStmt)

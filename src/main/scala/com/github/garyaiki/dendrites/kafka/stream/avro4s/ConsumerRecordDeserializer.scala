@@ -12,41 +12,39 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.github.garyaiki.dendrites.avro.stream
+package com.github.garyaiki.dendrites.kafka.stream.avro4s
 
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
-import org.apache.avro.Schema
-import org.apache.avro.generic.GenericRecord
-import com.github.garyaiki.dendrites.avro.byteArrayToGenericRecord
+import org.apache.kafka.clients.consumer.ConsumerRecord
 
-/** Maps a byteArray first to an Avro GenericRecord, then maps the GenericRecord to a case class
+/** Maps a byteArray to a case class
   *
   * @tparam A case class or tuple subclass of Product
-  * @param Avro schema for case class
-  * @param f user function copies values from Avro GenericRecord to case class
+  * @param f user function maps Array[Byte] to case class
   * @author Gary Struthers
   */
-class AvroDeserializer[A <: Product](schema: Schema, f:(GenericRecord) => A)
-  extends GraphStage[FlowShape[Array[Byte], A]] {
+class ConsumerRecordDeserializer[K, V <: Product](f:(Array[Byte]) => V)
+    extends GraphStage[FlowShape[ConsumerRecord[K, Array[Byte]], (K, V)]] {
 
-  val in = Inlet[Array[Byte]]("AvroDeserializer.in")
-  val out = Outlet[A]("AvroDeserializer.out")
+  val in = Inlet[ConsumerRecord[K, Array[Byte]]]("Avro4sConsumerRecordDeserializer.in")
+  val out = Outlet[(K, V)]("Avro4sConsumerRecordDeserializer.out")
 
   override val shape = FlowShape.of(in, out)
 
-  /** Deserialize bytearray to Avro GenericRecord on push
+  /** Deserialize ConsumerRecord to Key, case class tuple on push
     *
     * @param inheritedAttributes
-    * @return GenericRecord
+    * @return case class
     */
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
     new GraphStageLogic(shape) {
       setHandler(in, new InHandler {
         override def onPush(): Unit = {
-          val bytes = grab(in)
-          val record = byteArrayToGenericRecord(schema, bytes)
-          push(out, f(record))
+          val consumerRecord: ConsumerRecord[K, Array[Byte]] = grab(in)
+          val bytes: Array[Byte] = consumerRecord.value
+          val caseClass: V = f(bytes)
+          push(out, (consumerRecord.key, caseClass))
         }
       })
 
