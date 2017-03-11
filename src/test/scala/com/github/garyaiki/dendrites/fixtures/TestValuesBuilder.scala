@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,15 +25,11 @@ import com.github.garyaiki.dendrites.filters.extractElementByIndex
   */
 trait TestValuesBuilder extends TestSuiteMixin { this: TestSuite =>
 
-  abstract override def withFixture(test: NoArgTest): Outcome = {
-    super.withFixture(test)
-  }
+  abstract override def withFixture(test: NoArgTest): Outcome = super.withFixture(test)
 
   def makeCaseClasses[A, B](keyRange: NumericRange.Inclusive[Char])(
     implicit ev: CaseClassLike[A, B]): Seq[B] = {
-    for (k <- keyRange) yield {
-      ev.apply(k)
-    }
+    for (k <- keyRange) yield { ev.apply(k) }
   }
 
   val keyRange = 'a' to 'z'
@@ -90,7 +86,7 @@ trait TestValuesBuilder extends TestSuiteMixin { this: TestSuite =>
   val eithInts = extractElementByIndex[Either[String, Int]](keyEithInt, 1)
   val eithLongs = extractElementByIndex[Either[String, Long]](keyEithLong, 1)
   val eithStrs = extractElementByIndex[Either[String, String]](keyEithStr, 1)
-  
+
   // 'a' - 32 = 'A'
   val bigDecimals2 = bigDecimals.map(x => x - 32)
   val bigInts2 = bigInts.map(x => x - 32)

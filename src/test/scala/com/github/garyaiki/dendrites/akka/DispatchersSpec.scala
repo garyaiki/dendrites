@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@ package com.github.garyaiki.dendrites.akka
 
 import akka.actor.ActorSystem
 import org.scalatest.WordSpecLike
-//import org.scalatest._
 import org.scalatest.Matchers._
 
 class DispatchersSpec extends WordSpecLike {

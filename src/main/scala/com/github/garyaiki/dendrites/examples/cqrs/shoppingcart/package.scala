@@ -1,4 +1,4 @@
-/** Copyright 2016 - 2017 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,12 +27,4 @@ package shoppingcart {
 
   sealed trait Query extends Cart
   case class GetItems(cartId: UUID) extends Query
-
-  /*
-
-case class ManagerCommand(cmd: Command, id: Long, replyTo: ActorRef)
-case class ManagerEvent(id: Long, event: Event)
-case class ManagerQuery(cmd: Query, id: Long, replyTo: ActorRef)
-case class ManagerResult(id: Long, result: Result)
-case class ManagerRejection(id: Long, reason: String)*/
 }

@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -66,12 +66,10 @@ class AvroKafkaProducerConsumerSpec extends WordSpecLike with BeforeAndAfterAll 
     "read the message" in {
       val crs = consumer.poll(timeout)
       crs.count shouldBe 1
-      val it = crs.iterator()
+      val it = crs.iterator
       var consumerRecord: ConsumerRecord[String, Array[Byte]] = null
-      while(it.hasNext()) {
-        consumerRecord = it.next()
-      }
-      val value = consumerRecord.value()
+      while(it.hasNext) { consumerRecord = it.next }
+      val value = consumerRecord.value
       val genericRecord: GenericRecord = byteArrayToGenericRecord(schema, value)
       val accountBalances = genericRecordToGetAccountBalances(genericRecord)
 

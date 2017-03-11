@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,22 +23,20 @@ import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.twitter.algebird.{AveragedValue, HLL}
 import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext
 import com.github.garyaiki.dendrites.algebird.stream.{avgFlow, CreateHLLFlow, maxFlow, minFlow}
 import com.github.garyaiki.dendrites.examples.account.{extractBalancesVals, GetAccountBalances}
-import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols,
-  CheckingBalancesClientConfig}
-import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQueryResponse}
+import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
 import com.github.garyaiki.dendrites.examples.account.stream.extractBalancesFlow
+import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQueryResponse}
 
 /**
   *
   * @author Gary Struthers
   */
-class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers with BeforeAndAfter
-        with BalancesProtocols {
+class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers with BeforeAndAfter with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   implicit val ec: ExecutionContext = system.dispatcher
   override implicit val mat = ActorMaterializer()
@@ -56,11 +54,10 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers with Befor
     val clientConfig = new CheckingBalancesClientConfig()
     val baseURL = clientConfig.baseURL
 
-    def partial = typedQueryResponse(
-          baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
+    def partial = typedQueryResponse(baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
     val responseFuture = partial(GetAccountBalances(id))
 
-    whenReady(responseFuture, Timeout(120000 millis)) { result => }    
+    whenReady(responseFuture, Timeout(120000 millis)) { result => }
   }
 
   "A ParallelCallAlgebirdFlowClient" should {
@@ -81,15 +78,13 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers with Befor
       rightResponse = Some(response._2)
     }
 
-  def source2 = TestSource.probe[Seq[AnyRef]]
-  def sink2 = TestSink.probe[Seq[BigDecimal]]
+    def source2 = TestSource.probe[Seq[AnyRef]]
+    def sink2 = TestSink.probe[Seq[BigDecimal]]
 
-  var balancesValues: Option[Seq[BigDecimal]] = None
+    var balancesValues: Option[Seq[BigDecimal]] = None
 
     "extract balances from the Right response" in {
-      val (pub2, sub2) = source2
-        .via(extractBalancesFlow)
-        .toMat(sink2)(Keep.both).run()
+      val (pub2, sub2) = source2.via(extractBalancesFlow).toMat(sink2)(Keep.both).run()
       sub2.request(1)
       pub2.sendNext(rightResponse.get)
       val response2 = sub2.expectNext
@@ -98,7 +93,7 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers with Befor
 
       response2 should equal(List(1000.1, 11000.1, 111000.1))
       balancesValues = Some(response2)
-    }
+      }
 
     "get averaged value from the Right response" in {
       val (pub2, sub2) = source2
@@ -160,9 +155,7 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers with Befor
   it should {
     "get balances for id 2" in {
       val id = 2L
-      val (pub, sub) = source
-        .via(wrappedFlow)
-        .toMat(sinkLeftRight)(Keep.both).run()
+      val (pub, sub) = source.via(wrappedFlow).toMat(sinkLeftRight)(Keep.both).run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
       val response = sub.expectNext
@@ -177,9 +170,7 @@ class ParallelCallAlgebirdFlowSpec extends WordSpecLike with Matchers with Befor
   it should {
     "get balances for id 3" in {
       val id = 3L
-      val (pub, sub) = source
-        .via(wrappedFlow)
-        .toMat(sinkLeftRight)(Keep.both).run()
+      val (pub, sub) = source.via(wrappedFlow).toMat(sinkLeftRight)(Keep.both).run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
       val response = sub.expectNext

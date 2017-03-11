@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -39,12 +39,7 @@ object Playlists {
     */
   def createTable(session: Session, schema: String): ResultSet = {
     val resultSetF = session.executeAsync("CREATE TABLE IF NOT EXISTS " + schema + "." + table +
-        " (id uuid," +
-        "title text," +
-        "album text," +
-        "artist text," +
-        "song_id uuid," +
-        "PRIMARY KEY (id, title, album, artist));")
+      " (id uuid,title text,album text,artist text,song_id uuid,PRIMARY KEY (id, title, album, artist));")
     resultSetF.getUninterruptibly()
   }
 
@@ -101,10 +96,10 @@ object Playlists {
     */
   def mapRow(row: Row): Playlist = {
     Playlist(row.as[UUID]("id"),
-             row.as[String]("title"),
-             row.as[String]("album"),
-             row.as[String]("artist"),
-             row.as[UUID]("song_id"))
+      row.as[String]("title"),
+      row.as[String]("album"),
+      row.as[String]("artist"),
+      row.as[UUID]("song_id"))
   }
 
   def mapRows(rows: Seq[Row]): Seq[Playlist] = rows.map { x => mapRow(x) }

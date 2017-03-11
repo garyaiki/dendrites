@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,21 +25,21 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import com.github.garyaiki.dendrites.kafka.MockConsumerConfig
 
-/** Test a Kafka MockConsumer in a Source 
- 	*
- 	* KafkaSource makes calls to Kafka Java client that block. The default system dispatcher uses
- 	* Java's ForkJoin thread pool which prefers to allocate as many threads as the CPU has cores.
- 	* Blocking calls with ForkJoin could possibly cause thread starvation. This can be avoided in
- 	* AkkaStreams by adding a different dispatcher to a Source, Sink, or Flow. Logging shows which
- 	* dispatcher is used for each logging call.
-  */ 
+/** Test a Kafka MockConsumer in a Source
+   *
+   * KafkaSource makes calls to Kafka Java client that block. The default system dispatcher uses
+   * Java's ForkJoin thread pool which prefers to allocate as many threads as the CPU has cores.
+   * Blocking calls with ForkJoin could possibly cause thread starvation. This can be avoided in
+   * AkkaStreams by adding a different dispatcher to a Source, Sink, or Flow. Logging shows which
+   * dispatcher is used for each logging call.
+  */
 class MockSourceSpec extends WordSpecLike {
   implicit val system = ActorSystem("dendrites")
   implicit val ec = system.dispatcher
   implicit val logger = Logging(system, getClass)
   implicit val materializer = ActorMaterializer()
   val mockConsumerFacade = MockConsumerConfig
-        
+
   "An MockKafkaSource" should {
     "poll ConsumeRecords from Kafka" in {
       val source = KafkaSource[String, String](mockConsumerFacade)
@@ -54,8 +54,7 @@ class MockSourceSpec extends WordSpecLike {
     "poll with a blocking dispatcher" in {
       val dispatcher = ActorAttributes.dispatcher("dendrites.blocking-dispatcher")
       val source = KafkaSource[String, String](mockConsumerFacade).withAttributes(dispatcher)
-      val future = source.grouped(1).map {
-        elem => logger.debug(elem.toString()); elem}.runWith(Sink.head)
+      val future = source.grouped(1).map { elem => logger.debug(elem.toString()); elem}.runWith(Sink.head)
       val result = Await.result(future, 1000.millis)
       var crs: ConsumerRecords[String, String] = null
       result match {

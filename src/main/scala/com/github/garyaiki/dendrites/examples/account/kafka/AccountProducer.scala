@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import com.github.garyaiki.dendrites.kafka.createProducer
   */
 object AccountProducer extends ProducerConfig[String, Array[Byte]] {
 
-  override def generateKey = UUID.randomUUID.toString
+  override def generateKey: String = UUID.randomUUID.toString
 
   val config = ConfigFactory.load
   val topic = config.getString("dendrites.kafka.account.topic")

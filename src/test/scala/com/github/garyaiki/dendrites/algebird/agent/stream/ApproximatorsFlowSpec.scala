@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,14 +20,14 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.twitter.algebird.CMSHasherImplicits._
-import com.twitter.algebird._
+import com.twitter.algebird.{AveragedValue, CMS, DecayedValue, HLL, QTree, QTreeSemigroup}
 import org.scalatest.{Matchers,WordSpecLike}
 import org.scalatest.Matchers._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 import com.github.garyaiki.dendrites.algebird.AlgebirdConfigurer
 import com.github.garyaiki.dendrites.algebird.BigDecimalField
-import com.github.garyaiki.dendrites.algebird._
+import com.github.garyaiki.dendrites.algebird.{cmsHasherBigDecimal, cmsHasherDouble, cmsHasherFloat, createHLL}
 import com.github.garyaiki.dendrites.algebird.agent.Agents
 import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
 
@@ -55,7 +55,7 @@ class ApproximatorsFlowSpec extends WordSpecLike with TestValuesBuilder {
       val hllAgent = agents.hllAgent
       val qtAgent = agents.qtAgent
       val bdFlow = new ApproximatorsFlow[BigDecimal](avgAgent, cmsAgent, dvAgent, hllAgent, qtAgent)
-        
+
       val (pub, sub) = TestSource.probe[Seq[BigDecimal]]
         .via(bdFlow.approximators)
         .toMat(TestSink.probe[(com.twitter.algebird.AveragedValue,
@@ -87,7 +87,7 @@ class ApproximatorsFlowSpec extends WordSpecLike with TestValuesBuilder {
       val hllAgent = agents.hllAgent
       val qtAgent = agents.qtAgent
       val biFlow = new ApproximatorsFlow[BigInt](avgAgent, cmsAgent, dvAgent, hllAgent, qtAgent)
-        
+
       val (pub, sub) = TestSource.probe[Seq[BigInt]]
         .via(biFlow.approximators)
         .toMat(TestSink.probe[(com.twitter.algebird.AveragedValue,
@@ -119,7 +119,7 @@ class ApproximatorsFlowSpec extends WordSpecLike with TestValuesBuilder {
       val hllAgent = agents.hllAgent
       val qtAgent = agents.qtAgent
       val biFlow = new ApproximatorsFlow[Double](avgAgent, cmsAgent, dvAgent, hllAgent, qtAgent)
-        
+
       val (pub, sub) = TestSource.probe[Seq[Double]]
         .via(biFlow.approximators)
         .toMat(TestSink.probe[(com.twitter.algebird.AveragedValue,
@@ -151,7 +151,7 @@ class ApproximatorsFlowSpec extends WordSpecLike with TestValuesBuilder {
       val hllAgent = agents.hllAgent
       val qtAgent = agents.qtAgent
       val biFlow = new ApproximatorsFlow[Float](avgAgent, cmsAgent, dvAgent, hllAgent, qtAgent)
-        
+
       val (pub, sub) = TestSource.probe[Seq[Float]]
         .via(biFlow.approximators)
         .toMat(TestSink.probe[(com.twitter.algebird.AveragedValue,
@@ -183,7 +183,7 @@ class ApproximatorsFlowSpec extends WordSpecLike with TestValuesBuilder {
       val hllAgent = agents.hllAgent
       val qtAgent = agents.qtAgent
       val biFlow = new ApproximatorsFlow[Int](avgAgent, cmsAgent, dvAgent, hllAgent, qtAgent)
-        
+
       val (pub, sub) = TestSource.probe[Seq[Int]]
         .via(biFlow.approximators)
         .toMat(TestSink.probe[(com.twitter.algebird.AveragedValue,
@@ -215,7 +215,7 @@ class ApproximatorsFlowSpec extends WordSpecLike with TestValuesBuilder {
       val hllAgent = agents.hllAgent
       val qtAgent = agents.qtAgent
       val biFlow = new ApproximatorsFlow[Long](avgAgent, cmsAgent, dvAgent, hllAgent, qtAgent)
-        
+
       val (pub, sub) = TestSource.probe[Seq[Long]]
         .via(biFlow.approximators)
         .toMat(TestSink.probe[(com.twitter.algebird.AveragedValue,

@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import com.github.garyaiki.dendrites.kafka.{MockConsumerConfig, MockConsumerReco
   * ConsumerRecord
   *
   * @author Gary Struthers
-  */ 
+  */
 class MockSourceConsumerRecordSpec extends WordSpecLike {
   implicit val system = ActorSystem("dendrites")
   implicit val ec: ExecutionContext = system.dispatcher

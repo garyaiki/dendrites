@@ -14,6 +14,10 @@ makeVersionProperties := {
 
 mappings in packageBin in Compile += (baseDirectory.value / "LICENSE.md") -> "dendrites-LICENSE"
 
+scalastyleConfig in Test := file("scalastyle-test-config.xml")
+
+scalastyleConfig in Compile := file("scalastyle-config.xml")
+
 lazy val commonSettings = Seq(
 	organization := "com.github.garyaiki",
 	version := "0.4.2",
@@ -65,8 +69,8 @@ lazy val root = (project in file(".")).
 		resolvers += "ivy2 cache" at "file://"+Path.userHome+"/.ivy2/cache",
 		resolvers += Resolver.jcenterRepo,
 		javaOptions += "-Xmx500M",
-		scalastyleFailOnError := false,
-		(scalastyleConfig in Test) := baseDirectory.value / "scalastyle-test-config.xml"                                                                                                                  
+		scalastyleFailOnError := false
 	).
-	settings(site.settings : _*)
+
+settings(site.settings : _*)
 

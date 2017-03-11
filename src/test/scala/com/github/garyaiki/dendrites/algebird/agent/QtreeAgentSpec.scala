@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,10 +18,9 @@ import com.twitter.algebird.QTreeSemigroup
 import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.Matchers._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext.Implicits.global
-import com.github.garyaiki.dendrites._
 import com.github.garyaiki.dendrites.algebird.{AlgebirdConfigurer, BigDecimalField}
 import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
 import com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike
@@ -42,11 +41,13 @@ class QTreeAgentSpec extends WordSpecLike with Matchers with TestValuesBuilder {
       val a = qTreeAgent.agent.get()
       a.count shouldBe 1
     }
+
     "have the count of first update data" in {
       val qTreeAgent = new QTreeAgent[BigDecimal]("testBD 1st update data")
       val updateFuture = qTreeAgent.alter(bigDecimals)
       whenReady(updateFuture, timeout) { result => result.count shouldBe bigDecimals.size }
     }
+
     val qTreeAgent = new QTreeAgent[BigDecimal]("testBD bounds", level, Some(bigDecimals))
     val qTree = qTreeAgent.agent.get()
     val lb = qTree.lowerBound
@@ -62,23 +63,27 @@ class QTreeAgentSpec extends WordSpecLike with Matchers with TestValuesBuilder {
       fst._1 should be >= q1
       fst._2 should be <= q1 + 0.0001
     }
+
     "have 2nd quantile bounds" in {
       val snd = qTree.quantileBounds(0.5)
       val q2 = 110.0
       snd._1 should be >= q2
       snd._2 should be <= q2 + 0.0001
     }
+
     "have 3rd quantile bounds" in {
       val trd = qTree.quantileBounds(0.75)
       val q3 = 116.0
       trd._1 should be >= q3
       trd._2 should be <= q3 + 0.0001
     }
+
     "have range sum bounds" in {
       val rsb = qTree.rangeSumBounds(lb, ub)
       val sum = bigDecimals.sum
       rsb shouldBe (sum, sum)
     }
+
     "have range count bounds" in {
       val rcb = qTree.rangeCountBounds(lb, ub)
       val size = bigDecimals.size

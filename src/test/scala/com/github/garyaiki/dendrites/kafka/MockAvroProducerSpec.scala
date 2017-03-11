@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@ class MockAvroProducerSpec extends WordSpecLike {
 
   val schema = loadSchema("getAccountBalances.avsc", "/avro/")
   val gab = GetAccountBalances(1L)
-
   val mock = MockProducerConfig
   val topic = mock.topic
 

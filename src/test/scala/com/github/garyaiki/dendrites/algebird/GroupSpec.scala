@@ -1,40 +1,39 @@
 /**
-  */
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.github.garyaiki.dendrites.algebird
 
 import org.scalatest.FlatSpecLike
-import com.twitter.algebird.Operators
 import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
 
-
-/** @author garystruthers
+/**
   *
+  * @author Gary Struthers
   */
 class GroupSpec extends FlatSpecLike with TestValuesBuilder {
 
-  "A BigDecimal" should "be negated by a Group" in {
-    assert(negate(bigDecimal * -1) === bigDecimal)
-  }
+  "A BigDecimal" should "be negated by a Group" in { assert(negate(bigDecimal * -1) === bigDecimal) }
 
-  "A BigInt" should "be negated by a Group" in {
-    assert(negate(bigInt * -1) === bigInt)
-  }
+  "A BigInt" should "be negated by a Group" in { assert(negate(bigInt * -1) === bigInt) }
 
-  "A Double" should "be negated by a Group" in {
-    assert(negate(double * -1) === double)
-  }
+  "A Double" should "be negated by a Group" in { assert(negate(double * -1) === double) }
 
-  "A Float" should "be negated by a Group" in {
-    assert(negate(float * -1) === float)
-  }
+  "A Float" should "be negated by a Group" in { assert(negate(float * -1) === float) }
 
-  "A Int" should "be negated by a Group" in {
-    assert(negate(int * -1) === int)
-  }
+  "A Int" should "be negated by a Group" in { assert(negate(int * -1) === int) }
 
-  "A Long" should "be negated by a Group" in {
-    assert(negate(long * -1) === long)
-  }
+  "A Long" should "be negated by a Group" in { assert(negate(long * -1) === long) }
 
   "A Option[BigDecimal]" should "be negated by a Group" in {
     val v = Some(bigDecimal * -1)
@@ -96,54 +95,29 @@ class GroupSpec extends FlatSpecLike with TestValuesBuilder {
     assert(negate(v.right.get) === long)
   }
 
-  val op = Operators
-  "A BigDecimal" should "be subtracted by a Group" in {
-    assert(minus(bigDecimal, bigDecimal) === 0)
-  }
+  "A BigDecimal" should "be subtracted by a Group" in { assert(minus(bigDecimal, bigDecimal) === 0) }
 
-  "A BigInt" should "be subtracted by a Group" in {
-    assert(minus(bigInt, bigInt) === 0)
-  }
+  "A BigInt" should "be subtracted by a Group" in { assert(minus(bigInt, bigInt) === 0) }
 
-  "A Double" should "be subtracted by a Group" in {
-    assert(minus(double, double) === 0.0)
-  }
+  "A Double" should "be subtracted by a Group" in { assert(minus(double, double) === 0.0) }
 
-  "A Float" should "be subtracted by a Group" in {
-    assert(minus(float, float) === 0.0f)
-  }
+  "A Float" should "be subtracted by a Group" in { assert(minus(float, float) === 0.0f) }
 
-  "A Int" should "be subtracted by a Group" in {
-    assert(minus(int, int) === 0)
-  }
+  "A Int" should "be subtracted by a Group" in { assert(minus(int, int) === 0) }
 
-  "A Long" should "be subtracted by a Group" in {
-    assert(minus(long, long) === 0L)
-  }
+  "A Long" should "be subtracted by a Group" in { assert(minus(long, long) === 0L) }
 
-  "A Option[BigDecimal]" should "be subtracted by a Group" in {
-    assert(minus(optBigDec.get, optBigDec.get) === 0)
-  }
+  "A Option[BigDecimal]" should "be subtracted by a Group" in { assert(minus(optBigDec.get, optBigDec.get) === 0) }
 
-  "A Option[BigInt]" should "be subtracted by a Group" in {
-    assert(minus(optBigInt.get, optBigInt.get) === 0)
-  }
+  "A Option[BigInt]" should "be subtracted by a Group" in { assert(minus(optBigInt.get, optBigInt.get) === 0) }
 
-  "A Option[Double]" should "be subtracted by a Group" in {
-    assert(minus(optDouble.get, optDouble.get) === 0.0)
-  }
+  "A Option[Double]" should "be subtracted by a Group" in { assert(minus(optDouble.get, optDouble.get) === 0.0) }
 
-  "A Option[Float]" should "be subtracted by a Group" in {
-    assert(minus(optFloat.get, optFloat.get) === 0.0f)
-  }
+  "A Option[Float]" should "be subtracted by a Group" in { assert(minus(optFloat.get, optFloat.get) === 0.0f) }
 
-  "A Option[Int]" should "be subtracted by a Group" in {
-    assert(minus(optInt.get, optInt.get) === 0)
-  }
+  "A Option[Int]" should "be subtracted by a Group" in { assert(minus(optInt.get, optInt.get) === 0) }
 
-  "A Option[Long]" should "be subtracted by a Group" in {
-    assert(minus(optLong.get, optLong.get) === 0L)
-  }
+  "A Option[Long]" should "be subtracted by a Group" in { assert(minus(optLong.get, optLong.get) === 0L) }
 
   "A Either[String, BigDecimal]" should "be subtracted by a Group" in {
     assert(minus(eithBigDec.right.get, eithBigDec.right.get) === 0)

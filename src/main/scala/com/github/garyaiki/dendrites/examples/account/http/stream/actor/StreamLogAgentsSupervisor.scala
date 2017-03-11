@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLik
   var results: ActorRef = null
 
   override def preStart() = {
-    log.debug("preStart:{} sink:{} streamSuper:{}", this.toString, resultsName, streamSuperName)   
+    log.debug("preStart:{} sink:{} streamSuper:{}", this.toString, resultsName, streamSuperName)
     // create children here
     val resultsProps = CallStream.props[Seq[AnyRef]](resultsRunnable)
     results = context.actorOf(resultsProps, resultsName)

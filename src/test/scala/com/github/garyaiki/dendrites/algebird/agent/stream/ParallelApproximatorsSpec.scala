@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,18 +21,18 @@ import akka.stream.scaladsl.{Flow, Keep}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.twitter.algebird.{QTree, QTreeSemigroup}
 import com.twitter.algebird.CMSHasherImplicits._
-import com.twitter.algebird._
+import com.twitter.algebird.{AveragedValue, CMS, HLL, QTree}
 import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.Matchers._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 import com.github.garyaiki.dendrites.aggregator.mean
-import com.github.garyaiki.dendrites.algebird.AlgebirdConfigurer
-import com.github.garyaiki.dendrites.algebird._
+import com.github.garyaiki.dendrites.algebird.{AlgebirdConfigurer, BigDecimalField}
+import com.github.garyaiki.dendrites.algebird.{cmsHasherBigDecimal, cmsHasherDouble, cmsHasherFloat}
 import com.github.garyaiki.dendrites.algebird.agent.Agents
 import com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike
 import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
@@ -51,7 +51,7 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
   implicit val monoid = AlgebirdConfigurer.hyperLogLogMonoid
   val qTreeLevel = AlgebirdConfigurer.qTreeLevel
   val timeout = Timeout(3000 millis)
-  
+
   "A BigDecimals ParallelApproximators" should {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[BigDecimal](qTreeLevel)
@@ -102,11 +102,11 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
         result.estimatedSize shouldBe longs.distinct.size.toDouble +- 0.09
       }
 
-		  val updateQTFuture = qtAgent.agent.future()
-		  whenReady(updateQTFuture, timeout) { result => result.count shouldBe bigDecimals.size }
+      val updateQTFuture = qtAgent.agent.future()
+      whenReady(updateQTFuture, timeout) { result => result.count shouldBe bigDecimals.size }
     }
   }
-  
+
   "A BigInt ParallelApproximators" should {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[BigInt](qTreeLevel)
@@ -157,11 +157,11 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
         result.estimatedSize shouldBe longs.distinct.size.toDouble +- 0.09
       }
 
-		  val updateQTFuture = qtAgent.agent.future()
-		  whenReady(updateQTFuture, timeout) { result => result.count shouldBe bigInts.size }
+      val updateQTFuture = qtAgent.agent.future()
+      whenReady(updateQTFuture, timeout) { result => result.count shouldBe bigInts.size }
     }
   }
-  
+
   "A Double ParallelApproximators" should {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[Double](qTreeLevel)
@@ -207,14 +207,14 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
       val updateDVFuture = dvAgent.agent.future()
       whenReady(updateDVFuture, timeout) { result => result.size shouldBe bigInts.size +- 2 }
 
-      val updateHLLFuture = hllAgent.agent.future() //@FIXME
+      val updateHLLFuture = hllAgent.agent.future() // @FIXME
       whenReady(updateHLLFuture, timeout) { result => result.estimatedSize shouldBe 3.0 +- 0.09 }
 
-		  val updateQTFuture = qtAgent.agent.future()
-		  whenReady(updateQTFuture, timeout) { result => result.count shouldBe doubles.size }
+      val updateQTFuture = qtAgent.agent.future()
+      whenReady(updateQTFuture, timeout) { result => result.count shouldBe doubles.size }
     }
   }
-  
+
   "A Float ParallelApproximators" should {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[Float](qTreeLevel)
@@ -265,11 +265,11 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
         result.estimatedSize shouldBe longs.distinct.size.toDouble +- 0.09
       }
 
-		  val updateQTFuture = qtAgent.agent.future()
-		  whenReady(updateQTFuture, timeout) { result => result.count shouldBe floats.size }
+      val updateQTFuture = qtAgent.agent.future()
+      whenReady(updateQTFuture, timeout) { result => result.count shouldBe floats.size }
     }
   }
-  
+
   "A Int ParallelApproximators" should {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[Int](qTreeLevel)
@@ -320,11 +320,11 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
         result.estimatedSize shouldBe longs.distinct.size.toDouble +- 0.09
       }
 
-		  val updateQTFuture = qtAgent.agent.future()
-		  whenReady(updateQTFuture, timeout) { result => result.count shouldBe floats.size }
+      val updateQTFuture = qtAgent.agent.future()
+      whenReady(updateQTFuture, timeout) { result => result.count shouldBe floats.size }
     }
   }
-  
+
   "A Long ParallelApproximators" should {
     "update all agents and return their latest values" in {
       implicit val qtBDSemigroup = new QTreeSemigroup[Long](qTreeLevel)
@@ -375,8 +375,8 @@ class ParallelApproximatorsSpec extends WordSpecLike with TestValuesBuilder {
         result.estimatedSize shouldBe longs.distinct.size.toDouble +- 0.09
       }
 
-		  val updateQTFuture = qtAgent.agent.future()
-		  whenReady(updateQTFuture, timeout) { result => result.count shouldBe longs.size }
+      val updateQTFuture = qtAgent.agent.future()
+      whenReady(updateQTFuture, timeout) { result => result.count shouldBe longs.size }
     }
   }
 }

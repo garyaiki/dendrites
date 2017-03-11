@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import com.github.garyaiki.dendrites.stream.SpyFlow
   * ConsumerRecord
   *
   * @author Gary Struthers
-  */ 
+  */
 class ResilientStreamSpec extends WordSpecLike {
   implicit val system = ActorSystem("dendrites")
   implicit val ec: ExecutionContext = system.dispatcher
@@ -41,7 +41,6 @@ class ResilientStreamSpec extends WordSpecLike {
   val mockConsumerFacade = MockConsumerConfig
   val source = KafkaSource[String, String](mockConsumerFacade)
   val consumerRecordQueue = new ConsumerRecordQueue[String, String]()
-
 
   val mockVals = Seq("0","5","10","15","20","25","35")
   val mockPartitionVals = Seq("0","10","20","5","15","25","35")
@@ -63,15 +62,16 @@ class ResilientStreamSpec extends WordSpecLike {
       spy.pulls shouldBe 1
       spy.pushes shouldBe 1
     }
+
     "pull again from source after draining stream" in {
       val spy = new SpyFlow[ConsumerRecords[String,String]]("test 2 spy 1", 0, 0)
       val spy2 = new SpyFlow[String]("test 2 spy 2", 0, 0)
       val sourceUnderTest = source
-      .via(spy)
-      .via(consumerRecordsFlow[String, String])
-      .via(consumerRecordQueue)
-      .via(consumerRecordValueFlow)
-      .via(spy2)
+        .via(spy)
+        .via(consumerRecordsFlow[String, String])
+        .via(consumerRecordQueue)
+        .via(consumerRecordValueFlow)
+        .via(spy2)
       val result = sourceUnderTest
         .runWith(TestSink.probe[String])
         .request(9)
@@ -82,6 +82,7 @@ class ResilientStreamSpec extends WordSpecLike {
       spy2.pulls shouldBe 8
       spy2.pushes shouldBe 7
     }
+
     "pull once from source after exception" in {
       val spy = new SpyFlow[ConsumerRecords[String,String]]("test 3 spy 1", 0, 0)
       val spy2 = new SpyFlow[String]("test 3 spy 2", 0, 0)

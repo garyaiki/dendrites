@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import akka.stream.scaladsl.{Flow, Keep}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext
 import scala.math.BigDecimal.double2bigDecimal
@@ -36,8 +36,7 @@ import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQueryRespon
   *
   * @author Gary Struthers
   */
-class CheckingCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfter
-        with BalancesProtocols {
+class CheckingCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfter with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   implicit val ec: ExecutionContext = system.dispatcher
   override implicit val mat = ActorMaterializer()
@@ -48,7 +47,7 @@ class CheckingCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfte
   val ccf = new CheckingCallFlow
   val testFlow = source.via(ccf.flow).toMat(sink)(Keep.both)
 
-  before { // init connection pool 
+  before { // init connection pool
     val id = 1L
     val clientConfig = new CheckingBalancesClientConfig()
     val baseURL = clientConfig.baseURL
@@ -57,7 +56,7 @@ class CheckingCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfte
 
     val responseFuture = partial(GetAccountBalances(id))
 
-    whenReady(responseFuture, Timeout(120000 millis)) { result => }    
+    whenReady(responseFuture, Timeout(120000 millis)) { result => }
   }
 
   "A CheckingCallFlowClient" should {
@@ -83,7 +82,7 @@ class CheckingCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfte
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-      
+
       response should equal(Right(CheckingAccountBalances(Some(List((2L, BigDecimal(2000.20)),
           (22L, BigDecimal(2200.22)))))))
     }
@@ -98,7 +97,7 @@ class CheckingCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfte
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-      
+
       response should equal(Right(CheckingAccountBalances(Some(List((3L, BigDecimal(3000.30)),
           (33L, BigDecimal(3300.33)),
           (333L, BigDecimal(3330.33)))))))
@@ -114,26 +113,22 @@ class CheckingCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfte
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-      
+
       response should equal(Left("Checking account 4 not found"))
     }
   }
-  
+
   val clientConfig = new CheckingBalancesClientConfig()
   val badBaseURL = clientConfig.baseURL.dropRight(1)
 
-  def badPartial = typedQueryResponse(
-          badBaseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
+  def badPartial = typedQueryResponse(badBaseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
 
-  def badFlow: Flow[Product, Either[String, AnyRef], NotUsed] =
-            Flow[Product].mapAsync(1)(badPartial)
+  def badFlow: Flow[Product, Either[String, AnyRef], NotUsed] = Flow[Product].mapAsync(1)(badPartial)
 
   it should {
     "fail bad request URLs" in {
       val id = 1L
-      val (pub, sub) = source
-        .via(badFlow)
-        .toMat(sink)(Keep.both).run()
+      val (pub, sub) = source.via(badFlow).toMat(sink)(Keep.both).run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
       val response = sub.expectNext()

@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,33 +19,19 @@ import akka.event.LoggingAdapter
 import akka.stream.{ActorAttributes, Attributes, Inlet, SinkShape, Supervision}
 import akka.stream.ActorAttributes.SupervisionStrategy
 import akka.stream.scaladsl.Sink
-import akka.stream.stage.{AsyncCallback,
-    GraphStage,
-    GraphStageLogic,
-    InHandler,
-    TimerGraphStageLogic}
+import akka.stream.stage.{AsyncCallback, GraphStage, GraphStageLogic, InHandler, TimerGraphStageLogic}
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord, RecordMetadata}
-
 import org.apache.kafka.common.KafkaException
-import org.apache.kafka.common.errors.{CorruptRecordException, // Retriable exceptions
-  InvalidMetadataException,
-  NotEnoughReplicasAfterAppendException,
-  NotEnoughReplicasException,
-  OffsetOutOfRangeException,
-  TimeoutException,
-  UnknownTopicOrPartitionException,
-  RetriableException}
-import org.apache.kafka.common.errors.{InvalidTopicException, //Stopping exceptions
-  OffsetMetadataTooLarge,
-  RecordBatchTooLargeException,
-  RecordTooLargeException,
-  UnknownServerException}
-
+// Retriable exceptions
+import org.apache.kafka.common.errors.{CorruptRecordException, InvalidMetadataException,
+  NotEnoughReplicasAfterAppendException, NotEnoughReplicasException, OffsetOutOfRangeException, TimeoutException,
+  UnknownTopicOrPartitionException, RetriableException}
+// Stopping exceptions
+import org.apache.kafka.common.errors.{InvalidTopicException, OffsetMetadataTooLarge, RecordBatchTooLargeException,
+  RecordTooLargeException, UnknownServerException}
 import scala.util.control.NonFatal
-
 import com.github.garyaiki.dendrites.kafka.ProducerConfig
-
-import com.github.garyaiki.dendrites.kafka.stream.KafkaSink.decider;
+import com.github.garyaiki.dendrites.kafka.stream.KafkaSink.decider
 
 /** A copy of [[com.github.garyaiki.dendrites.kafka.stream.KafkaSink]] modified to inject exceptions into Kafka Producer
   * asynchronous callback
@@ -63,7 +49,7 @@ class MockKafkaSink[K, V](prod: ProducerConfig[K, V], testException: RuntimeExce
         (implicit logger: LoggingAdapter) extends GraphStage[SinkShape[V]] {
 
   val producer = prod.producer
-  /* for access to MockProducer debugging methods
+  /** for access to MockProducer debugging methods
   import org.apache.kafka.clients.producer.MockProducer
   val mockProducer = producer match {
     case x: MockProducer[K, V] => x
@@ -119,8 +105,7 @@ class MockKafkaSink[K, V](prod: ProducerConfig[K, V], testException: RuntimeExce
             val kafkaCallback = new Callback() {
               def onCompletion(meta: RecordMetadata, e: Exception): Unit = {
                 if (e != null) errorCallback invoke(e) else
-                  if (testException != null) errorCallback invoke(testException)
-                  else pullCallback invoke((): Unit)
+                  if (testException != null) errorCallback invoke(testException) else pullCallback invoke((): Unit)
               }
             }
             val curriedAsyncEx = asyncExceptions(producerRecord, kafkaCallback) _
@@ -136,7 +121,7 @@ class MockKafkaSink[K, V](prod: ProducerConfig[K, V], testException: RuntimeExce
         timerKey match {
           case (pRec: ProducerRecord[K, V], callback: Callback) => producer send(pRec, callback)
           case x => throw new IllegalArgumentException(
-              s"expected (ProducerRecord[K, V], Callback)) received:${x.toString()}")
+            s"expected (ProducerRecord[K, V], Callback)) received:${x.toString()}")
         }
       }
     }
@@ -152,10 +137,10 @@ object MockKafkaSink {
     *
     * @tparam K key type
     * @tparam V value type
-  	* @param producer configuration object
- 		* @param implicit logger
-  	* @return Sink[V, NotUsed]
-  	*/
+    * @param producer configuration object
+     * @param implicit logger
+    * @return Sink[V, NotUsed]
+    */
   def apply[K, V](producer: ProducerConfig[K, V], testException: RuntimeException)(implicit logger: LoggingAdapter):
       Sink[V, NotUsed] = {
     val sink = Sink.fromGraph(new MockKafkaSink[K, V](producer, testException))

@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import com.twitter.algebird.CMSHasherImplicits._
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -90,12 +90,10 @@ class CountMinSketchAgentFlowSpec extends WordSpecLike with TestValuesBuilder {
       val cmsAgt = new CountMinSketchAgent[Long]("test Longs")
       val composite = CountMinSketchAgentFlow.compositeSink[Long](cmsAgt)
       source.runWith(composite)
-      Thread.sleep(10)//Stream completes before agent updates
+      Thread.sleep(10) // Stream completes before agent updates
       val updateFuture = cmsAgt.agent.future()
 
-      whenReady(updateFuture, timeout) { result =>
-        result.totalCount should equal(longs.size)
-      }
+      whenReady(updateFuture, timeout) { result => result.totalCount should equal(longs.size) }
     }
   }
 }

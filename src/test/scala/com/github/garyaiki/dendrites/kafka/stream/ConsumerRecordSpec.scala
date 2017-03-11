@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@ import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.{ActorMaterializer, ClosedShape, FanOutShape2, FanOutShape3, FlowShape, UniformFanOutShape}
-import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Keep, Merge, RunnableGraph, Source, Sink, Unzip, UnzipWith, UnzipWith3}
+import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Keep, Merge, RunnableGraph, Source, Sink, Unzip, UnzipWith,
+  UnzipWith3}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import java.util.{List => JList}
 import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords}
@@ -31,13 +32,13 @@ class ConsumerRecordSpec extends WordSpecLike with MockConsumerRecords {
   implicit val system = ActorSystem("dendrites")
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
-  
+
   "ConsumerRecords with 1 TopicPartition" should {
     "extract a queue of ConsumerRecord" in {
       val (pub, sub) = TestSource.probe[ConsumerRecords[String, String]]
-      .via(consumerRecordsFlow[String, String])
-      .toMat(TestSink.probe[Queue[ConsumerRecord[String, String]]])(Keep.both)
-      .run()
+        .via(consumerRecordsFlow[String, String])
+        .toMat(TestSink.probe[Queue[ConsumerRecord[String, String]]])(Keep.both)
+        .run()
       sub.request(1)
       pub.sendNext(cRecords0)
       val response = sub.expectNext()
@@ -58,7 +59,7 @@ class ConsumerRecordSpec extends WordSpecLike with MockConsumerRecords {
       cr2.value() shouldBe "20"
     }
   }
-  
+
   "ConsumerRecords with 2 TopicPartition" should {
     "extract 2 queues of ConsumerRecord" in {
       val (pub, sub) = TestSource.probe[ConsumerRecords[String, String]]
@@ -83,6 +84,7 @@ class ConsumerRecordSpec extends WordSpecLike with MockConsumerRecords {
       partition1Queue foreach( cr => q2Vals.++=(cr.value()))
       q2Vals.toString() shouldBe "5152535"
     }
+
     "extract tuple2 of String" in {
       val g2 = RunnableGraph.fromGraph(GraphDSL.create() { implicit b: GraphDSL.Builder[NotUsed] ⇒
         import GraphDSL.Implicits._
@@ -98,7 +100,8 @@ class ConsumerRecordSpec extends WordSpecLike with MockConsumerRecords {
         ClosedShape
       }).run()
     }
-    "extract tuple2 of queues of ConsumerRecord" in {//@FIXME
+
+    "extract tuple2 of queues of ConsumerRecord" in { // @FIXME
       val g2 = RunnableGraph.fromGraph(GraphDSL.create() { implicit b: GraphDSL.Builder[NotUsed] ⇒
         import GraphDSL.Implicits._
         import scala.language.postfixOps
@@ -113,6 +116,7 @@ class ConsumerRecordSpec extends WordSpecLike with MockConsumerRecords {
         ClosedShape
       }).run()
     }
+
     "extract tuple3 of queues of ConsumerRecord" in {
 
       val g2 = RunnableGraph.fromGraph(GraphDSL.create() { implicit b: GraphDSL.Builder[NotUsed] ⇒
@@ -124,7 +128,7 @@ class ConsumerRecordSpec extends WordSpecLike with MockConsumerRecords {
 
         unzip.out0 ~> Sink.ignore
         unzip.out1 ~> Sink.ignore
-        unzip.out2 ~> Sink.ignore  
+        unzip.out2 ~> Sink.ignore
         ClosedShape
       }).run()
       /*

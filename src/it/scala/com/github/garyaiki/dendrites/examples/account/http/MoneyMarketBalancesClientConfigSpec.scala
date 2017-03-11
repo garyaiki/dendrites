@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,20 +19,20 @@ import akka.event.Logging
 import akka.stream.ActorMaterializer
 import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
-import scala.concurrent.ExecutionContext
 import scala.math.BigDecimal.double2bigDecimal
-import com.github.garyaiki.dendrites.examples.account.{GetAccountBalances,
-  MoneyMarketAccountBalances}
+import scala.concurrent.ExecutionContext
+import com.github.garyaiki.dendrites.examples.account.{GetAccountBalances, MoneyMarketAccountBalances}
 import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQuery, typedFutureResponse}
 
 /**
   *
   * @author Gary Struthers
-  */ 
+  */
 class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers with BeforeAndAfter
-        with BalancesProtocols {
+  with BalancesProtocols {
+
   implicit val system = ActorSystem("dendrites")
   implicit val ec: ExecutionContext = system.dispatcher
   override implicit val mat = ActorMaterializer()
@@ -50,9 +50,9 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
       val callFuture = typedQuery(baseURL, cc.productPrefix, caseClassToGetQuery)(cc)
       val responseFuture = typedFutureResponse(mapPlain, mapMoneyMarket)(callFuture)
 
-      whenReady(responseFuture, Timeout(90000 millis)) { result => }    
+      whenReady(responseFuture, Timeout(90000 millis)) { result => }
   }
-  
+
   "A MoneyBalancesClient" should {
     "get balances for id 1" in {
       val id = 1L
@@ -102,9 +102,7 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
       val callFuture = typedQuery(baseURL, cc.productPrefix, caseClassToGetQuery)(cc)
       val responseFuture = typedFutureResponse(mapPlain, mapMoneyMarket)(callFuture)
 
-      whenReady(responseFuture, timeout) { result =>
-        result should equal(Left("Money Market account 4 not found"))
-      }
+      whenReady(responseFuture, timeout) { result => result should equal(Left("Money Market account 4 not found")) }
     }
   }
 
@@ -116,8 +114,7 @@ class MoneyMarketBalancesClientConfigSpec extends WordSpecLike with Matchers wit
       val responseFuture = typedFutureResponse(mapPlain, mapMoneyMarket)(callFuture)
 
       whenReady(responseFuture, timeout) { result =>
-        result should equal(Left(
-          "FAIL 404 Not Found The requested resource could not be found."))
+        result should equal(Left("FAIL 404 Not Found The requested resource could not be found."))
       }
     }
   }

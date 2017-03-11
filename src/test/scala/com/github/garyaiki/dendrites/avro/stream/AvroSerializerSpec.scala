@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ class AvroSerializerSpec extends WordSpecLike {
       response.length shouldBe 1
       response(0).toString() shouldBe "2" // zigzag encoding
 
-      def record = byteArrayToGenericRecord(schema, response)
+      val record = byteArrayToGenericRecord(schema, response)
       val obj = record.get("id")
       val l:Long = obj.asInstanceOf[Number].longValue
       val gab2 = GetAccountBalances(l)

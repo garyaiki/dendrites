@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -26,11 +26,11 @@ import org.apache.kafka.common.KafkaException
 import org.apache.kafka.common.errors.{CorruptRecordException, // Retriable exceptions
   InvalidMetadataException, NetworkException, NotEnoughReplicasAfterAppendException, NotEnoughReplicasException,
   OffsetOutOfRangeException, TimeoutException, UnknownTopicOrPartitionException, RetriableException}
-import org.apache.kafka.common.errors.{InvalidTopicException, //Stopping exceptions
+import org.apache.kafka.common.errors.{InvalidTopicException, // Stopping exceptions
   OffsetMetadataTooLarge, RecordBatchTooLargeException, RecordTooLargeException, UnknownServerException}
 import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -75,15 +75,15 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
   val serializer = new AvroSerializer(schema, avroOps.toBytes)
 
   val getBals = Seq(GetAccountBalances(0L),
-          GetAccountBalances(1L),
-          GetAccountBalances(2L),
-          GetAccountBalances(3L),
-          GetAccountBalances(4L),
-          GetAccountBalances(5L),
-          GetAccountBalances(6L),
-          GetAccountBalances(7L),
-          GetAccountBalances(8L),
-          GetAccountBalances(9L))
+        GetAccountBalances(1L),
+        GetAccountBalances(2L),
+        GetAccountBalances(3L),
+        GetAccountBalances(4L),
+        GetAccountBalances(5L),
+        GetAccountBalances(6L),
+        GetAccountBalances(7L),
+        GetAccountBalances(8L),
+        GetAccountBalances(9L))
 
   "A MockKafkaSink" should {
     "serialize case classes and MockSink should send them " in {
@@ -98,6 +98,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       producer.history().size shouldBe 10
       producer.close()
     }
+
     "handle CorruptRecordException with Supervision.Resume " in {
       val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
@@ -110,6 +111,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       producer.history().size shouldBe 3 +- 2
       producer.close()
     }
+
     "handle UnknownServerException with Supervision.Stop " in {
       val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
@@ -122,19 +124,20 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       producer.history().size shouldBe 3 +- 2
       producer.close()
     }
+
     "handle UnknownTopicOrPartitionException with Supervision.Resume " in {
       val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
-      val sink = MockKafkaSink[String, Array[Byte]](mock,
-              new UnknownTopicOrPartitionException("test"))
+      val sink = MockKafkaSink[String, Array[Byte]](mock, new UnknownTopicOrPartitionException("test"))
 
       source.via(serializer).runWith(sink)
       Thread.sleep(200)
       producer.history().size shouldBe 3 +- 2
       producer.close()
     }
+
     "handle subclass of InvalidMetadataException with Supervision.Resume " in {
       val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
@@ -147,32 +150,33 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       producer.history().size shouldBe 3 +- 2
       producer.close()
     }
+
     "handle NotEnoughReplicasAfterAppendException with Supervision.Resume " in {
       val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
-      val sink = MockKafkaSink[String, Array[Byte]](mock,
-              new NotEnoughReplicasAfterAppendException("test"))
+      val sink = MockKafkaSink[String, Array[Byte]](mock, new NotEnoughReplicasAfterAppendException("test"))
 
       source.via(serializer).runWith(sink)
       Thread.sleep(200)
       producer.history().size shouldBe 3 +- 2
       producer.close()
     }
+
     "handle NotEnoughReplicasException with Supervision.Resume " in {
       val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
       val iter = Iterable(getBals.toSeq:_*)
       val source = Source[GetAccountBalances](iter)
-      val sink = MockKafkaSink[String, Array[Byte]](mock,
-              new NotEnoughReplicasAfterAppendException("test"))
+      val sink = MockKafkaSink[String, Array[Byte]](mock, new NotEnoughReplicasAfterAppendException("test"))
 
       source.via(serializer).runWith(sink)
       Thread.sleep(300)
       producer.history().size shouldBe 3 +- 2
       producer.close()
     }
+
     "handle OffsetOutOfRangeException with Supervision.Resume " in {
       val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
@@ -185,6 +189,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       producer.history().size shouldBe 3 +- 2
       producer.close()
     }
+
     "handle TimeoutException with Supervision.Resume " in {
       val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
@@ -197,6 +202,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       producer.history().size shouldBe 3 +- 2
       producer.close()
     }
+
     "handle subclass of RetriableException with Supervision.Resume " in {
       val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
@@ -209,6 +215,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       producer.history().size shouldBe 4 +- 2
       producer.close()
     }
+
     "handle InvalidTopicException with Supervision.Stop " in {
       val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
@@ -221,6 +228,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       producer.history().size shouldBe 3 +- 2
       producer.close()
     }
+
     "handle OffsetMetadataTooLarge with Supervision.Stop " in {
       val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
@@ -233,6 +241,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       producer.history().size shouldBe 3 +- 2
       producer.close()
     }
+
     "handle RecordBatchTooLargeException with Supervision.Stop " in {
       val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
@@ -245,6 +254,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       producer.history().size shouldBe 3 +- 2
       producer.close()
     }
+
     "handle RecordTooLargeException with Supervision.Stop " in {
       val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()
@@ -257,6 +267,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
       producer.history().size shouldBe 3 +- 2
       producer.close()
     }
+
     "handle KafkaException with Supervision.Stop " in {
       val producer: MockProducer[String, Array[Byte]] = mock.producer
       producer.clear()

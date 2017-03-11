@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,16 +17,14 @@ limitations under the License.
   */
 package com.github.garyaiki.dendrites.algebird
 
-import com.twitter.algebird._
+import com.twitter.algebird.QTree
 import org.scalatest.FlatSpecLike
 import org.scalatest.Matchers._
-import com.github.garyaiki.dendrites._
-import com.github.garyaiki.dendrites.algebird._
 import com.github.garyaiki.dendrites.algebird.fixtures.QTreeBuilder
 
 /**
-  * 
-	* @see [[http://en.wikipedia.org/wiki/Interquartile_mean Interquartile_mean]]
+  *
+  * @see [[http://en.wikipedia.org/wiki/Interquartile_mean Interquartile_mean]]
   * @see [[http://en.wikipedia.org/wiki/Interquartile_range Interquartile_range]]
   *
   * @author Gary Struthers
@@ -107,18 +105,18 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
     iqm._1 should be > 88.5
     iqm._2 < 94.8
   }
-  
+
   it should "be created from a Sequence of Double" in {
     val size = doubles.size
     qtD.count shouldBe size
-    qtD.level shouldBe level + 3 //Why?
+    qtD.level shouldBe level + 3 // Why?
     assert(qtD.range >= size)
     val lb = qtD.lowerBound
     assert(lb <= doubles.min)
     val ub = qtD.upperBound
     assert(ub >= doubles.max)
     val fst = qtD.quantileBounds(0.25)
-    fst._1 should be >= 110.0 //Why?
+    fst._1 should be >= 110.0 // Why?
     fst._2 should be <= 110 + 0.0001
     val snd = qtD.quantileBounds(0.5)
     snd._1 should be >= 120.0
@@ -144,11 +142,11 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
     iqm._1 should be > 72.5
     iqm._2 should be < 109.4
   }
-  
+
   it should "be created from a Sequence of Float" in {
     val size = floats.size
     qtF.count shouldBe size
-    qtF.level shouldBe level + 3 //Why?
+    qtF.level shouldBe level + 3 // Why?
     assert(qtF.range >= size)
     val lb = qtF.lowerBound
     assert(lb <= floats.min.toDouble)
@@ -247,7 +245,7 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
     assert(iqm._1 > 100.0)
     assert(iqm._2 < 119.13)
   }
-  
+
   it should "return InterQuartileMean by summing a Sequence of QTree[Long]" in {
     val qTrees = Vector(qtL, qtL2)
     val sumQTree = sumQTrees(qTrees)
@@ -255,7 +253,7 @@ class QTreeSpec extends FlatSpecLike with QTreeBuilder {
     assert(iqm._1 > 88.6)
     assert(iqm._2 < 99.1)
   }
-  
+
   "A Sequence of QTrees" should "be created from a Sequence of BigDecimal" in {
     val qTrees: Seq[QTree[BigDecimal]] = buildQTrees(bigDecimals)
     qTrees.size shouldBe bigDecimals.size

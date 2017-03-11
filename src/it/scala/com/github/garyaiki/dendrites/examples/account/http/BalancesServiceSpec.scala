@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,8 +30,7 @@ import com.github.garyaiki.dendrites.http.caseClassToGetQuery
   *
   * @author Gary Struthers
   */
-class BalancesServiceSpec extends WordSpec with Matchers with ScalatestRouteTest
-        with BalancesService {
+class BalancesServiceSpec extends WordSpec with Matchers with ScalatestRouteTest with BalancesService {
 
   override def testConfigSource = "akka.loglevel = WARNING"
   def config = testConfig
@@ -50,9 +49,7 @@ class BalancesServiceSpec extends WordSpec with Matchers with ScalatestRouteTest
 
   "BalancesService" should {
     "respond handled = false for single slash query" in {
-      Get(s"/") ~> routes ~> check {
-        handled shouldEqual false
-      }
+      Get(s"/") ~> routes ~> check { handled shouldEqual false }
     }
   }
   it should {
@@ -97,12 +94,12 @@ class BalancesServiceSpec extends WordSpec with Matchers with ScalatestRouteTest
       }
     }
   }
-  
+
   val saBalances = SavingsAccountBalances(Some(List((goodId, 111000.10))))
   val saPath = "/account/balances/savings/"
   val saQ = saPath ++ balancesQuery
   val badSaQ = saPath ++ badBalancesQuery
-  
+
   it should {
     "return existing Savings Account Balances" in {
       Get(saQ) ~> routes ~> check {

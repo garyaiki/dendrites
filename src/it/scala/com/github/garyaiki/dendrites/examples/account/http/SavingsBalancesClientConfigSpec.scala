@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import akka.stream.ActorMaterializer
 import java.util.concurrent.Executors
 import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.math.BigDecimal.double2bigDecimal
@@ -31,8 +31,7 @@ import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQuery, type
   *
   * @author Gary Struthers
   */
-class SavingsBalancesClientConfigSpec extends WordSpecLike with Matchers with BeforeAndAfter with
-        BalancesProtocols {
+class SavingsBalancesClientConfigSpec extends WordSpecLike with Matchers with BeforeAndAfter with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   override implicit val mat = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
@@ -43,14 +42,14 @@ class SavingsBalancesClientConfigSpec extends WordSpecLike with Matchers with Be
   val baseURL = clientConfig.baseURL
   val badBaseURL = baseURL.dropRight(1)
   val timeout = Timeout(1000 millis)
-  
+
   before { // Send dummy request to ensure connection pool initialized
       val id = 1L
       val cc = GetAccountBalances(id)
       val callFuture = typedQuery(baseURL, cc.productPrefix, caseClassToGetQuery)(cc)
       val responseFuture = typedFutureResponse(mapPlain, mapSavings)(callFuture)
 
-      whenReady(responseFuture, Timeout(120000 millis)) { result => }    
+      whenReady(responseFuture, Timeout(120000 millis)) { result => }
   }
 
   "A SavingsBalancesClient" should {
@@ -102,9 +101,7 @@ class SavingsBalancesClientConfigSpec extends WordSpecLike with Matchers with Be
       val callFuture = typedQuery(baseURL, cc.productPrefix, caseClassToGetQuery)(cc)
       val responseFuture = typedFutureResponse(mapPlain, mapSavings)(callFuture)
 
-      whenReady(responseFuture, timeout) { result =>
-        result should equal(Left("Savings account 4 not found"))
-      }
+      whenReady(responseFuture, timeout) { result => result should equal(Left("Savings account 4 not found")) }
     }
   }
 
@@ -116,8 +113,7 @@ class SavingsBalancesClientConfigSpec extends WordSpecLike with Matchers with Be
       val responseFuture = typedFutureResponse(mapPlain, mapSavings)(callFuture)
 
       whenReady(responseFuture, timeout) { result =>
-        result should equal(Left(
-          "FAIL 404 Not Found The requested resource could not be found."))
+        result should equal(Left("FAIL 404 Not Found The requested resource could not be found."))
       }
     }
   }

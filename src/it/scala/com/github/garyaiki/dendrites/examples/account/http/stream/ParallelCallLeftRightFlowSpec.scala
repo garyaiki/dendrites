@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,28 +21,26 @@ import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext
 import scala.math.BigDecimal.double2bigDecimal
 import com.github.garyaiki.dendrites.examples.account.{CheckingAccountBalances, GetAccountBalances,
   MoneyMarketAccountBalances, SavingsAccountBalances}
-import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols,
-  CheckingBalancesClientConfig}
+import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
 import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQueryResponse}
 
 /**
   *
   * @author Gary Struthers
   */
-class ParallelCallLeftRightFlowSpec extends WordSpecLike with Matchers with BeforeAndAfter
-        with BalancesProtocols {
+class ParallelCallLeftRightFlowSpec extends WordSpecLike with Matchers with BeforeAndAfter with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   implicit val ec: ExecutionContext = system.dispatcher
   override implicit val mat = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   val timeout = Timeout(3000 millis)
-  
+
   def source = TestSource.probe[Product]
   def sinkLeftRight = TestSink.probe[(Seq[String],Seq[AnyRef])]
   val pcf = new ParallelCallFlow
@@ -53,19 +51,16 @@ class ParallelCallLeftRightFlowSpec extends WordSpecLike with Matchers with Befo
     val clientConfig = new CheckingBalancesClientConfig()
     val baseURL = clientConfig.baseURL
 
-    def partial = typedQueryResponse(
-          baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
+    def partial = typedQueryResponse(baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
     val responseFuture = partial(GetAccountBalances(id))
 
-    whenReady(responseFuture, Timeout(120000 millis)) { result => }    
+    whenReady(responseFuture, Timeout(120000 millis)) { result => }
   }
 
   "A ParallelCallLeftRightFlowClient" should {
     "get balances for id 1" in {
       val id = 1L
-      val (pub, sub) = source
-      .via(wrappedFlow)
-      .toMat(sinkLeftRight)(Keep.both).run()
+      val (pub, sub) = source.via(wrappedFlow).toMat(sinkLeftRight)(Keep.both).run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
       Thread.sleep(40000)
@@ -74,36 +69,31 @@ class ParallelCallLeftRightFlowSpec extends WordSpecLike with Matchers with Befo
       sub.expectComplete()
 
       response._2 shouldBe List(CheckingAccountBalances[BigDecimal](Some(List((1,1000.1)))),
-          MoneyMarketAccountBalances[BigDecimal](Some(List((1,11000.1)))),
-          SavingsAccountBalances[BigDecimal](Some(List((1,111000.1)))))
+        MoneyMarketAccountBalances[BigDecimal](Some(List((1,11000.1)))),
+        SavingsAccountBalances[BigDecimal](Some(List((1,111000.1)))))
     }
   }
 
   it should {
     "get balances for id 2" in {
       val id = 2L
-      val (pub, sub) = source
-      .via(wrappedFlow)
-      .toMat(sinkLeftRight)(Keep.both).run()
+      val (pub, sub) = source.via(wrappedFlow).toMat(sinkLeftRight)(Keep.both).run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
 
-      response._2 shouldBe List(CheckingAccountBalances[BigDecimal](
-                  Some(List((2,2000.2), (22,2200.22)))),
-          MoneyMarketAccountBalances[BigDecimal](Some(List((2,22000.2), (22,22200.22)))),
-          SavingsAccountBalances[BigDecimal](Some(List((2,222000.2), (22,222200.22)))))
+      response._2 shouldBe List(CheckingAccountBalances[BigDecimal](Some(List((2,2000.2), (22,2200.22)))),
+        MoneyMarketAccountBalances[BigDecimal](Some(List((2,22000.2), (22,22200.22)))),
+        SavingsAccountBalances[BigDecimal](Some(List((2,222000.2), (22,222200.22)))))
     }
   }
 
   it should {
     "get balances for id 3" in {
       val id = 3L
-      val (pub, sub) = source
-      .via(wrappedFlow)
-      .toMat(sinkLeftRight)(Keep.both).run()
+      val (pub, sub) = source.via(wrappedFlow).toMat(sinkLeftRight)(Keep.both).run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
       val response = sub.expectNext()
@@ -111,20 +101,16 @@ class ParallelCallLeftRightFlowSpec extends WordSpecLike with Matchers with Befo
       sub.expectComplete()
 
       response._2 shouldBe List(
-          CheckingAccountBalances[BigDecimal](Some(List((3,3000.3), (33,3300.33), (333,3330.33)))),
-          MoneyMarketAccountBalances[BigDecimal](
-                  Some(List((3,33000.3), (33,33300.33), (333,33330.33)))),
-          SavingsAccountBalances[BigDecimal](
-                  Some(List((3,333000.3), (33,333300.33), (333,333330.33)))))
+        CheckingAccountBalances[BigDecimal](Some(List((3,3000.3), (33,3300.33), (333,3330.33)))),
+        MoneyMarketAccountBalances[BigDecimal](Some(List((3,33000.3), (33,33300.33), (333,33330.33)))),
+        SavingsAccountBalances[BigDecimal](Some(List((3,333000.3), (33,333300.33), (333,333330.33)))))
     }
   }
 
   it should {
     "not find bad ids" in {
       val id = 4L
-      val (pub, sub) = source
-      .via(wrappedFlow)
-      .toMat(sinkLeftRight)(Keep.both).run()
+      val (pub, sub) = source.via(wrappedFlow).toMat(sinkLeftRight)(Keep.both).run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
       val response = sub.expectNext()
@@ -132,8 +118,8 @@ class ParallelCallLeftRightFlowSpec extends WordSpecLike with Matchers with Befo
       sub.expectComplete()
 
       response._1 shouldBe List("Checking account 4 not found",
-          "Money Market account 4 not found",
-          "Savings account 4 not found")
+        "Money Market account 4 not found",
+        "Savings account 4 not found")
     }
   }
 }

@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,8 +18,9 @@ import scala.io.Source
 import scala.language.postfixOps
 import scala.sys.process._
 
-/** @author garystruthers
+/**
   *
+  * @author Gary Struthers
   */
 trait SysProcessUtils {
 
@@ -57,4 +58,3 @@ trait SysProcessUtils {
     for (line <- fileLines) yield line.trim.toLowerCase
   }
 }
-

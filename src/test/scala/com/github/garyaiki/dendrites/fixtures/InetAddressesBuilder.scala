@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.fixtures
 
-import java.net.Inet4Address
-import java.net.InetAddress
+import java.net.{Inet4Address, InetAddress}
 import org.scalatest.{Outcome, TestSuite, TestSuiteMixin}
 
 /**
@@ -24,14 +23,10 @@ import org.scalatest.{Outcome, TestSuite, TestSuiteMixin}
   */
 trait InetAddressesBuilder extends TestSuiteMixin { this: TestSuite =>
 
-  abstract override def withFixture(test: NoArgTest): Outcome = {
-    super.withFixture(test)
-  }
+  abstract override def withFixture(test: NoArgTest): Outcome = super.withFixture(test)
 
-  import java.net.{ Inet4Address, InetAddress }
-
-
-  /** @see https://github.com/twitter...util-core...NetUtil.scala
+  /**
+    * @see https://github.com/twitter...util-core...NetUtil.scala
     * @param inetAddress
     * @return
     */
@@ -39,20 +34,16 @@ trait InetAddressesBuilder extends TestSuiteMixin { this: TestSuite =>
     inetAddress match {
       case inetAddress: Inet4Address =>
         val addr = inetAddress.getAddress
-        ((addr(0) & 0xff) << 24) |
-          ((addr(1) & 0xff) << 16) |
-          ((addr(2) & 0xff) << 8) |
-          (addr(3) & 0xff)
-      case _ =>
-        throw new IllegalArgumentException("non-Inet4Address cannot be converted to a Long")
+        ((addr(0) & 0xff) << 24) | ((addr(1) & 0xff) << 16) | ((addr(2) & 0xff) << 8) | (addr(3) & 0xff)
+      case _ => throw new IllegalArgumentException("non-Inet4Address cannot be converted to a Long")
     }
   }
 
   val ipRange = 1 to 255
 
   def inetAddresses(ipRange: Range): IndexedSeq[InetAddress] = for {
-      i <- ipRange
-    } yield InetAddress.getByAddress(Array[Byte](i.toByte, i.toByte, i.toByte, i.toByte))
+    i <- ipRange
+  } yield InetAddress.getByAddress(Array[Byte](i.toByte, i.toByte, i.toByte, i.toByte))
 
   def inetToLongZip(addrs: IndexedSeq[InetAddress]): IndexedSeq[(Long, Int)] = {
     val longs = addrs.map(inetAddressToLong)

@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ class AccountTypeSpec extends WordSpecLike with AccountTypesBuilder {
       isAccountType(MoneyMarket) shouldBe true
       isAccountType(Savings) shouldBe true
     }
+
     "match subtypes of AccountBalances" in {
       val cb = CheckingAccountBalances[BigDecimal](Some(List((3,3000.3), (33,3300.33), (333,3.33))))
       isAccountBalances(cb) shouldBe true

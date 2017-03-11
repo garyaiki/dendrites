@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,12 +18,13 @@ import com.twitter.algebird._
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.github.garyaiki.dendrites.fixtures.TrigUtils
 
-/** @author garystruthers
+/**
+  * @author garystruthers
   *
   */
 class DecayedValueAgentSpec extends WordSpecLike with TrigUtils {
@@ -38,9 +39,7 @@ class DecayedValueAgentSpec extends WordSpecLike with TrigUtils {
     val decayedValues = new DecayedValueAgent("test90", 10.0, None)
     val updateFuture = decayedValues.alter(sinesZip)
     "exceed the mean at 90º" in {
-      whenReady(updateFuture, timeout) { result =>
-        result(90).average(10.0) should be > meanDay90
-      }
+      whenReady(updateFuture, timeout) { result => result(90).average(10.0) should be > meanDay90 }
     }
 
     "equal the first 90 values" in {

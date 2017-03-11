@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,8 +18,7 @@ import scala.collection.immutable.Range
 import scala.math.Numeric.BigDecimalAsIfIntegral
 import org.scalatest.{Outcome, TestSuite, TestSuiteMixin}
 import scala.annotation.implicitNotFound
-import com.github.garyaiki.dendrites.examples.account.AccBalances
-import com.github.garyaiki.dendrites.examples.account.AccountType
+import com.github.garyaiki.dendrites.examples.account.{AccBalances, AccountType}
 import com.github.garyaiki.dendrites.examples.account.accountTypes
 
 /**
@@ -38,9 +37,9 @@ trait AccountTypesBuilder extends TestSuiteMixin { this: TestSuite =>
   val acTypes = accountTypes.toIndexedSeq
 
   def makeBalances(): IndexedSeq[(Long, BigDecimal)] = for {
-      id <- idRange
-      balances <- balancesRange
-    } yield (id, balances)
+    id <- idRange
+    balances <- balancesRange
+  } yield (id, balances)
 
   def makeAccountBalances(): IndexedSeq[AccBalances[BigDecimal]] = {
     def applyType(): AccountType = {

@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,30 +18,24 @@ import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-import org.apache.kafka.clients.consumer.{CommitFailedException,
-      InvalidOffsetException,
-      OffsetOutOfRangeException}
-
+import org.apache.kafka.clients.consumer.{CommitFailedException, InvalidOffsetException, OffsetOutOfRangeException}
 import org.apache.kafka.common.KafkaException
 import org.apache.kafka.common.errors.{AuthorizationException, WakeupException}
 import org.scalatest.{Matchers, WordSpecLike}
-
-import com.github.garyaiki.dendrites.kafka.stream.KafkaSource.decider;
-
 import scala.collection.immutable.Seq
-import KafkaSource.decider
+import com.github.garyaiki.dendrites.kafka.stream.KafkaSource.decider
 
 /** Test KafkaSource Supervision. KafkaSource companion object defines a Supervision Decider. Custom
   * AkkaStream stages can use Akka Supervision but they must provide customized ways to handle
   * exception directives returned by the Decider.
   *
   * These tests use a MockKafkaSource so a Kafka server doesn't have to be running, also Kafka's
-  * asynchronous callback handler is modified so exceptions can be injected into the callback. 
+  * asynchronous callback handler is modified so exceptions can be injected into the callback.
   *
   * Kafka's Retriable exceptions thrown by Kafka Producer are mapped to Supervision.Resume.
   * AkkaStream doesn't have a Retry mode, so Resume is used instead.A Consumer.poll or
   * Consumer.commit that failed with a Retriable exception will retry as many times as the retries
-  * variable or until there is a Stop exception. 
+  * variable or until there is a Stop exception.
   *
   * Other exceptions thrown by Kafka Consumer are mapped to Supervision.Stop. This stops KafkaSource.
   * Each test sends 10 items to a sink. If no exception is injected TestSink.Probe.expectNextN
@@ -73,7 +67,7 @@ class KafkaSourceSupervisionSpec extends WordSpecLike with Matchers {
       val error = source.runWith(TestSink.probe[String])
       .request(10)
       .expectError()
-      Thread.sleep(200) //Wait for retries
+      Thread.sleep(200) // Wait for retries
       error shouldBe a [CommitFailedException]
     }
 
@@ -83,7 +77,7 @@ class KafkaSourceSupervisionSpec extends WordSpecLike with Matchers {
       val error = source.runWith(TestSink.probe[String])
       .request(10)
       .expectError()
-      Thread.sleep(200) //Wait for retries
+      Thread.sleep(200) // Wait for retries
       error shouldBe a [WakeupException]
     }
 

@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,18 +19,15 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.stream.{ActorAttributes, ActorMaterializer}
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-
 import com.typesafe.config.ConfigFactory
 import java.util.UUID
 import org.apache.avro.Schema
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
-
 import scala.concurrent.ExecutionContext
 import scala.collection.immutable.{Iterable, Seq}
-
 import com.github.garyaiki.dendrites.avro.stream.{AvroDeserializer, AvroSerializer}
 import com.github.garyaiki.dendrites.examples.account.GetAccountBalances
 import com.github.garyaiki.dendrites.examples.account.avro.AvroGetAccountBalances
@@ -91,15 +88,15 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
   val accountConsumerConfig = AccountConsumer
 
   val getBals = Seq(GetAccountBalances(0L),
-          GetAccountBalances(1L),
-          GetAccountBalances(2L),
-          GetAccountBalances(3L),
-          GetAccountBalances(4L),
-          GetAccountBalances(5L),
-          GetAccountBalances(6L),
-          GetAccountBalances(7L),
-          GetAccountBalances(8L),
-          GetAccountBalances(9L))
+    GetAccountBalances(1L),
+    GetAccountBalances(2L),
+    GetAccountBalances(3L),
+    GetAccountBalances(4L),
+    GetAccountBalances(5L),
+    GetAccountBalances(6L),
+    GetAccountBalances(7L),
+    GetAccountBalances(8L),
+    GetAccountBalances(9L))
   val iter = Iterable(getBals.toSeq:_*)
 
   "An KafkaStream" should {
@@ -116,13 +113,13 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
       val consumerRecordQueue = new ConsumerRecordQueue[String, Array[Byte]]()
       val deserializer = new AvroDeserializer(schema, avroOps.fromRecord)
       val streamFuture = kafkaSource
-          .via(consumerRecordsFlow[String, Array[Byte]])
-          .via(consumerRecordQueue)
-          .via(consumerRecordValueFlow)
-          .via(deserializer)
-          .runWith(TestSink.probe[GetAccountBalances])
-          .request(10)
-          .expectNextUnorderedN(getBals)
+        .via(consumerRecordsFlow[String, Array[Byte]])
+        .via(consumerRecordQueue)
+        .via(consumerRecordValueFlow)
+        .via(deserializer)
+        .runWith(TestSink.probe[GetAccountBalances])
+        .request(10)
+        .expectNextUnorderedN(getBals)
     }
   }
 

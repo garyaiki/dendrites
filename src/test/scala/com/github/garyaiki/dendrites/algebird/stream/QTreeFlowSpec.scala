@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-import com.twitter.algebird._
+import com.twitter.algebird.QTree
 import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.Matchers._
 import com.github.garyaiki.dendrites.algebird.fixtures.QTreeBuilder
@@ -46,95 +46,95 @@ class QTreeFlowSpec extends WordSpecLike with QTreeBuilder {
 
   "A QTree[BigDecimal] Flow" should {
     "return its minimum" in {
-    	val (pub, sub) = sourceBD
-    			.via(qTreeMinFlow)
-    			.toMat(sinkD)(Keep.both)
-    			.run()
-    			sub.request(1)
-    			pub.sendNext(qtBD)
-    			val min = sub.expectNext()
-    			pub.sendComplete()
-    			sub.expectComplete()
-    			assert(min <= bigDecimals.min)
+      val (pub, sub) = sourceBD
+        .via(qTreeMinFlow)
+        .toMat(sinkD)(Keep.both)
+        .run()
+      sub.request(1)
+      pub.sendNext(qtBD)
+      val min = sub.expectNext()
+      pub.sendComplete()
+      sub.expectComplete()
+      assert(min <= bigDecimals.min)
     }
   }
-  
+
   "A QTree[BigInt] Flow" should {
     "return its maximum" in {
-    	val (pub, sub) = sourceBI
-    			.via(qTreeMaxFlow)
-    			.toMat(sinkD)(Keep.both)
-    			.run()
-    			sub.request(1)
-    			pub.sendNext(qtBI)
-    			val max = sub.expectNext()
-    			pub.sendComplete()
-    			sub.expectComplete()
-    			max should be >= bigInts.max.toDouble
+      val (pub, sub) = sourceBI
+        .via(qTreeMaxFlow)
+        .toMat(sinkD)(Keep.both)
+        .run()
+      sub.request(1)
+      pub.sendNext(qtBI)
+      val max = sub.expectNext()
+      pub.sendComplete()
+      sub.expectComplete()
+      max should be >= bigInts.max.toDouble
     }
   }
-  
+
   "A QTree[Double] Flow" should {
     "return its 1st quartile bounds" in {
-    	val (pub, sub) = sourceD
-    			.via(firstQuartileFlow)
-    			.toMat(sinkDD)(Keep.both)
-    			.run()
-    			sub.request(1)
-    			pub.sendNext(qtD)
-    			val qB = sub.expectNext()
-    			pub.sendComplete()
-    			sub.expectComplete()
-    			qB._1 should be >= 110.0
-    			qB._2 should be <= 110 + 0.0001
+      val (pub, sub) = sourceD
+        .via(firstQuartileFlow)
+        .toMat(sinkDD)(Keep.both)
+        .run()
+      sub.request(1)
+      pub.sendNext(qtD)
+      val qB = sub.expectNext()
+      pub.sendComplete()
+      sub.expectComplete()
+      qB._1 should be >= 110.0
+      qB._2 should be <= 110 + 0.0001
     }
   }
-  
+
   "A QTree[Float] Flow" should {
     "return its second quartile bounds" in {
-    	val (pub, sub) = sourceF
-    			.via(secondQuartileFlow)
-    			.toMat(sinkDD)(Keep.both)
-    			.run()
-    			sub.request(1)
-    			pub.sendNext(qtF)
-    			val qB = sub.expectNext()
-    			pub.sendComplete()
-    			sub.expectComplete()
-    			qB._1 should be >= 121.0
-    			qB._2 should be <= 121 + 0.001
+      val (pub, sub) = sourceF
+        .via(secondQuartileFlow)
+        .toMat(sinkDD)(Keep.both)
+        .run()
+      sub.request(1)
+      pub.sendNext(qtF)
+      val qB = sub.expectNext()
+      pub.sendComplete()
+      sub.expectComplete()
+      qB._1 should be >= 121.0
+      qB._2 should be <= 121 + 0.001
     }
   }
-  
+
   "A QTree[Int] Flow" should {
     "return its third quartile bounds" in {
-    	val (pub, sub) = sourceI
-    			.via(thirdQuartileFlow)
-    			.toMat(sinkDD)(Keep.both)
-    			.run()
-    			sub.request(1)
-    			pub.sendNext(qtI)
-    			val qB = sub.expectNext()
-    			pub.sendComplete()
-    			sub.expectComplete()
-    			qB._1 should be >= 116.0
-    			qB._2 should be <= 116.0 + 0.0001
+      val (pub, sub) = sourceI
+        .via(thirdQuartileFlow)
+        .toMat(sinkDD)(Keep.both)
+        .run()
+      sub.request(1)
+      pub.sendNext(qtI)
+      val qB = sub.expectNext()
+      pub.sendComplete()
+      sub.expectComplete()
+      qB._1 should be >= 116.0
+      qB._2 should be <= 116.0 + 0.0001
     }
   }
-  
+
   "A QTree[Long] Flow" should {
     "return its inter quartile mean" in {
-    	val (pub, sub) = sourceL
-    			.via(interQuartileMeanLFlow)
-    			.toMat(sinkDD)(Keep.both)
-    			.run()
-    			sub.request(1)
-    			pub.sendNext(qtL)
-    			val iqm = sub.expectNext()
-    			pub.sendComplete()
-    			sub.expectComplete()
-    			iqm._1 should be > 101.2
-    			iqm._2 should be < 119.93
+      val (pub, sub) = sourceL
+        .via(interQuartileMeanLFlow)
+        .toMat(sinkDD)(Keep.both)
+        .run()
+      sub.request(1)
+      pub.sendNext(qtL)
+      val iqm = sub.expectNext()
+      pub.sendComplete()
+      sub.expectComplete()
+      iqm._1 should be > 101.2
+      iqm._2 should be < 119.93
     }
   }
 }

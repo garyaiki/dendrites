@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,8 +27,7 @@ trait MockConsumerRecords {
   val topic = "akkaKafka"
   val key = topic + "Key"
 
-  val cRecordList0: JList[ConsumerRecord[String, String]] =
-        new ArrayList[ConsumerRecord[String, String]]()
+  val cRecordList0: JList[ConsumerRecord[String, String]] = new ArrayList[ConsumerRecord[String, String]]()
   cRecordList0.add(new ConsumerRecord[String, String](topic, 0, 0L, key, "0"))
   cRecordList0.add(new ConsumerRecord[String, String](topic, 0, 10L, key, "10"))
   cRecordList0.add(new ConsumerRecord[String, String](topic, 0, 20L, key, "20"))

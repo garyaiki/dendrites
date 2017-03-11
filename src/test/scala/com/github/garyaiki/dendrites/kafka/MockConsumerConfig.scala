@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ object MockConsumerConfig extends ConsumerConfig[String, String] with MockConsum
   val maxDuration = FiniteDuration(1000, MILLISECONDS)
   val randomFactor = 0.2
   val curriedDelay = calculateDelay(minDuration, maxDuration, 0.2) _
-  
+
   def createAndSubscribe(): Consumer[Key, Value] = {
     val mc = new MockConsumer[Key, Value](OffsetResetStrategy.EARLIEST)
     mc.subscribe(topics, new NoOpConsumerRebalanceListener())

@@ -1,40 +1,40 @@
 /**
-  */
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.github.garyaiki.dendrites.algebird
 
 import org.scalatest.FlatSpecLike
 import com.twitter.algebird.Operators
 import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
 
-
-/** @author garystruthers
+/**
   *
+  * @author Gary Struthers
   */
 class FieldSpec extends FlatSpecLike with TestValuesBuilder {
 
-  "A BigDecimal" should "get its recipricol from a Field" in {
-    assert(inverse(bigDecimal) === 1/bigDecimal)
-  }
+  "A BigDecimal" should "get its recipricol from a Field" in { assert(inverse(bigDecimal) === 1/bigDecimal) }
 
-  "A BigInt" should "get its recipricol from a Field" in {
-    assert(inverse(bigInt) === 1/bigInt)
-  }
+  "A BigInt" should "get its recipricol from a Field" in { assert(inverse(bigInt) === 1/bigInt) }
 
-  "A Double" should "get its recipricol from a Field" in {
-    assert(inverse(double) === 1/double)
-  }
+  "A Double" should "get its recipricol from a Field" in { assert(inverse(double) === 1/double) }
 
-  "A Float" should "get its recipricol from a Field" in {
-    assert(inverse(float) === 1/float)
-  }
+  "A Float" should "get its recipricol from a Field" in { assert(inverse(float) === 1/float) }
 
-  "A Int" should "get its recipricol from a Field" in {
-    assert(inverse(int) === 1/int)
-  }
+  "A Int" should "get its recipricol from a Field" in { assert(inverse(int) === 1/int) }
 
-  "A Long" should "get its recipricol from a Field" in {
-    assert(inverse(long) === 1/long)
-  }
+  "A Long" should "get its recipricol from a Field" in { assert(inverse(long) === 1/long) }
 
   "A Option[BigDecimal]" should "get its recipricol from a Field" in {
     val v = Some(bigDecimal)

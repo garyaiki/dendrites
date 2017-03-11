@@ -1,3 +1,17 @@
+/**
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.github.garyaiki.dendrites.avro
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
@@ -13,18 +27,15 @@ object avro4s  {
     * @return
     * @see https://github.com/sksamuel/avro4s/blob/16fdfc31e9c4280ff97f7e36005dc84b89bbbd73/avro4s-core/src/main/scala/com/sksamuel/avro4s/RecordFormat.scala
     */
-  def createRecordFormat[A](implicit toRec: ToRecord[A], fromRec: FromRecord[A]): RecordFormat[A] = {
-    RecordFormat[A]
-  }
+  def createRecordFormat[A](implicit toRec: ToRecord[A], fromRec: FromRecord[A]): RecordFormat[A] = RecordFormat[A]
+
   /** case class to GenericRecord
     *
     * @param cc case class
     * @param format RecordFormat for case class
     * @return GenericRecord
     */
-  def caseClassToGenericRecord[A](cc: A)(implicit format: RecordFormat[A]): GenericRecord = {
-    format.to(cc)
-  }
+  def caseClassToGenericRecord[A](cc: A)(implicit format: RecordFormat[A]): GenericRecord = format.to(cc)
 
   /** GenericRecord to case class
     *
@@ -32,9 +43,7 @@ object avro4s  {
     * @param format
     * @return
     */
-  def genericRecordToCaseClass[A](record: GenericRecord)(implicit format: RecordFormat[A]): A = {
-    format.from(record)
-  }
+  def genericRecordToCaseClass[A](record: GenericRecord)(implicit format: RecordFormat[A]): A = format.from(record)
 
   /** case class to Array[Byte
     *
@@ -59,8 +68,7 @@ object avro4s  {
     * @return case class
     */
   def bytesToCaseClass[A](bytes: Array[Byte])(implicit schema4: SchemaFor[A], fromRec: FromRecord[A]): A = {
-    //val bais = new ByteArrayInputStream(bytes)
-    val input = AvroInputStream.data[A](bytes)//(bais)
+    val input = AvroInputStream.data[A](bytes) // (bais)
 
     input.iterator.next() // fail if no first element
   }

@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ import akka.stream.ActorMaterializer
 import java.util.concurrent.Executors
 import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
-import scala.math.BigDecimal.double2bigDecimal
 import scala.concurrent.ExecutionContext
+import scala.math.BigDecimal.double2bigDecimal
 import com.github.garyaiki.dendrites.examples.account.{CheckingAccountBalances, GetAccountBalances}
 import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQueryResponse}
 
@@ -31,8 +31,7 @@ import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQueryRespon
   *
   * @author Gary Struthers
   */
-class CheckingCallSpec extends WordSpecLike with Matchers with BeforeAndAfter
-        with BalancesProtocols {
+class CheckingCallSpec extends WordSpecLike with Matchers with BeforeAndAfter with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   implicit val ec: ExecutionContext = system.dispatcher
   override implicit val mat = ActorMaterializer()
@@ -43,21 +42,19 @@ class CheckingCallSpec extends WordSpecLike with Matchers with BeforeAndAfter
   val baseURL = clientConfig.baseURL
   val badBaseURL = baseURL.dropRight(1)
   val timeout = Timeout(3000 millis)
-  def partial = typedQueryResponse(
-          baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
-  def badPartial = typedQueryResponse(
-          badBaseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
+  def partial = typedQueryResponse(baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
+  def badPartial = typedQueryResponse(badBaseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
 
   before {
-      val id = 1L 
+      val id = 1L
       val responseFuture = partial(GetAccountBalances(id))
 
-      whenReady(responseFuture, Timeout(120000 millis)) { result => }    
+      whenReady(responseFuture, Timeout(120000 millis)) { result => }
   }
 
   "A CheckingCallClient" should {
     "get balances for id 1" in {
-      val id = 1L 
+      val id = 1L
       val responseFuture = partial(GetAccountBalances(id))
 
       whenReady(responseFuture, timeout) { result =>
@@ -70,7 +67,7 @@ class CheckingCallSpec extends WordSpecLike with Matchers with BeforeAndAfter
     "get balances for id 2" in {
       val id = 2L
       val responseFuture = partial(GetAccountBalances(id))
-      
+
       whenReady(responseFuture, timeout) { result =>
         result shouldBe Right(CheckingAccountBalances(Some(List((2L, BigDecimal(2000.20)),
           (22L, BigDecimal(2200.22))))))
@@ -82,7 +79,7 @@ class CheckingCallSpec extends WordSpecLike with Matchers with BeforeAndAfter
     "get balances for id 3" in {
       val id = 3L
       val responseFuture = partial(GetAccountBalances(id))
-      
+
       whenReady(responseFuture, timeout) { result =>
         result shouldBe Right(CheckingAccountBalances(Some(List((3L, BigDecimal(3000.30)),
           (33L, BigDecimal(3300.33)), (333L, BigDecimal(3330.33))))))
@@ -94,9 +91,8 @@ class CheckingCallSpec extends WordSpecLike with Matchers with BeforeAndAfter
     "not find bad ids" in {
       val id = 4L
       val responseFuture = partial(GetAccountBalances(id))
-      
-      whenReady(responseFuture, timeout) { result =>
-        result shouldBe Left("Checking account 4 not found")
+
+      whenReady(responseFuture, timeout) { result => result shouldBe Left("Checking account 4 not found")
       }
     }
   }
@@ -105,7 +101,7 @@ class CheckingCallSpec extends WordSpecLike with Matchers with BeforeAndAfter
     "fail bad request URLs" in {
       val id = 1L
       val responseFuture = badPartial(GetAccountBalances(id))
-      
+
       whenReady(responseFuture, timeout) { result =>
         result shouldBe Left("FAIL 404 Not Found The requested resource could not be found.")
       }

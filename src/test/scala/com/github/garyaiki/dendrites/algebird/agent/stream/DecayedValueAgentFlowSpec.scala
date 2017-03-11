@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import com.twitter.algebird.{DecayedValue, DecayedValueMonoid}
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -61,37 +61,28 @@ class DecayedValueAgentFlowSpec extends WordSpecLike with TrigUtils {
   val updateFuture = sub.expectNext()
   pub.sendComplete()
   sub.expectComplete()
-    
+
   "A DecayedValueAgentFlow of value/time doubles" should {
     "exceed the mean for 1st 90 values" in {
-      whenReady(updateFuture, timeout) { result =>
-        result(90).average(halfLife) should be > meanDay90
-      }
+      whenReady(updateFuture, timeout) { result => result(90).average(halfLife) should be > meanDay90 }
     }
   }
 
   it should {
     "be less than the mean for the first 180" in {
-      whenReady(updateFuture, timeout) { result =>
-        result(180).average(halfLife) should be < sines.take(180).sum / 180
-      }
+      whenReady(updateFuture, timeout) { result => result(180).average(halfLife) should be < sines.take(180).sum / 180 }
     }
   }
 
   it should {
     "be less than the mean for the first 270" in {
-      whenReady(updateFuture, timeout) { result =>
-        result(270).average(halfLife) should be < sines.take(270).sum / 270
-      }
+      whenReady(updateFuture, timeout) { result => result(270).average(halfLife) should be < sines.take(270).sum / 270 }
     }
   }
 
   it should {
     "be less than the mean for all 3600" in {
-
-      whenReady(updateFuture, timeout) { result =>
-        result(360).average(halfLife) should be < sines.take(360).sum / 360
-      }
+      whenReady(updateFuture, timeout) { result => result(360).average(halfLife) should be < sines.take(360).sum / 360 }
     }
   }
 
@@ -109,9 +100,7 @@ class DecayedValueAgentFlowSpec extends WordSpecLike with TrigUtils {
         val updateFuture = sub.expectNext()
         pub.sendComplete()
         sub.expectComplete()
-        whenReady(updateFuture, timeout) {  result =>
-          result(90).average(halfLife) should be > meanDay90
-        }
+        whenReady(updateFuture, timeout) {  result => result(90).average(halfLife) should be > meanDay90 }
     }
   }
 
@@ -122,12 +111,10 @@ class DecayedValueAgentFlowSpec extends WordSpecLike with TrigUtils {
         val composite = DecayedValueAgentFlow.compositeSink[Double](dvAgent,
             DecayedValueAgentFlow.nowMillis)
         source.runWith(composite)
-        Thread.sleep(10)//Stream completes before agent updates
-         
+        Thread.sleep(10) // Stream completes before agent updates
+
         val updateFuture = dvAgent.agent.future()
-        whenReady(updateFuture, timeout) {  result =>
-          result(90).average(halfLife) should be > meanDay90
-        }
+        whenReady(updateFuture, timeout) {  result => result(90).average(halfLife) should be > meanDay90 }
     }
   }
 }

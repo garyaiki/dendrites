@@ -1,13 +1,26 @@
 /**
-  */
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.github.garyaiki.dendrites.algebird
 
 import org.scalatest.FlatSpecLike
-import com.github.garyaiki.dendrites.filters._
+import com.github.garyaiki.dendrites.filters.filterRight
 import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
 
-/** @author garystruthers
+/**
   *
+  * @author Gary Struthers
   */
 class RingSpec extends FlatSpecLike with TestValuesBuilder {
 
@@ -15,30 +28,20 @@ class RingSpec extends FlatSpecLike with TestValuesBuilder {
     assert(times(bigDecimal, bigDecimal) === bigDecimal * bigDecimal)
   }
 
-  "A BigInt" should "be multiplied by a Ring" in {
-    assert(times(bigInt, bigInt) === bigInt * bigInt)
-  }
+  "A BigInt" should "be multiplied by a Ring" in { assert(times(bigInt, bigInt) === bigInt * bigInt) }
 /*
   "A Boolean" should "be multiplied by a Ring" in {
     val sum = sumOption(booleans)
     assert(sum.get === true)
   }
 */
-  "A Double" should "be multiplied by a Ring" in {
-    assert(times(double, double) === double * double)
-  }
+  "A Double" should "be multiplied by a Ring" in { assert(times(double, double) === double * double) }
 
-  "A Float" should "be multiplied by a Ring" in {
-    assert(times(float, float) === float * float)
-  }
+  "A Float" should "be multiplied by a Ring" in { assert(times(float, float) === float * float) }
 
-  "A Int" should "be multiplied by a Ring" in {
-    assert(times(int, int) === int * int)
-  }
+  "A Int" should "be multiplied by a Ring" in { assert(times(int, int) === int * int) }
 
-  "A Long" should "be multiplied by a Ring" in {
-    assert(times(long, long) === long * long)
-  }
+  "A Long" should "be multiplied by a Ring" in { assert(times(long, long) === long * long) }
 
   "A Option[BigDecimal]" should "be multiplied by a Ring" in {
     assert(times(optBigDec.get, optBigDec.get) === optBigDec.get * optBigDec.get)
@@ -103,25 +106,15 @@ class RingSpec extends FlatSpecLike with TestValuesBuilder {
     assert(product(bigDecimals) === bigDecimals.product)
   }
 
-  "A Sequence of BigInt" should "get a product from a Ring " in {
-    assert(product(bigInts) === bigInts.product)
-  }
+  "A Sequence of BigInt" should "get a product from a Ring " in { assert(product(bigInts) === bigInts.product) }
 
-  "A Sequence of Double" should "get a product from a Ring " in {
-    assert(product(doubles) === doubles.product)
-  }
+  "A Sequence of Double" should "get a product from a Ring " in { assert(product(doubles) === doubles.product) }
 
-  "A Sequence of Float" should "get a product from a Ring " in {
-    assert(product(floats) === floats.product)
-  }
+  "A Sequence of Float" should "get a product from a Ring " in { assert(product(floats) === floats.product) }
 
-  "A Sequence of Int" should "get a product from a Ring " in {
-    assert(product(ints) === ints.product)
-  }
+  "A Sequence of Int" should "get a product from a Ring " in { assert(product(ints) === ints.product) }
 
-  "A Sequence of Long" should "get a product from a Ring " in {
-    assert(product(longs) === longs.product)
-  }
+  "A Sequence of Long" should "get a product from a Ring " in { assert(product(longs) === longs.product) }
 
   "A Sequence of Option[BigDecimal]" should "get a product from a Ring " in {
     assert(product(optBigDecs.flatten) === optBigDecs.flatten.product)

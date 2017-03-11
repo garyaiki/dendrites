@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,41 +22,38 @@ import akka.stream.scaladsl.{Keep, Flow}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext
 import scala.math.BigDecimal.double2bigDecimal
 import com.github.garyaiki.dendrites.examples.account.{GetAccountBalances, SavingsAccountBalances}
-import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols,
-  SavingsBalancesClientConfig}
+import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols, SavingsBalancesClientConfig}
 import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQueryResponse}
 
 /**
   *
   * @author Gary Struthers
   */
-class SavingsCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfter
-        with BalancesProtocols {
+class SavingsCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfter with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   implicit val ec: ExecutionContext = system.dispatcher
   override implicit val mat = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   val timeout = Timeout(200 millis)
-  
+
   def source = TestSource.probe[Product]
   def sink = TestSink.probe[Either[String, AnyRef]]
   val scf = new SavingsCallFlow
   val testFlow = source.via(scf.flow).toMat(sink)(Keep.both)
 
-  before { // init connection pool 
+  before { // init connection pool
     val id = 1L
     val clientConfig = new SavingsBalancesClientConfig()
     val baseURL = clientConfig.baseURL
-    def partial = typedQueryResponse(
-            baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapSavings) _
-      val responseFuture = partial(GetAccountBalances(id))
+    def partial = typedQueryResponse(baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapSavings) _
+    val responseFuture = partial(GetAccountBalances(id))
 
-      whenReady(responseFuture, Timeout(120000 millis)) { result => }    
+    whenReady(responseFuture, Timeout(120000 millis)) { result => }
   }
 
   "A SavingsCallFlowClient" should {
@@ -82,9 +79,9 @@ class SavingsCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfter
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-      
+
       response shouldBe Right(SavingsAccountBalances(Some(List((2L, BigDecimal(222000.20)),
-              (22L, BigDecimal(222200.22))))))
+        (22L, BigDecimal(222200.22))))))
     }
   }
 
@@ -97,10 +94,10 @@ class SavingsCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfter
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-      
+
       response shouldBe Right(SavingsAccountBalances(Some(List((3L, BigDecimal(333000.30)),
-          (33L, BigDecimal(333300.33)),
-          (333L, BigDecimal(333330.33))))))
+        (33L, BigDecimal(333300.33)),
+        (333L, BigDecimal(333330.33))))))
     }
   }
 
@@ -113,23 +110,20 @@ class SavingsCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfter
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-      
+
       response shouldBe Left("Savings account 4 not found")
     }
   }
 
   val clientConfig = new SavingsBalancesClientConfig()
   val badBaseURL = clientConfig.baseURL.dropRight(1)
-  def badPartial = typedQueryResponse(
-          badBaseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapSavings) _
+  def badPartial = typedQueryResponse(badBaseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapSavings) _
   def badFlow: Flow[Product, Either[String, AnyRef], NotUsed] = Flow[Product].mapAsync(1)(badPartial)
 
   it should {
     "fail bad request URLs" in {
       val id = 1L
-      val (pub, sub) = source
-        .via(badFlow)
-        .toMat(sink)(Keep.both).run()
+      val (pub, sub) = source.via(badFlow).toMat(sink)(Keep.both).run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
       val response = sub.expectNext()

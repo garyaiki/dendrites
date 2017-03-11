@@ -44,6 +44,8 @@ In a terminal window `cd` to the dendrites directory.
 
 `> scalastyle` Run scalastyle on source code under `src/main/scala`
 
+`> test:scalastyle` Run scalastyle on source code under `src/test/scala`
+
 `> dependencyTree` Prints an ascii tree of all the dependencies to the console
 
 `> exit` quit sbt

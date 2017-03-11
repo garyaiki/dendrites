@@ -1,9 +1,22 @@
 /**
-  */
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.github.garyaiki.dendrites.fixtures
 
-/** @author garystruthers
+/**
   *
+  * @author Gary Struthers
   */
 trait TrigUtils {
 
@@ -13,16 +26,5 @@ trait TrigUtils {
       val s = amplitude * math.sin(math.toRadians(i))
       BigDecimal(s).setScale(4, BigDecimal.RoundingMode.HALF_UP).toDouble
     }
-  }
-}
-
-object TestTrigUtils extends TrigUtils{
-  def main(args: Array[String]): Unit = {
-    val sines = genSineWave(100, 0 to 360)
-    println(s"sine 0: ${sines(0)}")
-    println(s"sine 90: ${sines(90)}")
-    println(s"sine 180: ${sines(180)}")
-    println(s"sine 270: ${sines(270)}")
-    println(s"sine 360: ${sines(360)}")
   }
 }

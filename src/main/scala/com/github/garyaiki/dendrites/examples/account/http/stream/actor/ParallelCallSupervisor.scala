@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,15 +17,9 @@ package com.github.garyaiki.dendrites.examples.account.http.stream.actor
 import akka.NotUsed
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, Props, Stash, SupervisorStrategy, Terminated}
 import akka.actor.SupervisorStrategy.{Escalate, Restart, Resume, Stop}
-import akka.http.scaladsl.model.{EntityStreamException,
-  EntityStreamSizeException,
-  IllegalHeaderException,
-  IllegalRequestException,
-  IllegalResponseException,
-  IllegalUriException,
-  InvalidContentLengthException,
-  ParsingException,
-  RequestTimeoutException}
+import akka.http.scaladsl.model.{EntityStreamException, EntityStreamSizeException, IllegalHeaderException,
+  IllegalRequestException, IllegalResponseException, IllegalUriException, InvalidContentLengthException,
+  ParsingException, RequestTimeoutException}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, OverflowStrategy}
 import akka.stream.OverflowStrategy.fail
 import akka.stream.scaladsl.Flow
@@ -110,8 +104,7 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSink: SinkActor) extends
       case _: IllegalStateException => Restart
       case _: IllegalUriException => Stop
       case _: ParsingException => Stop
-      case t =>
-        super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => SupervisorStrategy.Escalate)
+      case t => super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => SupervisorStrategy.Escalate)
     }
 
   /** ready:Receive normal processing
@@ -132,7 +125,7 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSink: SinkActor) extends
       context.become(waiting)
       log.warning("sinkActor {} terminated", sink)
     }
-    case x: A ⇒ callStream forward x //@TODO match generic type in receive
+    case x: A ⇒ callStream forward x // @TODO match generic type in receive
   }
 
   /** waiting Receive state.
@@ -172,4 +165,3 @@ object ParallelCallSupervisor {
 
   def props[A <: Product: TypeTag](sinkActor: SinkActor): Props = Props(new ParallelCallSupervisor[A](sinkActor))
 }
-

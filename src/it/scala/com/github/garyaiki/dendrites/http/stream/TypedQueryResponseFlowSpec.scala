@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,8 +27,7 @@ import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.math.BigDecimal.double2bigDecimal
 import com.github.garyaiki.dendrites.examples.account.{ CheckingAccountBalances, GetAccountBalances}
-import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols,
-  CheckingBalancesClientConfig}
+import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
 import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQueryResponse}
 
 /**
@@ -77,9 +76,9 @@ class TypedQueryResponseFlowSpec extends WordSpecLike with Matchers with Balance
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-      
+
       response shouldBe Right(CheckingAccountBalances(Some(List((2L, BigDecimal(2000.20)),
-          (22L, BigDecimal(2200.22))))))
+        (22L, BigDecimal(2200.22))))))
     }
   }
 
@@ -92,10 +91,10 @@ class TypedQueryResponseFlowSpec extends WordSpecLike with Matchers with Balance
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-      
+
       response shouldBe Right(CheckingAccountBalances(Some(List((3L, BigDecimal(3000.30)),
-          (33L, BigDecimal(3300.33)),
-          (333L, BigDecimal(3330.33))))))
+        (33L, BigDecimal(3300.33)),
+        (333L, BigDecimal(3330.33))))))
     }
   }
 
@@ -108,24 +107,21 @@ class TypedQueryResponseFlowSpec extends WordSpecLike with Matchers with Balance
       val response = sub.expectNext()
       pub.sendComplete()
       sub.expectComplete()
-      
+
       response shouldBe Left("Checking account 4 not found")
     }
   }
-  
+
   val badBaseURL = clientConfig.baseURL.dropRight(1)
 
-  def badPartial = typedQueryResponse(
-          badBaseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
+  def badPartial = typedQueryResponse(badBaseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
 
   def badFlow: Flow[Product, Either[String, AnyRef], NotUsed] = Flow[Product].mapAsync(1)(badPartial)
 
   it should {
     "fail bad request URLs" in {
       val id = 1L
-      val (pub, sub) = source
-        .via(badFlow)
-        .toMat(sink)(Keep.both).run()
+      val (pub, sub) = source.via(badFlow).toMat(sink)(Keep.both).run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
       val response = sub.expectNext()

@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,6 +30,5 @@ object MockProducerConfig extends ProducerConfig[String, Array[Byte]] {
   val maxDuration = FiniteDuration(1000, MILLISECONDS)
   val randomFactor = 0.2
   val curriedDelay = calculateDelay(minDuration, maxDuration, randomFactor) _
-
   val producer = new MockProducer(autoComplete, new StringSerializer, new ByteArraySerializer)
 }

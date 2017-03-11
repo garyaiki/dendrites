@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.kafka.stream.actor
 
-import akka.actor.{ActorSystem}
+import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.OverflowStrategy
 import akka.stream.OverflowStrategy.fail
 import akka.stream.scaladsl.{RunnableGraph, Sink, Source, SourceQueueWithComplete}
 import akka.stream.{ActorAttributes, Supervision}
-import akka.testkit.{TestKit}
+import akka.testkit.TestKit
 import java.util.MissingResourceException
 import org.scalatest.{Matchers, WordSpecLike}
 import scala.collection.mutable.ArrayBuffer
@@ -32,8 +32,7 @@ import com.github.garyaiki.dendrites.stream.actor.CallStreamSupervisor.props
   *
   * @author Gary Struthers
   */
-class MockSourceSupervisionSpec extends TestKit(ActorSystem("test")) with WordSpecLike
-        with Matchers {
+class MockSourceSupervisionSpec extends TestKit(ActorSystem("test")) with WordSpecLike with Matchers {
 
   implicit val logger: LoggingAdapter = system.log
   val nums = Seq("0","1","2","3","4","5","6","7","8","9", "10", "11", "12")
@@ -43,9 +42,7 @@ class MockSourceSupervisionSpec extends TestKit(ActorSystem("test")) with WordSp
   "A MockSourceSupervisior" should {
     "process all messages in child actor" in {
       val iter: Iterator[String] = nums.toIterator
-
       val rg: RunnableGraph[SourceQueueWithComplete[String]] = source.to(sink)
-
       val proxy = system.actorOf(CallStreamSupervisor.props(rg))
       while (iter.hasNext)  proxy ! iter.next()
     }
@@ -58,7 +55,7 @@ class MockSourceSupervisionSpec extends TestKit(ActorSystem("test")) with WordSp
             throw new NullPointerException("throw exception when elem = 2 {}, elem")
           } else elem
       }.map{ elem => sb.append(elem); elem }.to(sink)
-      
+
       val proxy = system.actorOf(CallStreamSupervisor.props(rg))
       while (iter.hasNext) {
         proxy ! iter.next()
@@ -67,8 +64,9 @@ class MockSourceSupervisionSpec extends TestKit(ActorSystem("test")) with WordSp
       val result = sb.toString
       result should startWith ("01")
       result should endWith ("6789101112")
-      result should not include ("23") //4,5 may or may not be in result
+      result should not include ("23") // 4,5 may or may not be in result
     }
+
     "stop child actor after exceeding supervisor maxNrOfRetries" in {
       val iter: Iterator[String] = nums.toIterator
       val sb = new StringBuilder()
@@ -78,7 +76,7 @@ class MockSourceSupervisionSpec extends TestKit(ActorSystem("test")) with WordSp
           case _ => elem
         }
       }.map{ elem => sb.append(elem); elem }.to(sink)
-      
+
       val proxy = system.actorOf(CallStreamSupervisor.props(rg))
       while (iter.hasNext) {
         proxy ! iter.next()

@@ -1,48 +1,44 @@
 /**
-  */
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.github.garyaiki.dendrites.algebird
 
-import org.scalatest.{ FlatSpecLike, Matchers }
-import com.github.garyaiki.dendrites.filters._
-import com.github.garyaiki.dendrites.algebird._
+import org.scalatest.{FlatSpecLike, Matchers}
+import com.github.garyaiki.dendrites.filters.filterRight
 import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
 
-/** @author garystruthers
+/**
   *
+  * @author Gary Struthers
   */
 class MonoidSpec extends FlatSpecLike with TestValuesBuilder {
 
-  "A Sequence of BigDecimal" should "be summed by a Monoid" in {
-    assert(sum(bigDecimals) === bigDecimals.sum)
-  }
+  "A Sequence of BigDecimal" should "be summed by a Monoid" in { assert(sum(bigDecimals) === bigDecimals.sum) }
 
-  "A Sequence of BigInt" should "be summed by a Monoid" in {
-    assert(sum(bigInts) === bigInts.sum)
-  }
+  "A Sequence of BigInt" should "be summed by a Monoid" in { assert(sum(bigInts) === bigInts.sum) }
 
-  "A Sequence of Boolean" should "be summed by a Monoid" in {
-    assert(sum(booleans) === true)
-  }
+  "A Sequence of Boolean" should "be summed by a Monoid" in { assert(sum(booleans) === true) }
 
-  "A Sequence of Double" should "be summed by a Monoid" in {
-    assert(sum(doubles) === doubles.sum)
-  }
+  "A Sequence of Double" should "be summed by a Monoid" in { assert(sum(doubles) === doubles.sum) }
 
-  "A Sequence of Float" should "be summed by a Monoid" in {
-    assert(sum(floats) === floats.sum)
-  }
+  "A Sequence of Float" should "be summed by a Monoid" in { assert(sum(floats) === floats.sum) }
 
-  "A Sequence of Int" should "be summed by a Monoid" in {
-    assert(sum(ints) === ints.sum)
-  }
+  "A Sequence of Int" should "be summed by a Monoid" in { assert(sum(ints) === ints.sum) }
 
-  "A Sequence of Long" should "be summed by a Monoid" in {
-    assert(sum(longs) === longs.sum)
-  }
+  "A Sequence of Long" should "be summed by a Monoid" in { assert(sum(longs) === longs.sum) }
 
-  "A Sequence of String" should "be summed by a Monoid" in {
-    assert(sum(strings) === string)
-  }
+  "A Sequence of String" should "be summed by a Monoid" in { assert(sum(strings) === string) }
 
   "A Sequence of Option[BigDecimal]" should "be summed by a Monoid" in {
     assert(sum(optBigDecs.flatten) === optBigDecs.flatten.sum)

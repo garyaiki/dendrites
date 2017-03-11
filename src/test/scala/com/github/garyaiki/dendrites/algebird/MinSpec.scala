@@ -1,48 +1,44 @@
 /**
-  */
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.github.garyaiki.dendrites.algebird
 
-import org.scalatest.{ FlatSpecLike, Matchers }
-import com.github.garyaiki.dendrites.algebird._
-import com.github.garyaiki.dendrites.filters._
+import org.scalatest.{FlatSpecLike, Matchers}
+import com.github.garyaiki.dendrites.filters.filterRight
 import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
 
-/** @author garystruthers
+/**
   *
+  * @author Gary Struthers
   */
 class MinSpec extends FlatSpecLike with TestValuesBuilder {
 
-  "A Sequence of BigDecimal" should "return its Min" in {
-    assert(min(bigDecimals) === bigDecimals.min)
-  }
+  "A Sequence of BigDecimal" should "return its Min" in { assert(min(bigDecimals) === bigDecimals.min) }
 
-  "A Sequence of BigInt" should "return its Min" in {
-    assert(min(bigInts) === bigInts.min)
-  }
+  "A Sequence of BigInt" should "return its Min" in { assert(min(bigInts) === bigInts.min) }
 
-  "A Sequence of Boolean" should "return its Min" in {
-    assert(min(booleans) === false)
-  }
+  "A Sequence of Boolean" should "return its Min" in { assert(min(booleans) === false) }
 
-  "A Sequence of Double" should "return its Min" in {
-    assert(min(doubles) === doubles.min)
-  }
+  "A Sequence of Double" should "return its Min" in { assert(min(doubles) === doubles.min) }
 
-  "A Sequence of Float" should "return its Min" in {
-    assert(min(floats) === floats.min)
-  }
+  "A Sequence of Float" should "return its Min" in { assert(min(floats) === floats.min) }
 
-  "A Sequence of Int" should "return its Min" in {
-    assert(min(ints) === ints.min)
-  }
+  "A Sequence of Int" should "return its Min" in { assert(min(ints) === ints.min) }
 
-  "A Sequence of Long" should "return its Min" in {
-    assert(min(longs) === longs.min)
-  }
+  "A Sequence of Long" should "return its Min" in { assert(min(longs) === longs.min) }
 
-  "A Sequence of String" should "return its Min" in {
-    assert(min(strings) === strings.min)
-  }
+  "A Sequence of String" should "return its Min" in { assert(min(strings) === strings.min) }
 
   "A Sequence of Option[BigDecimal]" should "return its Min" in {
     assert(min(optBigDecs.flatten) === optBigDecs.flatten.min)

@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -39,14 +39,7 @@ object Songs {
     */
   def createTable(session: Session, schema: String): ResultSet = {
     val resultSetF = session.executeAsync("CREATE TABLE IF NOT EXISTS " + schema + "." + table +
-      " (" +
-      "id uuid PRIMARY KEY," +
-      "title text," +
-      "album text," +
-      "artist text," +
-      "tags set<text>," +
-      "data blob" +
-      ");")
+      " (id uuid PRIMARY KEY,title text,album text,artist text,tags set<text>,data blob);")
     resultSetF.getUninterruptibly()
   }
 

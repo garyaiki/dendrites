@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.twitter.algebird.{HLL, HyperLogLogAggregator, HyperLogLogMonoid}
 import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -90,7 +90,7 @@ class HyperLogLogAgentFlowSpec extends WordSpecLike with Matchers with TestValue
        val hllAgent = new HyperLogLogAgent("test Longs")
        val composite = HyperLogLogAgentFlow.compositeSink[Long](hllAgent)
        source.runWith(composite)
-       Thread.sleep(10)//Stream completes before agent updates
+       Thread.sleep(10) // Stream completes before agent updates
 
       val updateFuture = hllAgent.agent.future()
       whenReady(updateFuture, timeout) { result =>

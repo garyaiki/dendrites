@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -190,9 +190,7 @@ package object filters {
     * @throws ClassCastException if element doesn't match type param
     */
   def extractTuple2ByIndex[A, B](l: Seq[Product], element1: Int, element2: Int): Seq[(A, B)] =
-    for(p <- l) yield {
-      (p.productElement(element1).asInstanceOf[A], p.productElement(element2).asInstanceOf[B])
-    }
+    for(p <- l) yield (p.productElement(element1).asInstanceOf[A], p.productElement(element2).asInstanceOf[B])
 
   /** Extract Seq of values from Either Right
     *
@@ -203,4 +201,3 @@ package object filters {
     */
   def filterRight[A, B](in: Seq[Either[A, B]]): Seq[B] = in.collect { case Right(r) => r }
 }
-

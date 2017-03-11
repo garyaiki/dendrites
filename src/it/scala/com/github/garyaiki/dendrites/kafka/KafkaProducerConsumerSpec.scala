@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,13 +22,10 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord, RecordMetadata}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import org.scalatest.Matchers._
-import scala.io.Source._
 import scala.collection.immutable.{Iterable, Seq}
 import scala.concurrent.duration.MILLISECONDS
-import com.github.garyaiki.dendrites._
 
-
-/** 
+/**
   *
   * @author Gary Struthers
   *
@@ -45,12 +42,12 @@ class KafkaProducerConsumerSpec extends WordSpecLike with BeforeAndAfterAll {
   val value = "test-value"
   var producer: KafkaProducer[String, String] = null
   var consumer: KafkaConsumer[String, String] = null
+
   override def beforeAll() {
     producer = createProducer[String, String]("testKafkaProducer.properties")
     consumer = createConsumer[String, String]("testKafkaConsumer.properties")
     consumer.subscribe(topics)
   }
-
 
   "A KafkaProducerConsumer" should {
     "send a message" in {
@@ -63,11 +60,11 @@ class KafkaProducerConsumerSpec extends WordSpecLike with BeforeAndAfterAll {
     "read the message" in {
       val crs = consumer.poll(timeout)
       assert(crs.count === 1)
-      val it = crs.iterator()
-      while(it.hasNext()) {
-        val cr = it.next()
-        assert(cr.key() === key)
-        assert(cr.value() === value)
+      val it = crs.iterator
+      while(it.hasNext) {
+        val cr = it.next
+        assert(cr.key === key)
+        assert(cr.value === value)
       }
     }
   }
@@ -76,6 +73,6 @@ class KafkaProducerConsumerSpec extends WordSpecLike with BeforeAndAfterAll {
     consumer.commitSync()
     consumer.close()
     producer.flush()
-    producer.close(timeout, MILLISECONDS)    
+    producer.close(timeout, MILLISECONDS)
   }
 }

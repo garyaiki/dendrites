@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,28 +21,22 @@ import akka.stream.ActorAttributes.SupervisionStrategy
 import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler, TimerGraphStageLogic}
 import akka.stream.scaladsl.Source
 import org.apache.kafka.clients.consumer.{CommitFailedException, InvalidOffsetException}
-
 import org.apache.kafka.common.KafkaException
 import org.apache.kafka.common.errors.{AuthorizationException, WakeupException}
-
 import scala.concurrent.duration._
 import scala.util.control.NonFatal
-
 import com.github.garyaiki.dendrites.concurrent.calculateDelay
+import com.github.garyaiki.dendrites.kafka.stream.KafkaSource.decider
 
-import com.github.garyaiki.dendrites.kafka.stream.KafkaSource.decider;
-
-import KafkaSource.decider
-
-/** A mock version of [[com.github.garyaiki.dendrites.kafka.stream.KafkaSource]] to test KafkaSource's exception handling
+/** Mock version of [[com.github.garyaiki.dendrites.kafka.stream.KafkaSource]] to test KafkaSource's exception handling
   *
   * @tparam V value
   * @iter input values
   * @param testException for injecting exceptions to test Supervision
   * @author Gary Struthers
   */
-class MockKafkaSource[V](iter: Iterator[V], testException: RuntimeException = null)
-        (implicit logger: LoggingAdapter) extends GraphStage[SourceShape[V]] {
+class MockKafkaSource[V](iter: Iterator[V], testException: RuntimeException = null)(implicit logger: LoggingAdapter)
+  extends GraphStage[SourceShape[V]] {
 
   val out = Outlet[V](s"KafkaSource")
   override val shape = SourceShape(out)
@@ -70,9 +64,7 @@ class MockKafkaSource[V](iter: Iterator[V], testException: RuntimeException = nu
           try {
             if(testException != null) throw testException
             retries = 0
-            if(iter.hasNext) {
-              push(out, iter.next())
-            }
+            if(iter.hasNext) { push(out, iter.next()) }
           } catch {
             case NonFatal(e) => decider(e) match {
               case Supervision.Stop => {
@@ -95,9 +87,7 @@ class MockKafkaSource[V](iter: Iterator[V], testException: RuntimeException = nu
       }
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          myHandler()
-        }
+        override def onPull(): Unit = myHandler()
       })
 
       override protected def onTimer(timerKey: Any): Unit = {
@@ -105,7 +95,7 @@ class MockKafkaSource[V](iter: Iterator[V], testException: RuntimeException = nu
         waitForTimer = false
         myHandler()
       }
-    } 
+    }
   }
 }
 
@@ -116,23 +106,23 @@ object MockKafkaSource {
     * @tparam V value type
     * @param iter test values
     * @param testException injected exception, can be null
-  	* @param implicit logger
-  	* @return Source[V, NotUsed]
-  	*/
-  def apply[V](iter: Iterator[V], testEx: RuntimeException = null)(implicit logger: LoggingAdapter):
-        Source[V, NotUsed] = {
+  * @param implicit logger
+  * @return Source[V, NotUsed]
+  */
+  def apply[V](iter: Iterator[V], testEx: RuntimeException = null)(implicit logger: LoggingAdapter): Source[V, NotUsed]
+    = {
     val source = Source.fromGraph(new MockKafkaSource[V](iter, testEx))
     source.withAttributes(ActorAttributes.supervisionStrategy(decider))
   }
+
   /** Create MockKafka Source subscribed to configured topic with Supervision
     * @tparam V value type
     * @param iter test values
     * @param ms: MockKafkaSource[V] exposes MockSource for testing
-  	* @param implicit logger
-  	* @return Source[V, NotUsed]
-  	*/
-  def apply[V](iter: Iterator[V], ms: MockKafkaSource[V])(implicit logger: LoggingAdapter):
-        Source[V, NotUsed] = {
+    * @param implicit logger
+    * @return Source[V, NotUsed]
+    */
+  def apply[V](iter: Iterator[V], ms: MockKafkaSource[V])(implicit logger: LoggingAdapter): Source[V, NotUsed] = {
     val source = Source.fromGraph(ms)
     source.withAttributes(ActorAttributes.supervisionStrategy(decider))
   }

@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import com.twitter.algebird.{AveragedValue, QTreeSemigroup}
 import com.twitter.algebird.CMSHasherImplicits._
 import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
 import scala.reflect.runtime.universe.TypeTag
 import com.github.garyaiki.dendrites.aggregator.mean
@@ -29,21 +29,19 @@ import com.github.garyaiki.dendrites.algebird.{AlgebirdConfigurer, BigDecimalFie
 import com.github.garyaiki.dendrites.algebird.cmsHasherBigDecimal
 import com.github.garyaiki.dendrites.algebird.agent.Agents
 import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
-import com.github.garyaiki.dendrites.examples.account.{GetCustomerAccountBalances, Savings}
-import com.github.garyaiki.dendrites.examples.account.{CheckingAccountBalances, GetAccountBalances}
-import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols,
-  CheckingBalancesClientConfig}
+import com.github.garyaiki.dendrites.examples.account.{CheckingAccountBalances, GetAccountBalances,
+  GetCustomerAccountBalances, Savings}
+import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
 import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQueryResponse}
 
 /** Parent Supervisor creates child supervisor of parallel HTTP stream and actor with parallel
   * Agents stream
-  * 
+  *
   * @note Http connection pool may not be initialized, so a dummy call is made in before.
   * @note Balances server has the default 4 max connections, so Thread.sleep is called after request
   * @note Thread.sleep may be called if agent hasn't been updated due to contention from other tests
   */
-class StreamLogAgentsSupervisorSpec extends WordSpecLike with Matchers with BeforeAndAfter
-        with BalancesProtocols {
+class StreamLogAgentsSupervisorSpec extends WordSpecLike with Matchers with BeforeAndAfter with BalancesProtocols {
 
   implicit val system = ActorSystem("dendrites")
   implicit val ec = system.dispatcher
@@ -53,20 +51,19 @@ class StreamLogAgentsSupervisorSpec extends WordSpecLike with Matchers with Befo
   var agents: Agents[BigDecimal] = null
 
   def testAvgVal(avgVal: AveragedValue): Unit = {
-		  val count = avgVal.count
-				  count should equal(3)
-				  val dValue: Double = avgVal.value
-				  val mD = mean(List[BigDecimal](1000.1, 11000.1, 111000.1))
-				  val expectMean = mD.right.get.toDouble
-				  dValue should be (expectMean  +- 0.1)        
+    val count = avgVal.count
+    count should equal(3)
+    val dValue: Double = avgVal.value
+    val mD = mean(List[BigDecimal](1000.1, 11000.1, 111000.1))
+    val expectMean = mD.right.get.toDouble
+    dValue should be (expectMean  +- 0.1)
   }
 
   before {
     val id = 1L
     val clientConfig = new CheckingBalancesClientConfig()
     val baseURL = clientConfig.baseURL
-    def partial = typedQueryResponse(
-            baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
+    def partial = typedQueryResponse(baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
 
     val responseFuture = partial(GetAccountBalances(id))
 
@@ -113,11 +110,8 @@ class StreamLogAgentsSupervisorSpec extends WordSpecLike with Matchers with Befo
         estimatedSize should be(3.0 +- 0.09)
       }
       val qtAgent = agents.qtAgent
-		  val updateQTFuture = qtAgent.agent.future()
-		  whenReady(updateQTFuture, futureTimeout) { result =>
-		    result.count should equal(3)
-		  }
+      val updateQTFuture = qtAgent.agent.future()
+      whenReady(updateQTFuture, futureTimeout) { result => result.count should equal(3)}
     }
   }
 }
-

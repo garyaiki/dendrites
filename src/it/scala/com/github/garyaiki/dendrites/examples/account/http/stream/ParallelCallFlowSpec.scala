@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,28 +21,26 @@ import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import org.scalatest.{BeforeAndAfter, Matchers, WordSpecLike}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
-import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext
 import scala.math.BigDecimal.double2bigDecimal
 import com.github.garyaiki.dendrites.examples.account.{CheckingAccountBalances, GetAccountBalances,
   MoneyMarketAccountBalances, SavingsAccountBalances}
-import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols,
-  CheckingBalancesClientConfig}
+import com.github.garyaiki.dendrites.examples.account.http.{BalancesProtocols, CheckingBalancesClientConfig}
 import com.github.garyaiki.dendrites.http.{caseClassToGetQuery, typedQueryResponse}
 
 /**
   *
   * @author Gary Struthers
   */
-class ParallelCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfter
-        with BalancesProtocols {
+class ParallelCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfter with BalancesProtocols {
   implicit val system = ActorSystem("dendrites")
   implicit val ec: ExecutionContext = system.dispatcher
   override implicit val mat = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   val timeout = Timeout(3000 millis)
-  
+
   def source = TestSource.probe[Product]
   def sink = TestSink.probe[(Either[String, AnyRef],Either[String, AnyRef],Either[String, AnyRef])]
   val pcf = new ParallelCallFlow
@@ -53,19 +51,16 @@ class ParallelCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfte
     val clientConfig = new CheckingBalancesClientConfig()
     val baseURL = clientConfig.baseURL
 
-    def partial = typedQueryResponse(
-          baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
+    def partial = typedQueryResponse(baseURL, "GetAccountBalances", caseClassToGetQuery, mapPlain, mapChecking) _
     val responseFuture = partial(GetAccountBalances(id))
 
-    whenReady(responseFuture, Timeout(120000 millis)) { result => }    
+    whenReady(responseFuture, Timeout(120000 millis)) { result => }
   }
 
   "A ParallelCallFlowClient" should {
     "get balances for id 1" in {
       val id = 1L
-      val (pub, sub) = source
-      .via(wrappedFlow)
-      .toMat(sink)(Keep.both).run()
+      val (pub, sub) = source.via(wrappedFlow).toMat(sink)(Keep.both).run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
       Thread.sleep(40000)
@@ -74,17 +69,15 @@ class ParallelCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfte
       sub.expectComplete()
 
       response should equal(Right(CheckingAccountBalances[BigDecimal](Some(List((1,1000.1))))),
-                            Right(MoneyMarketAccountBalances[BigDecimal](Some(List((1,11000.1))))),
-                            Right(SavingsAccountBalances[BigDecimal](Some(List((1,111000.1))))))
+        Right(MoneyMarketAccountBalances[BigDecimal](Some(List((1,11000.1))))),
+        Right(SavingsAccountBalances[BigDecimal](Some(List((1,111000.1))))))
     }
   }
 
   it should {
     "get balances for id 2" in {
       val id = 2L
-      val (pub, sub) = source
-      .via(wrappedFlow)
-      .toMat(sink)(Keep.both).run()
+      val (pub, sub) = source.via(wrappedFlow).toMat(sink)(Keep.both).run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
       val response = sub.expectNext()
@@ -101,9 +94,7 @@ class ParallelCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfte
   it should {
     "get balances for id 3" in {
       val id = 3L
-      val (pub, sub) = source
-      .via(wrappedFlow)
-      .toMat(sink)(Keep.both).run()
+      val (pub, sub) = source.via(wrappedFlow).toMat(sink)(Keep.both).run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
       val response = sub.expectNext()
@@ -111,20 +102,16 @@ class ParallelCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfte
       sub.expectComplete()
 
       response should equal(Right(CheckingAccountBalances[BigDecimal](
-                                Some(List((3,3000.3), (33,3300.33), (333,3330.33))))),
-                            Right(MoneyMarketAccountBalances[BigDecimal](
-                                Some(List((3,33000.3), (33,33300.33), (333,33330.33))))),
-                            Right(SavingsAccountBalances[BigDecimal](
-                                Some(List((3,333000.3), (33,333300.33), (333,333330.33))))))
+        Some(List((3,3000.3), (33,3300.33), (333,3330.33))))),
+        Right(MoneyMarketAccountBalances[BigDecimal](Some(List((3,33000.3), (33,33300.33), (333,33330.33))))),
+        Right(SavingsAccountBalances[BigDecimal](Some(List((3,333000.3), (33,333300.33), (333,333330.33))))))
     }
   }
 
   it should {
     "not find bad ids" in {
       val id = 4L
-      val (pub, sub) = source
-      .via(wrappedFlow)
-      .toMat(sink)(Keep.both).run()
+      val (pub, sub) = source.via(wrappedFlow).toMat(sink)(Keep.both).run()
       sub.request(1)
       pub.sendNext(GetAccountBalances(id))
       val response = sub.expectNext()
@@ -132,8 +119,8 @@ class ParallelCallFlowSpec extends WordSpecLike with Matchers with BeforeAndAfte
       sub.expectComplete()
 
       response should equal(Left("Checking account 4 not found"),
-                            Left("Money Market account 4 not found"),
-                            Left("Savings account 4 not found"))
+        Left("Money Market account 4 not found"),
+        Left("Savings account 4 not found"))
     }
   }
 }

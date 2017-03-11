@@ -1,4 +1,4 @@
-/** Copyright 2016 Gary Struthers
+/**
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,14 +14,12 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.examples.account.http
 
-import akka.actor.{ActorSystem}
+import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.Matchers._
-import com.github.garyaiki.dendrites.examples.account.{CheckingAccountBalances,
-      GetAccountBalances,
-      MoneyMarketAccountBalances,
-      SavingsAccountBalances}
+import com.github.garyaiki.dendrites.examples.account.{CheckingAccountBalances, GetAccountBalances,
+  MoneyMarketAccountBalances, SavingsAccountBalances}
 
 /**
   *
