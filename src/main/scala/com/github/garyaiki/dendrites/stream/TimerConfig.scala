@@ -12,24 +12,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.github.garyaiki.dendrites.kafka
+package com.github.garyaiki.dendrites.stream
 
-import java.util.{List => JList}
-import org.apache.kafka.clients.consumer.Consumer
-import com.github.garyaiki.dendrites.stream.TimerConfig
+import scala.concurrent.duration.FiniteDuration
 
-/** Abstract KafkaConsumer configuration and factory
+/** Abstract TimerGraphStageLogic configuration and factory
   *
-  * @tparam K ConsumerRecord key
-  * @tparam V ConsumerRecord value
   *
   * @author Gary Struthers
   */
-trait ConsumerConfig[K, V] extends TimerConfig {
-  type Key = K
-  type Value = V
+trait TimerConfig {
 
-  val topics: JList[String]
-
-  def createAndSubscribe(): Consumer[Key, Value]
+  val timeout: Long // milliseconds to wait
+  val minDuration: FiniteDuration
+  val maxDuration: FiniteDuration
+  val randomFactor: Double // random delay factor between 0.0, 1.0
+  val curriedDelay: Int => FiniteDuration // curried calculateDelay
 }

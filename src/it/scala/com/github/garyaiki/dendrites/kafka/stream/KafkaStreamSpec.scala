@@ -32,7 +32,9 @@ import com.github.garyaiki.dendrites.avro.stream.{AvroDeserializer, AvroSerializ
 import com.github.garyaiki.dendrites.examples.account.GetAccountBalances
 import com.github.garyaiki.dendrites.examples.account.avro.AvroGetAccountBalances
 import com.github.garyaiki.dendrites.examples.account.avro.genericRecordToGetAccountBalances
+import com.github.garyaiki.dendrites.examples.account.avro4s.Avro4sGetAccountBalances.toCaseClass
 import com.github.garyaiki.dendrites.examples.account.kafka.{AccountConsumer, AccountProducer}
+import com.github.garyaiki.dendrites.kafka.stream.avro4s.ConsumerRecordDeserializer
 import KafkaSource.decider
 
 /** Test integration of Kafka with Akka Streams. There are 2 multi-stage flows. The first stream
@@ -97,11 +99,10 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
     GetAccountBalances(7L),
     GetAccountBalances(8L),
     GetAccountBalances(9L))
-  val iter = Iterable(getBals.toSeq:_*)
 
-  "An KafkaStream" should {
-    "serialize case classes then write them to Kafka" in {
-
+  "A KafkaStream" should {
+    "write then recreate case classes" in {
+      val iter = Iterable(getBals.toSeq:_*)
       val serializer = new AvroSerializer(schema, avroOps.toBytes)
       val sink = KafkaSink[String, Array[Byte]](ap)
       val source = Source[GetAccountBalances](iter)

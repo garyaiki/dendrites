@@ -17,7 +17,7 @@ package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.strea
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorAttributes, ActorMaterializer}
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.datastax.driver.core.{Cluster, ResultSet, Row, Session}
@@ -35,6 +35,7 @@ import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.{Shopp
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.CassandraShoppingCart.{bndDelete, bndInsert,
   bndQuery, bndUpdateItems, bndUpdateOwner, checkAndSetOwner, createTable, mapRows, prepDelete, prepInsert, prepQuery,
   prepUpdateItems, prepUpdateOwner, rowAction}
+import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.RetryConfig
 
 class CassandraShoppingCartSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   implicit val system = ActorSystem("dendrites")
@@ -134,13 +135,16 @@ class CassandraShoppingCartSpec extends WordSpecLike with Matchers with BeforeAn
     response shouldBe updatedItemsCarts
   }
 
+  val dispatcher = ActorAttributes.dispatcher("dendrites.blocking-dispatcher")
+
   "check and set a ShoppingCart owner" in {
     val iter = Iterable(setOwners.toSeq: _*)
     val queryStmt = prepQuery(session, schema)
     val setStmt = prepUpdateOwner(session, schema)
     val curriedCheckAndSetOwner = checkAndSetOwner(session, queryStmt, setStmt) _
     val source = Source[SetOwner](iter)
-    val sink = new CassandraRetrySink[SetOwner](session, queryStmt, setStmt, curriedCheckAndSetOwner)
+    val sink = new CassandraRetrySink[SetOwner](session, queryStmt, setStmt, RetryConfig, curriedCheckAndSetOwner)
+      .withAttributes(dispatcher)
     source.runWith(sink)
   }
 

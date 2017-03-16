@@ -24,7 +24,8 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.typesafe.config.ConfigFactory
 import java.net.InetAddress
 import java.util.{Collection => JCollection, Date => JDate, HashSet => JHashSet, UUID}
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
+import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
@@ -155,7 +156,7 @@ package object cassandra {
     val metadata = cluster.getMetadata
     logger.debug(s"Connected to cluster:${metadata.getClusterName}")
     val hosts = metadata.getAllHosts
-    val it = hosts.iterator
+    val it = hosts.iterator.asScala
     it.foreach(h => logger.debug(s"Datacenter:${h.getDatacenter} host:${h.getAddress} rack:${h.getRack}"))
   }
 
@@ -285,7 +286,19 @@ package object cassandra {
     * @param resultSet
     * @return Seq[Row]
     */
-  def getAllRows(resultSet: ResultSet): Seq[Row] = resultSet.all.toSeq
+  def getAllRows(resultSet: ResultSet): Seq[Row] = resultSet.all.asScala.toSeq
+
+  /** Get column names returned by a failed conditional update or insert
+    *
+    * @param row
+    */
+  def getFailedColumnNames(row: Row): StringBuilder = {
+    val buf = new ArrayBuffer[String]
+    val colDefs = row.getColumnDefinitions.asList.asScala
+    val sb = new StringBuilder("Cassandra conditional op failed column names:")
+    colDefs foreach {x => sb.append(x.getName); sb.append(',');}
+    sb.dropRight(1)
+  }
 
   /** Handle conditional insert, update, delete. Conditional statements return a ResultSet with a single Row. If
     * statement successfully applied rs.wasApplied is true. If failed, call a user defined function to log or throw an
