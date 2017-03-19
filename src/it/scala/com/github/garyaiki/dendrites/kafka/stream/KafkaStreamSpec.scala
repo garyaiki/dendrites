@@ -127,7 +127,7 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
   override def afterAll() {
     ap.producer.flush()
     val config = ConfigFactory.load()
-    val closeTimeout = config.getLong("dendrites.kafka.account.close-timeout")
+    val closeTimeout = config.getLong("dendrites.kafka.close-timeout")
     Thread.sleep(closeTimeout)
     ap.producer.close(closeTimeout, scala.concurrent.duration.MILLISECONDS)
   }

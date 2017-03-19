@@ -68,7 +68,7 @@ class KafkaSinkSupervisionSpec extends WordSpecLike with Matchers {
   implicit val logger = Logging(system, getClass)
 
   val config = ConfigFactory.load()
-  val closeTimeout = config.getLong("dendrites.kafka.account.close-timeout")
+  val closeTimeout = config.getLong("dendrites.kafka.close-timeout")
   val mock = MockProducerConfig
   val avroOps = AvroGetAccountBalances
   val schema: Schema = avroOps.schemaFor(Some("/avro/"), "getAccountBalances.avsc")

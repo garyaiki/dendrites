@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.github.garyaiki.dendrites.examples.account.kafka
+package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.kafka
 
 import com.typesafe.config.ConfigFactory
 import org.apache.kafka.clients.consumer.Consumer
@@ -22,13 +22,13 @@ import com.github.garyaiki.dendrites.concurrent.calculateDelay
 import com.github.garyaiki.dendrites.kafka.ConsumerConfig
 import com.github.garyaiki.dendrites.kafka.createConsumer
 
-/** Configure and create KafkaConsumer, calculateDelay constant args, subscribe to account topic
+/** Configure and create KafkaConsumer, calculateDelay constant args, subscribe to shoppingcartcmd topic
   *
   * @author Gary Struthers
   */
-object AccountConsumer extends ConsumerConfig[String, Array[Byte]] {
+object ShoppingCartCmdConsumer extends ConsumerConfig[String, Array[Byte]] {
   val config = ConfigFactory.load
-  val topic = config getString("dendrites.kafka.account.topic")
+  val topic = config getString("dendrites.kafka.shoppingcartcmd.topic")
   val topics = List(topic).asJava
   val timeout = config getLong("dendrites.kafka.poll-timeout")
   val min = config getInt("dendrites.timer.min-backoff")

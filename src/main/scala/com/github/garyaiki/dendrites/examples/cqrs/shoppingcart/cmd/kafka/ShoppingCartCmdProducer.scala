@@ -12,38 +12,29 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.github.garyaiki.dendrites.examples.account.kafka
+package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.kafka
 
 import com.typesafe.config.ConfigFactory
-import org.apache.kafka.clients.consumer.Consumer
-import scala.collection.JavaConverters._
+import java.util.UUID
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 import com.github.garyaiki.dendrites.concurrent.calculateDelay
-import com.github.garyaiki.dendrites.kafka.ConsumerConfig
-import com.github.garyaiki.dendrites.kafka.createConsumer
+import com.github.garyaiki.dendrites.kafka.ProducerConfig
+import com.github.garyaiki.dendrites.kafka.createProducer
 
-/** Configure and create KafkaConsumer, calculateDelay constant args, subscribe to account topic
+/** Create KafkaProducer configured for GetAccountBalances
   *
-  * @author Gary Struthers
   */
-object AccountConsumer extends ConsumerConfig[String, Array[Byte]] {
+object ShoppingCartCmdProducer extends ProducerConfig[String, Array[Byte]] {
+
+  override def generateKey: String = UUID.randomUUID.toString
+
   val config = ConfigFactory.load
-  val topic = config getString("dendrites.kafka.account.topic")
-  val topics = List(topic).asJava
-  val timeout = config getLong("dendrites.kafka.poll-timeout")
+  val topic = config.getString("dendrites.kafka.shoppingcartcmd.topic")
+  val producer = createProducer[Key, Value]("kafkaProducer.properties")
   val min = config getInt("dendrites.timer.min-backoff")
   val minDuration = FiniteDuration(min, MILLISECONDS)
   val max = config getInt("dendrites.timer.max-backoff")
   val maxDuration = FiniteDuration(max, MILLISECONDS)
   val randomFactor = config getDouble("dendrites.timer.randomFactor")
   val curriedDelay = calculateDelay(minDuration, maxDuration, randomFactor) _
-
-  /** Create consumer with configuration properties, subscribe to account topic
-    * @return consumer
-    */
-  def createAndSubscribe(): Consumer[Key, Value] = {
-    val c = createConsumer[Key, Value]("kafkaConsumer.properties")
-    c subscribe(topics)
-    c
-  }
 }

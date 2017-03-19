@@ -34,7 +34,7 @@ class KafkaProducerConsumerSpec extends WordSpecLike with BeforeAndAfterAll {
   implicit val system = ActorSystem("dendrites")
   implicit val logger = Logging(system, getClass)
   val config = ConfigFactory.load()
-  val timeout = config.getLong("dendrites.kafka.account.close-timeout")
+  val timeout = config.getLong("dendrites.kafka.close-timeout")
   val topic = "test-topic"
   val topics = new ArrayList[String]()
   topics.add(topic)

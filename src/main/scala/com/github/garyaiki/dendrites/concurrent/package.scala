@@ -34,11 +34,11 @@ import scala.concurrent.duration.FiniteDuration
   * Calculate exponential backoff delay
   * Constant params can be passed to first argument list on startup
   * {{{
-  * val min = config getInt("dendrites.kafka.account.min-backoff")
+  * val min = config getInt("dendrites.timer.min-backoff")
   * val minDuration = FiniteDuration(min, MILLISECONDS)
-  * val max = config getInt("dendrites.kafka.account.max-backoff")
+  * val max = config getInt("dendrites.timer.max-backoff")
   * val maxDuration = FiniteDuration(max, MILLISECONDS)
-  * val randomFactor = config getDouble("dendrites.kafka.account.randomFactor")
+  * val randomFactor = config getDouble("dendrites.timer.randomFactor")
   * val curriedDelay = calculateDelay(minDuration, maxDuration, randomFactor) _
   * //Second arg list can be curried
   * val curriedDelay = consumerConfig.curriedDelay

@@ -198,12 +198,11 @@ object CassandraShoppingCart {
     * @param cartId: UUID
     * @return ShoppingCart
     */
-  def getShoppingCart(session: Session, queryStmt: PreparedStatement, cartId: UUID): ShoppingCart = {
+  def getShoppingCart(session: Session, queryStmt: PreparedStatement, cartId: UUID): Option[ShoppingCart] = {
     val boundQuery = bndQuery(queryStmt, cartId)
     val queryRS = session.execute(boundQuery)
     val row = queryRS.one
-    if (row == null) throw new InvalidQueryException(s"no shoppingCart with key:${cartId.toString}")
-    mapRow(row)
+    if (row == null) None else Some(mapRow(row))
   }
 
   /** Update ShoppingCart owner, synchronous
@@ -231,7 +230,10 @@ object CassandraShoppingCart {
   def checkAndSetOwner(session: Session, queryStmt: PreparedStatement, setStmt: PreparedStatement)(setOwner: SetOwner):
     ResultSet = {
     val sc = getShoppingCart(session, queryStmt, setOwner.cartId)
-    updateOwner(session, setStmt, SetOwner(setOwner.cartId, setOwner.owner, sc.version))
+    sc match {
+      case Some(x) => updateOwner(session, setStmt, SetOwner(setOwner.cartId, setOwner.owner, x.version))
+      case None => updateOwner(session, setStmt, SetOwner(setOwner.cartId, setOwner.owner, 1))
+    }
   }
 
   /** Update ShoppingCart items, synchronous
@@ -259,7 +261,10 @@ object CassandraShoppingCart {
   def checkAndSetItems(session: Session, queryStmt: PreparedStatement, setStmt: PreparedStatement)(setItems: SetItems):
     ResultSet = {
     val sc = getShoppingCart(session, queryStmt, setItems.cartId)
-    updateItems(session, setStmt, SetItems(setItems.cartId, setItems.items, sc.version))
+    sc match {
+      case Some(x) => updateItems(session, setStmt, SetItems(setItems.cartId, setItems.items, x.version))
+      case None => updateItems(session, setStmt, SetItems(setItems.cartId, setItems.items, 1))
+    }
   }
 
   /** Map Row to case class. Uses ScalaCass object mapping

@@ -31,10 +31,10 @@ object AccountProducer extends ProducerConfig[String, Array[Byte]] {
   val config = ConfigFactory.load
   val topic = config.getString("dendrites.kafka.account.topic")
   val producer = createProducer[Key, Value]("kafkaProducer.properties")
-  val min = config getInt("dendrites.kafka.account.min-backoff")
+  val min = config getInt("dendrites.timer.min-backoff")
   val minDuration = FiniteDuration(min, MILLISECONDS)
-  val max = config getInt("dendrites.kafka.account.max-backoff")
+  val max = config getInt("dendrites.timer.max-backoff")
   val maxDuration = FiniteDuration(max, MILLISECONDS)
-  val randomFactor = config getDouble("dendrites.kafka.account.randomFactor")
+  val randomFactor = config getDouble("dendrites.timer.randomFactor")
   val curriedDelay = calculateDelay(minDuration, maxDuration, randomFactor) _
 }
