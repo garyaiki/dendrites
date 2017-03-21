@@ -18,7 +18,7 @@ import akka.stream.{ Attributes, Inlet, SinkShape, Supervision }
 import akka.stream.ActorAttributes.SupervisionStrategy
 import akka.stream.scaladsl.Sink
 import akka.stream.stage.{ AsyncCallback, GraphStage, GraphStageLogic, InHandler, TimerGraphStageLogic }
-import com.datastax.driver.core.{ BoundStatement, PreparedStatement, ResultSet, Session }
+import com.datastax.driver.core.{ BoundStatement, PreparedStatement, ResultSet, ResultSetFuture, Session }
 import com.datastax.driver.core.exceptions.DriverException
 import com.google.common.util.concurrent.ListenableFuture
 import scala.concurrent.ExecutionContext
@@ -44,8 +44,8 @@ import com.github.garyaiki.dendrites.stream.TimerConfig
   * @param logger implicit LoggingAdapter
   * @author Gary Struthers
   */
-class CassandraRetrySink[A <: Product](tc: TimerConfig, f: (A) => ResultSet)(implicit val logger: LoggingAdapter)
-    extends GraphStage[SinkShape[A]] {
+class CassandraRetrySink[A <: Product](tc: TimerConfig, f: (A) => ResultSetFuture)(implicit val ec: ExecutionContext,
+                                                                                   logger: LoggingAdapter) extends GraphStage[SinkShape[A]] {
 
   val in = Inlet[A]("CassandraRetrySink.in")
   override val shape: SinkShape[A] = SinkShape(in)
@@ -66,21 +66,41 @@ class CassandraRetrySink[A <: Product](tc: TimerConfig, f: (A) => ResultSet)(imp
       /** start backpressure in custom Sink */
       override def preStart(): Unit = pull(in)
 
+      def myCallBack(rs: ResultSet): Unit = {
+        if (!rs.wasApplied) {
+          val sb = getFailedColumnNames(rs.one)
+          sb.append(" case class:").append(caseClass.productPrefix).append(" retries:").append(retries)
+          val msg = sb.toString
+          val duration = curriedDelay(retries)
+          if (duration < maxDuration) {
+            waitForTimer = true
+            logger.warning(msg)
+            scheduleOnce(None, duration)
+          } else { failStage(new DriverException(msg)) }
+        } else { retries = 0 }
+      }
+
       def myHandler(): Unit = {
         if (!waitForTimer) {
           try {
-            val conditionalResult = f(caseClass)
-            if (!conditionalResult.wasApplied) {
-              val sb = getFailedColumnNames(conditionalResult.one)
-              sb.append(" case class:").append(caseClass.productPrefix).append(" retries:").append(retries)
-              val msg = sb.toString
-              val duration = curriedDelay(retries)
-              if (duration < maxDuration) {
-                waitForTimer = true
-                logger.warning(msg)
-                scheduleOnce(None, duration)
-              } else { failStage(new DriverException(msg)) }
-            } else { retries = 0 }
+            val resultSetFuture = f(caseClass)
+            val scalaRSF = listenableFutureToScala[ResultSet](resultSetFuture.asInstanceOf[ListenableFuture[ResultSet]])
+            scalaRSF.onComplete {
+              case Success(rs) => {
+                val successCallback = getAsyncCallback { myCallBack }
+                successCallback.invoke(rs)
+              }
+              case Failure(t) => {
+                val failCallback = getAsyncCallback {
+                  (_: Unit) =>
+                    {
+                      logger.error(t, "CassandraSink ListenableFuture fail e:{}", t.getMessage)
+                      failStage(t)
+                    }
+                }
+                failCallback.invoke(t)
+              }
+            }
           } catch { case e: Throwable => failStage(e) }
         }
       }
@@ -107,10 +127,11 @@ object CassssandraRetrySink {
     *
     * @tparam A input type
     * @param tc: TimerConfig
-    * @param f map case class to ResultSet, Usually curried function
+    * @param f map case class to ResultSetFuture, Usually curried function
     * @return Sink[A, NotUsed]
     */
-  def apply[A <: Product](tc: TimerConfig, f: (A) => ResultSet)(implicit logger: LoggingAdapter): Sink[A, NotUsed] = {
+  def apply[A <: Product](tc: TimerConfig, f: (A) => ResultSetFuture)(implicit ec: ExecutionContext, logger: LoggingAdapter):
+    Sink[A, NotUsed] = {
     Sink.fromGraph(new CassandraRetrySink[A](tc, f))
   }
 }

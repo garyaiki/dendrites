@@ -15,7 +15,7 @@ limitations under the License.
 package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra
 
 import akka.event.LoggingAdapter
-import com.datastax.driver.core.{BoundStatement, PreparedStatement, ResultSet, Row, Session}
+import com.datastax.driver.core.{BoundStatement, PreparedStatement, ResultSet, ResultSetFuture, Row, Session}
 import com.datastax.driver.core.exceptions.InvalidQueryException
 import com.weather.scalacass.syntax._
 import java.util.UUID
@@ -206,16 +206,16 @@ object CassandraShoppingCart {
     if (row == null) None else Some(mapRow(row))
   }
 
-  /** Update ShoppingCart owner, synchronous
+  /** Update ShoppingCart owner, asynchronous
     *
     * @param session
     * @param setOwnerStmt
     * @param setOwner
     * @return ResultSet
     */
-  def updateOwner(session: Session, setOwnerStmt: PreparedStatement, setOwner: SetOwner): ResultSet = {
+  def updateOwner(session: Session, setOwnerStmt: PreparedStatement, setOwner: SetOwner): ResultSetFuture = {
     val boundUpdate = bndUpdateOwner(setOwnerStmt, setOwner)
-    session.execute(boundUpdate)
+    session.executeAsync(boundUpdate)
   }
 
   /** Query ShoppingCart by id, then update its owner with version returned by query and owner in setOwner
@@ -229,7 +229,7 @@ object CassandraShoppingCart {
     * @return ResultSet
     */
   def checkAndSetOwner(session: Session, queryStmt: PreparedStatement, setStmt: PreparedStatement)(setOwner: SetOwner):
-    ResultSet = {
+    ResultSetFuture = {
     val sc = getShoppingCart(session, queryStmt, setOwner.cartId)
     sc match {
       case Some(x) => updateOwner(session, setStmt, SetOwner(setOwner.cartId, setOwner.owner, x.version))
@@ -237,16 +237,16 @@ object CassandraShoppingCart {
     }
   }
 
-  /** Update ShoppingCart items, synchronous
+  /** Update ShoppingCart items, asynchronous
     *
     * @param session
     * @param setItemsStmt: PreparedStatement
     * @param setItems: SetItems
     * @return ResultSet
     */
-  def updateItems(session: Session, setItemsStmt: PreparedStatement, setItems: SetItems): ResultSet = {
+  def updateItems(session: Session, setItemsStmt: PreparedStatement, setItems: SetItems): ResultSetFuture = {
     val boundUpdate = bndUpdateItems(setItemsStmt, setItems)
-    session.execute(boundUpdate)
+    session.executeAsync(boundUpdate)
   }
 
   /** Query ShoppingCart by id, then update its items with version returned by query and items in setItems
@@ -260,7 +260,7 @@ object CassandraShoppingCart {
     * @return ResultSet
     */
   def checkAndSetItems(session: Session, queryStmt: PreparedStatement, setStmt: PreparedStatement)(setItems: SetItems):
-    ResultSet = {
+    ResultSetFuture = {
     val sc = getShoppingCart(session, queryStmt, setItems.cartId)
     sc match {
       case Some(x) => updateItems(session, setStmt, SetItems(setItems.cartId, setItems.items, x.version))
@@ -285,14 +285,4 @@ object CassandraShoppingCart {
     */
   def mapRows(rows: Seq[Row]): Seq[ShoppingCart] = rows.map { x => mapRow(x) }
 
-  def fromCmd(cmd: ShoppingCartCmd): Unit = {
-    val action = cmd.action
-    action match {
-      case _ if action == "Insert" =>
-      case _ if action == "SetOwner"   => //SetOwnerCmd(cartId, ownerOrItem)
-      case _ if action == "AddItem"    => //AddItemCmd(cartId, ownerOrItem, count.get)
-      case _ if action == "RemoveItem" => //RemoveItemCmd(cartId, ownerOrItem, count.get)
-      case _ if action == "Delete" =>
-    }
-  }
 }

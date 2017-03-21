@@ -24,7 +24,8 @@ package object cmd {
   case class ShoppingCartCmd(action: String, cartId: UUID, ownerOrItem: UUID, count: Option[Int]) extends Command
     with Cart
 
-  def doShoppingCartCmd(session: Session, stmts: Map[String, PreparedStatement])(cmd: ShoppingCartCmd): ResultSet = {
+  def doShoppingCartCmd(session: Session, stmts: Map[String, PreparedStatement])(cmd: ShoppingCartCmd): ResultSetFuture
+    = {
     val action = cmd.action
     action match {
       case _ if action == "Insert" => {
@@ -33,7 +34,7 @@ package object cmd {
           case Some(x) => {
             val cc = ShoppingCart(cmd.cartId, cmd.ownerOrItem, Map.empty[UUID, Int])
             val bs = bndInsert(x, cc)
-            session.execute(bs)
+            session.executeAsync(bs)
           }
           case None => throw new NullPointerException("ShoppingCart Insert preparedStatement not found")
         }
@@ -79,7 +80,7 @@ package object cmd {
         optStmt match {
           case Some(delStmt) => {
             val bs = bndDelete(delStmt, cmd.cartId)
-            session.execute(bs)
+            session.executeAsync(bs)
           }
           case None => throw new NullPointerException("ShoppingCart Delete preparedStatement not found")
         }
