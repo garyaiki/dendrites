@@ -14,29 +14,76 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart
 
+import com.datastax.driver.core.{PreparedStatement, ResultSet, ResultSetFuture ,Session}
 import java.util.UUID
 import com.github.garyaiki.dendrites.cqrs.Command
+import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.CassandraShoppingCart.{bndInsert,
+  checkAndSetItems, checkAndSetOwner, bndDelete, prepInsert}
 
 package object cmd {
   case class ShoppingCartCmd(action: String, cartId: UUID, ownerOrItem: UUID, count: Option[Int]) extends Command
-    with Cart {
+    with Cart
 
-    def fromCmd: Cart = action match {
-      case _ if action == "SetOwner"   => SetOwnerCmd(cartId, ownerOrItem)
-      case _ if action == "AddItem"    => AddItemCmd(cartId, ownerOrItem, count.get)
-      case _ if action == "RemoveItem" => RemoveItemCmd(cartId, ownerOrItem, count.get)
+  def doShoppingCartCmd(session: Session, stmts: Map[String, PreparedStatement])(cmd: ShoppingCartCmd): ResultSet = {
+    val action = cmd.action
+    action match {
+      case _ if action == "Insert" => {
+        val ps = stmts.get("Insert")
+        ps match {
+          case Some(x) => {
+            val cc = ShoppingCart(cmd.cartId, cmd.ownerOrItem, Map.empty[UUID, Int])
+            val bs = bndInsert(x, cc)
+            session.execute(bs)
+          }
+          case None => throw new NullPointerException("ShoppingCart Insert preparedStatement not found")
+        }
+      }
+      case _ if action == "SetOwner" => {
+        val bothStmts = (stmts.get("Query"), stmts.get("SetOwner"))
+        bothStmts match {
+          case (Some(queryStmt), Some(setStmt)) => {
+            val setOwner = SetOwner(cmd.cartId, cmd.ownerOrItem)
+            checkAndSetOwner(session, queryStmt, setStmt)(setOwner)
+          }
+          case (Some(x), None) => throw new NullPointerException("ShoppingCart SetOwner preparedStatement not found")
+          case (None, Some(y)) => throw new NullPointerException("ShoppingCart Query preparedStatement not found")
+          case (None, None) => throw new NullPointerException("ShoppingCart SetOwner,Query preparedStatement not found")
+        }
+      }
+      case _ if action == "AddItem" => {
+        val bothStmts = (stmts.get("Query"), stmts.get("SetItem"))
+        bothStmts match {
+          case (Some(queryStmt), Some(setStmt)) => {
+            val setItems = SetItems(cmd.cartId, Map(cmd.ownerOrItem -> cmd.count.get))
+            checkAndSetItems(session, queryStmt, setStmt)(setItems)
+          }
+          case (Some(x), None) => throw new NullPointerException("ShoppingCart SetItem preparedStatement not found")
+          case (None, Some(y)) => throw new NullPointerException("ShoppingCart Query preparedStatement not found")
+          case (None, None) => throw new NullPointerException("ShoppingCart SetItem,Query preparedStatement not found")
+        }
+      }
+      case _ if action == "RemoveItem" => {
+        val bothStmts = (stmts.get("Query"), stmts.get("SetItem"))
+        bothStmts match {
+          case (Some(queryStmt), Some(setStmt)) => {
+            val setItems = SetItems(cmd.cartId, Map(cmd.ownerOrItem -> (cmd.count.get * -1)))
+            checkAndSetItems(session, queryStmt, setStmt)(setItems)
+          }
+          case (Some(x), None) => throw new NullPointerException("ShoppingCart SetItem preparedStatement not found")
+          case (None, Some(y)) => throw new NullPointerException("ShoppingCart Query preparedStatement not found")
+          case (None, None) => throw new NullPointerException("ShoppingCart SetItem,Query preparedStatement not found")
+        }
+      }
+      case _ if action == "Delete" => {
+        val optStmt = stmts.get("Delete")
+        optStmt match {
+          case Some(delStmt) => {
+            val bs = bndDelete(delStmt, cmd.cartId)
+            session.execute(bs)
+          }
+          case None => throw new NullPointerException("ShoppingCart Delete preparedStatement not found")
+        }
+      }
     }
-  }
-
-  case class SetOwnerCmd(cartId: UUID, owner: UUID) extends Cart {
-    def toCmd: ShoppingCartCmd = ShoppingCartCmd("SetOwner", cartId, owner, None)
-  }
-
-  case class AddItemCmd(cartId: UUID, item: UUID, count: Int) extends Cart {
-    def toCmd: ShoppingCartCmd = ShoppingCartCmd("AddItem", cartId, item, Some(count))
-  }
-
-  case class RemoveItemCmd(cartId: UUID, item: UUID, count: Int) extends Cart {
-    def toCmd: ShoppingCartCmd = ShoppingCartCmd("RemoveItem", cartId, item, Some(count))
   }
 }

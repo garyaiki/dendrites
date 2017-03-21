@@ -1,5 +1,4 @@
-/**
-  * Licensed under the Apache License, Version 2.0 (the "License");
+/** Licensed under the Apache License, Version 2.0 (the "License");
   * you may not use this file except in compliance with the License.
   * You may obtain a copy of the License at
   *
@@ -15,15 +14,15 @@ package com.github.garyaiki.dendrites.cassandra.stream
 
 import akka.NotUsed
 import akka.event.LoggingAdapter
-import akka.stream.{Attributes, Inlet, SinkShape, Supervision}
+import akka.stream.{ Attributes, Inlet, SinkShape, Supervision }
 import akka.stream.ActorAttributes.SupervisionStrategy
 import akka.stream.scaladsl.Sink
-import akka.stream.stage.{AsyncCallback, GraphStage, GraphStageLogic, InHandler, TimerGraphStageLogic}
-import com.datastax.driver.core.{BoundStatement, PreparedStatement, ResultSet, Session}
+import akka.stream.stage.{ AsyncCallback, GraphStage, GraphStageLogic, InHandler, TimerGraphStageLogic }
+import com.datastax.driver.core.{ BoundStatement, PreparedStatement, ResultSet, Session }
 import com.datastax.driver.core.exceptions.DriverException
 import com.google.common.util.concurrent.ListenableFuture
 import scala.concurrent.ExecutionContext
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 import scala.util.control.NonFatal
 import com.github.garyaiki.dendrites.cassandra.getFailedColumnNames
 import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
@@ -40,16 +39,13 @@ import com.github.garyaiki.dendrites.stream.TimerConfig
   * Cassandra's Java driver handles retry and reconnection, so Supervision isn't used
   *
   * @tparam A input type
-  * @param session: Session
-  * @param queryStmt PreparedStatement
-  * @param setStmt: PreparedStatement
   * @param tc: TimerConfig
-  * @param f map case class to ResultSet Usually curried function i.e. checkAndSetOwner
+  * @param f map case class to ResultSet, Usually curried function
   * @param logger implicit LoggingAdapter
   * @author Gary Struthers
   */
-class CassandraRetrySink[A <: Product](session: Session, queryStmt: PreparedStatement, setStmt: PreparedStatement,
-  tc: TimerConfig, f: (A) => ResultSet)(implicit val logger: LoggingAdapter) extends GraphStage[SinkShape[A]] {
+class CassandraRetrySink[A <: Product](tc: TimerConfig, f: (A) => ResultSet)(implicit val logger: LoggingAdapter)
+    extends GraphStage[SinkShape[A]] {
 
   val in = Inlet[A]("CassandraRetrySink.in")
   override val shape: SinkShape[A] = SinkShape(in)
@@ -109,14 +105,12 @@ object CassssandraRetrySink {
 
   /** Create CassandraSink as Akka Sink
     *
-    * @param session Cassandra Session
+    * @tparam A input type
+    * @param tc: TimerConfig
+    * @param f map case class to ResultSet, Usually curried function
     * @return Sink[A, NotUsed]
     */
-  def apply[A <: Product](session: Session,
-                          queryStmt: PreparedStatement,
-                          setStmt: PreparedStatement,
-                          tc: TimerConfig,
-                          f: (A) => ResultSet)(implicit logger: LoggingAdapter): Sink[A, NotUsed] = {
-    Sink.fromGraph(new CassandraRetrySink[A](session, queryStmt, setStmt, tc, f))
+  def apply[A <: Product](tc: TimerConfig, f: (A) => ResultSet)(implicit logger: LoggingAdapter): Sink[A, NotUsed] = {
+    Sink.fromGraph(new CassandraRetrySink[A](tc, f))
   }
 }

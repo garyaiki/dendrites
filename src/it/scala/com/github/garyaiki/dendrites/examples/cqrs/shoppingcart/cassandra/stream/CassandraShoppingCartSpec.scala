@@ -143,7 +143,7 @@ class CassandraShoppingCartSpec extends WordSpecLike with Matchers with BeforeAn
     val setStmt = prepUpdateOwner(session, schema)
     val curriedCheckAndSetOwner = checkAndSetOwner(session, queryStmt, setStmt) _
     val source = Source[SetOwner](iter)
-    val sink = new CassandraRetrySink[SetOwner](session, queryStmt, setStmt, RetryConfig, curriedCheckAndSetOwner)
+    val sink = new CassandraRetrySink[SetOwner](RetryConfig, curriedCheckAndSetOwner)
       .withAttributes(dispatcher)
     source.runWith(sink)
   }

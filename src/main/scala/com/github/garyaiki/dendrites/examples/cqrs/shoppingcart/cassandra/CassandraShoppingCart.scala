@@ -22,6 +22,7 @@ import java.util.UUID
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ArrayBuffer, StringBuilder}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.{ShoppingCart, SetItems, SetOwner}
+import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.ShoppingCartCmd
 
 /** This provides Scala functions to create
   * a table, an insert PreparedStatement, a Query PreparedStatement, a case class, an insert
@@ -283,4 +284,15 @@ object CassandraShoppingCart {
     * @return Seq[ShoppingCart]
     */
   def mapRows(rows: Seq[Row]): Seq[ShoppingCart] = rows.map { x => mapRow(x) }
+
+  def fromCmd(cmd: ShoppingCartCmd): Unit = {
+    val action = cmd.action
+    action match {
+      case _ if action == "Insert" =>
+      case _ if action == "SetOwner"   => //SetOwnerCmd(cartId, ownerOrItem)
+      case _ if action == "AddItem"    => //AddItemCmd(cartId, ownerOrItem, count.get)
+      case _ if action == "RemoveItem" => //RemoveItemCmd(cartId, ownerOrItem, count.get)
+      case _ if action == "Delete" =>
+    }
+  }
 }
