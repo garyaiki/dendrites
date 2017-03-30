@@ -39,18 +39,22 @@ package object cmd {
           case None => throw new NullPointerException("ShoppingCart Insert preparedStatement not found")
         }
       }
+
       case _ if action == "SetOwner" => {
-        val bothStmts = (stmts.get("Query"), stmts.get("SetOwner"))
-        bothStmts match {
-          case (Some(queryStmt), Some(setStmt)) => {
-            val setOwner = SetOwner(cmd.cartId, cmd.ownerOrItem)
-            checkAndSetOwner(session, queryStmt, setStmt)(setOwner)
-          }
-          case (Some(x), None) => throw new NullPointerException("ShoppingCart SetOwner preparedStatement not found")
-          case (None, Some(y)) => throw new NullPointerException("ShoppingCart Query preparedStatement not found")
-          case (None, None) => throw new NullPointerException("ShoppingCart SetOwner,Query preparedStatement not found")
+        val optQueryStmt = stmts.get("Query")
+        val queryStmt = optQueryStmt match {
+          case Some(x) => x
+          case None => throw new NullPointerException("ShoppingCart SetOwner,Query preparedStatement not found")
         }
+        val optSetStmt = stmts.get("SetOwner")
+        val setStmt = optSetStmt match {
+          case Some(x) => x
+          case None => throw new NullPointerException("ShoppingCart SetOwner preparedStatement not found")
+        }
+        val setOwner = SetOwner(cmd.cartId, cmd.ownerOrItem)
+        checkAndSetOwner(session, queryStmt, setStmt)(setOwner)
       }
+
       case _ if action == "AddItem" => {
         val bothStmts = (stmts.get("Query"), stmts.get("SetItem"))
         bothStmts match {
@@ -61,8 +65,10 @@ package object cmd {
           case (Some(x), None) => throw new NullPointerException("ShoppingCart SetItem preparedStatement not found")
           case (None, Some(y)) => throw new NullPointerException("ShoppingCart Query preparedStatement not found")
           case (None, None) => throw new NullPointerException("ShoppingCart SetItem,Query preparedStatement not found")
+          case _ => throw new NullPointerException("ShoppingCart AddItem, one or both preparedStatements not found")
         }
       }
+
       case _ if action == "RemoveItem" => {
         val bothStmts = (stmts.get("Query"), stmts.get("SetItem"))
         bothStmts match {
@@ -73,8 +79,10 @@ package object cmd {
           case (Some(x), None) => throw new NullPointerException("ShoppingCart SetItem preparedStatement not found")
           case (None, Some(y)) => throw new NullPointerException("ShoppingCart Query preparedStatement not found")
           case (None, None) => throw new NullPointerException("ShoppingCart SetItem,Query preparedStatement not found")
+          case _ => throw new NullPointerException("ShoppingCart RemoveItem, one or both preparedStatements not found")
         }
       }
+
       case _ if action == "Delete" => {
         val optStmt = stmts.get("Delete")
         optStmt match {

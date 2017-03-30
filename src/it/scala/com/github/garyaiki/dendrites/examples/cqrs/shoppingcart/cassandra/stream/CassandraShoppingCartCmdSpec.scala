@@ -20,7 +20,7 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.stream.{ActorAttributes, ActorMaterializer}
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-import com.datastax.driver.core.{Cluster, PreparedStatement, ResultSet, Row, Session}
+import com.datastax.driver.core.{Cluster, ConsistencyLevel, PreparedStatement, ResultSet, Row, Session}
 import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy}
 import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
@@ -33,11 +33,14 @@ import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBind, CassandraB
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.{ShoppingCart, SetItems, SetOwner}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.{ShoppingCartConfig, CassandraShoppingCart}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.CassandraShoppingCart.{bndDelete, bndInsert,
-  bndQuery, bndUpdateItems, bndUpdateOwner, checkAndSetOwner, createTable, mapRows, prepDelete, prepInsert, prepQuery,
-  prepUpdateItems, prepUpdateOwner, rowToString}
+  bndQuery, bndUpdateItems, bndUpdateOwner, checkAndSetOwner, createTable, mapRow, mapRows, prepDelete, prepInsert, prepQuery,
+  prepUpdateItems, prepUpdateOwner, rowToString, table}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.RetryConfig
+import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.ShoppingCartCmd
+import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.doShoppingCartCmd
+import com.github.garyaiki.dendrites.stream.SpyFlow
 
-class CassandraShoppingCartSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
+class CassandraShoppingCartCmdSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   implicit val system = ActorSystem("dendrites")
   implicit val ec: ExecutionContext = system.dispatcher
   implicit val materializer = ActorMaterializer()
@@ -46,23 +49,27 @@ class CassandraShoppingCartSpec extends WordSpecLike with Matchers with BeforeAn
   val schema = myConfig.keySpace
   var cluster: Cluster = null
   var session: Session = null
-  val cartId: UUID = UUID.randomUUID
-  val ownerId: UUID = UUID.randomUUID
-  val updatedOwnerId: UUID = UUID.randomUUID
-  val firstItemId: UUID = UUID.randomUUID
-  val items: Map[UUID, Int] = Map(firstItemId -> 1, UUID.randomUUID -> 1)
-  val updatedItems: Map[UUID, Int] = items + (firstItemId -> 2)
-  val cart: ShoppingCart = ShoppingCart(cartId, ownerId, items)
-  val carts: Seq[ShoppingCart] = Seq(cart)
-  val cartIds: Seq[UUID] = Seq(cartId)
-  val setOwner: SetOwner = SetOwner(cartId, updatedOwnerId)
-  val setOwners = Seq(setOwner)
-  val setItems: SetItems = SetItems(cartId, updatedItems)
-  val updatedItemsCart: ShoppingCart = ShoppingCart(cartId, ownerId, updatedItems, 1)
-  val updatedItemsCarts = Seq(updatedItemsCart)
-  val updatedCart: ShoppingCart = ShoppingCart(cartId, updatedOwnerId, updatedItems, 2)
-  val updatedCarts = Seq(updatedCart)
+  var stmts: Map[String, PreparedStatement] = null
+  val curriedDoCmd = doShoppingCartCmd(session, stmts) _
+  val cartId = UUID.randomUUID
+  val firstOwner = UUID.randomUUID
+  val secondOwner = UUID.randomUUID
+  val firstItem = UUID.randomUUID
+  val secondItem = UUID.randomUUID
   var queryPrepStmt: PreparedStatement = null
+  var delPrepStmt: PreparedStatement = null
+  val cmds = Seq(ShoppingCartCmd("Insert", cartId, firstOwner, None),
+    ShoppingCartCmd("SetOwner", cartId, secondOwner, None),
+    ShoppingCartCmd("AddItem", cartId, firstItem, Some(1)),
+    ShoppingCartCmd("AddItem", cartId, secondItem, Some(1)),
+    ShoppingCartCmd("AddItem", cartId, firstItem, Some(1)),
+    ShoppingCartCmd("AddItem", cartId, secondItem, Some(1)),
+    ShoppingCartCmd("AddItem", cartId, secondItem, Some(1)),
+    ShoppingCartCmd("SetOwner", cartId, firstOwner, None),
+    ShoppingCartCmd("RemoveItem", cartId, firstItem, Some(1)),
+    ShoppingCartCmd("RemoveItem", cartId, secondItem, Some(1)))
+  // Should be secondOwner, firstItem = 1, secondItem = 2
+  val dispatcher = ActorAttributes.dispatcher("dendrites.blocking-dispatcher")
 
   override def beforeAll() {
     val addresses = myConfig.getInetAddresses()
@@ -76,79 +83,25 @@ class CassandraShoppingCartSpec extends WordSpecLike with Matchers with BeforeAn
     val strategy = myConfig.replicationStrategy
     val createSchemaRS = createSchema(session, schema, strategy, 1) // 1 instance
     val cartTableRS = createTable(session, schema)
+    delPrepStmt = prepDelete(session, schema)
     queryPrepStmt = prepQuery(session, schema)
+    //queryPrepStmt.setConsistencyLevel(ConsistencyLevel.LOCAL_ONE)
+    stmts = Map("Insert" -> prepInsert(session, schema), "SetOwner" -> prepUpdateOwner(session, schema),
+      "SetItem" -> prepUpdateItems(session, schema), "Delete" -> delPrepStmt, "Query" -> queryPrepStmt)
   }
 
-  "A Cassandra ShoppingCart client" should {
-    "insert ShoppingCart " in {
-      val iter = Iterable(carts.toSeq: _*)
-      val source = Source[ShoppingCart](iter)
-      val bndStmt = new CassandraBind(prepInsert(session, schema), bndInsert)
-      val sink = new CassandraSink(session)
-      source.via(bndStmt).runWith(sink)
+  "A Cassandra ShoppingCartCmd client" should {
+    "insert ShoppingCart, set owners & items " in {
+      val curriedDoCmd = doShoppingCartCmd(session, stmts) _
+      val iter = Iterable(cmds.toSeq: _*)
+      val source = Source[ShoppingCartCmd](iter)
+      //val spy = new SpyFlow[ShoppingCartCmd]("ShoppingCartCmd spy 1", 0, 0)
+
+      val sink = new CassandraRetrySink[ShoppingCartCmd](RetryConfig, curriedDoCmd).withAttributes(dispatcher)
+      source.runWith(sink)
     }
   }
-
-  "query a ShoppingCart" in {
-    val source = TestSource.probe[UUID]
-    val bndStmt = new CassandraBind(queryPrepStmt, bndQuery)
-    val query = new CassandraQuery(session)
-    val paging = new CassandraPaging(10)
-    def toCarts: Flow[Seq[Row], Seq[ShoppingCart], NotUsed] = Flow[Seq[Row]].map(CassandraShoppingCart.mapRows)
-    def sink = TestSink.probe[Seq[ShoppingCart]]
-    val (pub, sub) = source.via(bndStmt).via(query).via(paging).via(toCarts).toMat(sink)(Keep.both).run()
-    sub.request(1)
-    pub.sendNext(cartId)
-    val response = sub.expectNext()
-    pub.sendComplete()
-    sub.expectComplete()
-
-    response shouldBe carts
-  }
-
-  "update a ShoppingCart item" in {
-    val source = TestSource.probe[SetItems]
-    val bndStmt = new CassandraBind(prepUpdateItems(session, schema), bndUpdateItems)
-    val curriedErrorHandler = getConditionalError(rowToString) _
-    val conditional = new CassandraConditional(session, curriedErrorHandler)
-    def sink = TestSink.probe[Option[Row]]
-    val (pub, sub) = source.via(bndStmt).via(conditional).toMat(sink)(Keep.both).run()
-    sub.request(1)
-    pub.sendNext(setItems)
-    val response = sub.expectNext()
-    pub.sendComplete()
-    sub.expectComplete()
-
-    response shouldBe None
-  }
-
-  "query a ShoppingCart with combined stages" in {
-    val source = TestSource.probe[UUID]
-    val query = new CassandraBoundQuery[UUID](session, 1, queryPrepStmt, bndQuery)
-    val paging = new CassandraMappedPaging[ShoppingCart](10, mapRows)
-    def sink = TestSink.probe[Seq[ShoppingCart]]
-    val (pub, sub) = source.via(query).via(paging).toMat(sink)(Keep.both).run()
-    sub.request(1)
-    pub.sendNext(cartId)
-    val response = sub.expectNext()
-    pub.sendComplete()
-    sub.expectComplete()
-
-    response shouldBe updatedItemsCarts
-  }
-
-  val dispatcher = ActorAttributes.dispatcher("dendrites.blocking-dispatcher")
-
-  "check and set a ShoppingCart owner" in {
-    val iter = Iterable(setOwners.toSeq: _*)
-    val setStmt = prepUpdateOwner(session, schema)
-    val curriedCheckAndSetOwner = checkAndSetOwner(session, queryPrepStmt, setStmt) _
-    val source = Source[SetOwner](iter)
-    val sink = new CassandraRetrySink[SetOwner](RetryConfig, curriedCheckAndSetOwner)
-      .withAttributes(dispatcher)
-    source.runWith(sink)
-  }
-
+/*
   "query a ShoppingCart after updating items and then owner" in {
     val source = TestSource.probe[UUID]
     val query = new CassandraBoundQuery[UUID](session, 1, queryPrepStmt, bndQuery)
@@ -160,14 +113,54 @@ class CassandraShoppingCartSpec extends WordSpecLike with Matchers with BeforeAn
     val response = sub.expectNext()
     pub.sendComplete()
     sub.expectComplete()
+    val responseShoppingCart = response(0)
+    responseShoppingCart.cartId shouldBe cartId
+    responseShoppingCart.owner shouldBe secondOwner
+    val items = responseShoppingCart.items
+    items.get(firstItem) match {
+      case Some(x) => x shouldBe 1
+      case None => fail(s"ShoppingCart firstItem:$firstItem not found")
+    }
+    items.get(secondItem) match {
+      case Some(x) => x shouldBe 2
+      case None => fail(s"ShoppingCart secondItem:secondItem not found")
+    }
+    responseShoppingCart.version shouldBe 9
+    //response(0) shouldBe ShoppingCart(cartId, secondOwner, Map(firstItem -> 1, secondItem -> 2), 10)
+  }
+*/
+  "query a ShoppingCart again after updating items and then owner" in {
+    val source = TestSource.probe[UUID]
+    val query = new CassandraBoundQuery[UUID](session, 1, queryPrepStmt, bndQuery)
+    def sink = TestSink.probe[ResultSet]
+    val (pub, sub) = source.via(query).toMat(sink)(Keep.both).run()
+    sub.request(1)
+    pub.sendNext(cartId)
+    val response = sub.expectNext()
+    val row = response.one
+    pub.sendComplete()
+    sub.expectComplete()
 
-    response shouldBe updatedCarts
+    val responseShoppingCart = mapRow(row)
+    responseShoppingCart.cartId shouldBe cartId
+    responseShoppingCart.owner shouldBe firstOwner
+    val items = responseShoppingCart.items
+    items.get(firstItem) match {
+      case Some(x) => x shouldBe 1
+      case None => fail(s"ShoppingCart firstItem:$firstItem not found")
+    }
+    items.get(secondItem) match {
+      case Some(x) => x shouldBe 2
+      case None => fail(s"ShoppingCart secondItem:secondItem not found")
+    }
+    responseShoppingCart.version shouldBe 9
   }
 
   "delete ShoppingCart " in {
+    val cartIds = Seq(cartId)
     val iter = Iterable(cartIds.toSeq: _*)
     val source = Source[UUID](iter)
-    val bndStmt = new CassandraBind(prepDelete(session, schema), bndDelete)
+    val bndStmt = new CassandraBind(delPrepStmt, bndDelete)
     val sink = new CassandraSink(session)
     source.via(bndStmt).runWith(sink)
   }

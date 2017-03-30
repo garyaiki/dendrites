@@ -171,6 +171,13 @@ Delete topic
 
 `bin/kafka-topics.sh --delete --zookeeper localhost:2181 --topic account-topic`
 
+##### Test ShoppingCartCmd
+`bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic shoppingcartcmd-topic`
+
+`it:testOnly com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.ShoppingCartCmdSpec`
+
+`bin/kafka-topics.sh --delete --zookeeper localhost:2181 --topic shoppingcartcmd-topic`
+
 Give Kafka and Zookeeper a few seconds. Then stop Kafka
 
 `bin/kafka-server-stop.sh`
@@ -219,6 +226,8 @@ In a dendrites directory terminal window with sbt running
 `> it:testOnly com.github.garyaiki.dendrites.cassandra.stream.CassandraSpec`
 
 `> it:testOnly com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.stream.CassandraShoppingCartSpec`
+
+`> it:testOnly com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.stream.CassandraShoppingCartCmdSpec`
 
 `> it:testOnly com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.stream.CassandraShoppingCartEvtLogSpec`
 

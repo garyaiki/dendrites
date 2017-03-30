@@ -17,7 +17,6 @@ package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra
 import akka.event.LoggingAdapter
 import com.datastax.driver.core.{BoundStatement, PreparedStatement, ResultSet, ResultSetFuture, Row, Session}
 import com.datastax.driver.core.exceptions.InvalidQueryException
-import com.weather.scalacass.syntax._
 import java.util.UUID
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ArrayBuffer, StringBuilder}
@@ -36,6 +35,8 @@ import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.ShoppingCart
 object CassandraShoppingCart {
 
   val table = "shopping_cart"
+  val uuidCls = Class.forName("java.util.UUID")
+  val intCls = Class.forName("java.lang.Integer")
 
   /** Create ShoppingCart table asynchronously. executeAsync returns a ResultSetFuture which extends
     * Guava ListenableFuture. getUninterruptibly is the preferred way to complete the future
@@ -141,7 +142,7 @@ object CassandraShoppingCart {
     * @return prepared statement
     */
   def prepDelete(session: Session, schema: String): PreparedStatement = {
-    session.prepare("DELETE FROM " + schema + "." + table + " WHERE cartId = ? ");
+    session.prepare("DELETE FROM " + schema + "." + table + " WHERE cartId=?;");
   }
 
   /** Bind update PreparedStatement to owner value of SetOwner.
@@ -155,27 +156,24 @@ object CassandraShoppingCart {
     scBndStmt.bind(cartId: UUID)
   }
 
-  /** Log ShoppingCart row elements returned by a conditional update or insert
+  /** ShoppingCart row elements returned by a conditional update or insert
     *
     * @param row
-    * @param log
     */
-  def rowAction(row: Row)(implicit log: LoggingAdapter): Unit = {
+  def rowToString(row: Row): String = {
     val buf = new ArrayBuffer[String]
     val colDefs = row.getColumnDefinitions.asList.asScala
     colDefs foreach (x => buf.+=(x.getName))
-    val sb = new StringBuilder("ShoppingCart rowAction error ")
-    def rowToString(name: String): Unit = name match {
-      case "[applied]" =>
-        sb.append(name); sb.append(':'); sb.append(row.getBool("[applied]")); sb.append(' ')
-      case "version" =>
-        sb.append(name); sb.append(':'); sb.append(row.getInt("version")); sb.append(' ')
-      case "cartId" =>
-        sb.append(name); sb.append(':'); sb.append(row.getUUID("cartId")); sb.append(' ')
+    val sb = new StringBuilder("ShoppingCart ")
+    def columnsToString(name: String): Unit = name match {
+      case "[applied]" => sb.append(name); sb.append(':'); sb.append(row.getBool("[applied]")); sb.append(' ')
+      case "version" => sb.append(name); sb.append(':'); sb.append(row.getInt("version")); sb.append(' ')
+      case ("cartId" | "cartid") => sb.append(name); sb.append(':'); sb.append(row.getUUID("cartId")); sb.append(' ')
       case "items" => {
         sb.append(name)
         sb.append(':')
-        val map = row.getMap("items", Class.forName("UUID"), Class.forName("Int")).asScala
+
+        val map = row.getMap("items", uuidCls, intCls).asScala
         map.foreach { kv =>
           {
             sb.append("key:")
@@ -188,8 +186,8 @@ object CassandraShoppingCart {
       }
       case "owner" => sb.append(name); sb.append(':'); sb.append(row.getUUID("owner")); sb.append(' ')
     }
-    buf foreach rowToString
-    log.warning(sb.toString)
+    buf foreach columnsToString
+    sb.toString
   }
 
   /** Query ShoppingCard table by id map to ShoppingCart case class
@@ -202,8 +200,24 @@ object CassandraShoppingCart {
   def getShoppingCart(session: Session, queryStmt: PreparedStatement, cartId: UUID): Option[ShoppingCart] = {
     val boundQuery = bndQuery(queryStmt, cartId)
     val queryRS = session.execute(boundQuery)
-    val row = queryRS.one
-    if (row == null) None else Some(mapRow(row))
+    var row = null.asInstanceOf[Row]
+    do {
+      row = queryRS.one
+    } while (row == null | !queryRS.isExhausted )
+    if (row == null) {
+      System.out.println(s"(getShoppingCart NULL")
+      None
+    } else {
+      val sc = mapRow(row)
+      val sb = new StringBuilder()
+      sc.items foreach { x =>
+        sb.append(" kv ")
+        sb.append(x._1)
+        sb.append(" -> ")
+        sb.append(x._2)
+      }
+      Some(sc)
+    }
   }
 
   /** Update ShoppingCart owner, asynchronous
@@ -263,19 +277,28 @@ object CassandraShoppingCart {
     ResultSetFuture = {
     val sc = getShoppingCart(session, queryStmt, setItems.cartId)
     sc match {
-      case Some(x) => updateItems(session, setStmt, SetItems(setItems.cartId, setItems.items, x.version))
+      case Some(x) => {
+        val merged = x.items.toSeq ++ setItems.items
+        val grouped = merged.groupBy(_._1)
+        val cleaned = grouped.mapValues(_.map(_._2).reduce(_ + _))
+        updateItems(session, setStmt, SetItems(setItems.cartId, cleaned, x.version))
+      }
       case None => updateItems(session, setStmt, SetItems(setItems.cartId, setItems.items, 1))
     }
   }
 
-  /** Map Row to case class. Uses ScalaCass object mapping
+  /** Map ShoppingCart Row to case class.
     *
-    * @note Eclipse reports an error because it doesn't find a ScalaCass implicit but it's not an error.
+    * @note ScalaCass mapping fails sometimes
     *
     * @param row
     * @return case class
     */
-  def mapRow(row: Row): ShoppingCart = row.as[ShoppingCart]
+  def mapRow(row: Row): ShoppingCart = {
+    val m = row.getMap("items", classOf[java.util.UUID], classOf[java.lang.Integer]).asScala
+    val items = m.mapValues {x => x.intValue }
+    ShoppingCart(row.getUUID("cartId"), row.getUUID("owner"), items.toMap, row.getInt("version"))
+  }
 
   /** Map Seq of Rows to case class.
 
@@ -284,5 +307,4 @@ object CassandraShoppingCart {
     * @return Seq[ShoppingCart]
     */
   def mapRows(rows: Seq[Row]): Seq[ShoppingCart] = rows.map { x => mapRow(x) }
-
 }
