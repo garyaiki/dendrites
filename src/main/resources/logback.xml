@@ -33,6 +33,7 @@
   <logger name="com.github.garyaiki.dendrites.examples.account.http.stream" level="debug" />
   <logger name="com.github.garyaiki.dendrites.examples.account.http.stream.actor" level="debug" />
   <logger name="com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.stream" level="debug" />
+  <logger name="com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.stream" level="debug" />
   <logger name="com.github.garyaiki.dendrites.stream" level="debug" />
   <logger name="com.github.garyaiki.dendrites.stream.actor" level="debug" />
   <logger name="com.github.garyaiki.dendrites.actor" level="debug" />

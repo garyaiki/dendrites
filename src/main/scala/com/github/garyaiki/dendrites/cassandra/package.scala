@@ -16,8 +16,9 @@ package com.github.garyaiki.dendrites
 
 import _root_.akka.actor.ActorSystem
 import _root_.akka.event.Logging
-import com.datastax.driver.core.{BatchStatement, BoundStatement, CloseFuture, Cluster, Host, Metadata, QueryLogger,
+import com.datastax.driver.core.{BatchStatement, BoundStatement, CloseFuture, Cluster, Host, KeyspaceMetadata, Metadata, QueryLogger,
   PreparedStatement, ResultSet, Row, Session}
+import com.datastax.driver.core.exceptions.NoHostAvailableException
 import com.datastax.driver.core.policies.{DCAwareRoundRobinPolicy, DefaultRetryPolicy, LoadBalancingPolicy,
   LoggingRetryPolicy, ReconnectionPolicy, RetryPolicy}
 import com.google.common.util.concurrent.ListenableFuture
@@ -248,6 +249,50 @@ package object cassandra {
     rsf.getUninterruptibly
   }
 
+  /** Verbose description of keyspaces with their tables and queries
+    *
+    * @see [[http://docs.datastax.com/en/drivers/java/3.0/index.html?com/datastax/driver/core/querybuilder/QueryBuilder.html]]
+    * @param session
+    * @return all keyspaces metadata for session
+    */
+  def getKeyspacesMetadata(session: Session): String = {
+    val ks = session.getCluster.getMetadata.getKeyspaces.asScala
+    val sb = new StringBuilder(" keyspaces metadata:")
+    ks foreach(md => {
+      sb.append(md.exportAsString)
+      sb.append(", ")
+    })
+    sb.drop(2)
+    sb.toString
+  }
+
+  /** Verbose description of keyspaces
+    *
+    * @see [[http://docs.datastax.com/en/drivers/java/3.0/index.html?com/datastax/driver/core/querybuilder/QueryBuilder.html]]
+    * @param session
+    * @return keyspaces info
+    */
+  def getKeyspacesStrings(session: Session): String = {
+    val ks = session.getCluster.getMetadata.getKeyspaces.asScala
+    val sb = new StringBuilder(" keyspaces :")
+    ks foreach(md => {
+      sb.append(md.toString)
+      sb.append(", ")
+    })
+    sb.drop(2)
+    sb.toString
+  }
+
+  def getKeyspacesNames(session: Session): String = {
+    val ks = session.getCluster.getMetadata.getKeyspaces.asScala
+    val sb = new StringBuilder(" keyspaces :")
+    ks foreach(md => {
+      sb.append(md.getName)
+      sb.append(", ")
+    })
+    sb.drop(2)
+    sb.toString
+  }
   /** Create a PreparedStatement to return all rows of a table
     *
     * @param session
@@ -288,16 +333,19 @@ package object cassandra {
     */
   def getAllRows(resultSet: ResultSet): Seq[Row] = resultSet.all.asScala.toSeq
 
-  /** Get column names returned by a failed conditional update or insert
+  /** Get column names for a row. Can be used to log a failed conditional update or insert
     *
     * @param row
     */
-  def getFailedColumnNames(row: Row): StringBuilder = {
-    val buf = new ArrayBuffer[String]
-    val colDefs = row.getColumnDefinitions.asList.asScala
-    val sb = new StringBuilder("Cassandra conditional op failed column names:")
-    colDefs foreach {x => sb.append(x.getName); sb.append(',');}
-    sb.dropRight(1)
+  def getRowColumnNames(row: Row): StringBuilder = {
+    val sb = new StringBuilder("Cassandra row column names:")
+    if(row == null) {
+      sb.append("row is null")
+    } else {
+      val colDefs = row.getColumnDefinitions.asList.asScala
+      colDefs foreach {x => sb.append(x.getName); sb.append(',');}
+      sb.dropRight(1)
+    }
   }
 
   /** Handle conditional insert, update, delete. Conditional statements return a ResultSet with a single Row. If
@@ -319,6 +367,50 @@ package object cassandra {
         }
       }
     }
+  }
+
+  def sessionLogInfo(session: Session): String = {
+    val sb = new StringBuilder("session logged keyspace:")
+    sb.append(session.getLoggedKeyspace)
+    sb.append(" cluster:")
+    sb.append(session.getCluster.getClusterName)
+    sb.append(" session isClosed:")
+    sb.append(session.isClosed)
+    val state = session.getState
+    val hosts = state.getConnectedHosts.asScala
+    hosts foreach{ host => {
+        sb.append(" host state:")
+        sb.append(host.getState)
+        sb.append(", host inFlightQueries:")
+        sb.append(state.getInFlightQueries(host))
+        sb.append(", host openConnections:")
+        sb.append(state.getOpenConnections(host))
+        sb.append(", host trashedConnections:")
+        sb.append(state.getTrashedConnections(host))
+        sb.append(", ")
+      }
+    }
+    sb.drop(2)
+    sb.toString
+  }
+  /** Add host errors to NoHostAvailableException message
+    *
+    * @param e NoHostAvailableException
+    * @return augmented error message
+    */
+  def noHostAvailableExceptionMsg(e: NoHostAvailableException): String = {
+    val sb = new StringBuilder(e.getMessage)
+    sb.append(" host errors:")
+    val errors = e.getErrors.asScala
+    errors foreach { x =>
+      {
+        sb.append(x._1.getHostString)
+        sb.append(" msg:")
+        sb.append(x._2.getMessage)
+        sb.append(", ")
+      }
+    }
+    sb.toString.dropRight(2)
   }
 
   /** drop schema (keyspace)

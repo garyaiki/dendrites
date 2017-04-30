@@ -18,28 +18,34 @@ import akka.stream.{Attributes, Inlet, SinkShape}
 import akka.stream.scaladsl.Sink
 import akka.stream.stage.{AsyncCallback, GraphStage, GraphStageLogic, InHandler, TimerGraphStageLogic}
 import com.datastax.driver.core.{ResultSet, ResultSetFuture, Session}
-import com.datastax.driver.core.exceptions.DriverException
+import com.datastax.driver.core.exceptions.{DriverException, NoHostAvailableException}
 import com.google.common.util.concurrent.ListenableFuture
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
-import com.github.garyaiki.dendrites.cassandra.getFailedColumnNames
+import com.github.garyaiki.dendrites.cassandra.{getRowColumnNames, noHostAvailableExceptionMsg}
 import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
 import com.github.garyaiki.dendrites.stream.TimerConfig
 
-/** Execute Cassandra BoundStatements that don't return Rows (Insert, Update, Delete). Values are
-  * bound to the statement in the previous stage. BoundStatements can be for different queries.
+/** Input case class, a higher order function asynchronously executes BoundStatement(s) on value.
   *
-  * Cassandra's Async Execute statement returns a Guava ListenableFuture which is converted to a
-  * completed Scala Future.
-  * Success invokes an Akka Stream AsyncCallback which pulls
-  * Failure invokes an Akka Stream AsyncCallback which fails the stage
+  * Cassandra's executeAsync statement returns a Guava ListenableFuture which is converted to a completed Scala Future.
+  * Future's Success invokes an Akka Stream AsyncCallback. This checks if the conditional statement succeeded. If
+  * statement failed, log, then schedule a retry using TimerConfig and exponential backoff until max duration exceeded.
+  * On retry failure, log, then fail stage.
   *
-  * Cassandra's Java driver handles retry and reconnection, so Supervision isn't used
+  * Future's Failure invokes an Akka Stream AsyncCallback which fails the stage
   *
-  * @tparam A input type
+  * Cassandra exceptions that may be temporary are handled by the Java driver. It reconnects and retries the statement
+  * Akka Supervision isn't used.
+  *
+  * If upstream completes while busy, wait for handler to complete, then completeStage
+  *
+  * @tparam A input case class type
   * @param tc: TimerConfig
-  * @param f map case class to ResultSet, Usually curried function
+  * @param f map value case class to ResultSet, Usually this function is curried with only input data argument passed at
+  * this stage, arguments that don't change for the life of the stream are passed at stream creation.
+  * @param ec implicit ExecutionContext
   * @param logger implicit LoggingAdapter
   * @author Gary Struthers
   */
@@ -60,52 +66,65 @@ class CassandraRetrySink[A <: Product](tc: TimerConfig, f: (A) => ResultSetFutur
       val maxDuration = tc.maxDuration
       val curriedDelay = tc.curriedDelay
       var waitForTimer: Boolean = false
+      var waitForHandler: Boolean = false
+      var mustFinish: Boolean = false
 
-      /** start backpressure in custom Sink */
-      override def preStart(): Unit = pull(in)
+      override def preStart(): Unit = pull(in) // init stream backpressure
 
       def myCallBack(tuple: (A, ResultSet)): Unit = {
         val caseClass = tuple._1
         val rs = tuple._2
         if (!rs.wasApplied) {
-          val sb = getFailedColumnNames(rs.one)
-          sb.append(" case class:").append(caseClass.productPrefix).append(" retries:").append(retries)
-          val msg = sb.toString
+          val sb = getRowColumnNames(rs.one)
+          sb.append(" myCallBack fail case class:").append(caseClass.productPrefix).append(" retries:").append(retries)
           val duration = curriedDelay(retries)
           if (duration < maxDuration) {
             waitForTimer = true
-            logger.warning(msg)
+            logger.info(sb.toString)
             scheduleOnce(None, duration)
           } else {
+            sb.append(" duration:").append(duration).append(" maxDuration:").append(maxDuration)
+            val msg = sb.toString
+            logger.error(msg)
             failStage(new DriverException(msg))
           }
         } else {
           retries = 0
-          pull(in)
+          if(mustFinish) {
+            completeStage()
+          } else {
+            waitForHandler = false
+            pull(in)
+          }
         }
       }
 
       def myHandler(caseClass: A): Unit = {
-        try {
-          val resultSetFuture = f(caseClass)
-          val scalaRSF = listenableFutureToScala[ResultSet](resultSetFuture.asInstanceOf[ListenableFuture[ResultSet]])
-          scalaRSF.onComplete {
-            case Success(rs) => {
-              val successCallback = getAsyncCallback { myCallBack }
-              successCallback.invoke((caseClass, rs))
-            }
-            case Failure(t) => {
-              val failCallback = getAsyncCallback {
-                (_: Unit) => {
-                  logger.error(t, "CassandraSink ListenableFuture fail e:{}", t.getMessage)
+        waitForHandler = true
+        val resultSetFuture = f(caseClass)
+        val scalaRSF = listenableFutureToScala[ResultSet](resultSetFuture.asInstanceOf[ListenableFuture[ResultSet]])
+        scalaRSF.onComplete {
+          case Success(rs) => {
+            val successCallback = getAsyncCallback { myCallBack }
+            successCallback.invoke((caseClass, rs))
+          }
+          case Failure(t) => {
+            val failCallback = getAsyncCallback {
+              (_: Unit) =>
+                {
+                  t match {
+                    case e: NoHostAvailableException => {
+                      val msg = noHostAvailableExceptionMsg(e)
+                      logger.error(t, "myHandler NoHostAvailableException e:{}", msg)
+                    }
+                    case _ => logger.error(t, "myHandler ListenableFuture fail e:{}", t.getMessage)
+                  }
                   failStage(t)
                 }
-              }
-              failCallback.invoke(t)
             }
+            failCallback.invoke(t)
           }
-        } catch { case e: Throwable => failStage(e) }
-
+        }
       }
 
       override protected def onTimer(timerKey: Any): Unit = {
@@ -113,9 +132,8 @@ class CassandraRetrySink[A <: Product](tc: TimerConfig, f: (A) => ResultSetFutur
         waitForTimer = false
         timerKey match {
           case caseClass: A => myHandler(caseClass)
-          case x => throw new IllegalArgumentException(s"expected caseClass received:${x.toString}")
+          case x => throw new IllegalArgumentException(s"onTimer expected caseClass received:${x.toString}")
         }
-
       }
 
       setHandler(in, new InHandler {
@@ -123,6 +141,15 @@ class CassandraRetrySink[A <: Product](tc: TimerConfig, f: (A) => ResultSetFutur
           if (!waitForTimer) {
             val caseClass = grab(in)
             myHandler(caseClass)
+          }
+        }
+
+        override def onUpstreamFinish(): Unit = {
+          if(!waitForHandler) {
+            super.onUpstreamFinish()
+          } else {
+            logger.debug(s"received onUpstreamFinish waitForHandler:$waitForHandler")
+            mustFinish = true
           }
         }
       })

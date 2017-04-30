@@ -124,7 +124,7 @@ class CassandraShoppingCartSpec extends WordSpecLike with Matchers with BeforeAn
 
   "query a ShoppingCart with combined stages" in {
     val source = TestSource.probe[UUID]
-    val query = new CassandraBoundQuery[UUID](session, 1, queryPrepStmt, bndQuery)
+    val query = new CassandraBoundQuery[UUID](session, queryPrepStmt, bndQuery, 1)
     val paging = new CassandraMappedPaging[ShoppingCart](10, mapRows)
     def sink = TestSink.probe[Seq[ShoppingCart]]
     val (pub, sub) = source.via(query).via(paging).toMat(sink)(Keep.both).run()
@@ -151,7 +151,7 @@ class CassandraShoppingCartSpec extends WordSpecLike with Matchers with BeforeAn
 
   "query a ShoppingCart after updating items and then owner" in {
     val source = TestSource.probe[UUID]
-    val query = new CassandraBoundQuery[UUID](session, 1, queryPrepStmt, bndQuery)
+    val query = new CassandraBoundQuery[UUID](session, queryPrepStmt, bndQuery, 1)
     val paging = new CassandraMappedPaging[ShoppingCart](10, mapRows)
     def sink = TestSink.probe[Seq[ShoppingCart]]
     val (pub, sub) = source.via(query).via(paging).toMat(sink)(Keep.both).run()

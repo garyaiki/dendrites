@@ -20,19 +20,21 @@ import akka.stream.{Attributes, Inlet, SinkShape}
 import akka.stream.scaladsl.Sink
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler}
 import com.datastax.driver.core.{BoundStatement, ResultSet, Session}
+import com.datastax.driver.core.exceptions.NoHostAvailableException
 import com.google.common.util.concurrent.ListenableFuture
 import scala.concurrent.ExecutionContext
+import scala.collection.JavaConverters._
 import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
+import com.github.garyaiki.dendrites.cassandra.noHostAvailableExceptionMsg
 import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
 
 /** Execute Cassandra BoundStatements that don't return Rows (Insert, Update, Delete). Values are
   * bound to the statement in the previous stage. BoundStatements can be for different queries.
   *
-  * Cassandra's Async Execute statement returns a Guava ListenableFuture which is converted to a
-  * completed Scala Future.
-  * Success invokes an Akka Stream AsyncCallback which pulls
-  * Failure invokes an Akka Stream AsyncCallback which fails the stage
+  * Cassandra's Async Execute statement returns a Guava ListenableFuture which is converted to a completed Scala Future.
+  * Future's Success invokes an Akka Stream AsyncCallback which pulls
+  * Future's Failure invokes an Akka Stream AsyncCallback which fails the stage
   *
   * Cassandra's Java driver handles retry and reconnection, so Supervision isn't used
   *
@@ -54,21 +56,35 @@ class CassandraSink(session: Session)(implicit val ec: ExecutionContext, logger:
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
 
-      /** start backpressure in custom Sink */
-      override def preStart(): Unit = pull(in)
+      var waitForHandler: Boolean = false
+      var mustFinish: Boolean = false
+
+      override def preStart(): Unit = pull(in) // init backpressure for stream
 
       def executeStmt(stmt: BoundStatement): Unit = {
+        waitForHandler = true
         val resultSetFuture = session.executeAsync(stmt)
         val scalaRSF = listenableFutureToScala[ResultSet](resultSetFuture.asInstanceOf[ListenableFuture[ResultSet]])
         scalaRSF.onComplete {
           case Success(rs) => {
-            val successCallback = getAsyncCallback{ (_: Unit) => pull(in) }
+            val successCallback = getAsyncCallback{
+              (_: Unit) => {
+                if(mustFinish) completeStage() else pull(in)
+                waitForHandler = false
+              }
+            }
             successCallback.invoke(rs)
           }
           case Failure(t) => {
             val failCallback = getAsyncCallback{
               (_: Unit) => {
-                logger.error(t, "CassandraSink ListenableFuture fail e:{}", t.getMessage)
+                t match {
+                  case e: NoHostAvailableException => {
+                    val msg = noHostAvailableExceptionMsg(e)
+                    logger.error(t, "executeStmt NoHostAvailableException e:{}", msg)
+                  }
+                  case _ => logger.error(t, "executeStmt ListenableFuture fail e:{}", t.getMessage)
+                }
                 failStage(t)
               }
             }
@@ -81,6 +97,15 @@ class CassandraSink(session: Session)(implicit val ec: ExecutionContext, logger:
         override def onPush(): Unit = {
           val boundStatement = grab(in)
           executeStmt(boundStatement: BoundStatement)
+        }
+
+        override def onUpstreamFinish(): Unit = {
+          if(!waitForHandler) {
+            super.onUpstreamFinish()
+          } else {
+            logger.debug(s"received onUpstreamFinish waitForHandler:$waitForHandler")
+            mustFinish = true
+          }
         }
       })
     }

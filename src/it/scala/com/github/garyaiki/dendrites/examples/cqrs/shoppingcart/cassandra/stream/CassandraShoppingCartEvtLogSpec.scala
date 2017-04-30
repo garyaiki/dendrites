@@ -21,7 +21,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.datastax.driver.core.{Cluster, ResultSet, Row, Session}
-import com.datastax.driver.core.policies.{ DefaultRetryPolicy, LoggingRetryPolicy }
+import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy}
 import com.datastax.driver.core.utils.UUIDs.timeBased
 import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
@@ -83,7 +83,7 @@ class CassandraShoppingCartEvtLogSpec extends WordSpecLike with Matchers with Be
 
   "query by eventId and time" in {
     val source = TestSource.probe[(UUID, UUID)]
-    val bndStmt = new CassandraBoundQuery(session, 10, prepQuery(session, schema), bndQuery)
+    val bndStmt = new CassandraBoundQuery(session, prepQuery(session, schema), bndQuery, 10)
     val paging = new CassandraMappedPaging[ShoppingCartEvt](10, mapRows)
     def sink = TestSink.probe[Seq[ShoppingCartEvt]]
     val (pub, sub) = source.via(bndStmt).via(paging).toMat(sink)(Keep.both).run()

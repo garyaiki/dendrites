@@ -57,16 +57,6 @@ object CassandraShoppingCartEvtLog {
       " (cartId, time, eventID, owner, item, count) VALUES (?,?,?,?,?,?);")
   }
 
-  /** Tell DB to prepare a query by id ShoppingCart statement. Do this once.
-    *
-    * @param session
-    * @param schema
-    * @return prepared statement
-    */
-  def prepQuery(session: Session, schema: String): PreparedStatement = {
-    session.prepare("SELECT * FROM " + schema + "." + table + " WHERE cartId=? AND time >= ?;")
-  }
-
   /** Bind insert PreparedStatement to values of a case class. Does not execute.
     *
     * @param insert PreparedStatement
@@ -80,6 +70,16 @@ object CassandraShoppingCartEvtLog {
       case None => null
     }
     scBndStmt.bind(sc.cartId, sc.time, sc.eventID, sc.owner.orNull, sc.item.orNull, count)
+  }
+
+  /** Tell DB to prepare a query by id ShoppingCart statement. Do this once.
+    *
+    * @param session
+    * @param schema
+    * @return prepared statement
+    */
+  def prepQuery(session: Session, schema: String): PreparedStatement = {
+    session.prepare("SELECT * FROM " + schema + "." + table + " WHERE cartId=? AND time >= ?;")
   }
 
   /** Bind query by id PreparedStatement to values of a case class. Does not execute.

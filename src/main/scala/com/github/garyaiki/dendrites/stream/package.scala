@@ -16,6 +16,8 @@ package com.github.garyaiki.dendrites
 
 import _root_.akka.NotUsed
 import _root_.akka.event.LoggingAdapter
+import _root_.akka.stream.Supervision
+import _root_.akka.stream.ActorAttributes.SupervisionStrategy
 import _root_.akka.stream.scaladsl.Flow
 import scala.collection.mutable.ArrayBuffer
 import com.github.garyaiki.dendrites.filters.filterRight
@@ -143,4 +145,11 @@ package object stream {
   def logLeftRightFlow(implicit logger: LoggingAdapter):
     Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef]), Seq[AnyRef], NotUsed] =
       Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef])].map(tuple3LogLeftRight)
+
+  def debugDecider(implicit logger: LoggingAdapter): Supervision.Decider = {
+    case t: Throwable  => {
+      logger.error(t, t.getMessage)
+      Supervision.Stop
+    }
+  }
 }

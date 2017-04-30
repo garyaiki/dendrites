@@ -17,9 +17,8 @@ package com.github.garyaiki.dendrites.kafka.stream
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
-import akka.stream.{ActorMaterializer, ClosedShape, FanOutShape2, FanOutShape3, FlowShape, UniformFanOutShape}
-import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Keep, Merge, RunnableGraph, Source, Sink, Unzip, UnzipWith,
-  UnzipWith3}
+import akka.stream.{ActorMaterializer, ClosedShape, FanOutShape2, FanOutShape3, FlowShape}
+import akka.stream.scaladsl.{Flow, GraphDSL, Keep, RunnableGraph, Source, Sink, Unzip, UnzipWith}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import java.util.{List => JList}
 import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords}

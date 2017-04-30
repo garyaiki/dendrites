@@ -20,10 +20,12 @@ import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.scaladsl.Flow
 import akka.stream.stage.{AsyncCallback, GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.datastax.driver.core.{BoundStatement, PreparedStatement, ResultSet, Session}
+import com.datastax.driver.core.exceptions.NoHostAvailableException
 import com.google.common.util.concurrent.ListenableFuture
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
+import com.github.garyaiki.dendrites.cassandra.{getRowColumnNames, noHostAvailableExceptionMsg, sessionLogInfo}
 import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
 
 /** Map case class to BoundStatement query, execute it, Same as CassandraBind ~> CassandraQuery in 1 stage
@@ -37,16 +39,16 @@ import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
   *
   * @tparam A input type
   * @param session: Session
-  * @param fetchSize used by SELECT queries for page size. Default 0 means use Cassandra default
   * @param stmt: PreparedStatement
   * @param f function to map PreparedStatement to BoundStatement from with case class values
+  * @param fetchSize used by SELECT queries for page size. Default 0 means use Cassandra default
   * @param ec implicit ExecutionContext
   * @param logger implicit LoggingAdapter
   *
   * @author Gary Struthers
   */
-class CassandraBoundQuery[A](session: Session, fetchSize: Int = 0, stmt: PreparedStatement,
-  f:(PreparedStatement, A) => BoundStatement)(implicit val ec: ExecutionContext, logger: LoggingAdapter)
+class CassandraBoundQuery[A](session: Session, stmt: PreparedStatement, f:(PreparedStatement, A) => BoundStatement,
+  fetchSize: Int = 0)(implicit val ec: ExecutionContext, logger: LoggingAdapter)
   extends GraphStage[FlowShape[A, ResultSet]] {
 
   val in = Inlet[A]("CassandraBoundQuery.in")
@@ -60,22 +62,38 @@ class CassandraBoundQuery[A](session: Session, fetchSize: Int = 0, stmt: Prepare
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {
 
+      var waitForHandler: Boolean = false
+      var mustFinish: Boolean = false
+
       def executeStmt(stmt: BoundStatement): Unit = {
         val resultSetFuture = session.executeAsync(stmt)
         val scalaRSF = listenableFutureToScala[ResultSet](resultSetFuture.asInstanceOf[ListenableFuture[ResultSet]])
         scalaRSF.onComplete {
           case Success(rs) => {
-            val successCallback = getAsyncCallback{ (_: Unit) => push(out, rs) }
+            val successCallback = getAsyncCallback {
+              (_: Unit) => {
+                logger.debug("CassandraBoundQuery Success available:{} fully fetched:{}", rs.getAvailableWithoutFetching, rs.isFullyFetched)
+                push(out, rs)
+                waitForHandler = false
+                if(mustFinish) completeStage()
+              }
+            }
             successCallback.invoke(rs)
           }
           case Failure(t) => {
-            val failCallback = getAsyncCallback{
-              (_: Unit) => {
-                logger.error(t, "CassandraBoundQuery ListenableFuture fail e:{}", t.getMessage)
+              val failCallback = getAsyncCallback {
+                (_: Unit) => {
+                  t match {
+                    case e: NoHostAvailableException => {
+                      val msg = noHostAvailableExceptionMsg(e)
+                      logger.error(t, "myHandler NoHostAvailableException e:{}", msg)
+                    }
+                    case _ => logger.error(t, "myHandler ListenableFuture fail e:{}", t.getMessage)
+                  }
                 failStage(t)
+                }
               }
-            }
-            failCallback.invoke(t)
+              failCallback.invoke(t)
           }
         }
       }
@@ -83,9 +101,21 @@ class CassandraBoundQuery[A](session: Session, fetchSize: Int = 0, stmt: Prepare
       setHandler(in, new InHandler {
         override def onPush(): Unit = {
           val id: A = grab(in)
+          waitForHandler = true
+          val msg = sessionLogInfo(session)
+          logger.debug("CassandraBoundQuery onPush " + msg)
           val boundStatement = f(stmt, id)
           boundStatement.setFetchSize(fetchSize)
           executeStmt(boundStatement)
+        }
+
+      override def onUpstreamFinish(): Unit = {
+          if(!waitForHandler) {
+            super.onUpstreamFinish()
+          } else {
+            logger.debug(s"CassandraBoundQuery received onUpstreamFinish waitForHandler:$waitForHandler")
+            mustFinish = true
+          }
         }
       })
 
@@ -98,17 +128,17 @@ class CassandraBoundQuery[A](session: Session, fetchSize: Int = 0, stmt: Prepare
 
 object CassandraBoundQuery {
 
-  /** Create CassandraQuery as Flow
+  /** Create CassandraBoundQuery as Flow
     *
     * @tparam A input type
     * @param session Cassandra Session
-    * @param fetchSize limits how many results retrieved simultaneously, 0 means use default size
     * @param stmt PreparedStatement
     * @param f function to map PreparedStatement to BoundStatement with values to bind
+    * @param fetchSize limits how many results retrieved simultaneously, 0 means use default size
     * @return Flow[A, ResultSet, NotUsed]
     */
-  def apply[A](session: Session, fetchNum: Int = 0, stmt: PreparedStatement, f:(PreparedStatement, A) => BoundStatement)
+  def apply[A](session: Session, stmt: PreparedStatement, f:(PreparedStatement, A) => BoundStatement, fetchNum: Int = 0)
     (implicit ec: ExecutionContext, logger: LoggingAdapter): Flow[A, ResultSet, NotUsed] = {
-    Flow.fromGraph(new CassandraBoundQuery[A](session, fetchNum, stmt, f))
+    Flow.fromGraph(new CassandraBoundQuery[A](session, stmt, f, fetchNum))
   }
 }

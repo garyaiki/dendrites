@@ -14,7 +14,7 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart
 
-import com.datastax.driver.core.{PreparedStatement, ResultSet, ResultSetFuture ,Session}
+import com.datastax.driver.core.{PreparedStatement, ResultSet, ResultSetFuture, Session}
 import java.util.UUID
 import com.github.garyaiki.dendrites.cqrs.Command
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.CassandraShoppingCart.{bndInsert,
@@ -56,31 +56,33 @@ package object cmd {
       }
 
       case _ if action == "AddItem" => {
-        val bothStmts = (stmts.get("Query"), stmts.get("SetItem"))
-        bothStmts match {
-          case (Some(queryStmt), Some(setStmt)) => {
-            val setItems = SetItems(cmd.cartId, Map(cmd.ownerOrItem -> cmd.count.get))
-            checkAndSetItems(session, queryStmt, setStmt)(setItems)
-          }
-          case (Some(x), None) => throw new NullPointerException("ShoppingCart SetItem preparedStatement not found")
-          case (None, Some(y)) => throw new NullPointerException("ShoppingCart Query preparedStatement not found")
-          case (None, None) => throw new NullPointerException("ShoppingCart SetItem,Query preparedStatement not found")
-          case _ => throw new NullPointerException("ShoppingCart AddItem, one or both preparedStatements not found")
+        val optQueryStmt = stmts.get("Query")
+        val queryStmt = optQueryStmt match {
+          case Some(x) => x
+          case None => throw new NullPointerException("ShoppingCart AddItem, Query preparedStatement not found")
         }
+        val optSetStmt = stmts.get("SetItem")
+        val setStmt = optSetStmt match {
+          case Some(x) => x
+          case None => throw new NullPointerException("ShoppingCart AddItem, SetItem preparedStatement not found")
+        }
+        val setItems = SetItems(cmd.cartId, Map(cmd.ownerOrItem -> cmd.count.get))
+        checkAndSetItems(session, queryStmt, setStmt)(setItems)
       }
 
       case _ if action == "RemoveItem" => {
-        val bothStmts = (stmts.get("Query"), stmts.get("SetItem"))
-        bothStmts match {
-          case (Some(queryStmt), Some(setStmt)) => {
-            val setItems = SetItems(cmd.cartId, Map(cmd.ownerOrItem -> (cmd.count.get * -1)))
-            checkAndSetItems(session, queryStmt, setStmt)(setItems)
-          }
-          case (Some(x), None) => throw new NullPointerException("ShoppingCart SetItem preparedStatement not found")
-          case (None, Some(y)) => throw new NullPointerException("ShoppingCart Query preparedStatement not found")
-          case (None, None) => throw new NullPointerException("ShoppingCart SetItem,Query preparedStatement not found")
-          case _ => throw new NullPointerException("ShoppingCart RemoveItem, one or both preparedStatements not found")
+        val optQueryStmt = stmts.get("Query")
+        val queryStmt = optQueryStmt match {
+          case Some(x) => x
+          case None => throw new NullPointerException("ShoppingCart RemoveItem, Query preparedStatement not found")
         }
+        val optSetStmt = stmts.get("SetItem")
+        val setStmt = optSetStmt match {
+          case Some(x) => x
+          case None => throw new NullPointerException("ShoppingCart RemoveItem, SetItem preparedStatement not found")
+        }
+        val setItems = SetItems(cmd.cartId, Map(cmd.ownerOrItem -> (cmd.count.get * -1)))
+        checkAndSetItems(session, queryStmt, setStmt)(setItems)
       }
 
       case _ if action == "Delete" => {

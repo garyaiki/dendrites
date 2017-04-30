@@ -35,7 +35,7 @@ import com.github.garyaiki.dendrites.algebird.stream.avgFlow
 class SpyFlow[A](name: String, var pulls: Int, var pushes: Int)(implicit logger: LoggingAdapter)
   extends GraphStage[FlowShape[A, A]] {
 
-  logger.debug("spyFlow:{} init pulls:{} pushes{}", name, pulls, pushes)
+  //logger.debug("spyFlow:{} init pulls:{} pushes{}", name, pulls, pushes)
 
   val in = Inlet[A]("MonitorStream in")
   val out = Outlet[A]("MonitorStream out")
@@ -62,4 +62,3 @@ class SpyFlow[A](name: String, var pulls: Int, var pushes: Int)(implicit logger:
     }
   }
 }
-
