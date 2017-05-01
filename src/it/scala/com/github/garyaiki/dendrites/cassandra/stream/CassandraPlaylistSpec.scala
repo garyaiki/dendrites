@@ -28,8 +28,8 @@ import scala.collection.immutable.Iterable
 import scala.concurrent.ExecutionContext
 import com.github.garyaiki.dendrites.cassandra.{Playlists, PlaylistSongConfig}
 import com.github.garyaiki.dendrites.cassandra.Playlists.{bndInsert, bndQuery, Playlist}
-import com.github.garyaiki.dendrites.cassandra.{close, connect, createCluster, createLoadBalancingPolicy, createSchema,
-  dropSchema, initLoadBalancingPolicy, logMetadata, registerQueryLogger}
+import com.github.garyaiki.dendrites.cassandra.{close, connect, createSchema, dropSchema}
+import com.github.garyaiki.dendrites.cassandra.fixtures.buildCluster
 
 class CassandraPlaylistSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   implicit val system = ActorSystem("dendrites")
@@ -47,13 +47,7 @@ class CassandraPlaylistSpec extends WordSpecLike with Matchers with BeforeAndAft
   var playlistIds: Seq[UUID] = null
 
   override def beforeAll() {
-    val addresses = myConfig.getInetAddresses()
-    val retryPolicy = new LoggingRetryPolicy(DefaultRetryPolicy.INSTANCE)
-    cluster = createCluster(addresses, retryPolicy)
-    val lbp = createLoadBalancingPolicy(myConfig.localDataCenter)
-    initLoadBalancingPolicy(cluster, lbp)
-    logMetadata(cluster)
-    registerQueryLogger(cluster)
+    cluster = buildCluster(myConfig)
     session = connect(cluster)
     val strategy = myConfig.replicationStrategy
     val createSchemaRS = createSchema(session, schema, strategy, 3)

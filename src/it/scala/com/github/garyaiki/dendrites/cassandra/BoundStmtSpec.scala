@@ -16,12 +16,12 @@ package com.github.garyaiki.dendrites.cassandra
 
 import akka.actor.ActorSystem
 import com.datastax.driver.core.{Cluster, ResultSet, Session}
-import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy}
 import java.util.UUID
 import scala.concurrent.ExecutionContext
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import com.github.garyaiki.dendrites.cassandra.Playlists.Playlist
 import com.github.garyaiki.dendrites.cassandra.Songs.Song
+import com.github.garyaiki.dendrites.cassandra.fixtures.buildCluster
 
 class BoundStmtSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   implicit val system = ActorSystem("dendrites")
@@ -37,14 +37,7 @@ class BoundStmtSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   var playlist: Playlist = null
 
   override def beforeAll() {
-    val addresses = myConfig.getInetAddresses()
-    val retryPolicy = new LoggingRetryPolicy(DefaultRetryPolicy.INSTANCE)
-    cluster = createCluster(addresses, retryPolicy)
-    val metaData = cluster.getMetadata//DEBUG
-    val lbp = createLoadBalancingPolicy(myConfig.localDataCenter)
-    initLoadBalancingPolicy(cluster, lbp)
-    logMetadata(cluster)
-    registerQueryLogger(cluster)
+    cluster = buildCluster(myConfig)
     session = connect(cluster)
     val strategy = myConfig.replicationStrategy
     val createSchemaRS = createSchema(session, schema, strategy, 3)

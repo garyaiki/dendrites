@@ -28,10 +28,10 @@ import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
 import scala.concurrent.ExecutionContext
 import scala.util.Random
+import com.github.garyaiki.dendrites.cassandra.{close, connect, createSchema, dropSchema, executeBoundStmt}
+import com.github.garyaiki.dendrites.cassandra.fixtures.buildCluster
 import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBind, CassandraBoundQuery, CassandraMappedPaging,
   CassandraSink}
-import com.github.garyaiki.dendrites.cassandra.{close, connect, createCluster, createLoadBalancingPolicy, createSchema,
-  dropSchema, executeBoundStmt, initLoadBalancingPolicy, logMetadata, registerQueryLogger}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.event.ShoppingCartEvt
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.{ShoppingCartConfig,
   CassandraShoppingCartEvtLog}
@@ -57,15 +57,8 @@ class CassandraShoppingCartEvtLogSpec extends WordSpecLike with Matchers with Be
     ShoppingCartEvt(cartId, timeBased, UUID.randomUUID, Some(newOwnerId), None, None))
 
   override def beforeAll() {
-    val addresses = myConfig.getInetAddresses()
-    val retryPolicy = new LoggingRetryPolicy(DefaultRetryPolicy.INSTANCE)
-    cluster = createCluster(addresses, retryPolicy)
-    val lbp = createLoadBalancingPolicy(myConfig.localDataCenter)
-    initLoadBalancingPolicy(cluster, lbp)
-    logMetadata(cluster)
-    registerQueryLogger(cluster)
+    cluster = buildCluster(myConfig)
     session = connect(cluster)
-
     val strategy = myConfig.replicationStrategy
     val createSchemaRS = createSchema(session, schema, strategy, 3)
     val evtLogTable = createTable(session, schema)

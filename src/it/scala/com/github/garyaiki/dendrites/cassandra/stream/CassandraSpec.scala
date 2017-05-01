@@ -19,16 +19,14 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.datastax.driver.core.{Cluster, PreparedStatement, ResultSet, Session}
-import com.datastax.driver.core.policies.{DefaultRetryPolicy, ExponentialReconnectionPolicy, LoggingRetryPolicy}
 import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.concurrent.ExecutionContext
 import com.github.garyaiki.dendrites.cassandra.{Playlists, PlaylistSongConfig, Songs}
 import com.github.garyaiki.dendrites.cassandra.Playlists.Playlist
 import com.github.garyaiki.dendrites.cassandra.Songs.Song
-import com.github.garyaiki.dendrites.cassandra.{close, connect, createCluster, createLoadBalancingPolicy, createSchema,
-  dropSchema, executeBoundStmt, initLoadBalancingPolicy,  logMetadata, registerQueryLogger}
-import com.github.garyaiki.dendrites.cassandra.fixtures.getOneRow
+import com.github.garyaiki.dendrites.cassandra.{close, connect, createSchema, dropSchema, executeBoundStmt}
+import com.github.garyaiki.dendrites.cassandra.fixtures.{buildCluster, getOneRow}
 import com.github.garyaiki.dendrites.stream.SpyFlow
 
 class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
@@ -37,8 +35,8 @@ class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
   val myConfig = PlaylistSongConfig
-  val schema = myConfig.keySpace
   var cluster: Cluster = null
+  val schema = myConfig.keySpace
   var session: Session = null
   val songsTags = Set[String]("jazz", "2013")
   val songId = UUID.randomUUID
@@ -48,15 +46,7 @@ class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   var prepSongStmt: PreparedStatement = null
 
   override def beforeAll() {
-    val addresses = myConfig.getInetAddresses()
-    val retryPolicy = new LoggingRetryPolicy(DefaultRetryPolicy.INSTANCE)
-    val reConnectPolicy = new ExponentialReconnectionPolicy(10L, 10L)
-    cluster = createCluster(addresses, retryPolicy, reConnectPolicy)
-    cluster.init() //DEBUG
-    val lbp = createLoadBalancingPolicy(myConfig.localDataCenter)
-    initLoadBalancingPolicy(cluster, lbp)
-    logMetadata(cluster)
-    registerQueryLogger(cluster)
+    cluster = buildCluster(myConfig)
     session = connect(cluster)
     val strategy = myConfig.replicationStrategy
     val createSchemaRS = createSchema(session, schema, strategy, 3)
@@ -90,7 +80,6 @@ class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   }
 
   "query a Song" in {
-
     val rs = executeBoundStmt(session, Songs.bndQuery(prepSongStmt, songId))
     val row = rs.one()
     Songs.mapRow(row) shouldBe song

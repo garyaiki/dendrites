@@ -26,8 +26,8 @@ import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
 import scala.concurrent.ExecutionContext
-import com.github.garyaiki.dendrites.cassandra.{close, connect, createCluster, createLoadBalancingPolicy, createSchema,
-  dropSchema, getConditionalError, initLoadBalancingPolicy, logMetadata, registerQueryLogger}
+import com.github.garyaiki.dendrites.cassandra.{close, connect, createSchema, dropSchema, getConditionalError}
+import com.github.garyaiki.dendrites.cassandra.fixtures.buildCluster
 import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBind, CassandraBoundQuery, CassandraConditional,
   CassandraMappedPaging, CassandraPaging, CassandraQuery, CassandraRetrySink, CassandraSink}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.{ShoppingCart, SetItems, SetOwner}
@@ -65,13 +65,7 @@ class CassandraShoppingCartSpec extends WordSpecLike with Matchers with BeforeAn
   var queryPrepStmt: PreparedStatement = null
 
   override def beforeAll() {
-    val addresses = myConfig.getInetAddresses()
-    val retryPolicy = new LoggingRetryPolicy(DefaultRetryPolicy.INSTANCE)
-    cluster = createCluster(addresses, retryPolicy)
-    val lbp = createLoadBalancingPolicy(myConfig.localDataCenter)
-    initLoadBalancingPolicy(cluster, lbp)
-    logMetadata(cluster)
-    registerQueryLogger(cluster)
+    cluster = buildCluster(myConfig)
     session = connect(cluster)
     val strategy = myConfig.replicationStrategy
     val createSchemaRS = createSchema(session, schema, strategy, 1) // 1 instance
