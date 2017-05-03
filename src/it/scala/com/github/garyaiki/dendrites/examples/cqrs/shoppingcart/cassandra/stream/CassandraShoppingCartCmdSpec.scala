@@ -15,20 +15,18 @@
 package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.stream
 
 import akka.NotUsed
-import akka.actor.ActorSystem
-import akka.event.{Logging, LoggingAdapter}
-import akka.stream.{ActorAttributes, ActorMaterializer}
+import akka.stream.ActorAttributes
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.testkit.{TestPublisher, TestSubscriber}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-import com.datastax.driver.core.{Cluster, ConsistencyLevel, PreparedStatement, ResultSet, Row, Session}
-import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy}
+import com.datastax.driver.core.{PreparedStatement, ResultSet, Row}
 import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
 import scala.concurrent.ExecutionContext
-import com.github.garyaiki.dendrites.cassandra.{close, connect, createSchema, dropSchema, getConditionalError}
-import com.github.garyaiki.dendrites.cassandra.fixtures.{buildCluster, getOneRow}
+import com.github.garyaiki.dendrites.cassandra.getConditionalError
+import com.github.garyaiki.dendrites.cassandra.fixtures.BeforeAfterAllBuilder
+import com.github.garyaiki.dendrites.cassandra.fixtures.getOneRow
 import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBind, CassandraBoundQuery, CassandraConditional,
   CassandraMappedPaging, CassandraPaging, CassandraQuery, CassandraRetrySink, CassandraSink}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.{SetItems, SetOwner, ShoppingCart}
@@ -42,15 +40,9 @@ import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.doShoppingCa
 
 import com.github.garyaiki.dendrites.stream.SpyFlow
 
-class CassandraShoppingCartCmdSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
-  implicit val system = ActorSystem("dendrites")
-  implicit val ec: ExecutionContext = system.dispatcher
-  implicit val materializer = ActorMaterializer()
-  implicit val logger = Logging(system, getClass)
-  val myConfig = ShoppingCartConfig
-  val schema = myConfig.keySpace
-  var cluster: Cluster = null
-  var session: Session = null
+class CassandraShoppingCartCmdSpec extends WordSpecLike with Matchers with BeforeAndAfterAll
+  with BeforeAfterAllBuilder {
+
   var stmts: Map[String, PreparedStatement] = null
   val cartId = UUID.randomUUID
   val firstOwner = UUID.randomUUID
@@ -73,10 +65,7 @@ class CassandraShoppingCartCmdSpec extends WordSpecLike with Matchers with Befor
   val dispatcher = ActorAttributes.dispatcher("dendrites.blocking-dispatcher")
 
   override def beforeAll() {
-    cluster = buildCluster(myConfig)
-    session = connect(cluster)
-    val strategy = myConfig.replicationStrategy
-    createSchema(session, schema, strategy, 1) // 1 instance
+    createClusterSchemaSession(ShoppingCartConfig, 1)
     createTable(session, schema)
     delPrepStmt = prepDelete(session, schema)
     queryPrepStmt = prepQuery(session, schema)
@@ -130,8 +119,5 @@ class CassandraShoppingCartCmdSpec extends WordSpecLike with Matchers with Befor
     source.via(bndStmt).runWith(sink)
   }
 
-  override def afterAll() {
-    dropSchema(session, schema)
-    close(session, cluster)
-  }
+  override def afterAll() { dropSchemaCloseSessionCluster() }
 }

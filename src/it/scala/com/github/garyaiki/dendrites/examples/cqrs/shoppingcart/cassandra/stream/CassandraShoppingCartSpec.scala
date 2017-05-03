@@ -15,19 +15,15 @@
 package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.stream
 
 import akka.NotUsed
-import akka.actor.ActorSystem
-import akka.event.{Logging, LoggingAdapter}
-import akka.stream.{ActorAttributes, ActorMaterializer}
+import akka.stream.ActorAttributes
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-import com.datastax.driver.core.{Cluster, PreparedStatement, ResultSet, Row, Session}
-import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy}
+import com.datastax.driver.core.{PreparedStatement, ResultSet, Row}
 import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
-import scala.concurrent.ExecutionContext
-import com.github.garyaiki.dendrites.cassandra.{close, connect, createSchema, dropSchema, getConditionalError}
-import com.github.garyaiki.dendrites.cassandra.fixtures.buildCluster
+import com.github.garyaiki.dendrites.cassandra.getConditionalError
+import com.github.garyaiki.dendrites.cassandra.fixtures.BeforeAfterAllBuilder
 import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBind, CassandraBoundQuery, CassandraConditional,
   CassandraMappedPaging, CassandraPaging, CassandraQuery, CassandraRetrySink, CassandraSink}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.{ShoppingCart, SetItems, SetOwner}
@@ -37,15 +33,8 @@ import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.Cassan
   prepUpdateItems, prepUpdateOwner, rowToString}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.RetryConfig
 
-class CassandraShoppingCartSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
-  implicit val system = ActorSystem("dendrites")
-  implicit val ec: ExecutionContext = system.dispatcher
-  implicit val materializer = ActorMaterializer()
-  implicit val logger = Logging(system, getClass)
-  val myConfig = ShoppingCartConfig
-  val schema = myConfig.keySpace
-  var cluster: Cluster = null
-  var session: Session = null
+class CassandraShoppingCartSpec extends WordSpecLike with Matchers with BeforeAndAfterAll with BeforeAfterAllBuilder {
+
   val cartId: UUID = UUID.randomUUID
   val ownerId: UUID = UUID.randomUUID
   val updatedOwnerId: UUID = UUID.randomUUID
@@ -65,11 +54,8 @@ class CassandraShoppingCartSpec extends WordSpecLike with Matchers with BeforeAn
   var queryPrepStmt: PreparedStatement = null
 
   override def beforeAll() {
-    cluster = buildCluster(myConfig)
-    session = connect(cluster)
-    val strategy = myConfig.replicationStrategy
-    val createSchemaRS = createSchema(session, schema, strategy, 1) // 1 instance
-    val cartTableRS = createTable(session, schema)
+    createClusterSchemaSession(ShoppingCartConfig, 1)
+    createTable(session, schema)
     queryPrepStmt = prepQuery(session, schema)
   }
 
@@ -166,8 +152,5 @@ class CassandraShoppingCartSpec extends WordSpecLike with Matchers with BeforeAn
     source.via(bndStmt).runWith(sink)
   }
 
-  override def afterAll() {
-    dropSchema(session, schema)
-    close(session, cluster)
-  }
+  override def afterAll() { dropSchemaCloseSessionCluster() }
 }
