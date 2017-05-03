@@ -15,31 +15,17 @@ limitations under the License.
 package com.github.garyaiki.dendrites.cassandra.stream
 
 import akka.NotUsed
-import akka.actor.ActorSystem
-import akka.event.{Logging, LoggingAdapter}
-import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-import com.datastax.driver.core.{Cluster, ResultSet, Row, Session}
-import com.datastax.driver.core.policies.{DefaultRetryPolicy, LoggingRetryPolicy}
+import com.datastax.driver.core.{ResultSet, Row}
 import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
-import scala.concurrent.ExecutionContext
 import com.github.garyaiki.dendrites.cassandra.{Playlists, PlaylistSongConfig}
 import com.github.garyaiki.dendrites.cassandra.Playlists.{bndInsert, bndQuery, Playlist}
-import com.github.garyaiki.dendrites.cassandra.{close, connect, createSchema, dropSchema}
-import com.github.garyaiki.dendrites.cassandra.fixtures.buildCluster
+import com.github.garyaiki.dendrites.cassandra.fixtures.BeforeAfterAllBuilder
 
-class CassandraPlaylistSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
-  implicit val system = ActorSystem("dendrites")
-  implicit val ec: ExecutionContext = system.dispatcher
-  implicit val materializer = ActorMaterializer()
-  implicit val logger = Logging(system, getClass)
-  val myConfig = PlaylistSongConfig
-  val schema = myConfig.keySpace
-  var cluster: Cluster = null
-  var session: Session = null
+class CassandraPlaylistSpec extends WordSpecLike with Matchers with BeforeAndAfterAll with BeforeAfterAllBuilder {
   var songId: UUID = null
   var plId: UUID = null
   var playlist: Playlist = null
@@ -47,16 +33,13 @@ class CassandraPlaylistSpec extends WordSpecLike with Matchers with BeforeAndAft
   var playlistIds: Seq[UUID] = null
 
   override def beforeAll() {
-    cluster = buildCluster(myConfig)
-    session = connect(cluster)
-    val strategy = myConfig.replicationStrategy
-    val createSchemaRS = createSchema(session, schema, strategy, 3)
+    createClusterSchemaSession(PlaylistSongConfig, 3)
     songId = UUID.randomUUID()
     plId = UUID.randomUUID()
     playlist = Playlist(plId,"La Petite Tonkinoise","Bye Bye Blackbird","Joséphine Baker",songId)
     playlists = Seq(playlist)
     playlistIds = Seq(plId)
-    val songTRS = Playlists.createTable(session, schema)
+    Playlists.createTable(session, schema)
   }
 
   "A Cassandra Playlist client" should {
@@ -90,8 +73,5 @@ class CassandraPlaylistSpec extends WordSpecLike with Matchers with BeforeAndAft
       response shouldBe playlists
   }
 
-  override def afterAll() {
-    dropSchema(session, schema)
-    close(session, cluster)
-  }
+  override def afterAll() { dropSchemaCloseSessionCluster() }
 }

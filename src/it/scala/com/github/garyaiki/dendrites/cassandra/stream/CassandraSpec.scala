@@ -13,31 +13,20 @@
   */
 package com.github.garyaiki.dendrites.cassandra.stream
 
-import akka.actor.ActorSystem
-import akka.event.{Logging, LoggingAdapter}
-import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-import com.datastax.driver.core.{Cluster, PreparedStatement, ResultSet, Session}
+import com.datastax.driver.core.{PreparedStatement, ResultSet}
 import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
-import scala.concurrent.ExecutionContext
 import com.github.garyaiki.dendrites.cassandra.{Playlists, PlaylistSongConfig, Songs}
 import com.github.garyaiki.dendrites.cassandra.Playlists.Playlist
 import com.github.garyaiki.dendrites.cassandra.Songs.Song
-import com.github.garyaiki.dendrites.cassandra.{close, connect, createSchema, dropSchema, executeBoundStmt}
-import com.github.garyaiki.dendrites.cassandra.fixtures.{buildCluster, getOneRow}
+import com.github.garyaiki.dendrites.cassandra.executeBoundStmt
+import com.github.garyaiki.dendrites.cassandra.fixtures.BeforeAfterAllBuilder
+import com.github.garyaiki.dendrites.cassandra.fixtures.getOneRow
 import com.github.garyaiki.dendrites.stream.SpyFlow
 
-class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
-  implicit val system = ActorSystem("dendrites")
-  implicit val ec: ExecutionContext = system.dispatcher
-  implicit val materializer = ActorMaterializer()
-  implicit val logger = Logging(system, getClass)
-  val myConfig = PlaylistSongConfig
-  var cluster: Cluster = null
-  val schema = myConfig.keySpace
-  var session: Session = null
+class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll with BeforeAfterAllBuilder {
   val songsTags = Set[String]("jazz", "2013")
   val songId = UUID.randomUUID
   val song = Song(songId, "La Petite Tonkinoise", "Bye Bye Blackbird", "Joséphine Baker", songsTags)
@@ -45,12 +34,7 @@ class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   val playlist = Playlist(plId, "La Petite Tonkinoise", "Bye Bye Blackbird", "Joséphine Baker", songId)
   var prepSongStmt: PreparedStatement = null
 
-  override def beforeAll() {
-    cluster = buildCluster(myConfig)
-    session = connect(cluster)
-    val strategy = myConfig.replicationStrategy
-    val createSchemaRS = createSchema(session, schema, strategy, 3)
-  }
+  override def beforeAll() { createClusterSchemaSession(PlaylistSongConfig, 3) }
 
   "A Cassandra client" should {
     "create a Song table" in {
@@ -106,8 +90,6 @@ class CassandraSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
     val responseShoppingCart = Songs.mapRow(row)
     responseShoppingCart shouldBe song
   }
-  override def afterAll() {
-    dropSchema(session, schema)
-    close(session, cluster)
-  }
+
+  override def afterAll() { dropSchemaCloseSessionCluster() }
 }
