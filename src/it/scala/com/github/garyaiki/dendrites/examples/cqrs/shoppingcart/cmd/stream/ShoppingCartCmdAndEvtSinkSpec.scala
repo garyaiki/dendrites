@@ -19,29 +19,13 @@ import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.Cassan
   mapRows, prepQuery}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.ShoppingCartCmd
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.event.ShoppingCartEvt
+import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.fixtures.ShoppingCartCmdBuilder
 
 class ShoppingCartCmdAndEvtSinkSpec extends WordSpecLike with Matchers with BeforeAndAfterAll
-  with BeforeAfterAllBuilder {
+  with BeforeAfterAllBuilder with ShoppingCartCmdBuilder {
 
   val dispatcher = ActorAttributes.dispatcher("dendrites.blocking-dispatcher")
   val startTime = timeBased
-  val cartId = UUID.randomUUID
-  val firstOwner = UUID.randomUUID
-  val secondOwner = UUID.randomUUID
-  val firstItem = UUID.randomUUID
-  val secondItem = UUID.randomUUID
-  val kvCmds = Seq((UUID.randomUUID.toString, ShoppingCartCmd("Insert", cartId, firstOwner, None)),
-    (UUID.randomUUID.toString, ShoppingCartCmd("SetOwner", cartId, secondOwner, None)),
-    (UUID.randomUUID.toString, ShoppingCartCmd("AddItem", cartId, firstItem, Some(1))),
-    (UUID.randomUUID.toString, ShoppingCartCmd("AddItem", cartId, secondItem, Some(1))),
-    (UUID.randomUUID.toString, ShoppingCartCmd("AddItem", cartId, firstItem, Some(1))),
-    (UUID.randomUUID.toString, ShoppingCartCmd("AddItem", cartId, secondItem, Some(1))),
-    (UUID.randomUUID.toString, ShoppingCartCmd("AddItem", cartId, secondItem, Some(1))),
-    (UUID.randomUUID.toString, ShoppingCartCmd("SetOwner", cartId, firstOwner, None)),
-    (UUID.randomUUID.toString, ShoppingCartCmd("RemoveItem", cartId, firstItem, Some(1))),
-    (UUID.randomUUID.toString, ShoppingCartCmd("RemoveItem", cartId, secondItem, Some(1))))
-  // Should be secondOwner, firstItem = 1, secondItem = 2
-  var queryPrepStmt: PreparedStatement = null
   var evtQueryPrepStmt: PreparedStatement = null
   var prepStmts: Map[String, PreparedStatement] = null
 

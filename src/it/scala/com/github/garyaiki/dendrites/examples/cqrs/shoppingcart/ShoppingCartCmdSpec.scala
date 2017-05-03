@@ -32,6 +32,7 @@ import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.avro4s.Avro4sSho
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.avro4s.Avro4sShoppingCartCmd.toCaseClass
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.kafka.{ShoppingCartCmdConsumer,
   ShoppingCartCmdProducer}
+import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.fixtures.ShoppingCartCmdBuilder
 import com.github.garyaiki.dendrites.kafka.stream.avro4s.ConsumerRecordDeserializer
 import com.github.garyaiki.dendrites.kafka.stream.{ConsumerRecordsToQueue, KafkaSink, KafkaSource}
 import com.github.garyaiki.dendrites.kafka.stream.extractRecords
@@ -44,7 +45,7 @@ import com.github.garyaiki.dendrites.kafka.stream.extractRecords
   * @author Gary Struthers
   *
   */
-class ShoppingCartCmdSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
+class ShoppingCartCmdSpec extends WordSpecLike with Matchers with BeforeAndAfterAll with ShoppingCartCmdBuilder {
   implicit val system = ActorSystem("dendrites")
   implicit val ec: ExecutionContext = system.dispatcher
   implicit val materializer = ActorMaterializer()
@@ -52,25 +53,10 @@ class ShoppingCartCmdSpec extends WordSpecLike with Matchers with BeforeAndAfter
   val avro4sOps = Avro4sShoppingCartCmd
   val ap = ShoppingCartCmdProducer
   val consumerConfig = ShoppingCartCmdConsumer
-  val cartId = UUID.randomUUID
-  val firstOwner = UUID.randomUUID
-  val secondOwner = UUID.randomUUID
-  val firstItem = UUID.randomUUID
-  val secondItem = UUID.randomUUID
-  val getCmds = Seq(ShoppingCartCmd("SetOwner", cartId, firstOwner, None),
-    ShoppingCartCmd("AddItem", cartId, firstItem, Some(1)),
-    ShoppingCartCmd("AddItem", cartId, secondItem, Some(1)),
-    ShoppingCartCmd("AddItem", cartId, firstItem, Some(1)),
-    ShoppingCartCmd("AddItem", cartId, secondItem, Some(1)),
-    ShoppingCartCmd("AddItem", cartId, secondItem, Some(1)),
-    ShoppingCartCmd("SetOwner", cartId, secondOwner, None),
-    ShoppingCartCmd("RemoveItem", cartId, firstItem, Some(1)),
-    ShoppingCartCmd("RemoveItem", cartId, secondItem, Some(1)),
-    ShoppingCartCmd("RemoveItem", cartId, secondItem, Some(1)))
 
   "A KafkaStream" should {
     "write then recreate case classes using ConsumerRecordsToQueue" in {
-      val iter = Iterable(getCmds.toSeq:_*)
+      val iter = Iterable(cmds.toSeq:_*)
       val serializer = new Avro4sSerializer(avro4sOps.toBytes)
       val sink = KafkaSink[String, Array[Byte]](ap)
       val source = Source[ShoppingCartCmd](iter)
@@ -87,7 +73,7 @@ class ShoppingCartCmdSpec extends WordSpecLike with Matchers with BeforeAndAfter
         .runWith(TestSink.probe[(String, ShoppingCartCmd)])
         .request(10)
         .expectNextN(10)
-      results forall(kv => getCmds.contains(kv._2))
+      results forall(kv => cmds.contains(kv._2))
     }
   }
 

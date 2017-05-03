@@ -30,38 +30,22 @@ import com.github.garyaiki.dendrites.cassandra.fixtures.getOneRow
 import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBind, CassandraBoundQuery, CassandraConditional,
   CassandraMappedPaging, CassandraPaging, CassandraQuery, CassandraRetrySink, CassandraSink}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.{SetItems, SetOwner, ShoppingCart}
-import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.{CassandraShoppingCart, ShoppingCartConfig}
+import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.{CassandraShoppingCart, RetryConfig,
+  ShoppingCartConfig}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.CassandraShoppingCart.{bndDelete, bndInsert,
   bndQuery, bndUpdateItems, bndUpdateOwner, checkAndSetOwner, createTable, mapRow, mapRows, prepDelete, prepInsert, prepQuery,
   prepUpdateItems, prepUpdateOwner, rowToString, table}
-import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.{RetryConfig, ShoppingCartConfig}
+import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.fixtures.ShoppingCartCmdBuilder
+
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.ShoppingCartCmd
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.doShoppingCartCmd
 
 import com.github.garyaiki.dendrites.stream.SpyFlow
 
 class CassandraShoppingCartCmdSpec extends WordSpecLike with Matchers with BeforeAndAfterAll
-  with BeforeAfterAllBuilder {
+  with BeforeAfterAllBuilder with ShoppingCartCmdBuilder {
 
   var stmts: Map[String, PreparedStatement] = null
-  val cartId = UUID.randomUUID
-  val firstOwner = UUID.randomUUID
-  val secondOwner = UUID.randomUUID
-  val firstItem = UUID.randomUUID
-  val secondItem = UUID.randomUUID
-  var queryPrepStmt: PreparedStatement = null
-  var delPrepStmt: PreparedStatement = null
-  val cmds = Seq(ShoppingCartCmd("Insert", cartId, firstOwner, None),
-    ShoppingCartCmd("SetOwner", cartId, secondOwner, None),
-    ShoppingCartCmd("AddItem", cartId, firstItem, Some(1)),
-    ShoppingCartCmd("AddItem", cartId, secondItem, Some(1)),
-    ShoppingCartCmd("AddItem", cartId, firstItem, Some(1)),
-    ShoppingCartCmd("AddItem", cartId, secondItem, Some(1)),
-    ShoppingCartCmd("AddItem", cartId, secondItem, Some(1)),
-    ShoppingCartCmd("SetOwner", cartId, firstOwner, None),
-    ShoppingCartCmd("RemoveItem", cartId, firstItem, Some(1)),
-    ShoppingCartCmd("RemoveItem", cartId, secondItem, Some(1)))
-  // Should be firstOwner, firstItem = 1, secondItem = 2
   val dispatcher = ActorAttributes.dispatcher("dendrites.blocking-dispatcher")
 
   override def beforeAll() {
