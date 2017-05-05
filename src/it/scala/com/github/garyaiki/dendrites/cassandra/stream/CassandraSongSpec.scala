@@ -17,7 +17,7 @@ package com.github.garyaiki.dendrites.cassandra.stream
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-import com.datastax.driver.core.{ResultSet, Row, Session}
+import com.datastax.driver.core.Row
 import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable

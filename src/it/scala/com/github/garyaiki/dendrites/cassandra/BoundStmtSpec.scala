@@ -15,21 +15,15 @@ limitations under the License.
 package com.github.garyaiki.dendrites.cassandra
 
 import akka.actor.ActorSystem
-import com.datastax.driver.core.{Cluster, ResultSet, Session}
+import com.datastax.driver.core.ResultSet
 import java.util.UUID
-import scala.concurrent.ExecutionContext
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import com.github.garyaiki.dendrites.cassandra.Playlists.Playlist
 import com.github.garyaiki.dendrites.cassandra.Songs.Song
-import com.github.garyaiki.dendrites.cassandra.fixtures.buildCluster
+import com.github.garyaiki.dendrites.cassandra.fixtures.BeforeAfterAllBuilder
 
-class BoundStmtSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
-  implicit val system = ActorSystem("dendrites")
-  implicit val ec: ExecutionContext = system.dispatcher
-  val myConfig = PlaylistSongConfig
-  val schema = myConfig.keySpace
-  var cluster: Cluster = null
-  var session: Session = null
+class BoundStmtSpec extends WordSpecLike with Matchers with BeforeAndAfterAll with BeforeAfterAllBuilder {
+
   val songsTags = Set[String]("jazz", "2013")
   var songId: UUID = null
   var song: Song = null
@@ -37,10 +31,8 @@ class BoundStmtSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
   var playlist: Playlist = null
 
   override def beforeAll() {
-    cluster = buildCluster(myConfig)
+    createClusterSchemaSession(PlaylistSongConfig, 3)
     session = connect(cluster)
-    val strategy = myConfig.replicationStrategy
-    val createSchemaRS = createSchema(session, schema, strategy, 3)
     songId = UUID.randomUUID()
     song = Song(songId,"La Petite Tonkinoise","Bye Bye Blackbird","Joséphine Baker",songsTags)
     plId = UUID.randomUUID()
@@ -89,8 +81,5 @@ class BoundStmtSpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
       Playlists.mapRow(row) shouldBe playlist
   }
 
-  override def afterAll() {
-    dropSchema(session, schema)
-    close(session, cluster)
-  }
+  override def afterAll() { dropSchemaCloseSessionCluster() }
 }

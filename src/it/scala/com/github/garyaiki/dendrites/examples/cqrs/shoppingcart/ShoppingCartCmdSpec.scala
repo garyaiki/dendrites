@@ -16,7 +16,7 @@ package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart
 
 import akka.actor.ActorSystem
 import akka.event.Logging
-import akka.stream.{ActorAttributes, ActorMaterializer}
+import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
 import akka.stream.testkit.scaladsl.TestSink
 import com.typesafe.config.ConfigFactory
@@ -27,9 +27,9 @@ import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext
 import scala.collection.immutable.{Iterable, Seq}
 import com.github.garyaiki.dendrites.avro4s.stream.Avro4sSerializer
-import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.ShoppingCartCmd
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.avro4s.Avro4sShoppingCartCmd
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.avro4s.Avro4sShoppingCartCmd.toCaseClass
+import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.ShoppingCartCmd
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.kafka.{ShoppingCartCmdConsumer,
   ShoppingCartCmdProducer}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.fixtures.ShoppingCartCmdBuilder
@@ -61,8 +61,6 @@ class ShoppingCartCmdSpec extends WordSpecLike with Matchers with BeforeAndAfter
       val sink = KafkaSink[String, Array[Byte]](ap)
       val source = Source[ShoppingCartCmd](iter)
       source.via(serializer).runWith(sink)
-
-      val dispatcher = ActorAttributes.dispatcher("dendrites.blocking-dispatcher")
 
       val kafkaSource = KafkaSource[String, Array[Byte]](consumerConfig).withAttributes(dispatcher)
       val consumerRecordQueue = new ConsumerRecordsToQueue[String, Array[Byte]](extractRecords)
