@@ -8,19 +8,17 @@ import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import com.github.garyaiki.dendrites.cassandra.{getConditionalError, getKeyspacesNames}
 import com.github.garyaiki.dendrites.cassandra.fixtures.BeforeAfterAllBuilder
-import com.github.garyaiki.dendrites.cassandra.fixtures.getOneRow
 import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBoundQuery, CassandraMappedPaging}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.{CassandraShoppingCart,
   CassandraShoppingCartEvtLog, RetryConfig, ShoppingCartConfig}
-import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.CassandraShoppingCart.{bndQuery, mapRow}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.CassandraShoppingCartEvtLog.{bndQuery =>
   evtBndQuery, mapRows}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.ShoppingCartCmd
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.event.ShoppingCartEvt
-import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.fixtures.ShoppingCartCmdBuilder
+import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.fixtures.{ShoppingCartBehaviors, ShoppingCartCmdBuilder}
 
 class ShoppingCartCmdAndEvtSinksSpec extends WordSpecLike with Matchers with BeforeAndAfterAll
-  with BeforeAfterAllBuilder with ShoppingCartCmdBuilder {
+  with BeforeAfterAllBuilder with ShoppingCartCmdBuilder with ShoppingCartBehaviors {
 
   var prepStmts: Map[String, PreparedStatement] = null
 
@@ -42,22 +40,11 @@ class ShoppingCartCmdAndEvtSinksSpec extends WordSpecLike with Matchers with Bef
     }
 
     "find updated ShoppingCartCmd in Cassandra" in {
-      val source = TestSource.probe[UUID]
-      val prepStmt = prepStmts.get("Query") match {
-        case Some(stmt) => stmt
-        case None => fail("CassandraShoppingCart Query PreparedStatement not found")
-      }
-      val query = new CassandraBoundQuery[UUID](session, prepStmt, bndQuery, 1)
-      def sink = TestSink.probe[ResultSet]
-      val (pub, sub) = source.via(query).toMat(sink)(Keep.both).run()
-      val row = getOneRow(cartId, (pub, sub))
-      pub.sendComplete()
-      sub.expectComplete()
-
-      val responseShoppingCart = mapRow(row)
-      responseShoppingCart.cartId shouldBe cartId
-      responseShoppingCart.owner shouldBe firstOwner
-      val items = responseShoppingCart.items
+      val response = queryShoppingCart(session, prepStmts)
+      val shoppingCart = response(0)
+      shoppingCart.cartId shouldBe cartId
+      shoppingCart.owner shouldBe firstOwner
+      val items = shoppingCart.items
       items.get(firstItem) match {
         case Some(x) => x shouldBe 1
         case None    => fail(s"ShoppingCart firstItem:$firstItem not found")
@@ -66,7 +53,7 @@ class ShoppingCartCmdAndEvtSinksSpec extends WordSpecLike with Matchers with Bef
         case Some(x) => x shouldBe 2
         case None    => fail(s"ShoppingCart secondItem:secondItem not found")
       }
-      responseShoppingCart.version shouldBe 9
+      shoppingCart.version shouldBe 9
     }
 
     "query by eventId and time" in {

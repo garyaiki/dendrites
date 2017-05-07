@@ -20,19 +20,15 @@ import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
 import com.github.garyaiki.dendrites.cassandra.fixtures.BeforeAfterAllBuilder
-import com.github.garyaiki.dendrites.cassandra.fixtures.getOneRow
-import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBind, CassandraBoundQuery, CassandraRetrySink,
-  CassandraSink}
+import com.github.garyaiki.dendrites.cassandra.stream.CassandraRetrySink
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.{RetryConfig, ShoppingCartConfig}
-import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.CassandraShoppingCart.{bndDelete, bndQuery,
-  mapRow}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.ShoppingCartCmd
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.doShoppingCartCmd
-import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.fixtures.ShoppingCartCmdBuilder
+import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.fixtures.{ShoppingCartBehaviors, ShoppingCartCmdBuilder}
 import com.github.garyaiki.dendrites.stream.SpyFlow
 
 class CassandraShoppingCartCmdSpec extends WordSpecLike with Matchers with BeforeAndAfterAll
-    with BeforeAfterAllBuilder with ShoppingCartCmdBuilder {
+    with BeforeAfterAllBuilder with ShoppingCartCmdBuilder with ShoppingCartBehaviors {
 
   var prepStmts: Map[String, PreparedStatement] = null
 
@@ -56,22 +52,11 @@ class CassandraShoppingCartCmdSpec extends WordSpecLike with Matchers with Befor
   }
 
   "query a ShoppingCart after updating items and owner" in {
-    val source = TestSource.probe[UUID]
-    val prepStmt = prepStmts.get("Query") match {
-      case Some(stmt) => stmt
-      case None       => fail("CassandraShoppingCart Query PreparedStatement not found")
-    }
-    val query = new CassandraBoundQuery[UUID](session, prepStmt, bndQuery, 1)
-    def sink = TestSink.probe[ResultSet]
-    val (pub, sub) = source.via(query).toMat(sink)(Keep.both).run()
-    val row = getOneRow(cartId, (pub, sub))
-    pub.sendComplete()
-    sub.expectComplete()
-
-    val responseShoppingCart = mapRow(row)
-    responseShoppingCart.cartId shouldBe cartId
-    responseShoppingCart.owner shouldBe firstOwner
-    val items = responseShoppingCart.items
+    val response = queryShoppingCart(session, prepStmts)
+    val shoppingCart = response(0)
+    shoppingCart.cartId shouldBe cartId
+    shoppingCart.owner shouldBe firstOwner
+    val items = shoppingCart.items
     items.get(firstItem) match {
       case Some(x) => x shouldBe 1
       case None    => fail(s"ShoppingCart firstItem:$firstItem not found")
@@ -80,21 +65,10 @@ class CassandraShoppingCartCmdSpec extends WordSpecLike with Matchers with Befor
       case Some(x) => x shouldBe 2
       case None    => fail(s"ShoppingCart secondItem:secondItem not found")
     }
-    responseShoppingCart.version shouldBe 9
+    shoppingCart.version shouldBe 9
   }
 
-  "delete ShoppingCart " in {
-    val cartIds = Seq(cartId)
-    val iter = Iterable(cartIds.toSeq: _*)
-    val source = Source[UUID](iter)
-    val prepStmt = prepStmts.get("Delete") match {
-      case Some(stmt) => stmt
-      case None       => fail("CassandraShoppingCart Delete PreparedStatement not found")
-    }
-    val bndStmt = new CassandraBind(prepStmt, bndDelete)
-    val sink = new CassandraSink(session)
-    source.via(bndStmt).runWith(sink)
-  }
+  "delete ShoppingCart " in { deleteShoppingCart(session, prepStmts) }
 
   override def afterAll() { dropSchemaCloseSessionCluster() }
 }
