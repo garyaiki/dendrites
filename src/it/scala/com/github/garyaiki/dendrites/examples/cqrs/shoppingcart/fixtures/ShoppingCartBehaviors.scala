@@ -29,6 +29,9 @@ import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBind, CassandraB
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.ShoppingCart
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.CassandraShoppingCart.{bndDelete, bndQuery,
   mapRows}
+import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.CassandraShoppingCartEvtLog.{bndQuery =>
+  evtBndQuery, mapRows => evtMapRows}
+import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.event.ShoppingCartEvt
 
 trait ShoppingCartBehaviors extends Matchers with ShoppingCartCmdBuilder { this: WordSpecLike =>
 
@@ -67,5 +70,26 @@ trait ShoppingCartBehaviors extends Matchers with ShoppingCartCmdBuilder { this:
     val bndStmt = new CassandraBind(prepStmt, bndDelete)
     val sink = new CassandraSink(session)
     source.via(bndStmt).runWith(sink)
+  }
+
+  def queryShoppingCartEvent(session: Session, prepStmts: Map[String, PreparedStatement])
+    (implicit sys: ActorSystem, ec: ExecutionContext, mat: ActorMaterializer, logger: LoggingAdapter):
+      Seq[ShoppingCartEvt] = {
+    val source = TestSource.probe[(UUID, UUID)]
+    val prepStmt = prepStmts.get("QueryEvt") match {
+      case Some(stmt) => stmt
+      case None       => fail("CassandraShoppingCartEvtLog QueryEvt PreparedStatement not found")
+    }
+    val bndStmt = new CassandraBoundQuery(session, prepStmt, evtBndQuery, 10)
+    val paging = new CassandraMappedPaging[ShoppingCartEvt](10, evtMapRows)
+    def sink = TestSink.probe[Seq[ShoppingCartEvt]]
+    val (pub, sub) = source.via(bndStmt).via(paging).toMat(sink)(Keep.both).run()
+    sub.request(1)
+    pub.sendNext((cartId, startTime))
+    val response = sub.expectNext()
+    pub.sendComplete()
+    sub.expectComplete()
+
+    response
   }
 }

@@ -231,6 +231,15 @@ In a dendrites directory terminal window with sbt running
 
 `> it:testOnly com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.stream.CassandraShoppingCartEvtLogSpec`
 
+`> it:testOnly com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.stream.ShoppingCartCmdAndEvtSinkSpec`
+
+`> it:testOnly com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.stream.ShoppingCartCmdAndEvtSinksSpec`
+
+With Kafka shoppingcartcmd-topic
+
+`> it:testOnly com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.stream.ShoppingCartCmdAndEvtSpec`
+
+
 ##### Stop Cassandra
 After running integration tests, exit sbt to close its connection to Cassandra. If you kill Cassandra while sbt is still running after the tests it will keep trying to reconnect to Cassandra.
 

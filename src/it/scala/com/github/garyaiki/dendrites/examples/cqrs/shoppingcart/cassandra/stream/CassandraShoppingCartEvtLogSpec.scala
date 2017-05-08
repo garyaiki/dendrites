@@ -14,25 +14,22 @@
   */
 package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.stream
 
-import akka.NotUsed
-import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
+import akka.stream.scaladsl.Source
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-import com.datastax.driver.core.{PreparedStatement, ResultSet, Row}
+import com.datastax.driver.core.PreparedStatement
 import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
 import com.github.garyaiki.dendrites.cassandra.fixtures.BeforeAfterAllBuilder
-import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBind, CassandraBoundQuery, CassandraMappedPaging,
-  CassandraSink}
+import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBind, CassandraSink}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.event.ShoppingCartEvt
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.{ShoppingCartConfig,
   CassandraShoppingCartEvtLog}
-import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.CassandraShoppingCartEvtLog.{bndInsert,
-  bndQuery, mapRows}
-import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.fixtures.ShoppingCartCmdBuilder
+import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.CassandraShoppingCartEvtLog.bndInsert
+import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.fixtures.{ShoppingCartBehaviors, ShoppingCartCmdBuilder}
 
 class CassandraShoppingCartEvtLogSpec extends WordSpecLike with Matchers with BeforeAndAfterAll
-  with BeforeAfterAllBuilder with ShoppingCartCmdBuilder {
+  with BeforeAfterAllBuilder with ShoppingCartCmdBuilder with ShoppingCartBehaviors {
 
   var prepStmts: Map[String, PreparedStatement] = null
 
@@ -58,21 +55,8 @@ class CassandraShoppingCartEvtLogSpec extends WordSpecLike with Matchers with Be
   }
 
   "query by eventId and time" in {
-    val source = TestSource.probe[(UUID, UUID)]
-    val prepStmt = prepStmts.get("QueryEvt") match {
-      case Some(stmt) => stmt
-      case None       => fail("CassandraShoppingCartEvtLog QueryEvt PreparedStatement not found")
-    }
-    val bndStmt = new CassandraBoundQuery(session, prepStmt, bndQuery, 10)
-    val paging = new CassandraMappedPaging[ShoppingCartEvt](10, mapRows)
-    def sink = TestSink.probe[Seq[ShoppingCartEvt]]
-    val (pub, sub) = source.via(bndStmt).via(paging).toMat(sink)(Keep.both).run()
-    sub.request(1)
-    pub.sendNext((cartId, startTime))
-    var response = sub.expectNext()
+    val response = queryShoppingCartEvent(session, prepStmts)
     response shouldBe evts
-    pub.sendComplete()
-    sub.expectComplete()
   }
 
   override def afterAll() { dropSchemaCloseSessionCluster() }

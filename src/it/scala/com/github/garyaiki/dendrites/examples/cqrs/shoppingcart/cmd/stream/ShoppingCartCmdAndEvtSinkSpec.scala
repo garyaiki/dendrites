@@ -1,18 +1,12 @@
 package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.stream
 
-import akka.NotUsed
-import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Keep, Sink, Source}
+import akka.stream.scaladsl.Source
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-import com.datastax.driver.core.{PreparedStatement, ResultSet}
+import com.datastax.driver.core.PreparedStatement
 import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
-import com.github.garyaiki.dendrites.cassandra.{getConditionalError, getKeyspacesNames}
 import com.github.garyaiki.dendrites.cassandra.fixtures.BeforeAfterAllBuilder
-import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBoundQuery, CassandraMappedPaging}
-import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.{CassandraShoppingCart,
-  CassandraShoppingCartEvtLog, RetryConfig, ShoppingCartConfig}
-import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.CassandraShoppingCartEvtLog.{bndQuery =>
-  evtBndQuery, mapRows}
+import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.ShoppingCartConfig
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.ShoppingCartCmd
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.event.ShoppingCartEvt
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.fixtures.{ShoppingCartBehaviors, ShoppingCartCmdBuilder}
@@ -57,21 +51,8 @@ class ShoppingCartCmdAndEvtSinkSpec extends WordSpecLike with Matchers with Befo
     }
 
     "query by eventId and time" in {
-      val source = TestSource.probe[(UUID, UUID)]
-      val prepStmt = prepStmts.get("QueryEvt") match {
-        case Some(stmt) => stmt
-        case None => fail("CassandraShoppingCartEvtLog QueryEvt PreparedStatement not found")
-      }
-      val bndStmt = new CassandraBoundQuery(session, prepStmt, evtBndQuery, 10)
-      val paging = new CassandraMappedPaging[ShoppingCartEvt](10, mapRows)
-      def sink = TestSink.probe[Seq[ShoppingCartEvt]]
-      val (pub, sub) = source.via(bndStmt).via(paging).toMat(sink)(Keep.both).run()
-      sub.request(1)
-      pub.sendNext((cartId, startTime))
-      var response = sub.expectNext()
+      val response = queryShoppingCartEvent(session, prepStmts)
       response.length shouldBe kvCmds.length
-      pub.sendComplete()
-      sub.expectComplete()
     }
   }
 
