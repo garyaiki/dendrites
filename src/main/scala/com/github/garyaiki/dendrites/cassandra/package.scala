@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -16,8 +15,8 @@ package com.github.garyaiki.dendrites
 
 import _root_.akka.actor.ActorSystem
 import _root_.akka.event.Logging
-import com.datastax.driver.core.{BatchStatement, BoundStatement, CloseFuture, Cluster, Host, KeyspaceMetadata, Metadata, QueryLogger,
-  PreparedStatement, ResultSet, Row, Session}
+import com.datastax.driver.core.{BatchStatement, BoundStatement, CloseFuture, Cluster, Host, KeyspaceMetadata, Metadata,
+  QueryLogger, PreparedStatement, ResultSet, Row, Session}
 import com.datastax.driver.core.exceptions.NoHostAvailableException
 import com.datastax.driver.core.policies.{DCAwareRoundRobinPolicy, DefaultRetryPolicy, LoadBalancingPolicy,
   LoggingRetryPolicy, ReconnectionPolicy, RetryPolicy}

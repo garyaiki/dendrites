@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -24,10 +23,8 @@ import akka.stream.Materializer
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import spray.json.DefaultJsonProtocol
-import com.github.garyaiki.dendrites.examples.account.{CheckingAccountBalances,
-  GetAccountBalances,
-  MoneyMarketAccountBalances,
-  SavingsAccountBalances}
+import com.github.garyaiki.dendrites.examples.account.{CheckingAccountBalances, GetAccountBalances,
+  MoneyMarketAccountBalances, SavingsAccountBalances}
 
 /** Map json <=> case classes to Either Right on success, String to Left on failure
   *
@@ -45,7 +42,7 @@ trait BalancesProtocols extends DefaultJsonProtocol {
   /** Unmarshall HttpEntity result
     * @param entity
     * @return Future case class
-    * @see [[http://doc.akka.io/api/akka/current/#akka.http.scaladsl.unmarshalling.Unmarshaller$$NoContentException$ NoContentException]]
+    * @see [[http://doc.akka.io/api/akka-http/current/akka/http/scaladsl/unmarshalling/Unmarshaller$.html Unmarshaller]]
     * @throws NoContentException
     */
   def mapChecking(entity: HttpEntity): Future[Right[String, AnyRef]] = {
@@ -55,7 +52,6 @@ trait BalancesProtocols extends DefaultJsonProtocol {
   /** Unmarshall HttpEntity error
     * @param entity
     * @return Future error message
-    * @see [[http://doc.akka.io/api/akka/current/#akka.http.scaladsl.unmarshalling.Unmarshaller$$NoContentException$ NoContentException]]
     * @throws NoContentException
     */
   def mapPlain(entity: HttpEntity): Future[Left[String, Nothing]] = Unmarshal(entity).to[String].map(Left(_))
@@ -63,7 +59,6 @@ trait BalancesProtocols extends DefaultJsonProtocol {
   /** Unmarshall HttpEntity result
     * @param entity
     * @return Future case class
-    * @see [[http://doc.akka.io/api/akka/current/#akka.http.scaladsl.unmarshalling.Unmarshaller$$NoContentException$ NoContentException]]
     * @throws NoContentException
     */
   def mapMoneyMarket(entity: HttpEntity): Future[Right[String, AnyRef]] = {
@@ -73,7 +68,6 @@ trait BalancesProtocols extends DefaultJsonProtocol {
   /** Unmarshall HttpEntity result
     * @param entity
     * @return Future case class
-    * @see [[http://doc.akka.io/api/akka/current/#akka.http.scaladsl.unmarshalling.Unmarshaller$$NoContentException$ NoContentException]]
     * @throws NoContentException
     */
   def mapSavings(entity: HttpEntity): Future[Right[String, AnyRef]] = {

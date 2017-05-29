@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -101,7 +100,7 @@ object CassandraShoppingCartEvtLog {
     * @param row
     * @return case class
     */
-  def mapRow(row: Row): ShoppingCartEvt = row.as[ShoppingCartEvt]
+  def mapRow(row: Row): ShoppingCartEvt = row.as[ShoppingCartEvt] // Presentation compiler in Scala-ide shows error
 
   def mapRows(rows: Seq[Row]): Seq[ShoppingCartEvt] = rows.map { x => mapRow(x) }
 }

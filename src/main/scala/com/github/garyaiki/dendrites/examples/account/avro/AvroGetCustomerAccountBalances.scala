@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -14,12 +13,12 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.examples.account.avro
 
+import java.util.{List => JList}
 import org.apache.avro.Schema
-import org.apache.avro.io.DecoderFactory
 import org.apache.avro.generic.{GenericData, GenericDatumWriter, GenericRecord}
+import org.apache.avro.io.DecoderFactory
 import org.apache.avro.specific.{SpecificDatumReader, SpecificDatumWriter}
 import org.apache.avro.util.Utf8
-import java.util.{List => JList}
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 import com.github.garyaiki.dendrites.ccToMap

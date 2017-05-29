@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -23,8 +22,7 @@ import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
   * @param f user function maps Array[Byte] to case class
   * @author Gary Struthers
   */
-class Avro4sDeserializer[A <: Product](f:(Array[Byte]) => A)
-    extends GraphStage[FlowShape[Array[Byte], A]] {
+class Avro4sDeserializer[A <: Product](f:(Array[Byte]) => A) extends GraphStage[FlowShape[Array[Byte], A]] {
 
   val in = Inlet[Array[Byte]]("Avro4sSerializer.in")
   val out = Outlet[A]("Avro4sSerializer.out")
@@ -46,9 +44,7 @@ class Avro4sDeserializer[A <: Product](f:(Array[Byte]) => A)
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          pull(in)
-        }
+        override def onPull(): Unit = pull(in)
       })
     }
 }

@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -32,7 +31,7 @@ import com.github.garyaiki.dendrites.avro.byteArrayToGenericRecord
   * @author Gary Struthers
   */
 class ConsumerRecordDeserializer[K, V <: Product](schema: Schema, f:(GenericRecord) => V)
-    extends GraphStage[FlowShape[ConsumerRecord[K, Array[Byte]], (K, V)]] {
+  extends GraphStage[FlowShape[ConsumerRecord[K, Array[Byte]], (K, V)]] {
 
   val in = Inlet[ConsumerRecord[K, Array[Byte]]]("ConsumerRecordDeserializer.in")
   val out = Outlet[(K, V)]("ConsumerRecordDeserializer.out")
@@ -57,9 +56,7 @@ class ConsumerRecordDeserializer[K, V <: Product](schema: Schema, f:(GenericReco
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          pull(in)
-        }
+        override def onPull(): Unit = pull(in)
       })
     }
 }

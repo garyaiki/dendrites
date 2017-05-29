@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -30,8 +29,7 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike
   * @param qtAgent QTreeAgent
   * @author Gary Struthers
   */
-class QTreeAgentFlow[A: QTreeLike](qtAgent: QTreeAgent[A])
-  extends GraphStage[FlowShape[Seq[A], Future[QTree[A]]]] {
+class QTreeAgentFlow[A: QTreeLike](qtAgent: QTreeAgent[A]) extends GraphStage[FlowShape[Seq[A], Future[QTree[A]]]] {
 
   val in = Inlet[Seq[A]]("QTree like values in")
   val out = Outlet[Future[QTree[A]]]("Future QTree out")
@@ -47,9 +45,7 @@ class QTreeAgentFlow[A: QTreeLike](qtAgent: QTreeAgent[A])
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          pull(in)
-        }
+        override def onPull(): Unit = pull(in)
       })
     }
   }

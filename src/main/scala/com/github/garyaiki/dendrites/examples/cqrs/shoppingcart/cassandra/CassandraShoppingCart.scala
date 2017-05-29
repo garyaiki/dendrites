@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -17,6 +16,7 @@ package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra
 import akka.event.LoggingAdapter
 import com.datastax.driver.core.{BoundStatement, PreparedStatement, ResultSet, ResultSetFuture, Row, Session}
 import com.datastax.driver.core.exceptions.InvalidQueryException
+import com.weather.scalacass.syntax._
 import java.util.UUID
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ArrayBuffer, StringBuilder}
@@ -204,10 +204,7 @@ object CassandraShoppingCart {
     do {
       row = queryRS.one
     } while (row == null | !queryRS.isExhausted )
-    if (row == null) {
-      System.out.println(s"(getShoppingCart NULL")
-      None
-    } else {
+    if (row == null) { None } else {
       val sc = mapRow(row)
       val sb = new StringBuilder()
       sc.items foreach { x =>
@@ -244,6 +241,7 @@ object CassandraShoppingCart {
     */
   def checkAndSetOwner(session: Session, queryStmt: PreparedStatement, setStmt: PreparedStatement)(setOwner: SetOwner):
     ResultSetFuture = {
+
     val sc = getShoppingCart(session, queryStmt, setOwner.cartId)
     sc match {
       case Some(x) => updateOwner(session, setStmt, SetOwner(setOwner.cartId, setOwner.owner, x.version))
@@ -275,6 +273,7 @@ object CassandraShoppingCart {
     */
   def checkAndSetItems(session: Session, queryStmt: PreparedStatement, setStmt: PreparedStatement)(setItems: SetItems):
     ResultSetFuture = {
+
     val sc = getShoppingCart(session, queryStmt, setItems.cartId)
     sc match {
       case Some(x) => {
@@ -293,15 +292,16 @@ object CassandraShoppingCart {
     *
     * @param row
     * @return case class
-    */
+    *
   def mapRow(row: Row): ShoppingCart = {
     val m = row.getMap("items", classOf[java.util.UUID], classOf[java.lang.Integer]).asScala
     val items = m.mapValues {x => x.intValue }
     ShoppingCart(row.getUUID("cartId"), row.getUUID("owner"), items.toMap, row.getInt("version"))
-  }
+  }*/
+
+  def mapRow(row: Row): ShoppingCart = row.as[ShoppingCart] // Scala-ide shows error, Presentation compiler only
 
   /** Map Seq of Rows to case class.
-
     *
     * @param rows: Seq[Row]
     * @return Seq[ShoppingCart]

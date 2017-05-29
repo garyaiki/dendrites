@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -35,14 +34,11 @@ class AvroSerializer[A <: Product, B](schema: Schema, f:(Schema, A) => B) extend
   override def createLogic(attr: Attributes): GraphStageLogic =
     new GraphStageLogic(shape) {
       setHandler(in, new InHandler {
-        override def onPush(): Unit = {
-          push(out, f(schema, grab(in)))
-        }
+        override def onPush(): Unit = push(out, f(schema, grab(in)))
       })
+
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          pull(in)
-        }
+        override def onPull(): Unit = pull(in)
       })
     }
 }

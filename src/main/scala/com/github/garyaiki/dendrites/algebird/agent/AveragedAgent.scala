@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -26,8 +25,8 @@ import scala.concurrent.{ExecutionContext, Future}
   * @param ec implicit ExecutionContext
   *
   * @example [[com.github.garyaiki.dendrites.algebird.agent.stream.AveragedAgentFlow]]
-  * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
+  * @see [[http://doc.akka.io/api/akka/current/akka/agent/index.html Agent]]
+  * @see [[http://twitter.github.io/algebird/datatypes/averaged_value.html AveragedValue]]
   * @author Gary Struthers
   */
 class AveragedAgent(val name: String = "", init: AveragedValue = new AveragedValue(0, 0.0))

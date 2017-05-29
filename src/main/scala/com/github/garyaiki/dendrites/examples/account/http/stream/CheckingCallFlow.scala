@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -31,10 +30,8 @@ import com.github.garyaiki.dendrites.http.stream.TypedResponseFlow.decider
   * @author Gary Struthers
   *
   */
-class CheckingCallFlow(implicit ec: ExecutionContext,
-  val system: ActorSystem,
-  log: LoggingAdapter,
-  val mat: Materializer)  extends BalancesProtocols {
+class CheckingCallFlow(implicit ec: ExecutionContext, val sys: ActorSystem, log: LoggingAdapter, val mat: Materializer)
+  extends BalancesProtocols {
 
   val clientConfig = new CheckingBalancesClientConfig()
   val baseURL = clientConfig.baseURL

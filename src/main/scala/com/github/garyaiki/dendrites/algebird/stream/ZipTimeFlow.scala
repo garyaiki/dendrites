@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -21,7 +20,6 @@ import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
   *
   * @tparam A Numeric
   * @param f produces time, arg:A is ignore-able
-  * @example [[com.github.garyaiki.dendrites.algebird.agent.stream.DecayedValueAgentFlow]]
   * @author Gary Struthers
   */
 class ZipTimeFlow[A: Numeric](f: A => Double) extends GraphStage[FlowShape[Seq[A], Seq[(Double, Double)]]] {

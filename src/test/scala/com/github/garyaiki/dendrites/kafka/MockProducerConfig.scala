@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -22,7 +21,7 @@ import com.github.garyaiki.dendrites.concurrent.calculateDelay
 
 object MockProducerConfig extends ProducerConfig[String, Array[Byte]] {
 
-  override def generateKey() = UUID.randomUUID.toString
+  override def generateKey(): String = UUID.randomUUID.toString
 
   val topic = "akkaKafka"
   val autoComplete = true // When false must call completeNext or errorNext for each record

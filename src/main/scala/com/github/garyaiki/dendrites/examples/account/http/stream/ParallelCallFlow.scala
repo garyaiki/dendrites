@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -47,10 +46,7 @@ import com.github.garyaiki.dendrites.stream.{leftRightFlow, logLeftRightFlow}
   * @param materializer implicit Materializer
   * @author Gary Struthers
   */
-class ParallelCallFlow(implicit val ec: ExecutionContext,
-    sys: ActorSystem,
-    log: LoggingAdapter,
-    val materializer: Materializer) {
+class ParallelCallFlow(implicit ec: ExecutionContext, sys: ActorSystem, log: LoggingAdapter, val mat: Materializer) {
 
   def zipper = ZipWith((in0: Either[String, AnyRef], in1: Either[String, AnyRef], in2: Either[String, AnyRef]) =>
     (in0, in1, in2))

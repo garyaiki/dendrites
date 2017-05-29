@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -14,8 +13,8 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.algebird
 
-/** Akka [[http://doc.akka.io/api/akka/2.4/#akka.agent.Agent Agent]] for concurrently updating and
-  * accessing [[https://github.com/twitter/algebird/wiki Algebird]] approximate data structures
+/** Akka [[http://doc.akka.io/api/akka/current/akka/agent/index.html Agent]] for concurrently updating and
+  * accessing [[http://twitter.github.io/algebird/ Algebird]] approximate data structures
   *
   * == AveragedAgent ==
   * Create AveragedValue Agent, update it, Future will have latest AveragedValue
@@ -72,7 +71,7 @@ package com.github.garyaiki.dendrites.algebird
   * val qTreeAgent = new QTreeAgent[BigDecimal]("testBD 1st update data")
   * val updateFuture: Future[QTree[BigDecimal]] = qTreeAgent.alter(bigDecimals)
   * }}}
-  *      
+  *
   * @author Gary Struthers
   *
   */

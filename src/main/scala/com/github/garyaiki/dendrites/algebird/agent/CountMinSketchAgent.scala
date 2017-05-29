@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -27,14 +26,13 @@ import com.github.garyaiki.dendrites.algebird.createCMSMonoid
   * @param ec implicit ExecutionContext
   *
   * @example [[com.github.garyaiki.dendrites.algebird.agent.stream.CountMinSketchAgentFlow]]
-  * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSHasher CMSHasher]]
-  * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
+  * @see [[http://doc.akka.io/api/akka/current/akka/agent/index.html Agent]]
+  * @see [[http://twitter.github.io/algebird/datatypes/approx/countminsketch.html CMSHasher]]
+  * @see [[http://www.scala-lang.org/api/current/scala/math/Ordering.html Ordering]]
   *
   * @author Gary Struthers
   */
-class CountMinSketchAgent[K: Ordering: CMSHasher](val name: String = "")
-  (implicit ec: ExecutionContext) {
+class CountMinSketchAgent[K: Ordering: CMSHasher](val name: String = "")(implicit ec: ExecutionContext) {
 
   val zero = createCMSMonoid[K]().zero
   val agent = Agent(zero)

@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -27,7 +26,7 @@ import scala.collection.mutable.ArrayBuffer
   * @param logger implicit LoggingAdapter
   * @author Gary Struthers
   */
-class CassandraPaging(size: Int)(implicit logger: LoggingAdapter) extends GraphStage[FlowShape[ResultSet, Seq[Row]]]{
+class CassandraPaging(size: Int)(implicit logger: LoggingAdapter) extends GraphStage[FlowShape[ResultSet, Seq[Row]]] {
 
   val in = Inlet[ResultSet]("CassandraPaging.in")
   val out = Outlet[Seq[Row]]("CassandraPaging.out")

@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -20,7 +19,7 @@ import com.twitter.algebird.{HyperLogLog, HyperLogLogAggregator, HLL}
 /** Create an HLL from Seq[A]
   *
   * @tparam A convertable to Int or Long
-  * @see [[http://danielwestheide.com/blog/2013/02/06/the-neophytes-guide-to-scala-part-12-type-classes.html type-classes]]
+  * @see [[http://danielwestheide.com/blog/2013/02/06/the-neophytes-guide-to-scala-part-12-type-classes.html typeclass]]
   * @author Gary Struthers
   */
 @implicitNotFound(msg = "HyperLogLogLike type class for ${A} must be convertable to Int or Long")

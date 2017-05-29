@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -142,7 +141,7 @@ package object http {
 
   /** Call server with GET query, case class is turned into Get query, appended to baseURL
     *
-    * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.Http$ Http]]
+    * @see [[http://doc.akka.io/api/akka-http/current/akka/http/scaladsl/Http$.html Http]]
     *
     * @param baseURL
     * @param requestPath
@@ -154,6 +153,7 @@ package object http {
     */
   def typedQuery(baseURL: StringBuilder, requestPath: String, ccToGet:(Product, String) => StringBuilder)
     (cc: Product)(implicit system: ActorSystem, materializer: Materializer): Future[HttpResponse] = {
+
     val balancesQuery = ccToGet(cc, requestPath)
     val uriS = (baseURL ++ balancesQuery).mkString
 
@@ -162,8 +162,8 @@ package object http {
 
   /** Map HttpResponse to a Future[Either] Left for error, Right for good result
     *
-    * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.model.HttpResponse HttpResponse]]
-    * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.unmarshalling.Unmarshal Unmarshal]]
+    * @see [[http://doc.akka.io/api/akka-http/current/akka/http/scaladsl/model/HttpResponse.html HttpResponse]]
+    * @see [[http://doc.akka.io/api/akka-http/current/akka/http/scaladsl/unmarshalling/Unmarshal.html Unmarshal]]
     * @example [[com.github.garyaiki.dendrites.examples.account.http.actor.CheckingAccountClient]]
     *
     * @param mapLeft plain text response to Left
@@ -175,8 +175,7 @@ package object http {
     * @return Future[Either[String, AnyRef]]
     */
   def typedResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
-    mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
-    (response: HttpResponse)
+    mapRight: (HttpEntity) => Future[Right[String, AnyRef]])(response: HttpResponse)
     (implicit ec: ExecutionContext, logger: LoggingAdapter, materializer: Materializer):
     Future[Either[String, AnyRef]] = {
       response.status match {
@@ -198,8 +197,6 @@ package object http {
 
   /** Map Future[HttpResponse} to a Future[Either] Left for error, Right for good result
     *
-    * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.model.HttpResponse HttpResponse]]
-    * @see [[http://doc.akka.io/api/akka/2.4.7/#akka.http.scaladsl.unmarshalling.Unmarshal Unmarshal]]
     * @example [[com.github.garyaiki.dendrites.examples.account.http.actor.CheckingAccountClient]]
     *
     * @param mapLeft plain text response to Left
@@ -210,8 +207,7 @@ package object http {
     * @return Future[Either[String, AnyRef]]
     */
   def typedFutureResponse(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
-    mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
-    (caller: Future[HttpResponse])
+    mapRight: (HttpEntity) => Future[Right[String, AnyRef]])(caller: Future[HttpResponse])
     (implicit ec: ExecutionContext, logger: LoggingAdapter, materializer: Materializer):
     Future[Either[String, AnyRef]] = {
 
@@ -241,6 +237,7 @@ package object http {
     (cc: Product)
     (implicit ec: ExecutionContext, system: ActorSystem, logger: LoggingAdapter, materializer: Materializer):
     Future[Either[String, AnyRef]] = {
+
       val callFuture = typedQuery(baseURL, requestPath, ccToGet)(cc)
       typedFutureResponse(mapLeft, mapRight)(callFuture)
   }

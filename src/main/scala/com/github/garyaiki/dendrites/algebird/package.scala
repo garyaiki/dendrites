@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -15,16 +14,14 @@ limitations under the License.
 package com.github.garyaiki.dendrites
 
 import com.twitter.algebird.{Approximate, AveragedGroup, AveragedValue, Averager, BF, BloomFilter, CMS, CMSHasher,
-  CMSMonoid, DecayedValue, DecayedValueMonoid, Field, Functor, Group, HLL, HyperLogLogAggregator, IntRing, LongRing,
-  MaxAggregator, MinAggregator, Monoid, NumericRing, QTree, QTreeSemigroup, Ring, Semigroup}
+  CMSMonoid, DecayedValue, DecayedValueMonoid, Functor, HLL, HyperLogLogAggregator, MaxAggregator, MinAggregator, QTree,
+  QTreeSemigroup}
 import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTreeLike}
 
 /** Aggregation functions for Twitter Algebird.
   *
-  * Algebird provides implicit implementations of common types which are imported here. Class
-  * extraction methods in [[com.github.garyaiki.dendrites]] can be used to extract a field from your case classes and tuples.
-  * When the extracted field is an already supported type, you don't have to write custom Algebird
-  * classes.
+  * Algebird provides implicit implementations of common types which are imported here. Class extraction methods in
+  * [[com.github.garyaiki.dendrites]] can be used to extract a field from case classes and tuples.
   *
   * == AveragedValue ==
   *
@@ -43,10 +40,9 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTre
   *
   * == BloomFilter ==
   * Fast find if a word is in a dictionary
-  * OSX has dictionaries you can use to create BloomFilters
-  * `com.github.garyaiki.dendrites.fixtures.SysProcessUtils` for Paths to properNames, connectives,
-  * words and functions to read them
-  * `com.github.garyaiki.dendrites.algebird.fixtures.BloomFilterBuilder`
+  * OSX and Linux have dictionaries you can use to create BloomFilters
+  * `com.github.garyaiki.dendrites.fixtures.SysProcessUtils` for Paths to properNames, connectives, words and functions
+  * to read them `com.github.garyaiki.dendrites.algebird.fixtures.BloomFilterBuilder`
   * for creation of BloomFilters for these dictionaries and select test words for them.
   *
   * Create a BloomFilter for OSX words dictionary
@@ -76,8 +72,7 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTre
   *
   * Test data is IP addresses repeated a random number of times
   * `com.github.garyaiki.dendrites.algebird.CountMinSketchSpec`
-  * Estimate total number of elements seen so far
-  * `com.github.garyaiki.dendrites.fixtures.InetAddressesBuilder`
+  * Estimate total number of elements seen so far `com.github.garyaiki.dendrites.fixtures.InetAddressesBuilder`
   * {{{
   * val addrs = inetAddresses(ipRange)
   * val longZips = inetToLongZip(addrs)
@@ -107,12 +102,10 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTre
   *
   * == DecayedValue ==
   *
-  * Test data is a sine wave with a value for each of 360 degrees with a corresponding time value
-  * The idea is a rising and falling value over a year
-  * `com.github.garyaiki.dendrites.fixtures.TrigUtils`
+  * Test data is a sine wave with a value for each of 360 degrees with a corresponding time value. The idea is a
+  * rising and falling value over a year `com.github.garyaiki.dendrites.fixtures.TrigUtils`
   *
-  * Moving average from the initial value to specified index
-  * `com.github.garyaiki.dendrites.algebird.DecayedValueSpec`
+  * Moving average from the initial value to specified index `com.github.garyaiki.dendrites.algebird.DecayedValueSpec`
   * {{{
   * val sines = genSineWave(100, 0 to 360)
   * val days = Range.Double(0.0, 361.0, 1.0)
@@ -228,195 +221,13 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTre
   * val min3 = min(filterRight(eithBigInts)
   * }}}
   *
-  * == Semigroup ==
-  * Plus function obeys associative law `com.github.garyaiki.dendrites.algebird.SemigroupSpec`
-  * Sum elements of a sequence that may be empty.
-  * {{{
-  * val bigDecimals: Seq[BigDecimal]
-  * val opt = sumOption(bigDecimals)
-  * val sum = opt.get
-  * val eithBigInts = Seq[Either[String, BigInt]]
-  * val eith = sumOption(eithBigInts).get
-  * val sum2 = eith.right.get
-  * }}}
-  *
-  * == Monoid ==
-  * Extends Semigroup with a zero element `com.github.garyaiki.dendrites.algebird.MonoidSpec`
-  * Sum sequence elements for a type that has a zero under addition.
-  * {{{
-  * val doubles: Seq[Double]
-  * val sum = sum(doubles)
-  * val optBigInts: Seq[Option[BigInt]]
-  * val sum2 = sum(optBigInts.flatten)
-  * val eithFloats = Seq[Either[String, Float]]
-  * val sum3 = sum(eithFloats).right.get
-  * }}}
-  *
-  * == Group ==
-  * Extends Monoid with minus, negate operators `com.github.garyaiki.dendrites.algebird.GroupSpec`
-  * Negate a value
-  * {{{
-  * val float = 3131.7f
-  * val neg = negate(float)
-  * val double = 3130.0
-  * val neg2 = negate(double.get)
-  * val int = 2847
-  * val neg3 = negate(int.right.get)
-  * }}}
-  *
-  * Subract a value from another
-  * {{{
-  * val float = 3131.7f
-  * val diff = minus(float, 1.7f)
-  * val opt = Some(3130.0)
-  * val diff2 = minus(opt.get, 30.0)
-  * val eithLong = 2847L
-  * val diff3 = minus(eithLong.right.get, 47L)
-  * }}}
-  *
-  * == Ring ==
-  * Extends Group with times, product and one identity under multiplication
-  * Multiply a value by another `com.github.garyaiki.dendrites.algebird.RingSpec`
-  * {{{
-  * val float = 3131.7f
-  * val prod = times(float, 1.7f)
-  * val opt = Some(3130.0)
-  * val prod2 = times(opt.get, 30.0)
-  * val eithLong = 2847L
-  * val prod3 = times(eithLong.right.get, 47L)
-  * }}}
-  *
-  * Multiply elements of a sequence `(((xs[0] * xs[1]) * xs[2]) * xs[3])` for a type with identity.
-  * {{{
-  * val doubles: Seq[Double]
-  * val prod = product(doubles)
-  * val optBigInts: Seq[Option[BigInt]]
-  * val prod2 = product(optBigInts.flatten)
-  * val eithFloats = Seq[Either[String, Float]]
-  * val prod3 = product(eithFloats).right.get
-  * }}}
-  *
-  * == Field ==
-  * Extends Ring with inverse, div  `com.github.garyaiki.dendrites.algebird.FieldSpec`
-  * Invert a value a -> 1/a
-  * {{{
-  * val float = 3131.7f
-  * val recip = inverse(float)
-  * }}}
-  * {{{
-  * val optDouble = Some(3130.0)
-  * val recip = inverse(double.get)
-  * }}}
-  * {{{
-  * val eithInt = Right(2847)
-  * val recip = inverse(eithInt.right.get)
-  * }}}
-  *
-  * Divide a value
-  * {{{
-  * val float = 3131.7f
-  * val quotient = div(float, 1.7f)
-  * }}}
-  * {{{
-  * val opt = Some(3130.0)
-  * val quotient = div(opt.get, 30.0)
-  * }}}
-  * {{{
-  * val eithLong = 2847L
-  * val quotient = div(eithLong.right.get, 47L)
-  * }}}
   * @author Gary Struthers
   */
 package object algebird {
 
-  /** Semigroup sums sequence elements
-    *
-    * @tparam A: Semigroup, element
-    * @param xs sequence
-    * @return Some(sum) or None if xs empty
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Semigroup "Semigroup"]]
-    */
-  def sumOption[A: Semigroup](xs: Seq[A]): Option[A] = implicitly[Semigroup[A]].sumOption(xs)
-
-  /** Monoid sums sequence elements
-    *
-    * @tparam A: Monoid, element
-    * @param xs sequence
-    * @return sum or Monoid[A] zero for empty sequence
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Monoid "Monoid"]]
-    *
-    */
-  def sum[A: Monoid](xs: Seq[A]): A = implicitly[Monoid[A]].sum(xs)
-
-  /** Group negates an element
-    *
-    * @tparam A: Group, element
-    * @param x element to negate
-    * @return -x
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Group Group]]
-    */
-  def negate[A: Group](x: A): A = implicitly[Group[A]].negate(x)
-
-  /** Group subtracts an element from another
-    *
-    *
-    * @tparam A: Group, element
-    * @param l
-    * @param r
-    * @return l - r
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Group Group]]
-    */
-  def minus[A: Group](l: A, r: A): A = implicitly[Group[A]].minus(l, r)
-
-  /** Ring multiplies 2 elements
-    *
-    * @tparam A: Ring, element
-    * @param l
-    * @param r
-    * @return l * r
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Ring Ring]]
-    */
-  def times[A: Ring](l: A, r: A): A = implicitly[Ring[A]].times(l, r)
-
-  /** Ring multiplies sequence elements
-    *
-    * @tparam A: Ring, element
-    * @param xs sequence
-    * @return sum or Monoid[A] zero for empty sequence
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Ring Ring]]
-    */
-  def product[A: Ring](xs: Seq[A]): A = implicitly[Ring[A]].product(xs)
-
-  /** Field inverts an element
-    *
-    * @tparam A: element and Field
-    * @param x element to divide one
-    * @return 1/x
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Field Field]]
-    */
-  def inverse[A: Field](x: A): A = implicitly[Field[A]].inverse(x)
-
-  /** Field divides an element by another
-    *
-    * @tparam A: element and Field
-    * @param l
-    * @param r
-    * @return l * r
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Field Field]]
-    */
-  def div[A: Field](l: A, r: A): A = implicitly[Field[A]].div(l, r)
-
   /** MaxAggregator finds maximum element in a Seq
     *
-    * @tparam A: Ordering element type that can be ordered, uses Ordering[A]
+    * @tparam A: Ordering element type, uses Ordering[A]
     * @param xs Seq[A]
     * @return max
     *
@@ -427,7 +238,7 @@ package object algebird {
 
   /** MinAggregator find minimum element in a Seq
     *
-    * @tparam A: Ordering element type that can be ordered, uses Ordering[A]
+    * @tparam A: Ordering element type, uses Ordering[A]
     * @param xs Seq[A]
     * @return min element
     *
@@ -435,97 +246,6 @@ package object algebird {
     * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     */
   def min[A: Ordering](xs: Seq[A]): A = MinAggregator[A].reduce(xs)
-
-  /** Field[BigDecimal] implicit
-    *
-    * BigDecimal implicits supported in Algebird with NumericRing[BigDecimal]
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Field Field]]
-    */
-  implicit object BigDecimalField extends NumericRing[BigDecimal] with Field[BigDecimal] {
-    override def inverse(v: BigDecimal): BigDecimal = {
-      assertNotZero(v)
-      1 / v
-    }
-  }
-
-  /** Field[BigInt] implicit
-    *
-    * BigInt implicits supported in Algebird with NumericRing[BigInt]
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Field Field]]
-    */
-  implicit object BigIntField extends NumericRing[BigInt] with Field[BigInt] {
-    override def div(l: BigInt, r: BigInt): BigInt = {
-      assertNotZero(r)
-      l / r
-    }
-
-    override def inverse(v: BigInt): BigInt = {
-      assertNotZero(v)
-      1 / v
-    }
-  }
-
-  /** Field[Int] implicit
-    *
-    * Int implicits supported in Algebird with IntRing
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Field Field]]
-    */
-  implicit object IntField extends Field[Int] {
-    def zero: Int = IntRing.zero
-
-    def one: Int = IntRing.one
-
-    override def negate(v: Int): Int = IntRing.negate(v)
-
-    def plus(l: Int, r: Int): Int = IntRing.plus(l, r)
-
-    override def minus(l: Int, r: Int): Int = IntRing.minus(l, r)
-
-    def times(l: Int, r: Int): Int = IntRing.times(l, r)
-
-    override def div(l: Int, r: Int): Int = {
-      assertNotZero(r)
-      l / r
-    }
-
-    override def inverse(v: Int): Int = {
-      assertNotZero(v)
-      1 / v
-    }
-  }
-
-  /** Field[Long] implicit
-    *
-    * Long implicits supported in Algebird with LongRing
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Field Field]]
-    */
-  implicit object LongField extends Field[Long] {
-    def zero: Long = LongRing.zero
-
-    def one: Long = LongRing.one
-
-    override def negate(v: Long): Long = LongRing.negate(v)
-
-    def plus(l: Long, r: Long): Long = LongRing.plus(l, r)
-
-    override def minus(l: Long, r: Long): Long = LongRing.minus(l, r)
-
-    def times(l: Long, r: Long): Long = LongRing.times(l, r)
-
-    override def div(l: Long, r: Long): Long = {
-      assertNotZero(r)
-      l / r
-    }
-
-    override def inverse(v: Long): Long = {
-      assertNotZero(v)
-      1 / v
-    }
-  }
 
   /** Functor maps sequence[A] to sequence[B]
     *
@@ -535,11 +255,10 @@ package object algebird {
     * @tparam B returned element
     * @param fa Seq[A]
     * @param f A => B
-    * @param ev implicit Functor[Seq]
     * @return Seq[B]
     */
   implicit object SeqFunctor extends Functor[Seq] {
-    def map[A, B](fa: Seq[A])(f: A => B): Seq[B] = (for {a <- fa} yield f(a))
+    def map[A, B](fa: Seq[A])(f: A => B): Seq[B] = (for { a <- fa } yield f(a))
   }
 
   /** Functor composes 2 functors map Seq[A] -> Seq[B] -> Seq[C]
@@ -553,15 +272,12 @@ package object algebird {
     * @param ev implicit Functor[Seq]
     * @return Seq[C]
     */
-  def andThen[A, B, C](fa: Seq[A])(f: A => B)(g: B => C)(implicit ev: Functor[Seq]): Seq[C] = {
-    ev.map(ev.map(fa)(f))(g)
-  }
+  def andThen[A, B, C](fa: Seq[A])(f: A => B)(g: B => C)(implicit ev: Functor[Seq]): Seq[C] = ev.map(ev.map(fa)(f))(g)
 
-  /** AverageValue of a Seq of Numeric elements. Create AveragedValue for each element then sum
+  /** AverageValue of a Seq of Numeric elements. Create AveragedValue for elements then sum
     *
-    * @tparam A: Numeric, elements must be Numeric
-    * @param xs Seq
-    * @param evidence implicit Numeric[A]
+    * @tparam A
+    * @param xs Seq, elements must be Numeric
     * @return AverageValue
     *
     * @note when there's more than 1 Numeric type in scope you must use explicitly typed avg below
@@ -576,7 +292,7 @@ package object algebird {
 
   /** AverageValue of a Seq of AverageValues.
     *
-    * @param xs Seq
+    * @param xs Seq[AverageValue]
     * @return AverageValue
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedGroup$ AveragedGroup]]
@@ -592,9 +308,9 @@ package object algebird {
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.BloomFilter$ BloomFilter]]
     */
-  def createBF(words: Seq[String], fpProb: Double = 0.01): BF = {
+  def createBF(words: Seq[String], fpProb: Double = 0.01): BF[String] = {
     val wc = words.size
-    val bfMonoid = BloomFilter(wc, fpProb)
+    val bfMonoid = BloomFilter[String](wc, fpProb)
     bfMonoid.create(words: _*)
   }
 
@@ -606,7 +322,7 @@ package object algebird {
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.BloomFilter$ BloomFilter]]
     */
-  def bloomFilterPartition(xs: Seq[String])(implicit bf: BF): (Seq[String], Seq[String]) =
+  def bloomFilterPartition(xs: Seq[String])(implicit bf: BF[String]): (Seq[String], Seq[String]) =
     xs.partition(bf.contains(_).isTrue)
 
   /** Array[Byte] hasher for CMS
@@ -621,6 +337,11 @@ package object algebird {
     }
   }
 
+  /** map Double to Array[Byte]
+    *
+    * @param d Double
+    * @return Array[Byte]
+    */
   def doubleToArrayBytes(d: Double): Array[Byte] = {
     val l: Long = java.lang.Double.doubleToLongBits(d)
     java.nio.ByteBuffer.allocate(8).putLong(l).array()
@@ -663,13 +384,13 @@ package object algebird {
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSMonoid CMSMonoid]]
     * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     */
-  def createCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])(implicit m: CMSMonoid[K]):CMS[K] = m.create(xs)
+  def createCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])(implicit m: CMSMonoid[K]): CMS[K] = m.create(xs)
 
   /** Sum a Sequence of CMS
     *
     * @tparam K elements which are implicitly Ordering[K] and CMSHasher[K]
     * @param xs Sequence of CMS
-    * @param m
+    * @param m CMSMonoid
     * @return CMS as the sum of Sequence of CMS
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSHasher CMSHasher]]
@@ -681,9 +402,9 @@ package object algebird {
 
   /** Turn a sequence of value, time tuples into a seq of DecayedValues
     *
-    * @param xs sequence of value, time tuples
     * @param halfLife to scale value based on time
     * @param last is initial element, if None use implicit monoid.zero
+    * @param xs sequence of value, time tuples
     * @param m implicit DecayedValueMonoid used to scan from initial value
     * @return seq of DecayedValues
     *
@@ -764,10 +485,9 @@ package object algebird {
   /** Sum a Sequence of QTrees
     *
     * @tparam A: BigDecimal, BigInt, Double, Float, Int, Long
-    * @param vals
-    * @param ev Typeclass to build from Seq
-    * @param sg
-    * @return
+    * @param qTrees Seq[QTree[A]]
+    * @param sg implicit QTreeSemigroup
+    * @return QTree[A]
     *
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
     * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTreeSemigroup QTreeSemigroup]]

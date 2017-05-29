@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -17,8 +16,8 @@ package com.github.garyaiki.dendrites.algebird.stream
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.twitter.algebird.{HLL, HyperLogLogAggregator}
-import com.github.garyaiki.dendrites.algebird.createHLL
 import com.github.garyaiki.dendrites.algebird.AlgebirdConfigurer.hyperLogLogBits
+import com.github.garyaiki.dendrites.algebird.createHLL
 import com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike
 
 /** Flow to create HLL from Seq[A]
@@ -27,8 +26,7 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike
   * @param bits to initialize HyperLogLogAggregator
   * @author Gary Struthers
   */
-class CreateHLLFlow[A: HyperLogLogLike](bits: Int = hyperLogLogBits)
-  extends GraphStage[FlowShape[Seq[A], HLL]] {
+class CreateHLLFlow[A: HyperLogLogLike](bits: Int = hyperLogLogBits) extends GraphStage[FlowShape[Seq[A], HLL]] {
 
   val in = Inlet[Seq[A]]("CreateHLLFlow in")
   val out = Outlet[HLL]("CreateHLLFlow out")
@@ -45,9 +43,7 @@ class CreateHLLFlow[A: HyperLogLogLike](bits: Int = hyperLogLogBits)
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          pull(in)
-        }
+        override def onPull(): Unit = pull(in)
       })
     }
   }

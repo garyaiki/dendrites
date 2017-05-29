@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -47,9 +46,7 @@ class DecayedValueAgentFlow(dvAgent: DecayedValueAgent)
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          pull(in)
-        }
+        override def onPull(): Unit = pull(in)
       })
     }
   }
@@ -73,7 +70,7 @@ object DecayedValueAgentFlow {
     * @return Future for Agents updated value
     */
   def compositeFlow[A: TypeTag : Numeric](dvAgent: DecayedValueAgent, time:A => Double):
-          Flow[Seq[A], Future[Seq[DecayedValue]], NotUsed] = {
+        Flow[Seq[A], Future[Seq[DecayedValue]], NotUsed] = {
 
     val zt = new ZipTimeFlow[A](time)
     val ffg = Flow.fromGraph(zt)
@@ -88,8 +85,7 @@ object DecayedValueAgentFlow {
     * @param time function that adds time value, needed by DecayedValue
     * @return Sink that accepts Seq[A]
     */
-  def compositeSink[A: TypeTag: Numeric](dvAgent: DecayedValueAgent,
-              time:A => Double): Sink[Seq[A], NotUsed] = {
+  def compositeSink[A: TypeTag: Numeric](dvAgent: DecayedValueAgent, time:A => Double): Sink[Seq[A], NotUsed] = {
     compositeFlow(dvAgent, time).to(Sink.ignore)
   }
 }

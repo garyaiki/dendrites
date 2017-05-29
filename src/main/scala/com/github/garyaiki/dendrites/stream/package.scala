@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -110,9 +109,9 @@ package object stream {
     *
     * @return mapped tuple2
     */
-  def leftRightFlow: Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef]),
-    (Seq[String], Seq[AnyRef]), NotUsed] =
-    Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef])].map(tuple3LeftRight)
+  def leftRightFlow:
+    Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef]),(Seq[String], Seq[AnyRef]), NotUsed] =
+      Flow[(Either[String, AnyRef], Either[String, AnyRef], Either[String, AnyRef])].map(tuple3LeftRight)
 
   /** Map tuple3 from Zip stage to log failure and pass success results
     *

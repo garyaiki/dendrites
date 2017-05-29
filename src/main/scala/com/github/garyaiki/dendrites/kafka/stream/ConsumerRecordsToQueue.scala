@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -26,10 +25,11 @@ import scala.collection.immutable.Queue
   *
   * @tparam K ConsumerRecord key
   * @tparam V ConsumerRecord value
-  *
+  * @param f function maps ConsumerRecords to Queue[ConsumerRecord[K, V]]
   * @author Gary Struthers
   */
-class ConsumerRecordsToQueue[K, V](f:(ConsumerRecords[K,V]) => Queue[ConsumerRecord[K, V]]) extends GraphStage[FlowShape[ConsumerRecords[K, V], ConsumerRecord[K, V]]] {
+class ConsumerRecordsToQueue[K, V](f:(ConsumerRecords[K,V]) => Queue[ConsumerRecord[K, V]]) extends
+  GraphStage[FlowShape[ConsumerRecords[K, V], ConsumerRecord[K, V]]] {
 
   val in = Inlet[ConsumerRecords[K, V]] ("ConsumerRecords.in")
   val out = Outlet[ConsumerRecord[K, V]]("ConsumerRecord.out")

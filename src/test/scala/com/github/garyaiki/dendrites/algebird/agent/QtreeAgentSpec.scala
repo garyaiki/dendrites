@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -21,9 +20,9 @@ import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
 import scala.concurrent.ExecutionContext.Implicits.global
-import com.github.garyaiki.dendrites.algebird.{AlgebirdConfigurer, BigDecimalField}
-import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
+import com.github.garyaiki.dendrites.algebird.AlgebirdConfigurer
 import com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike
+import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder
 
 /**
   *

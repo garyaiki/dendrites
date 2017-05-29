@@ -8,7 +8,8 @@ import akka.stream.scaladsl.GraphDSL.Implicits._
 import com.datastax.driver.core.{PreparedStatement, Session}
 import scala.concurrent.ExecutionContext
 import scala.language.postfixOps
-import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBind, CassandraKeyValueFlow, CassandraRetrySink, CassandraSink}
+import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBind, CassandraKeyValueFlow, CassandraRetrySink,
+  CassandraSink}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.avro4s.Avro4sShoppingCartCmd.toCaseClass
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.{CassandraShoppingCart,
   CassandraShoppingCartEvtLog, RetryConfig, ShoppingCartConfig}
@@ -19,7 +20,6 @@ import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.event.cmdToEvt
 import com.github.garyaiki.dendrites.kafka.stream.avro4s.ConsumerRecordDeserializer
 import com.github.garyaiki.dendrites.kafka.stream.{ConsumerRecordsToQueue, KafkaSource}
 import com.github.garyaiki.dendrites.kafka.stream.extractRecords
-import com.github.garyaiki.dendrites.stream.SpyFlow
 import com.datastax.driver.core.BoundStatement
 
 package object stream {
@@ -28,12 +28,12 @@ package object stream {
     * ShoppingCartCmd
     *
     * @param dispatcher
-    * @param ec
-    * @param logger
+    * @param ec implicit ExecutionContext
+    * @param logger implicit LoggingAdapter
     * @return composite source
     */
-  def shoppingCartCmdEvtSource(dispatcher: Attributes)
-    (implicit ec: ExecutionContext, logger: LoggingAdapter): Source[(String, ShoppingCartCmd), NotUsed] = {
+  def shoppingCartCmdEvtSource(dispatcher: Attributes)(implicit ec: ExecutionContext, logger: LoggingAdapter):
+    Source[(String, ShoppingCartCmd), NotUsed] = {
 
     val kafkaSource = KafkaSource[String, Array[Byte]](ShoppingCartCmdConsumer).withAttributes(dispatcher)
     val consumerRecordQueue = new ConsumerRecordsToQueue[String, Array[Byte]](extractRecords)
@@ -67,11 +67,8 @@ package object stream {
     }
     val bndStmt = new CassandraBind(insEvtPrepStmt, bndInsert)
     val sink = new CassandraSink(session)
-    //val spyCmd = new SpyFlow[(String, ShoppingCartCmd)]("cmd spy", 0, 0)
-    //val spy = Flow.fromGraph(new SpyFlow[(String, ShoppingCartCmd)]("source spy", 0, 0))
-    //val spyEvt = new SpyFlow[ShoppingCartEvt]("evt spy", 0, 0)
 
-    cmdFlow.via(toEvt).via(bndStmt).to(sink)//.to(Sink.ignore)
+    cmdFlow.via(toEvt).via(bndStmt).to(sink) // .to(Sink.ignore)
   }
 
   /** Composite parallel Cassandra sinks. Equivalent to shoppingCartCmdEvtSink but this splits command and event logging
@@ -84,7 +81,7 @@ package object stream {
     * @param prepStmts map of PreparedStatements used by Cassandra stages
     * @param ec
     * @param logger
-    * @return composite Cassandra sink
+    * @return composite Command sink and Event log sink
     */
   def shoppingCartCmdEvtSinks(dispatcher: Attributes, session: Session, prepStmts: Map[String, PreparedStatement])
     (implicit ec: ExecutionContext, logger: LoggingAdapter): Sink[(String, ShoppingCartCmd), NotUsed] = {
@@ -94,23 +91,18 @@ package object stream {
     val cmdSink = new CassandraRetrySink[ShoppingCartCmd](RetryConfig, curriedDoCmd).withAttributes(dispatcher)
 
     val toEvt = Flow.fromFunction[(String, ShoppingCartCmd), ShoppingCartEvt] { x => cmdToEvt(x._1, x._2) }
-    val optInsEvtPrepStmt = prepStmts.get("InsertEvt")//CassandraShoppingCartEvtLog.prepInsert(session, schema)
+    val optInsEvtPrepStmt = prepStmts.get("InsertEvt")
     val insEvtPrepStmt = optInsEvtPrepStmt match {
       case Some(x) => x
       case None => throw new NullPointerException("ShoppingCartEvt Insert preparedStatement not found")
     }
     val bndStmt = new CassandraBind(insEvtPrepStmt, bndInsert)
     val sink = new CassandraSink(session)
-    //val spy = new SpyFlow[BoundStatement]("evt spy", 0, 0)
-    //val spyCmd = new SpyFlow[ShoppingCartCmd]("cmd spy", 0, 0)
-    //val spyEvt = new SpyFlow[ShoppingCartEvt]("evt spy", 0, 0)
 
     Sink.fromGraph(GraphDSL.create() { implicit builder =>
       val bcast: UniformFanOutShape[(String, ShoppingCartCmd), (String, ShoppingCartCmd)] =
         builder.add(Broadcast[(String, ShoppingCartCmd)](2))
-      //val onlyVal = Flow.fromFunction[(String, ShoppingCartCmd), ShoppingCartCmd] { x => x._2 }
-     // val toEvt = Flow.fromFunction[(String, ShoppingCartCmd), ShoppingCartEvt] { x => cmdToEvt(x._1, x._2) }
-      //val sCmd = Flow.fromGraph(spyCmd)
+
       bcast ~> onlyVal ~> cmdSink
       bcast ~> toEvt ~> bndStmt ~> sink
       SinkShape(bcast.in)

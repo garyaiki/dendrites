@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -32,8 +31,7 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike
   * @param hllAgent HyperLogLogAgent
   * @author Gary Struthers
   */
-class HyperLogLogAgentFlow(hllAgent: HyperLogLogAgent)
-  extends GraphStage[FlowShape[HLL, Future[HLL]]] {
+class HyperLogLogAgentFlow(hllAgent: HyperLogLogAgent) extends GraphStage[FlowShape[HLL, Future[HLL]]] {
 
   val in = Inlet[HLL]("HLL in")
   val out = Outlet[Future[HLL]]("Future HLL out")
@@ -49,9 +47,7 @@ class HyperLogLogAgentFlow(hllAgent: HyperLogLogAgent)
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          pull(in)
-        }
+        override def onPull(): Unit = pull(in)
       })
     }
   }
@@ -66,8 +62,7 @@ object HyperLogLogAgentFlow {
     * @return Future for Agents updated value
     * @see [[com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike]]
     */
-  def compositeFlow[A: TypeTag: HyperLogLogLike](hllAgent: HyperLogLogAgent):
-          Flow[Seq[A], Future[HLL], NotUsed] = {
+  def compositeFlow[A: TypeTag: HyperLogLogLike](hllAgent: HyperLogLogAgent): Flow[Seq[A], Future[HLL], NotUsed] = {
     val hllFlow = new CreateHLLFlow[A]()
     val ffg = Flow.fromGraph(hllFlow)
     val agnt = new HyperLogLogAgentFlow(hllAgent)

@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -25,7 +24,7 @@ import org.scalatest.concurrent.ScalaFutures.whenReady
 import org.scalatest.time.SpanSugar._
 import scala.reflect.runtime.universe.TypeTag
 import com.github.garyaiki.dendrites.aggregator.mean
-import com.github.garyaiki.dendrites.algebird.{AlgebirdConfigurer, BigDecimalField}
+import com.github.garyaiki.dendrites.algebird.AlgebirdConfigurer
 import com.github.garyaiki.dendrites.algebird.cmsHasherBigDecimal
 import com.github.garyaiki.dendrites.algebird.agent.Agents
 import com.github.garyaiki.dendrites.algebird.typeclasses.{HyperLogLogLike, QTreeLike}

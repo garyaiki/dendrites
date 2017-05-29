@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -22,11 +21,11 @@ import akka.stream.scaladsl.Sink
 import akka.stream.stage.{AsyncCallback, GraphStage, GraphStageLogic, InHandler, TimerGraphStageLogic}
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord, RecordMetadata}
 import org.apache.kafka.common.KafkaException
-// Retriable exceptions
+// Retriable Kafka exceptions
 import org.apache.kafka.common.errors.{CorruptRecordException, InvalidMetadataException,
   NotEnoughReplicasAfterAppendException, NotEnoughReplicasException, OffsetOutOfRangeException, TimeoutException,
   UnknownTopicOrPartitionException, RetriableException}
-// Stopping exceptions
+// Stopping Kafka exceptions
 import org.apache.kafka.common.errors.{InvalidTopicException, OffsetMetadataTooLarge, RecordBatchTooLargeException,
   RecordTooLargeException, UnknownServerException}
 import scala.util.control.NonFatal
@@ -46,7 +45,7 @@ import com.github.garyaiki.dendrites.kafka.stream.KafkaSink.decider
   *
   */
 class MockKafkaSink[K, V](prod: ProducerConfig[K, V], testException: RuntimeException = null)
-        (implicit logger: LoggingAdapter) extends GraphStage[SinkShape[V]] {
+  (implicit logger: LoggingAdapter) extends GraphStage[SinkShape[V]] {
 
   val producer = prod.producer
   /** for access to MockProducer debugging methods
@@ -143,6 +142,7 @@ object MockKafkaSink {
     */
   def apply[K, V](producer: ProducerConfig[K, V], testException: RuntimeException)(implicit logger: LoggingAdapter):
       Sink[V, NotUsed] = {
+
     val sink = Sink.fromGraph(new MockKafkaSink[K, V](producer, testException))
     sink.withAttributes(ActorAttributes.supervisionStrategy(decider))
   }

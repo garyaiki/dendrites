@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -102,6 +101,7 @@ object CassandraQuery {
     */
   def apply(session: Session, fetchSize: Int = 0)(implicit ec: ExecutionContext, logger: LoggingAdapter):
     Flow[BoundStatement, ResultSet, NotUsed] = {
+
     Flow.fromGraph(new CassandraQuery(session, fetchSize))
   }
 }

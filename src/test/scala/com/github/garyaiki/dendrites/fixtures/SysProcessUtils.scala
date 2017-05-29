@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -24,7 +23,7 @@ import scala.sys.process._
   */
 trait SysProcessUtils {
 
-  def fileExists(name: String) = Seq("test", "-f", name).! == 0
+  def fileExists(name: String): Boolean = Seq("test", "-f", name).! == 0
 
   def properNamesPath(): String = {
     val shareProperNames = "/usr/share/dict/propernames" // OSX

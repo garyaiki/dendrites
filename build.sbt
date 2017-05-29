@@ -20,13 +20,14 @@ scalastyleConfig in Compile := file("scalastyle-config.xml")
 
 lazy val commonSettings = Seq(
 	organization := "com.github.garyaiki",
-	version := "0.4.2",
-	scalaVersion := "2.11.8"
+	version := "0.5.0",
+	scalaVersion := "2.11.11",
+	crossScalaVersions := Seq("2.11.11", "2.12.2")
 )
-lazy val akkaV = "2.5.1"
-lazy val akkaHttpV = "10.0.6"
+lazy val akkaV = "2.5.2"
+lazy val akkaHttpV = "10.0.7"
 lazy val scalaTestV = "3.0.1"
-lazy val algebirdV = "0.12.2"
+lazy val algebirdV = "0.13.0"
 lazy val cassandraDriverV = "3.2.0"
 lazy val root = (project in file(".")).
   configs(IntegrationTest).
@@ -37,7 +38,7 @@ lazy val root = (project in file(".")).
 		libraryDependencies ++= Seq(
 			"org.scalatest" %% "scalatest" % scalaTestV % "it,test",
 			"org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
-			"ch.qos.logback" % "logback-classic" % "1.1.8",
+			"ch.qos.logback" % "logback-classic" % "1.2.3",
 			"com.typesafe.akka" %% "akka-actor" % akkaV,
 			"com.typesafe.akka" %% "akka-slf4j" % akkaV,
 			"com.typesafe.akka" %% "akka-agent" % akkaV, 
@@ -48,7 +49,7 @@ lazy val root = (project in file(".")).
 			"com.typesafe.akka" %% "akka-stream-testkit" % akkaV % "it,test",
 			"com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpV,
 			"com.typesafe.akka" %% "akka-http-testkit" % akkaHttpV % "it,test",
-			"com.twitter" %% "algebird" % algebirdV,
+			"org.typelevel" %% "algebra" % "0.7.0",
 			"com.twitter" %% "algebird-core" % algebirdV,
 			"io.spray" %% "spray-json" % "1.3.3",
 			"commons-io" % "commons-io" % "2.5" % "it,test",
@@ -57,11 +58,11 @@ lazy val root = (project in file(".")).
 			"com.datastax.cassandra" % "cassandra-driver-core" % cassandraDriverV,
 			"com.datastax.cassandra" % "cassandra-driver-mapping" % cassandraDriverV,
 			"com.datastax.cassandra" % "cassandra-driver-extras" % cassandraDriverV,
-			"org.apache.avro" % "avro" % "1.8.1",
-			"com.sksamuel.avro4s" % "avro4s-core_2.11" % "1.6.4",
+			"org.apache.avro" % "avro" % "1.8.2",
+			"com.sksamuel.avro4s" %% "avro4s-core" % "1.6.4",
 			"com.google.guava" % "guava" % "19.0",
 			"com.google.code.findbugs" % "jsr305" % "3.0.1",
-			"com.github.thurstonsand" %% "scalacass" % "0.6.11"
+			"com.github.thurstonsand" %% "scala-cass" % "2.1.0"
 		),
 		javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
 		scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-feature"),
@@ -70,7 +71,6 @@ lazy val root = (project in file(".")).
 		resolvers += Resolver.jcenterRepo,
 		javaOptions += "-Xmx500M",
 		scalastyleFailOnError := false
-	).
+	)
 
-settings(site.settings : _*)
 

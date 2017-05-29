@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -49,12 +48,8 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike
   * @param materializer implicit Materializer
   * @author Gary Struthers
   */
-class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
-  avgAgent: AveragedAgent,
-  cmsAgent: CountMinSketchAgent[A],
-  dcaAgent: DecayedValueAgent,
-  hllAgent: HyperLogLogAgent,
-  qtrAgent: QTreeAgent[A])
+class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](avgAgent: AveragedAgent,
+  cmsAgent: CountMinSketchAgent[A], dcaAgent: DecayedValueAgent, hllAgent: HyperLogLogAgent, qtrAgent: QTreeAgent[A])
   (implicit val logger: LoggingAdapter, val materializer: Materializer) {
 
   // Zip input agent update Futures, waits for all to complete
@@ -71,8 +66,7 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
   val qtrAgentAlter = qtrAgent.alter _
 
   // Asynchronous flow stages to update agents
-  def avgAgflow: Flow[AveragedValue, AveragedValue, NotUsed] =
-        Flow[AveragedValue].mapAsync(1)(avgAgentAlter)
+  def avgAgflow: Flow[AveragedValue, AveragedValue, NotUsed] = Flow[AveragedValue].mapAsync(1)(avgAgentAlter)
 
   def cmsAgflow: Flow[CMS[A], CMS[A], NotUsed] = Flow[CMS[A]].mapAsync(1)(cmsAgentAlter)
 
@@ -84,7 +78,9 @@ class ApproximatorsFlow[A: HyperLogLogLike: Numeric: CMSHasher: TypeTag](
   def qtrAgFlow: Flow[Seq[A], QTree[A], NotUsed] = Flow[Seq[A]].mapAsync(1)(qtrAgentAlter)
 
   val days = Range.Double(0.0, 361.0, 1.0)
+
   def nextTime[T](it: Iterator[Double])(x: T): Double = it.next
+
   val curriedNextTime = nextTime[A](days.iterator) _
   // Graph to broadcast to update agent flow stages then zip results then cast to FlowShape
   val approximators = GraphDSL.create() { implicit builder =>

@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -28,10 +27,8 @@ import scala.concurrent.{ExecutionContext, Future}
   * @param agg implicit HyperLogLogAggregator to add HLLs, 12 bits for 1% accuracy
   *
   * @example [[com.github.garyaiki.dendrites.algebird.agent.stream.HyperLogLogAgentFlow]]
-  * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HyperLogLogAggregator HyperLogLogAggregator]]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HyperLogLogMonoid HyperLogLogMonoid]]
+  * @see [[http://doc.akka.io/api/akka/current/akka/agent/index.html Agent]]
+  * @see [[http://twitter.github.io/algebird/datatypes/approx/hyperloglog.html HyperLogLog]]
   * @author Gary Struthers
   */
 class HyperLogLogAgent(val name: String = "", init: Option[HLL] = None)

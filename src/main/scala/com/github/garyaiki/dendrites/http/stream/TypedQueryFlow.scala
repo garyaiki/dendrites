@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -39,9 +38,7 @@ import com.github.garyaiki.dendrites.http.typedQuery
   * @author Gary Struthers
   *
   */
-class TypedQueryFlow(baseURL: StringBuilder,
-  reqPath: String,
-  ccToGet:(Product, String) => StringBuilder)
+class TypedQueryFlow(baseURL: StringBuilder, reqPath: String, ccToGet:(Product, String) => StringBuilder)
   (implicit val system: ActorSystem, logger: LoggingAdapter, val materializer: Materializer) {
 
   def partial: Product => Future[HttpResponse] = typedQuery(baseURL, reqPath, ccToGet) _ // curried

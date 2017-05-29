@@ -3,9 +3,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.garyaiki</groupId>
   <artifactId>dendrites_2.11</artifactId>
-  <version>0.4.2</version>
+  <version>0.5.0</version>
   <name>dendrites</name>
-  <description>Scala Akka Stream stages, reactive streams, examples</description>
+  <description>Scala, Akka Streams, pre-built stages, CQRS, Event Sourcing, Reactive streams</description>
   <packaging>jar</packaging>
 	<url>https://github.com/garyaiki/dendrites</url>
   <organization>
@@ -33,13 +33,13 @@
   </scm>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <scala.version>2.11.8</scala.version>
+      <scala.version>2.11.11</scala.version>
       <java.version>1.8</java.version>
-      <akka.version>2.5.1</akka.version>
-      <akka.http.version>10.0.6</akka.http.version>
+      <akka.version>2.5.2</akka.version>
+      <akka.http.version>10.0.7</akka.http.version>
       <cassandra.driver.version>3.2.0</cassandra.driver.version>
       <kafka-clients.version>0.10.2.1</kafka-clients.version>
-      <algebird.version>0.12.2</algebird.version>
+      <algebird.version>0.13.0</algebird.version>
     </properties>
     <dependencies>
         <dependency>
@@ -62,7 +62,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.1.8</version>
+            <version>1.2.3</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
@@ -118,9 +118,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.twitter</groupId>
-            <artifactId>algebird_2.11</artifactId>
-            <version>${algebird.version}</version>
+            <groupId>org.typelevel</groupId>
+            <artifactId>algebra_2.11</artifactId>
+            <version>0.7.0</version>
         </dependency>
         <dependency>
             <groupId>com.twitter</groupId>
@@ -166,7 +166,7 @@
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
-            <version>1.8.1</version>
+            <version>1.8.2</version>
         </dependency>
         <dependency>
             <groupId>com.sksamuel.avro4s</groupId>
@@ -185,8 +185,8 @@
         </dependency>
         <dependency>
             <groupId>com.github.thurstonsand</groupId>
-            <artifactId>scalacass_2.11</artifactId>
-            <version>0.6.11</version>
+            <artifactId>scala-cass_2.11</artifactId>
+            <version>2.1.0</version>
         </dependency>
     </dependencies>
     <repositories>
@@ -258,7 +258,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.5.1</version>
+          <version>3.6.1</version>
           <configuration>
             <source>${java.version}</source>
             <target>${java.version}</target>
@@ -276,7 +276,7 @@
 		<plugin>
 		  <groupId>org.apache.maven.plugins</groupId>
 		  <artifactId>maven-surefire-plugin</artifactId>
-		  <version>2.7</version>
+		  <version>2.20</version>
 		  <configuration>
 		    <skipTests>true</skipTests>
 		  </configuration>
@@ -330,7 +330,7 @@
     <plugin>
       <groupId>org.sonatype.plugins</groupId>
       <artifactId>nexus-staging-maven-plugin</artifactId>
-      <version>1.6.7</version>
+      <version>1.6.8</version>
       <extensions>true</extensions>
       <configuration>
         <serverId>ossrh</serverId>

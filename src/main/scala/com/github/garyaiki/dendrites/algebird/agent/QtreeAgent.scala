@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -32,16 +31,11 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike
   * @param sg implicit QTreeSemigroup for adding
   *
   * @example [[com.github.garyaiki.dendrites.algebird.agent.stream.QTreeAgentFlow]]
-  * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTreeSemigroup QTreeSemigroup]]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.SeqMonoid SeqMonoid]]
-  * @author Gary sStruthers
+  * @see [[http://doc.akka.io/api/akka/current/akka/agent/index.html Agent]]
+  * @see [[http://twitter.github.io/algebird/datatypes/approx/q_tree.html QTree]
+  * @author Gary Struthers
   */
-class QTreeAgent[A: QTreeLike : TypeTag](
-  val name: String = "",
-  level: Int = qTreeLevel,
-  xs: Option[Seq[A]] = None)
+class QTreeAgent[A: QTreeLike : TypeTag](val name: String = "", level: Int = qTreeLevel, xs: Option[Seq[A]] = None)
   (implicit ec: ExecutionContext, sg: QTreeSemigroup[A]) {
 
   val zero: QTree[A] = implicitly[QTreeLike[A]].apply(sg.underlyingMonoid.zero)

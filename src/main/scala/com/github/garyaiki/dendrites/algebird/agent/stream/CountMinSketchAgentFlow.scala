@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -21,8 +20,7 @@ import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.twitter.algebird.{CMS, CMSHasher}
 import scala.concurrent.Future
 import scala.reflect.runtime.universe.TypeTag
-import com.github.garyaiki.dendrites.algebird.{createCMSMonoid, cmsHasherBigDecimal,
-  cmsHasherDouble, cmsHasherFloat}
+import com.github.garyaiki.dendrites.algebird.{createCMSMonoid, cmsHasherBigDecimal, cmsHasherDouble, cmsHasherFloat}
 import com.github.garyaiki.dendrites.algebird.agent.CountMinSketchAgent
 import com.github.garyaiki.dendrites.algebird.stream.CreateCMSFlow
 
@@ -49,9 +47,7 @@ class CountMinSketchAgentFlow[K: Ordering: CMSHasher](cmsAgent: CountMinSketchAg
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          pull(in)
-        }
+        override def onPull(): Unit = pull(in)
       })
     }
   }
@@ -66,7 +62,8 @@ object CountMinSketchAgentFlow {
     * @return Future for Agents updated value
     */
   def compositeFlow[A: TypeTag: Numeric: CMSHasher](cmsAgt: CountMinSketchAgent[A]):
-          Flow[Seq[A], Future[CMS[A]], NotUsed] = {
+        Flow[Seq[A], Future[CMS[A]], NotUsed] = {
+
     val cmsFlow = new CreateCMSFlow[A]()
     val ffg = Flow.fromGraph(cmsFlow)
     val cmsAgtFlow = new CountMinSketchAgentFlow(cmsAgt)
@@ -79,8 +76,7 @@ object CountMinSketchAgentFlow {
     * @param cmsAgt Akka Agent accumulates CountMinSketch
     * @return Sink that accepts Seq[A]
     */
-  def compositeSink[A: TypeTag: Numeric: CMSHasher](cmsAgt: CountMinSketchAgent[A]):
-          Sink[Seq[A], NotUsed] = {
+  def compositeSink[A: TypeTag: Numeric: CMSHasher](cmsAgt: CountMinSketchAgent[A]): Sink[Seq[A], NotUsed] = {
     compositeFlow(cmsAgt).to(Sink.ignore)
   }
 }

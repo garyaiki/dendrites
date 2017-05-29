@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -30,8 +29,7 @@ import com.github.garyaiki.dendrites.algebird.stream.avgFlow
   * @param avgAgent AveragedAgent
   * @author Gary Struthers
   */
-class AveragedAgentFlow(avgAgent: AveragedAgent)
-  extends GraphStage[FlowShape[AveragedValue, Future[AveragedValue]]] {
+class AveragedAgentFlow(avgAgent: AveragedAgent) extends GraphStage[FlowShape[AveragedValue, Future[AveragedValue]]] {
 
   val in = Inlet[AveragedValue]("AveragedValue in")
   val out = Outlet[Future[AveragedValue]]("Future AveragedValue out")
@@ -63,8 +61,7 @@ object AveragedAgentFlow {
     * @param avgAgent Akka Agent accumulates AveragedValue
     * @return Future for Agents updated value
     */
-  def compositeFlow[A: TypeTag: Numeric](avgAgent: AveragedAgent):
-          Flow[Seq[A], Future[AveragedValue], NotUsed] = {
+  def compositeFlow[A: TypeTag: Numeric](avgAgent: AveragedAgent): Flow[Seq[A], Future[AveragedValue], NotUsed] = {
     val agnt = new AveragedAgentFlow(avgAgent)
     avgFlow.via(agnt).named("SeqToAvgAgent")
   }
@@ -75,8 +72,8 @@ object AveragedAgentFlow {
     * @param avgAgent Akka Agent accumulates AveragedValue
     * @return Sink that accepts Seq[A]
     */
-  def compositeSink[A: TypeTag: Numeric](avgAgent: AveragedAgent)
-          (implicit log: LoggingAdapter, ec: ExecutionContext): Sink[Seq[A], NotUsed] = {
+  def compositeSink[A: TypeTag: Numeric](avgAgent: AveragedAgent)(implicit log: LoggingAdapter, ec: ExecutionContext):
+    Sink[Seq[A], NotUsed] = {
 
     compositeFlow(avgAgent).to(Sink.ignore).named("SeqToAvgAgentSink")
   }

@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -45,7 +44,7 @@ import CallStream.CompleteMessage
   *
   * @tparam A: TypeTag case class or tuple passed to stream
   * @param rg complete RunnableGraph with Source and Sink. Not yet materialized
-  * @see [[http://doc.akka.io/api/akka/2.4/#akka.stream.javadsl.SourceQueueWithComplete SourceQueueWithComplete]]
+  * @see [[http://doc.akka.io/api/akka/current/akka/stream/scaladsl/SourceQueueWithComplete.html SourceQueueWithComplete]]
   * @author Gary Struthers
   */
 class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) extends Actor with ActorLogging {

@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -25,7 +24,7 @@ object avro4s  {
     * @param toRec case class to GenericRecord
     * @param fromRec GenericRecord to case class
     * @return
-    * @see https://github.com/sksamuel/avro4s/blob/16fdfc31e9c4280ff97f7e36005dc84b89bbbd73/avro4s-core/src/main/scala/com/sksamuel/avro4s/RecordFormat.scala
+    * @see [[https://github.com/sksamuel/avro4s avro4s]]
     */
   def createRecordFormat[A](implicit toRec: ToRecord[A], fromRec: FromRecord[A]): RecordFormat[A] = RecordFormat[A]
 

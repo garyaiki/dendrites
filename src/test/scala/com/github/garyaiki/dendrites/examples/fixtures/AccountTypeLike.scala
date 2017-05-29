@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -31,11 +30,11 @@ trait AccountTypeLike[A, B] {
   *
   */
 object AccountTypeLike {
-  def altTF(k: Char) = if (k % 2 == 0) (true) else (false)
+  def altTF(k: Char): Boolean = if (k % 2 == 0) (true) else (false)
 
   implicit val mc = new java.math.MathContext(2)
 
-  def exDouble(k: Char)(implicit ev: java.math.MathContext) = BigDecimal(k.toInt * 1.1, ev).toDouble
+  def exDouble(k: Char)(implicit ev: java.math.MathContext): Double = BigDecimal(k.toInt * 1.1, ev).toDouble
   def exFloat(k: Char): Float = k.toInt * 1.1f
   def exStr(k: Char): String = k.toString.toUpperCase()
   def exLeftStr(k: Char): String = s"Error key:$k"

@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -22,12 +21,13 @@ import akka.stream.scaladsl.Sink
 import akka.stream.stage.{AsyncCallback, GraphStage, GraphStageLogic,InHandler,TimerGraphStageLogic}
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord, RecordMetadata}
 import org.apache.kafka.common.KafkaException
-import org.apache.kafka.common.errors.{CorruptRecordException, // Retriable exceptions
-  InvalidMetadataException, NotEnoughReplicasAfterAppendException, NotEnoughReplicasException,
-  OffsetOutOfRangeException, TimeoutException, UnknownTopicOrPartitionException, RetriableException}
-import org.apache.kafka.common.errors.{InvalidTopicException, // Stopping exceptions
-  OffsetMetadataTooLarge, RecordBatchTooLargeException, RecordTooLargeException,
-  UnknownServerException}
+// Retriable Kafka exceptions
+import org.apache.kafka.common.errors.{CorruptRecordException, InvalidMetadataException,
+  NotEnoughReplicasAfterAppendException, NotEnoughReplicasException, OffsetOutOfRangeException, TimeoutException,
+  UnknownTopicOrPartitionException, RetriableException}
+// Stopping Kafka exceptions
+import org.apache.kafka.common.errors.{InvalidTopicException, OffsetMetadataTooLarge, RecordBatchTooLargeException,
+  RecordTooLargeException, UnknownServerException}
 import scala.util.control.NonFatal
 import com.github.garyaiki.dendrites.kafka.ProducerConfig
 

@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -49,7 +48,7 @@ import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
   */
 class CassandraBoundQuery[A](session: Session, stmt: PreparedStatement, f:(PreparedStatement, A) => BoundStatement,
   fetchSize: Int = 0)(implicit val ec: ExecutionContext, logger: LoggingAdapter)
-  extends GraphStage[FlowShape[A, ResultSet]] {
+    extends GraphStage[FlowShape[A, ResultSet]] {
 
   val in = Inlet[A]("CassandraBoundQuery.in")
   val out = Outlet[ResultSet]("CassandraQuery.out")
@@ -72,7 +71,8 @@ class CassandraBoundQuery[A](session: Session, stmt: PreparedStatement, f:(Prepa
           case Success(rs) => {
             val successCallback = getAsyncCallback {
               (_: Unit) => {
-                logger.debug("CassandraBoundQuery Success available:{} fully fetched:{}", rs.getAvailableWithoutFetching, rs.isFullyFetched)
+                logger.debug("CassandraBoundQuery Success available:{} fully fetched:{}",
+                  rs.getAvailableWithoutFetching, rs.isFullyFetched)
                 push(out, rs)
                 waitForHandler = false
                 if(mustFinish) completeStage()

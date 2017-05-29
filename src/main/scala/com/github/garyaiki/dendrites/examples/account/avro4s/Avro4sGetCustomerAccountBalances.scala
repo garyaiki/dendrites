@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -25,8 +24,6 @@ import com.github.garyaiki.dendrites.examples.account.{AccountType, Checking, Mo
   * @author Gary Struthers
   */
 object Avro4sGetCustomerAccountBalances {
-
-  val avroFriendly = Avro4sGetCustomerStringAccountBalances
 
   /** Map Set[AccountType] to Set[String]
     *
@@ -55,7 +52,7 @@ object Avro4sGetCustomerAccountBalances {
     */
   def toBytes(cc: GetCustomerAccountBalances): Array[Byte] = {
     val caseClass = toAvroFriendly(cc)
-    avroFriendly.toBytes(caseClass)
+    Avro4sGetCustomerStringAccountBalances.toBytes(caseClass)
   }
 
   /** Map Set[String] to Set[AccountType]
@@ -88,7 +85,7 @@ object Avro4sGetCustomerAccountBalances {
     * @return GetAccountBalances
     */
   def toCaseClass(bytes: Array[Byte]): GetCustomerAccountBalances = {
-    val caseClass = avroFriendly.toCaseClass(bytes)
+    val caseClass = Avro4sGetCustomerStringAccountBalances.toCaseClass(bytes)
     fromAvroFriendly(caseClass)
   }
 }

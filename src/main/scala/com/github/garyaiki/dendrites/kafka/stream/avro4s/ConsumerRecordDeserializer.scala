@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -25,7 +24,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
   * @author Gary Struthers
   */
 class ConsumerRecordDeserializer[K, V <: Product](f:(Array[Byte]) => V)
-    extends GraphStage[FlowShape[ConsumerRecord[K, Array[Byte]], (K, V)]] {
+  extends GraphStage[FlowShape[ConsumerRecord[K, Array[Byte]], (K, V)]] {
 
   val in = Inlet[ConsumerRecord[K, Array[Byte]]]("Avro4sConsumerRecordDeserializer.in")
   val out = Outlet[(K, V)]("Avro4sConsumerRecordDeserializer.out")
@@ -49,9 +48,7 @@ class ConsumerRecordDeserializer[K, V <: Product](f:(Array[Byte]) => V)
       })
 
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          pull(in)
-        }
+        override def onPull(): Unit = pull(in)
       })
     }
 }

@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -23,7 +22,7 @@ import com.twitter.algebird.QTree
   * These sum the original types
   *
   * @tparam A convertable to Double or Long
-  * @see [[http://danielwestheide.com/blog/2013/02/06/the-neophytes-guide-to-scala-part-12-type-classes.html type-classes]]
+  * @see [[http://danielwestheide.com/blog/2013/02/06/the-neophytes-guide-to-scala-part-12-type-classes.html typeclass]]
   * @author Gary Struthers
   */
 @implicitNotFound(msg = "Cannot find QTreeLike type class for ${A}")

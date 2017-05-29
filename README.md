@@ -77,7 +77,7 @@ In a terminal window `cd` to the dendrites directory.
 ###### sbt
 Add dependency in sbt `build.sbt`
 
-`libraryDependencies += "com.github.garyaiki" % "dendrites_2.11" % "0.4.1"`
+`libraryDependencies += "com.github.garyaiki" % "dendrites_2.11" % "0.5.0"`
 ###### Maven
 Add dependency in Maven `pom.xml`
 
@@ -85,7 +85,7 @@ Add dependency in Maven `pom.xml`
     <dependency>
         <groupId>com.github.garyaiki</groupId>
         <artifactId>dendrites_2.11</artifactId>
-        <version>0.4.1</version>
+        <version>0.5.0</version>
     </dependency>
 `
 

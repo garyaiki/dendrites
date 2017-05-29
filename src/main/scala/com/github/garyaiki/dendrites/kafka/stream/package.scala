@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -120,8 +119,8 @@ package object stream {
     * @return a tuple2 of queues of ConsumerRecord
     * @see [[com.github.garyaiki.dendrites.examples.account]]
     */
-  def dualConsumerRecordsFlow[K, V]: Flow[ConsumerRecords[K, V],
-    (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]), NotUsed] =
+  def dualConsumerRecordsFlow[K, V]:
+    Flow[ConsumerRecords[K, V], (Queue[ConsumerRecord[K, V]], Queue[ConsumerRecord[K, V]]), NotUsed] =
       Flow[ConsumerRecords[K, V]].map(tuple2PartitionQs[K, V])
 
   /** Like extract records but unzips them into 3 queues of ConsumerRecord, separated by partition

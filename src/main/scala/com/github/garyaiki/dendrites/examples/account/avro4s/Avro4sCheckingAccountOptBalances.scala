@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -14,7 +13,7 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.examples.account.avro4s
 
-import com.sksamuel.avro4s.{AvroInputStream, AvroOutputStream, AvroSchema, FromRecord, SchemaFor, ToSchema, ToRecord}
+import com.sksamuel.avro4s.{AvroInputStream, AvroOutputStream, AvroSchema, FromRecord, SchemaFor, ToRecord, ToSchema}
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import org.apache.avro.Schema
 import com.github.garyaiki.dendrites.avro4s.Avro4sOps

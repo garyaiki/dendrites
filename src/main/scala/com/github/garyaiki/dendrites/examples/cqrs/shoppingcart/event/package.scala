@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -17,7 +16,6 @@ package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart
 import akka.event.LoggingAdapter
 import com.datastax.driver.core.{PreparedStatement, ResultSetFuture, Session}
 import com.datastax.driver.core.utils.UUIDs.timeBased
-
 import java.util.UUID
 import com.github.garyaiki.dendrites.cqrs.Event
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.CassandraShoppingCartEvtLog.bndInsert
@@ -98,13 +96,11 @@ case class ShoppingCartEvt(cartId: UUID, time: UUID, eventID: UUID, owner: Optio
     * @param xs Sequence of ShoppingCartEvt
     * @return map key is eventId with Sequence of events for that id
     */
-  def groupByEvtId(xs: Seq[ShoppingCartEvt]): Map[UUID, Seq[ShoppingCartEvt]] = {
-    xs.groupBy[UUID](_.eventID)
-  }
+  def groupByEvtId(xs: Seq[ShoppingCartEvt]): Map[UUID, Seq[ShoppingCartEvt]] = xs.groupBy[UUID](_.eventID)
 
   /** Remove events without duplicates and removed owner changed duplicates (owner changed is idempotent)
     *
-    * @param evtMap
+    * @param evtMap key is eventId value is Seq[ShoppingCartEvt] with that eventId
     * @return filtered map
     */
   def filterDups(evtMap : Map[UUID, Seq[ShoppingCartEvt]]): Map[UUID, Seq[ShoppingCartEvt]] = {
@@ -122,9 +118,7 @@ case class ShoppingCartEvt(cartId: UUID, time: UUID, eventID: UUID, owner: Optio
     */
   def compensateDupEvt(xs: Seq[ShoppingCartEvt]): Option[Seq[ShoppingCartEvt]] = {
     val grouped = groupByEvtId(xs)
-    System.out.println(s"grouped size:${grouped.size}")
     val itemDups = filterDups(grouped)
-    System.out.println(s"itemDups size:${itemDups.size}")
     val ys = for {
       evt <- itemDups
       values = evt._2

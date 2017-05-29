@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -26,7 +25,6 @@ import org.scalatest.Matchers._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 import com.github.garyaiki.dendrites.algebird.AlgebirdConfigurer
-import com.github.garyaiki.dendrites.algebird.BigDecimalField
 import com.github.garyaiki.dendrites.algebird.{cmsHasherBigDecimal, cmsHasherDouble, cmsHasherFloat, createHLL}
 import com.github.garyaiki.dendrites.algebird.agent.Agents
 import com.github.garyaiki.dendrites.fixtures.TestValuesBuilder

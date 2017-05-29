@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -18,7 +17,7 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import org.apache.avro.Schema
 import org.apache.avro.generic.{GenericData, GenericDatumReader, GenericDatumWriter, GenericRecord}
 import org.apache.avro.specific.SpecificDatumWriter
-import org.apache.avro.io.{ Decoder, DecoderFactory, Encoder, EncoderFactory }
+import org.apache.avro.io.{Decoder, DecoderFactory, Encoder, EncoderFactory}
 import scala.io.Source
 import scala.io.Source.fromInputStream
 

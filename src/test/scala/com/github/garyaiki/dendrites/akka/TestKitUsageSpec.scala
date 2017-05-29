@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -14,26 +13,21 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.akka
 
-import scala.util.Random
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.WordSpecLike
-import org.scalatest.Matchers
+import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.testkit.{DefaultTimeout, ImplicitSender, TestActors, TestKit}
 import com.typesafe.config.ConfigFactory
-import akka.actor.Actor
-import akka.actor.ActorRef
-import akka.actor.ActorSystem
-import akka.actor.Props
-import akka.testkit.{ TestActors, DefaultTimeout, ImplicitSender, TestKit }
+import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.concurrent.duration._
 import scala.collection.immutable
 import scala.language.postfixOps
+import scala.util.Random
 
 /**
  * a Test to show some TestKit examples
 */
-class TestKitUsageSpec extends TestKit(ActorSystem("TestKitUsageSpec",
-  ConfigFactory.parseString(TestKitUsageSpec.config))) with DefaultTimeout with ImplicitSender with WordSpecLike
-    with Matchers with BeforeAndAfterAll {
+class TestKitUsageSpec extends
+  TestKit(ActorSystem("TestKitUsageSpec", ConfigFactory.parseString(TestKitUsageSpec.config))) with
+    DefaultTimeout with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
 
   val echoRef = system.actorOf(TestActors.echoActorProps)
 
@@ -47,9 +41,7 @@ class TestKitUsageSpec extends TestKit(ActorSystem("TestKitUsageSpec",
   val tailList = immutable.Seq().padTo(randomTail, "1")
   val seqRef = system.actorOf(Props(classOf[SequencingActor], testActor, headList, tailList))
 
-  override def afterAll {
-    shutdown()
-  }
+  override def afterAll { shutdown() }
 
   "An EchoActor" should {
     "Respond with the same message it receives" in {
@@ -82,9 +74,7 @@ class TestKitUsageSpec extends TestKit(ActorSystem("TestKitUsageSpec",
         filterRef ! 1
         filterRef ! "text"
         filterRef ! 1
-        receiveWhile(500 millis) {
-          case msg: String => messages = msg +: messages
-        }
+        receiveWhile(500 millis) { case msg: String => messages = msg +: messages }
       }
       messages.length should be(3)
       messages.reverse should be(Seq("some", "more", "text"))
@@ -107,8 +97,8 @@ class TestKitUsageSpec extends TestKit(ActorSystem("TestKitUsageSpec",
         ignoreNoMsg
       }
     }
-    }
   }
+}
 
 object TestKitUsageSpec {
   // Define your test specific configuration here
@@ -120,9 +110,7 @@ object TestKitUsageSpec {
     * An Actor that forwards every message to a next Actor
     */
   class ForwardingActor(next: ActorRef) extends Actor {
-    def receive = {
-      case msg => next ! msg
-    }
+    def receive = { case msg => next ! msg }
   }
 
   /**
@@ -141,8 +129,7 @@ object TestKitUsageSpec {
    * like to test that the interesting value is received and that you cant
    * be bothered with the rest
    */
-  class SequencingActor(next: ActorRef, head: immutable.Seq[String],
-                        tail: immutable.Seq[String]) extends Actor {
+  class SequencingActor(next: ActorRef, head: immutable.Seq[String], tail: immutable.Seq[String]) extends Actor {
     def receive = {
       case msg => {
         head foreach { next ! _ }

@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -79,16 +78,14 @@ package object concurrent {
     * based on this factor is added, e.g. `0.2` adds up to `20%` delay.
     * In order to skip this additional delay pass in `0`.
     * @param retryCount in 2nd arg list for currying
-    * @see [[https://github.com/akka/akka/blob/v2.4.9/akka-actor/src/main/scala/akka/pattern/BackoffSupervisor.scala BackoffSupervisor]]
+    * @see [[http://doc.akka.io/api/akka/current/akka/pattern/BackoffSupervisor.html BackoffSupervisor]]
     *
     */
-  def calculateDelay(
-    minBackoff: FiniteDuration,
-    maxBackoff: FiniteDuration,
-    randomFactor: Double)(retryCount: Int): FiniteDuration = {
+  def calculateDelay(minBackoff: FiniteDuration, maxBackoff: FiniteDuration, randomFactor: Double)(retryCount: Int):
+    FiniteDuration = {
+
       val rnd = 1.0 + ThreadLocalRandom.current.nextDouble * randomFactor
-      if (retryCount >= 30) // Duration overflow protection
-        maxBackoff
+      if (retryCount >= 30) maxBackoff // Duration overflow protection
       else
         maxBackoff.min(minBackoff * math.pow(2, retryCount)) * rnd match {
           case f: FiniteDuration ⇒ f

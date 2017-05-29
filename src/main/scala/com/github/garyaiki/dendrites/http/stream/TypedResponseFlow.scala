@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -43,16 +42,11 @@ import com.github.garyaiki.dendrites.http.typedResponse
   */
 class TypedResponseFlow(mapLeft: (HttpEntity) => Future[Left[String, Nothing]],
   mapRight: (HttpEntity) => Future[Right[String, AnyRef]])
-  (implicit val ec: ExecutionContext,
-    system: ActorSystem,
-    logger: LoggingAdapter,
-    val materializer: Materializer) {
+  (implicit val ec: ExecutionContext, system: ActorSystem, logger: LoggingAdapter, val materializer: Materializer) {
 
-  def partial: HttpResponse => Future[Either[String, AnyRef]] =
-        typedResponse(mapLeft, mapRight) _ // curried
+  def partial: HttpResponse => Future[Either[String, AnyRef]] = typedResponse(mapLeft, mapRight) _ // curried
 
-  def flow: Flow[HttpResponse, Either[String, AnyRef], NotUsed] =
-    Flow[HttpResponse].mapAsync(1)(partial)
+  def flow: Flow[HttpResponse, Either[String, AnyRef], NotUsed] = Flow[HttpResponse].mapAsync(1)(partial)
 }
 
 object TypedResponseFlow {

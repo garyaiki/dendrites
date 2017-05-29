@@ -1,5 +1,4 @@
 /**
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -32,14 +31,11 @@ class Avro4sSerializer[A <: Product](f:(A) => Array[Byte]) extends GraphStage[Fl
   override def createLogic(attr: Attributes): GraphStageLogic =
     new GraphStageLogic(shape) {
       setHandler(in, new InHandler {
-        override def onPush(): Unit = {
-          push(out, f(grab(in)))
-        }
+        override def onPush(): Unit = push(out, f(grab(in)))
       })
+
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          pull(in)
-        }
+        override def onPull(): Unit = pull(in)
       })
     }
 }
