@@ -29,7 +29,7 @@ trait BeforeAfterAllBuilder extends TestSuiteMixin { this: TestSuite =>
   implicit val system = ActorSystem("dendrites")
   implicit val ec: ExecutionContext = system.dispatcher
   implicit val materializer = ActorMaterializer()
-  implicit val logger = Logging(system, getClass)
+  implicit val logger = Logging.getLogger(system, getClass)
 
   var schema: String = null
   var cluster: Cluster = null

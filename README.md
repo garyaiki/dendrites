@@ -275,7 +275,7 @@ Ctrl-C
 dendrites uses Typesafe Config. Traits with names ending in `Config` define configuration properties for components. This mediates configuration from usage, so you may use these traits with different configuration sources.
 
 [Typesafe Config user guide](https://github.com/typesafehub/config),
-[Akka config user guide](http://doc.akka.io/docs/akka/2.4/general/configuration.html)
+[Akka config user guide](http://doc.akka.io/docs/akka/current/scala/general/configuration.html)
 
 Each configuration in `/src/main/resources/reference.conf` can be overridden by your `application.conf`.
 

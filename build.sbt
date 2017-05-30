@@ -21,8 +21,8 @@ scalastyleConfig in Compile := file("scalastyle-config.xml")
 lazy val commonSettings = Seq(
 	organization := "com.github.garyaiki",
 	version := "0.5.0",
-	scalaVersion := "2.11.11",
-	crossScalaVersions := Seq("2.11.11", "2.12.2")
+	scalaVersion := "2.12.2",
+	crossScalaVersions := Seq("2.12.2", "2.11.11")
 )
 lazy val akkaV = "2.5.2"
 lazy val akkaHttpV = "10.0.7"
