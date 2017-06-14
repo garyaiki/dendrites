@@ -11,13 +11,40 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.github.garyaiki.dendrites.avro
+package com.github.garyaiki.dendrites
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import org.apache.avro.generic.GenericRecord
 import com.sksamuel.avro4s.{AvroInputStream, AvroOutputStream, FromRecord, FromValue, RecordFormat, SchemaFor, ToRecord}
 
-object avro4s  {
+/** Extend Avro4sOps to serialize/deserialize case class
+  * {{{
+  * object Avro4sShoppingCartCmd  extends Avro4sOps[ShoppingCartCmd] {
+  *   implicit val schemaFor = SchemaFor[ShoppingCartCmd]
+  *   implicit val toRecord = ToRecord[ShoppingCartCmd]
+  *   implicit val fromRecord = FromRecord[ShoppingCartCmd]
+	* }}}
+	* implement case class serializer
+	* {{{  
+  *   def toBytes(caseClass: ShoppingCartCmd): Array[Byte] = {
+  *     val baos = new ByteArrayOutputStream()
+  *     val output = AvroOutputStream.binary[ShoppingCartCmd](baos)
+  *     output.write(caseClass)
+  *     output.close()
+  *     baos.toByteArray
+  *   }
+	* }}}
+	* implement deserializer
+	* {{{
+  *   def toCaseClass(bytes: Array[Byte]): ShoppingCartCmd = {
+  *     val in = new ByteArrayInputStream(bytes)
+  *     val input = AvroInputStream.binary[ShoppingCartCmd](in)
+  *     val result = input.iterator.toSeq
+  *     result(0)
+  *   }
+  * }}}
+  */
+package object avro4s  {
 
   /** RecordFormat contains toRecord, fromRecord
     *

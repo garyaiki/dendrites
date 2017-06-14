@@ -13,7 +13,7 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.avro4s
 
-import com.sksamuel.avro4s.{AvroInputStream, AvroOutputStream, AvroSchema, FromRecord, SchemaFor, ToRecord}
+import com.sksamuel.avro4s.{AvroInputStream, AvroOutputStream, FromRecord, SchemaFor, ToRecord}
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import com.github.garyaiki.dendrites.avro4s.Avro4sOps
 import com.sksamuel.avro4s.SchemaFor
@@ -28,7 +28,6 @@ object Avro4sShoppingCartCmd  extends Avro4sOps[ShoppingCartCmd] {
   implicit val schemaFor = SchemaFor[ShoppingCartCmd]
   implicit val toRecord = ToRecord[ShoppingCartCmd]
   implicit val fromRecord = FromRecord[ShoppingCartCmd]
-  val schema = AvroSchema[ShoppingCartCmd]
 
   /** ShoppingCartCmd to Array[Byte]
     *
