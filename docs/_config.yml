@@ -2,6 +2,6 @@ name: dendrites
 description: Scala library of streaming components
 author: Gary Struthers
 author_email: agilej2ee@earthlink.net
-baseurl: /docs
+baseurl: /dendrites
 url: http://garyaiki.github.io/dendrites/
 theme: jekyll-theme-cayman
