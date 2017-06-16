@@ -42,4 +42,8 @@ Twitter’s [Algebird](https://twitter.github.io/algebird/){:target="_blank"} ha
 ##### Akka Streams with Akka Actors
 [Streams with Actors page](StreamsWithActors.html)
 
+##### CQRS, Event Sourcing with Kafka, Avro, Cassandra, and Akka Streams
+[CQRS Event Sourcing](CqrsEventSourcing.html)
+
+
 
