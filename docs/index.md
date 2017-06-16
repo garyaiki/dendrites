@@ -3,7 +3,7 @@
 
 A Scala library of looser than loosely coupled streaming components for Microservices, Event Sourcing, Event Logging, Command Query Responsibility Segregation (CQRS), scaling up, and scaling out. Akka Streams stages and stand-alone functions for Kafka, Avro, Cassandra, Algebird, Akka HTTP, and Akka Actors. 
 <p >
-<img src="https://github.com/garyaiki/dendrites/blob/master/docs/png/CQRS.png?raw=true" width="50%" />
+<img src="png/CQRS.png?raw=true" width="50%" />
 </p>
 
 Software should make the most of multi-core CPUs, be easy to modify throughout its lifecycle, and be resilient in an ensemble of systems. Today's software is usually the opposite because metamorphosis is hard. Adapting popular core technologies to streaming, functional programming, and disentangling common from custom code can turn a blocking, synchronous spaghetti code caterpillar into a [Reactive](http://www.reactivemanifesto.org){:target="_blank"} butterfly.
@@ -14,7 +14,7 @@ Scala's functional and concurrent programming features are made for multi-core C
 
 Akka Stream’s fan-out and fan-in stages make for an elegant way to call external services in parallel and proceed when results are ready. 
 <p >
-<img src="https://github.com/garyaiki/dendrites/blob/master/docs/png/ParallelHttpFlow.png?raw=true" width="50%"/>
+<img src="png/ParallelHttpFlow.png?raw=true" width="50%"/>
 </p>
 
 Programing teams short of experienced Scala developers can be productive and confident. Those new to Scala can climb a skill ladder starting with stand-alone functions then learn progressively instead of being overwhelmed by too many new concepts up front as they would be coding a monolithic application.
