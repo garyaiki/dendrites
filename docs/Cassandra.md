@@ -1,4 +1,4 @@
-### Cassadra
+### Cassandra
 
 Build distributed database clients with pre-built Cassandra stream stages.
 
