@@ -1,4 +1,6 @@
-### Algebird hashing approximators
+### Algebird streaming approximations
+
+{% include nav.html %}
 Aggregate streaming data with pre-built Algebird stages and functions.
 
 [<img src="png/AvgFlow.png?raw=true" alt="AvgFlow" width="20%" height="20%" title="input a sequence of Numeric types, output their AveragedValue">](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/algebird/stream/package.scala){:target="_blank"}

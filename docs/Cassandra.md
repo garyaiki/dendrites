@@ -1,5 +1,6 @@
-### Cassandra
+### Cassandra streaming components
 
+{% include nav.html %}
 Build distributed database clients with pre-built Cassandra stream stages.
 
 [<img src="png/CassandraBind.png?raw=true" alt="CassandraBind" width="20%" height="20%" title="input a case class, output a BoundStatement">](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/cassandra/stream/CassandraBind.scala){:target="_blank"}

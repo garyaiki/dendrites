@@ -1,0 +1,11 @@
+<nav class="nav-primary" role="navigation" >
+    <ul>
+        {% for p in site.html_pages %}
+        {% if p.url != page.url %}
+        <li>
+          <a  href="{{ site.baseurl }}{{ p.url }}">{{ p.title }}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+</nav>

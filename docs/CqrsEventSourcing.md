@@ -1,5 +1,6 @@
-### CQRS, Event Sourcing with Kafka, Avro, Cassandra, and Akka Streams
+### CQRS, Event Sourcing streaming components
 
+{% include nav.html %}
 Build Command Query Responsibility Segregation streams out of, mostly, [pre-built Akka Stream stages](https://github.com/garyaiki/dendrites/wiki/PreBuiltStreamStages){:target="_blank"}, functions, and your custom code.
 
 <img src="png/CQRS.png?raw=true" alt="CQRS" width="100%" height="100%">

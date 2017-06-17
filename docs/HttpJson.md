@@ -1,5 +1,6 @@
-### Akka HTTP, JSON
+### HTTP, JSON streaming components
 
+{% include nav.html %}
 Build HTTP streaming clients with pre-built HTTP stages and JSON mapping to case classes.
 
 [<img src="png/TypedQueryFlow.png?raw=true" alt="TypedQueryFlow" width="20%" height="20%" title="input case class, output Future of HTTPResponse to Get query">](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/http/stream/TypedQueryFlow.scala){:target="_blank"}

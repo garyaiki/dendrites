@@ -1,6 +1,7 @@
 
-### Kafka, Avro, and Akka Streams
+### Kafka, Avro streaming components
 
+{% include nav.html %}
 Build distributed streaming systems with pre-built Kafka and Avro stream stages.
 
 [<img src="png/KafkaSink.png?raw=true" alt="KafkaSink" width="25%" height="25%" title="input serialized value, publish it, uses Akka Supervision to retry temporary errors with exponential backoff or fail the stream">](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/kafka/stream/KafkaSink.scala){:target="_blank"}

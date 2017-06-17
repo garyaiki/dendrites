@@ -1,4 +1,6 @@
-### Running an Akka Stream within an Actor
+### Running Akka Stream with Actors
+
+{% include nav.html %}
 [Supervise](http://doc.akka.io/docs/akka/current/scala/fault-tolerance.html#default-supervisor-strategy){:target="_blank"}, and integrate Akka [Actors](http://doc.akka.io/docs/akka/current/scala/actors.html){:target="_blank"} with Akka Streams.
 
 Streams need something to handle failures, and they should be able to receive and send Actor messages.
