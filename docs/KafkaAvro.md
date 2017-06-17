@@ -1,4 +1,3 @@
-
 ### Kafka, Avro streaming components
 
 {% include nav.html %}

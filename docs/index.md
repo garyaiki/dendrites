@@ -1,4 +1,3 @@
-
 # dendrites
 
 A Scala library of looser than loosely coupled streaming components for Microservices, Event Sourcing, Event Logging, Command Query Responsibility Segregation (CQRS), scaling up, and scaling out.
