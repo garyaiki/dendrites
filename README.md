@@ -1,21 +1,25 @@
 # dendrites
 
-A Scala library for building Reactive systems with Akka Streams, HTTP, Actors, and Agents, Kafka, Cassandra, Twitter's Algebird, Spray, and Avro. It blends Scala's functional programming with Akka's resilient non-blocking message passing concurrency and Akka Stream's debuggable, pluggable, testable, and Reactive component design. 
+A Scala library of streaming components for building Microservices, Event Sourcing, Event Logging, Command Query Responsibility Segregation (CQRS), and Reactive systems. Functions and pre-built stream stages for Akka Streams, HTTP, Actors, Kafka, Cassandra, Algebird, and Avro.
 
-Introductory documentation is on the [Wiki](https://github.com/garyaiki/dendrites/wiki), Scaladocs go into detail.
+It blends Scala's functional programming with Akka's resilient non-blocking message passing concurrency and Akka Stream's debuggable, pluggable, testable, and Reactive component design. 
+
+This Readme covers download, setup and configuration, unit and integration testing and adding it to your project.
+
+Documentation is on the [dendrites website](https://garyaiki.github.io/dendrites/) Scaladocs have many examples and more detailed information.
 #### Build from source
 Requires Java 8 
 [download sdk](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) and
-Scala 2.11 
+Scala 2.12 
 [download scala](http://www.scala-lang.org/download/)
 
 Clone or download dendrites from Github, see 
 [cloning-a-repository](https://help.github.com/articles/cloning-a-repository/)
 
-##### Build and test with sbt
+#### Build and test with sbt
 [version](https://github.com/garyaiki/dendrites/blob/master/project/build.properties),  [download](http://www.scala-sbt.org/download.html),  [documentation](http://www.scala-sbt.org/documentation.html)
 
-###### commands
+#### sbt commands
 In a terminal window `cd` to the dendrites directory.
 
 `$ sbt` launch sbt, returns `>` prompt
@@ -40,7 +44,7 @@ In a terminal window `cd` to the dendrites directory.
 
 `> package` Produces the jar.
 
-`> doc` Generates Scaladocs in `/dendrites/target/scala-2.11/api`
+`> doc` Generates Scaladocs in `/dendrites/target/scala-2.12/api`
 
 `> scalastyle` Run scalastyle on source code under `src/main/scala`
 
@@ -49,10 +53,10 @@ In a terminal window `cd` to the dendrites directory.
 `> dependencyTree` Prints an ascii tree of all the dependencies to the console
 
 `> exit` quit sbt
-##### Build and test with Maven
+#### Build and test with Maven
 Maven [home page](https://maven.apache.org/index.html)
 
-###### commands
+#### Maven commands
 In a terminal window `cd` to the dendrites directory.
 
 `$ mvn dependency:resolve` Resolves and optionally retrieves dependencies.
@@ -77,21 +81,21 @@ In a terminal window `cd` to the dendrites directory.
 ###### sbt
 Add dependency in sbt `build.sbt`
 
-`libraryDependencies += "com.github.garyaiki" % "dendrites_2.11" % "0.5.0"`
+`libraryDependencies += "com.github.garyaiki" % "dendrites_2.12" % "0.6.0"`
 ###### Maven
 Add dependency in Maven `pom.xml`
 
-    `<!-- https://mvnrepository.com/artifact/com.github.garyaiki/dendrites_2.11 -->
+    `<!-- https://mvnrepository.com/artifact/com.github.garyaiki/dendrites_2.12 -->
     <dependency>
         <groupId>com.github.garyaiki</groupId>
-        <artifactId>dendrites_2.11</artifactId>
-        <version>0.5.0</version>
+        <artifactId>dendrites_2.12</artifactId>
+        <version>0.6.0</version>
     </dependency>
 `
 
-#### Kafka local installation, configuration, and dendrites integration tests
+##### Kafka local installation, configuration, and dendrites integration tests
 Kafka's [documentation](http://kafka.apache.org/documentation)
-##### Install server
+###### Install server
 [Download](http://kafka.apache.org/downloads) Kafka for Scala version 2.11
 
 Extract files

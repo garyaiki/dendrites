@@ -24,9 +24,9 @@ lazy val commonSettings = Seq(
 	scalaVersion := "2.12.2",
 	crossScalaVersions := Seq("2.12.2", "2.11.11")
 )
-lazy val akkaV = "2.5.2"
-lazy val akkaHttpV = "10.0.7"
-lazy val scalaTestV = "3.0.1"
+lazy val akkaV = "2.5.3"
+lazy val akkaHttpV = "10.0.8"
+lazy val scalaTestV = "3.0.3"
 lazy val algebirdV = "0.13.0"
 lazy val cassandraDriverV = "3.2.0"
 lazy val root = (project in file(".")).
@@ -60,8 +60,8 @@ lazy val root = (project in file(".")).
 			"com.datastax.cassandra" % "cassandra-driver-extras" % cassandraDriverV,
 			"org.apache.avro" % "avro" % "1.8.2",
 			"com.sksamuel.avro4s" %% "avro4s-core" % "1.6.4",
-			"com.google.guava" % "guava" % "19.0",
-			"com.google.code.findbugs" % "jsr305" % "3.0.1",
+			"com.google.guava" % "guava" % "22.0",
+			"com.google.code.findbugs" % "jsr305" % "3.0.2",
 			"com.github.thurstonsand" %% "scala-cass" % "2.1.0"
 		),
 		javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
