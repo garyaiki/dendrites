@@ -9,10 +9,10 @@ Build streaming clients from pre-built HTTP stages and JSON mapping to case clas
 [<img src="png/TypedQueryResponseFlow.png?raw=true" alt="TypedQueryResponseFlow" width="50%" height="50%" title="input case class, output Either Right is mapped case class Either Left is error message">](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/http/stream/TypedQueryResponseFlow.scala){:target="_blank"}
 ###### Click image to open source code in a new tab. Hover over image for stage inputs and outputs
 #### Akka HTTP servers
-Akka HTTP's high level [routing DSL](http://doc.akka.io/docs/akka-http/current/scala/http/routing-dsl/index.html){:target="_blank"} is elegant and easy to read and code. [BalancesService](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/examples/account/http/BalancesService.scala) shows an example server with a GET request handler.
+Akka HTTP's high level [routing DSL](http://doc.akka.io/docs/akka-http/current/scala/http/routing-dsl/index.html){:target="_blank"} is elegant, easy to code, and readable for non-programmers. [BalancesService](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/examples/account/http/BalancesService.scala) shows an example server with a GET request handler.
 
 #### POST, PUT, and DELETE methods
-[Akka HTTP](http://doc.akka.io/docs/akka-http/current/scala/http/index.html){:target="_blank"} built-in components and examples fully support these methods on the client side.  See [routing DSL](http://doc.akka.io/docs/akka-http/current/scala/http/routing-dsl/index.html){:target="_blank"}.
+[Akka HTTP](http://doc.akka.io/docs/akka-http/current/scala/http/index.html){:target="_blank"} built-in components and examples support these methods on the client side.  See [routing DSL](http://doc.akka.io/docs/akka-http/current/scala/http/routing-dsl/index.html){:target="_blank"}.
 
 #### Non blocking GET requests
 <p >

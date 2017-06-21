@@ -26,8 +26,7 @@ prepStmts = prepareStatements(session, schema)
 ```
 
 #### Query from a stream
-
-![image](png/CassandraQueryStream.png?raw=true)
+<img src="png/CassandraQueryStream.png?raw=true" width="60%" />
 
 [CassandraBind](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/cassandra/stream/CassandraBind.scala){:target="_blank"} binds values to a PreparedStatement with a user defined function (UDF) to create a [BoundStatement](http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/BoundStatement.html){:target="_blank"}. Example insert, query bind [UDF](https://github.com/garyaiki/dendrites/blob/master/src/it/scala/com/github/garyaiki/dendrites/cassandra/Playlists.scala){:target="_blank"}
 

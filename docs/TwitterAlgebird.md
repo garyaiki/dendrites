@@ -1,7 +1,8 @@
 ### Algebird streaming approximations
 
 {% include nav.html %}
-Aggregate streaming data with pre-built Algebird stages and functions.
+
+Hash streaming values for near realtime approximate statistics with pre-built Algebird stages and functions.
 
 [<img src="png/AvgFlow.png?raw=true" alt="AvgFlow" width="20%" height="20%" title="input a sequence of Numeric types, output their AveragedValue">](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/algebird/stream/package.scala){:target="_blank"}
 [<img src="png/sumAvgFlow.png?raw=true" alt="sumAvgFlow" width="20%" height="20%" title="input sequence of AveragedValue, output single AveragedValue">](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/algebird/stream/package.scala){:target="_blank"}
@@ -22,15 +23,13 @@ Aggregate streaming data with pre-built Algebird stages and functions.
 [<img src="png/qTreeMinFlow.png?raw=true" alt="qTreeMinFlow" width="20%" height="20%" title="input sequence of values that are QTree like,  output QTree's min value">](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/algebird/stream/package.scala){:target="_blank"}
 ###### Click image to open source code in a new tab. Hover over image for stage inputs and outputs
 
-Hash streaming values for near realtime approximate statistics.
-
 [AveragedValue](https://twitter.github.io/algebird/datatypes/averaged_value.html){:target="_blank"} estimates a variable's mean in the stream.
 
 [CountMinSketch](https://twitter.github.io/algebird/datatypes/approx/countminsketch.html){:target="_blank"} estimates a variable's frequency in the stream.
 
-[DacayedValue](https://twitter.github.io/algebird/datatypes/decayed_value.html){:target="_blank"} estimates a variable's moving average in the stream. The value is tupled with a timestamp in ZipTimeFlow. Halflife de-weights values by age.
+[DecayedValue](https://twitter.github.io/algebird/datatypes/decayed_value.html){:target="_blank"} estimates a variable's moving average in the stream and de-weights values by age. The value is tupled with a timestamp in ZipTimeFlow.
 
-[HyperLogLog](https://twitter.github.io/algebird/datatypes/approx/hyperloglog.html){:target="_blank"} estimates a variable's distinct values in the stream.
+[HyperLogLog](https://twitter.github.io/algebird/datatypes/approx/hyperloglog.html){:target="_blank"} estimates a variable's number of distinct values in the stream.
 
 [Min and Max](https://twitter.github.io/algebird/datatypes/min_and_max.html){:target="_blank"} estimates a variable's minimum or maximum values in the stream.
 
@@ -38,9 +37,9 @@ Hash streaming values for near realtime approximate statistics.
 
 [BloomFilter](https://twitter.github.io/algebird/datatypes/approx/bloom_filter.html){:target="_blank"} quickly ensures a word is *not* in a dictionary or a set of words and quickly predicts a word is *probably* in a dictionary or a set of words
 
-[Algebird](https://github.com/twitter/algebird){:target="_blank"} approximators can stream in parallel. [Agents](http://doc.akka.io/docs/akka/current/scala/agents.html){:target="_blank"} can be used to make these approximations globally readable and updatable but they are deprecated in Akka.
+[Algebird](https://github.com/twitter/algebird){:target="_blank"} approximators can stream in parallel. This example uses [Agents](http://doc.akka.io/docs/akka/current/scala/agents.html){:target="_blank"} which are deprecated in Akka 2.5.
 
-![image](png/AlgebirdApproximatorsAgentsFlow.png?raw=true)
+<img src="png/AlgebirdApproximatorsAgentsFlow.png?raw=true" width="80%" />
 
 ```scala
 // Zip input agent update Futures, waits for all to complete
