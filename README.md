@@ -5,18 +5,16 @@
 A Scala library of streaming components for building Microservices, Event Sourcing, Event Logging, CQRS, and Reactive systems. Functions and pre-built stream stages for Akka Streams, HTTP, Actors, Kafka, Cassandra, Algebird, and Avro.
 
 This Readme covers download, setup and configuration, unit and integration testing and adding it to your project.
-
 Documentation is on the [dendrites website](https://garyaiki.github.io/dendrites/), Scaladocs have examples and lower level descriptions.
 
 #### Add dendrites to your project
 ##### Download from Maven Central
-
 [dendrites](http://mvnrepository.com/artifact/com.github.garyaiki)
-###### sbt
+##### sbt
 Add dependency in `build.sbt`
 
 `libraryDependencies += "com.github.garyaiki" % "dendrites_2.12" % "0.6.0"`
-###### Maven
+##### Maven
 Add dependency in `pom.xml`
 
     `<!-- https://mvnrepository.com/artifact/com.github.garyaiki/dendrites_2.12 -->
@@ -34,7 +32,7 @@ Requires Java 8
 #### Build and test with sbt
 [sbt version](https://github.com/garyaiki/dendrites/blob/master/project/build.properties),  [download](http://www.scala-sbt.org/download.html),  [documentation](http://www.scala-sbt.org/documentation.html)
 
-#### sbt commands
+##### sbt commands
 In a terminal window `cd` to the dendrites directory.
 
 `$ sbt` launch sbt, returns `>` prompt
@@ -71,7 +69,7 @@ In a terminal window `cd` to the dendrites directory.
 #### Build and test with Maven
 [Maven](https://maven.apache.org/index.html)
 
-#### Maven commands
+##### Maven commands
 In a terminal window `cd` to the dendrites directory.
 
 `$ mvn dependency:resolve` Resolves and optionally retrieves dependencies.
@@ -90,16 +88,12 @@ In a terminal window `cd` to the dendrites directory.
 
 `$ mvn scala:doc-jar` Generate Scaladocs in a jar
 
-##### Kafka
-Install and configure for running dendrites integration tests
+#### Kafka
+Minimal install and configure for running dendrites integration tests. [documentation](http://kafka.apache.org/documentation) [download](http://kafka.apache.org/downloads)
 
-[documentation](http://kafka.apache.org/documentation)
+Extract server files `tar -xvf kafka_2.1*-0.1*.*.*.tar`
 
-[download](http://kafka.apache.org/downloads)
-
-Extract server files `tar -xvf kafka_2.11-0.10.2.1.tar`
-
-Optionally, create or replace symbolic link `ln -nsf kafka_2.11-0.10.2.1 kafka`
+Optionally, create or replace symbolic link `ln -nsf kafka_2.1*-0.1*.*.* kafka`
 
 ##### Configure server
 Edit configuration in install directory `/config/server.properties`
@@ -138,7 +132,6 @@ In a 2nd Terminal window in the same directory
 
 Kafka server will run in the foreground
 ###### Create topic for 1 partition
-change `account-topic` to your topic name.
 
 In a 3rd Terminal window in the same directory
 
@@ -146,7 +139,7 @@ In a 3rd Terminal window in the same directory
 
 This takes a few seconds.
 
-##### Run integration tests
+###### Run integration tests
 Kafka server must be running and have an `account-topic`
 
 In dendrites directory terminal window with sbt running
@@ -159,7 +152,7 @@ In dendrites directory terminal window with sbt running
 
 `> it:testOnly com.github.garyaiki.dendrites.kafka.stream.KafkaStreamSpec`
 
-##### After tests, delete topic
+###### After tests, delete topic
 List topics
 
 `bin/kafka-topics.sh --zookeeper localhost:2181 --list`
@@ -168,16 +161,16 @@ Delete topic, this may not happen right away
 
 `bin/kafka-topics.sh --delete --zookeeper localhost:2181 --topic account-topic`
 
-##### ShoppingCartCmd integration tests
+###### ShoppingCartCmd integration tests
 ###### Create a topic for 1 partition
 `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic shoppingcartcmd-topic`
 
 `it:testOnly com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.ShoppingCartCmdSpec`
-##### After tests, delete topic
+###### After tests, delete topic
 
 `bin/kafka-topics.sh --delete --zookeeper localhost:2181 --topic shoppingcartcmd-topic`
 
-##### After all tests, stop Kafka server, stop Zookeeper
+###### After all tests, stop Kafka server, stop Zookeeper
 After topic deleted, stop Kafka server
 
 `bin/kafka-server-stop.sh`
@@ -187,9 +180,7 @@ Give Zookeeper a few seconds. Then stop it too
 `bin/zookeeper-server-stop.sh`
 
 #### Cassandra
-Install and configure for running dendrites integration tests, [documentation](http://www.planetcassandra.org/apache-cassandra-documentation/)
-
-[download](http://www.planetcassandra.org/cassandra/)
+Minimal install and configure for running dendrites integration tests, [documentation](http://www.planetcassandra.org/apache-cassandra-documentation/) [download](http://www.planetcassandra.org/cassandra/)
 
 Extract files `tar -xvf apache-cassandra-3.9-bin.tar`
 
@@ -207,7 +198,7 @@ In a Terminal window `cd` to cassandra install directory
 `bin/cassandra -f`
 
 It will run in the foreground
-##### Run integration tests
+###### Run integration tests
 
 In a dendrites directory terminal window with sbt running. These tests teardown their keyspaces, tables, and connections, run them one at a time so ScalaTest doesn't mix them up and report false errors.
 
@@ -236,7 +227,7 @@ With Kafka shoppingcartcmd-topic
 `> it:testOnly com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.stream.ShoppingCartCmdAndEvtSpec`
 
 
-##### Stop Cassandra
+###### Stop Cassandra
 Exit sbt to close its connection to Cassandra. If you kill Cassandra while sbt is still  it will keep trying to reconnect to Cassandra.
 
 Then, `Ctrl-C` in the terminal running Cassandra
@@ -249,7 +240,7 @@ Then, `Ctrl-C` in the terminal running Cassandra
 These integration tests need Balances Server running to handle HTTP requests. Open a 2nd dendrites directory terminal window and start sbt in this window to run the server.
 
 `> run` Runs `Balances Server` an Http server
-##### Run integration tests
+###### Run integration tests
 
 In the dendrites directory terminal with sbt running
 
@@ -260,7 +251,7 @@ In the dendrites directory terminal with sbt running
 `> it:testOnly com.github.garyaiki.dendrites.examples.account.http.*`
 
 Sometimes, some of these tests fail because Balances Server has a default limit of 4 concurrent requests and tests are running in parallel and may not get time on the server. If this happens, re-run the failed tests one at a time.
-##### Stop Balances Server
+###### Stop Balances Server
 `Ctrl-C` in the terminal window running Balances Server
 
 ### Typesafe Config
@@ -269,7 +260,7 @@ dendrites uses Typesafe Config. Traits with names ending in `Config` define conf
 [Typesafe Config user guide](https://github.com/typesafehub/config),
 [Akka config user guide](http://doc.akka.io/docs/akka/current/scala/general/configuration.html)
 
-Each configuration in `/src/main/resources/reference.conf` can be overridden by your `application.conf`.
+Configurations in `/src/main/resources/reference.conf` can be overridden by your `application.conf`.
 
 The `akka` section is for logging and has Akka specific logging settings
 
@@ -279,12 +270,13 @@ Under the `dendrites` section
 
 `blocking-dispatcher` configures a thread pool to be used when there are blocking calls
 
-These other sections are examples, that don't need to be overriden.
 `checking-balances`, `money-market-balances`, and `savings-balances` are example http client configurations
 
-`kafka` is an example topic configuration
+`kafka` is an example topic and timeout configuration
 
-`cassandra` is an example configuration
+`cassandra` is an example cluster and keyspace configuration
+
+`timer` is asychronous and exponential backoff timeout configuration
 
 ### Logback configuration
 
@@ -292,7 +284,7 @@ These other sections are examples, that don't need to be overriden.
 
 Logging configuration for running dendrites tests is in `/src/main/resources/logback.xml`
 
-Application Logback configuration is done separately.
+Your application Logback configuration is done separately.
 
 [Logging Separation](http://logback.qos.ch/manual/loggingSeparation.html)
 
