@@ -180,11 +180,11 @@ Give Zookeeper a few seconds. Then stop it too
 `bin/zookeeper-server-stop.sh`
 
 #### Cassandra
-Minimal install and configure for running dendrites integration tests, [documentation](http://www.planetcassandra.org/apache-cassandra-documentation/) [download](http://www.planetcassandra.org/cassandra/)
+Minimal install and configure for running dendrites integration tests, [documentation](http://www.planetcassandra.org/apache-cassandra-documentation/) [download](http://cassandra.apache.org/download/)
 
-Extract files `tar -xvf apache-cassandra-3.9-bin.tar`
+Extract files `tar -xvf apache-cassandra-3.11.0-bin.tar`
 
-Optionally, create or replace symbolic link `ln -nsf apache-cassandra-3.9 cassandra`
+Optionally, create or replace symbolic link `ln -nsf apache-cassandra-3.11.0 cassandra`
 ##### Configure
 For development, default configuration can be used.
 ##### Install Cassandra Java Driver
