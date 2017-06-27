@@ -19,9 +19,9 @@ import com.datastax.driver.core.PreparedStatement
 import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import com.github.garyaiki.dendrites.cassandra.fixtures.BeforeAfterAllBuilder
+import com.github.garyaiki.dendrites.kafka.ConsumerRecordMetadata
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.ShoppingCartConfig
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.ShoppingCartCmd
-import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.event.ShoppingCartEvt
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.fixtures.{ShoppingCartBehaviors, ShoppingCartCmdBuilder}
 
 class ShoppingCartCmdAndEvtSinkSpec extends WordSpecLike with Matchers with BeforeAndAfterAll
@@ -39,7 +39,7 @@ class ShoppingCartCmdAndEvtSinkSpec extends WordSpecLike with Matchers with Befo
 
     "poll commands, execute them and save events to Cassandra" in {
       val iter = kvCmds.to[collection.immutable.Iterable]
-      val source = Source[(String, ShoppingCartCmd)](iter)
+      val source = Source[(ConsumerRecordMetadata[String], ShoppingCartCmd)](iter)
       val sink = shoppingCartCmdEvtSink(dispatcher, session, prepStmts)
       val rg = source.to(sink)
       rg.run()

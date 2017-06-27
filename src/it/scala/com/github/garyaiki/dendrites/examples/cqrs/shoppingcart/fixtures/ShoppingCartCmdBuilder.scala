@@ -15,8 +15,7 @@ package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.fixtures
 
 import akka.stream.ActorAttributes
 import com.datastax.driver.core.{PreparedStatement, Session}
-import com.datastax.driver.core.utils.UUIDs.endOf
-import java.util.UUID
+import com.datastax.driver.core.utils.UUIDs.{random, startOf}
 import org.apache.kafka.common.record.TimestampType
 import org.scalatest.{Outcome, TestSuite, TestSuiteMixin}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.{CassandraShoppingCart,
@@ -33,12 +32,12 @@ trait ShoppingCartCmdBuilder extends TestSuiteMixin { this: TestSuite =>
 
   val dispatcher = ActorAttributes.dispatcher("dendrites.blocking-dispatcher")
   val now = System.currentTimeMillis
-  val nowUUID = endOf(now)
-  val cartId = UUID.randomUUID
-  val firstOwner = UUID.randomUUID
-  val secondOwner = UUID.randomUUID
-  val firstItem = UUID.randomUUID
-  val secondItem = UUID.randomUUID
+  val nowUUID = startOf(now)
+  val cartId = random
+  val firstOwner = random
+  val secondOwner = random
+  val firstItem = random
+  val secondItem = random
 
   val cmds = Seq(ShoppingCartCmd("Insert", cartId, firstOwner, None),
     ShoppingCartCmd("SetOwner", cartId, secondOwner, None),
@@ -53,11 +52,11 @@ trait ShoppingCartCmdBuilder extends TestSuiteMixin { this: TestSuite =>
   // Should be firstOwner, firstItem = 1, secondItem = 2
   val kvCmds = for {
     cmd <- cmds
-  } yield (ConsumerRecordMetadata("", 0, 0L, now, TimestampType.LOG_APPEND_TIME, UUID.randomUUID.toString), cmd)
+  } yield (ConsumerRecordMetadata("", 0, 0L, now, TimestampType.LOG_APPEND_TIME, random.toString), cmd)
 
-  val evts = Seq(ShoppingCartEvt(UUID.randomUUID, cartId, nowUUID, Some(firstOwner), Some(firstItem), Some(1)),
-    ShoppingCartEvt(UUID.randomUUID, cartId, nowUUID, None, Some(firstItem), Some(1)),
-    ShoppingCartEvt(UUID.randomUUID, cartId, nowUUID, Some(secondOwner), None, None))
+  val evts = Seq(ShoppingCartEvt(random, random, cartId, nowUUID, Some(firstOwner), Some(firstItem), Some(1)),
+    ShoppingCartEvt(random, random, cartId, nowUUID, None, Some(firstItem), Some(1)),
+    ShoppingCartEvt(random, random, cartId, nowUUID, Some(secondOwner), None, None))
 
   def createTables(session: Session, schema: String): Unit = {
     createTable(session, schema)

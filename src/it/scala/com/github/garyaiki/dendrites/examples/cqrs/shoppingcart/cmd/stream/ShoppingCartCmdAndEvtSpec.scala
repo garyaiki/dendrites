@@ -33,7 +33,6 @@ import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.Cassan
   evtBndQuery, mapRows}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.ShoppingCartCmd
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.kafka.ShoppingCartCmdProducer
-import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.event.ShoppingCartEvt
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.fixtures.{ShoppingCartBehaviors, ShoppingCartCmdBuilder}
 import com.github.garyaiki.dendrites.kafka.stream.KafkaSink
 import com.github.garyaiki.dendrites.stream.SpyFlow

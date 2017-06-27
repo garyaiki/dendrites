@@ -43,8 +43,8 @@ object CassandraShoppingCartEvtLog {
     */
   def createTable(session: Session, schema: String): ResultSet = {
     val resultSetF = session.executeAsync("CREATE TABLE IF NOT EXISTS " + schema + "." + table +
-      """ (eventID uuid, cartId uuid, time timeuuid, owner uuid, item uuid, count int,
-         PRIMARY KEY ((eventID, cartId), time)) WITH CLUSTERING ORDER BY ( time  DESC );""")
+      """ (id uuid, eventID uuid, cartId uuid, time timeuuid, owner uuid, item uuid, count int,
+         PRIMARY KEY ((id, cartId), time));""")
     resultSetF.getUninterruptibly()
   }
 
@@ -56,7 +56,7 @@ object CassandraShoppingCartEvtLog {
     */
   def prepInsert(session: Session, schema: String): PreparedStatement = {
     session.prepare("INSERT INTO " + schema + "." + table +
-      " (eventID, cartId, time, owner, item, count) VALUES (?,?,?,?,?,?);")
+      " (id, eventID, cartId, time, owner, item, count) VALUES (?,?,?,?,?,?,?);")
   }
 
   /** Bind insert PreparedStatement to values of a case class. Does not execute.
@@ -71,7 +71,7 @@ object CassandraShoppingCartEvtLog {
       case Some(x) => Int.box(x)
       case None => null
     }
-    scBndStmt.bind(sc.eventID, sc.cartId, sc.time, sc.owner.orNull, sc.item.orNull, count)
+    scBndStmt.bind(sc.id, sc.eventID, sc.cartId, sc.time, sc.owner.orNull, sc.item.orNull, count)
   }
 
   /** Tell DB to prepare a query by id ShoppingCart statement. Do this once.
@@ -88,13 +88,13 @@ object CassandraShoppingCartEvtLog {
   /** Bind query by id PreparedStatement to values of a case class. Does not execute.
     *
     * @param query PreparedStatement
-    * @param playlst case class
+    * @param queryArgs cartId, time
     * @return BoundStatement ready to execute
     */
-  def bndQuery(query: PreparedStatement, compositeKey: (UUID, UUID)): BoundStatement = {
+  def bndQuery(query: PreparedStatement, queryArgs: (UUID, UUID)): BoundStatement = {
     val scBndStmt = new BoundStatement(query)
-    val cartId = compositeKey._1
-    val time = compositeKey._2
+    val cartId = queryArgs._1
+    val time = queryArgs._2
     scBndStmt.bind(cartId, time)
   }
 

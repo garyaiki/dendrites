@@ -16,7 +16,6 @@ package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.strea
 import akka.stream.scaladsl.Source
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.datastax.driver.core.PreparedStatement
-import java.util.UUID
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
 import com.github.garyaiki.dendrites.cassandra.fixtures.BeforeAfterAllBuilder
