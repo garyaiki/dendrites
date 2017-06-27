@@ -15,19 +15,20 @@ package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart
 
 import akka.event.LoggingAdapter
 import com.datastax.driver.core.{PreparedStatement, ResultSetFuture, Session}
-import com.datastax.driver.core.utils.UUIDs.timeBased
+import com.datastax.driver.core.utils.UUIDs.startOf
 import java.util.UUID
 import com.github.garyaiki.dendrites.cqrs.Event
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.CassandraShoppingCartEvtLog.bndInsert
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.ShoppingCartCmd
+import com.github.garyaiki.dendrites.kafka.ConsumerRecordMetadata
 
 package object event {
 // Events
-case class OwnerChanged(cartId: UUID, time: UUID, eventID: UUID, owner: UUID) extends Event with Cart
-case class ItemAdded(cartId: UUID, time: UUID, eventID: UUID, item: UUID, count: Int) extends Event with Cart
-case class ItemRemoved(cartId: UUID, time: UUID, eventID: UUID, item: UUID, count: Int) extends Event with Cart
+case class OwnerChanged(eventID: UUID, cartId: UUID, time: UUID, owner: UUID) extends Event with Cart
+case class ItemAdded(eventID: UUID, cartId: UUID, time: UUID, item: UUID, count: Int) extends Event with Cart
+case class ItemRemoved(eventID: UUID, cartId: UUID, time: UUID, item: UUID, count: Int) extends Event with Cart
 // Event log
-case class ShoppingCartEvt(cartId: UUID, time: UUID, eventID: UUID, owner: Option[UUID], item: Option[UUID],
+case class ShoppingCartEvt(eventID: UUID, cartId: UUID, time: UUID, owner: Option[UUID], item: Option[UUID],
   count: Option[Int]) extends Event with Cart
 
   /** Convert Kafka key and ShoppingCartCmd to a ShoppingCartEvt
@@ -38,13 +39,16 @@ case class ShoppingCartEvt(cartId: UUID, time: UUID, eventID: UUID, owner: Optio
     * @return ShoppingCartEvt
     * @throws IllegalArgumentException if kafkaKey can't be converted to a UUID
     */
-  def cmdToEvt(kafkaKey: String, cmd: ShoppingCartCmd)(implicit logger: LoggingAdapter): ShoppingCartEvt = {
+  def cmdToEvt(crMeta: (ConsumerRecordMetadata[String], ShoppingCartCmd))(implicit logger: LoggingAdapter):
+    ShoppingCartEvt = {
+
     try {
-      val evtId = UUID.fromString(kafkaKey)
-      val now = timeBased
-      cmd.count match {
-        case None => ShoppingCartEvt(cmd.cartId, now, evtId, Some(cmd.ownerOrItem), None, None)
-        case Some(count) => ShoppingCartEvt(cmd.cartId, now, evtId, None, Some(cmd.ownerOrItem), Some(count))
+      val evtId = UUID.fromString(crMeta._1.key)
+      val time = startOf(crMeta._1.timestamp)
+      crMeta._2.count match {
+        case None => ShoppingCartEvt(evtId, crMeta._2.cartId, time, Some(crMeta._2.ownerOrItem), None, None)
+        case Some(count) =>
+          ShoppingCartEvt(evtId, crMeta._2.cartId, time, None, Some(crMeta._2.ownerOrItem), Some(count))
       }
     } catch {
       case e: IllegalArgumentException => {
@@ -70,17 +74,17 @@ case class ShoppingCartEvt(cartId: UUID, time: UUID, eventID: UUID, owner: Optio
     = {
     evt match {
       case oc: OwnerChanged => {
-        val cc = ShoppingCartEvt(oc.cartId, oc.time, oc.eventID, Some(oc.owner), None, None)
+        val cc = ShoppingCartEvt(oc.eventID, oc.cartId, oc.time, Some(oc.owner), None, None)
         val bs = bndInsert(stmt, cc)
         session.executeAsync(bs)
       }
       case ia: ItemAdded => {
-        val cc = ShoppingCartEvt(ia.cartId, ia.time, ia.eventID, None, Some(ia.item), Some(ia.count))
+        val cc = ShoppingCartEvt(ia.eventID, ia.cartId, ia.time, None, Some(ia.item), Some(ia.count))
         val bs = bndInsert(stmt, cc)
         session.executeAsync(bs)
       }
       case ir: ItemRemoved => {
-        val cc = ShoppingCartEvt(ir.cartId, ir.time, ir.eventID, None, Some(ir.item), Some(ir.count))
+        val cc = ShoppingCartEvt(ir.eventID, ir.cartId, ir.time, None, Some(ir.item), Some(ir.count))
         val bs = bndInsert(stmt, cc)
         session.executeAsync(bs)
       }
@@ -126,7 +130,7 @@ case class ShoppingCartEvt(cartId: UUID, time: UUID, eventID: UUID, owner: Optio
       count = sc.count.getOrElse(0) * values.length
       if(count != 0)
       compensatedCount = if(count > 0) (count -1) * -1 else (count + 1) * -1
-    } yield ShoppingCartEvt(sc.cartId, sc.time, sc.eventID, None, sc.item, Some(compensatedCount))
+    } yield ShoppingCartEvt(sc.eventID, sc.cartId, sc.time, None, sc.item, Some(compensatedCount))
 
     val zs = ys.toSeq
     if(zs.isEmpty) None else Some(zs)

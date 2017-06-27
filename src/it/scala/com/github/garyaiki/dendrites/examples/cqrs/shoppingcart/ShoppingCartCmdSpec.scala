@@ -32,6 +32,7 @@ import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.ShoppingCart
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.kafka.{ShoppingCartCmdConsumer,
   ShoppingCartCmdProducer}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.fixtures.ShoppingCartCmdBuilder
+import com.github.garyaiki.dendrites.kafka.ConsumerRecordMetadata
 import com.github.garyaiki.dendrites.kafka.stream.avro4s.ConsumerRecordDeserializer
 import com.github.garyaiki.dendrites.kafka.stream.{ConsumerRecordsToQueue, KafkaSink, KafkaSource}
 import com.github.garyaiki.dendrites.kafka.stream.extractRecords
@@ -67,7 +68,7 @@ class ShoppingCartCmdSpec extends WordSpecLike with Matchers with BeforeAndAfter
       val results = kafkaSource
         .via(consumerRecordQueue)
         .via(deserializer)
-        .runWith(TestSink.probe[(String, ShoppingCartCmd)])
+        .runWith(TestSink.probe[(ConsumerRecordMetadata[String], ShoppingCartCmd)])
         .request(10)
         .expectNextN(10)
       results forall(kv => cmds.contains(kv._2))

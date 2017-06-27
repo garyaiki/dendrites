@@ -55,7 +55,7 @@ class CassandraShoppingCartEvtLogSpec extends WordSpecLike with Matchers with Be
 
   "query by eventId and time" in {
     val response = queryShoppingCartEvent(session, prepStmts)
-    response shouldBe evts
+    response should contain allElementsOf evts
   }
 
   override def afterAll() { dropSchemaCloseSessionCluster() }

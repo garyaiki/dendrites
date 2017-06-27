@@ -19,6 +19,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.datastax.driver.core.{PreparedStatement, Session}
+import com.datastax.driver.core.utils.UUIDs.timeBased
 import java.util.UUID
 import org.scalatest.{Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
@@ -84,7 +85,7 @@ trait ShoppingCartBehaviors extends Matchers with ShoppingCartCmdBuilder { this:
     def sink = TestSink.probe[Seq[ShoppingCartEvt]]
     val (pub, sub) = source.via(bndStmt).via(paging).toMat(sink)(Keep.both).run()
     sub.request(1)
-    pub.sendNext((cartId, startTime))
+    pub.sendNext((cartId, nowUUID))
     val response = sub.expectNext()
     pub.sendComplete()
     sub.expectComplete()

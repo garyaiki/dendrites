@@ -16,6 +16,7 @@ package com.github.garyaiki.dendrites.kafka.stream.avro4s
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import com.github.garyaiki.dendrites.kafka.ConsumerRecordMetadata
 
 /** Maps a byteArray to a case class
   *
@@ -24,10 +25,10 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
   * @author Gary Struthers
   */
 class ConsumerRecordDeserializer[K, V <: Product](f:(Array[Byte]) => V)
-  extends GraphStage[FlowShape[ConsumerRecord[K, Array[Byte]], (K, V)]] {
+  extends GraphStage[FlowShape[ConsumerRecord[K, Array[Byte]], (ConsumerRecordMetadata[K], V)]] {
 
   val in = Inlet[ConsumerRecord[K, Array[Byte]]]("Avro4sConsumerRecordDeserializer.in")
-  val out = Outlet[(K, V)]("Avro4sConsumerRecordDeserializer.out")
+  val out = Outlet[(ConsumerRecordMetadata[K], V)]("Avro4sConsumerRecordDeserializer.out")
 
   override val shape = FlowShape.of(in, out)
 
@@ -41,9 +42,7 @@ class ConsumerRecordDeserializer[K, V <: Product](f:(Array[Byte]) => V)
       setHandler(in, new InHandler {
         override def onPush(): Unit = {
           val consumerRecord: ConsumerRecord[K, Array[Byte]] = grab(in)
-          val bytes: Array[Byte] = consumerRecord.value
-          val caseClass: V = f(bytes)
-          push(out, (consumerRecord.key, caseClass))
+          push(out, (ConsumerRecordMetadata(consumerRecord), f(consumerRecord.value)))
         }
       })
 

@@ -13,8 +13,10 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites
 
-import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.clients.consumer.{ConsumerRecord, KafkaConsumer}
 import org.apache.kafka.clients.producer.KafkaProducer
+//import org.apache.kafka.common.header.Headers v0.11
+import org.apache.kafka.common.record.TimestampType
 
 /** Provides Classes to add fields to KafkaConsumer and KafkaProducer. Also Factories for
   * KafkaConsumer, KafkaProducer from their Properties files
@@ -54,5 +56,26 @@ package object kafka {
   def createProducer[K, V](filename: String): KafkaProducer[K, V] = {
     val props = loadProperties(filename)
     new KafkaProducer[K, V](props)
+  }
+
+  /** ConsumerRecordMetadata has data Kafka attaches to messages which may be used in other processing
+    *
+    * @see https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/common/record/TimestampType.java TimestampType]
+    * @tparam K ConsumerRecord key
+    * @param topic ConsumerRecord topic
+    * @param partition ConsumerRecord topic partition
+    * @param offset position in Kafka topic
+    * @param timestamp
+    * @param timestampType enum NO_TIMESTAMP_TYPE, CREATE_TIME, LOG_APPEND_TIME
+    * @param key of ConsumerRecord
+    * @author Gary Struthers
+    */
+  case class ConsumerRecordMetadata[K](topic: String, partition: Int, offset: Long, timestamp: Long,
+    timestampType: TimestampType, key: K)
+
+  object ConsumerRecordMetadata {
+    def apply[K, V](cr: ConsumerRecord[K, V]): ConsumerRecordMetadata[K] = {
+      ConsumerRecordMetadata(cr.topic, cr.partition, cr.offset, cr.timestamp, cr.timestampType, cr.key)
+    }
   }
 }

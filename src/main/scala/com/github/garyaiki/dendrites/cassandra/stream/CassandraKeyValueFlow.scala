@@ -26,10 +26,11 @@ import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
 import com.github.garyaiki.dendrites.cassandra.{getRowColumnNames, noHostAvailableExceptionMsg}
 import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
+import com.github.garyaiki.dendrites.kafka.ConsumerRecordMetadata
 import com.github.garyaiki.dendrites.stream.TimerConfig
 
-/** Input key value, a higher order function asynchronously executes BoundStatement(s) on value, pass input to next
-  * stage. Then an event logger can use the key as an event id with the value
+/** Input ConsumerRecordMetadata containing a key and a  value, a function executes BoundStatement(s) on value, pass
+  * input to next stage. Then an event logger can use the key as an event id with the value and optionally timestamp
   *
   * Cassandra's executeAsync statement returns a Guava ListenableFuture which is converted to a completed Scala Future.
   * Future's Success invokes an Akka Stream AsyncCallback. This checks if the conditional statement succeeded. If so,
@@ -53,11 +54,12 @@ import com.github.garyaiki.dendrites.stream.TimerConfig
   * @author Gary Struthers
   */
 class CassandraKeyValueFlow[K, V <: Product](tc: TimerConfig, f: (V) => ResultSetFuture)
-  (implicit val ec: ExecutionContext, logger: LoggingAdapter) extends GraphStage[FlowShape[(K, V), (K, V)]] {
+  (implicit val ec: ExecutionContext, logger: LoggingAdapter) extends
+    GraphStage[FlowShape[(ConsumerRecordMetadata[K], V), (ConsumerRecordMetadata[K], V)]] {
 
-  val in = Inlet[(K, V)]("CassandraKeyValueFlow.in")
-  val out = Outlet[(K, V)]("CassandraKeyValueFlow.out")
-  override val shape: FlowShape[(K, V), (K, V)] = FlowShape.of(in, out)
+  val in = Inlet[(ConsumerRecordMetadata[K], V)]("CassandraKeyValueFlow.in")
+  val out = Outlet[(ConsumerRecordMetadata[K], V)]("CassandraKeyValueFlow.out")
+  override val shape: FlowShape[(ConsumerRecordMetadata[K], V), (ConsumerRecordMetadata[K], V)] = FlowShape.of(in, out)
 
   /** When upstream pushes a case class execute it asynchronously. Then push the input
     *
@@ -73,7 +75,7 @@ class CassandraKeyValueFlow[K, V <: Product](tc: TimerConfig, f: (V) => ResultSe
       var waitForHandler: Boolean = false
       var mustFinish: Boolean = false
 
-      def myCallBack(kvRs: ((K, V), ResultSet)): Unit = {
+      def myCallBack(kvRs: ((ConsumerRecordMetadata[K], V), ResultSet)): Unit = {
         val kv = kvRs._1
         val rs = kvRs._2
         val caseClass = kv._2
@@ -99,7 +101,7 @@ class CassandraKeyValueFlow[K, V <: Product](tc: TimerConfig, f: (V) => ResultSe
         }
       }
 
-      def myHandler(kv: (K, V)): Unit = {
+      def myHandler(kv: (ConsumerRecordMetadata[K], V)): Unit = {
         waitForHandler = true
         val resultSetFuture = f(kv._2)
         val scalaRSF = listenableFutureToScala[ResultSet](resultSetFuture.asInstanceOf[ListenableFuture[ResultSet]])
@@ -131,7 +133,7 @@ class CassandraKeyValueFlow[K, V <: Product](tc: TimerConfig, f: (V) => ResultSe
         retries += 1
         waitForTimer = false
         timerKey match {
-          case kv: (K, V)  => myHandler(kv)
+          case kv: (ConsumerRecordMetadata[K], V)  => myHandler(kv)
           case x => throw new IllegalArgumentException(s"onTimer expected (K, V) received:${x.toString}")
         }
       }
@@ -163,10 +165,10 @@ object CassandraKeyValueFlow {
     * @tparam V value type case class or tuple
     * @param tc: TimerConfig
     * @param f map case class to ResultSetFuture, Usually a curried function
-    * @return Sink[A, NotUsed]
+    * @return Flow[(ConsumerRecordMetadata[K], V), (ConsumerRecordMetadata[K], V), NotUsed]
     */
   def apply[K, V <: Product](tc: TimerConfig, f: (V) => ResultSetFuture)(implicit ec: ExecutionContext,
-    logger: LoggingAdapter): Flow[(K, V), (K, V), NotUsed] = {
+    logger: LoggingAdapter): Flow[(ConsumerRecordMetadata[K], V), (ConsumerRecordMetadata[K], V), NotUsed] = {
 
       Flow.fromGraph(new CassandraKeyValueFlow[K, V](tc, f))
     }

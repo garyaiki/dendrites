@@ -15,8 +15,9 @@ package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.fixtures
 
 import akka.stream.ActorAttributes
 import com.datastax.driver.core.{PreparedStatement, Session}
-import com.datastax.driver.core.utils.UUIDs.timeBased
+import com.datastax.driver.core.utils.UUIDs.endOf
 import java.util.UUID
+import org.apache.kafka.common.record.TimestampType
 import org.scalatest.{Outcome, TestSuite, TestSuiteMixin}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.{CassandraShoppingCart,
   CassandraShoppingCartEvtLog}
@@ -25,13 +26,14 @@ import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.Cassan
   createEvtTable}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.ShoppingCartCmd
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.event.ShoppingCartEvt
-
+import com.github.garyaiki.dendrites.kafka.ConsumerRecordMetadata
 trait ShoppingCartCmdBuilder extends TestSuiteMixin { this: TestSuite =>
 
   abstract override def withFixture(test: NoArgTest): Outcome = { super.withFixture(test) }
 
   val dispatcher = ActorAttributes.dispatcher("dendrites.blocking-dispatcher")
-  val startTime = timeBased
+  val now = System.currentTimeMillis
+  val nowUUID = endOf(now)
   val cartId = UUID.randomUUID
   val firstOwner = UUID.randomUUID
   val secondOwner = UUID.randomUUID
@@ -51,11 +53,11 @@ trait ShoppingCartCmdBuilder extends TestSuiteMixin { this: TestSuite =>
   // Should be firstOwner, firstItem = 1, secondItem = 2
   val kvCmds = for {
     cmd <- cmds
-  } yield (UUID.randomUUID.toString, cmd)
+  } yield (ConsumerRecordMetadata("", 0, 0L, now, TimestampType.LOG_APPEND_TIME, UUID.randomUUID.toString), cmd)
 
-  val evts = Seq(ShoppingCartEvt(cartId, timeBased, UUID.randomUUID, Some(firstOwner), Some(firstItem), Some(1)),
-    ShoppingCartEvt(cartId, timeBased, UUID.randomUUID, None, Some(firstItem), Some(1)),
-    ShoppingCartEvt(cartId, timeBased, UUID.randomUUID, Some(secondOwner), None, None))
+  val evts = Seq(ShoppingCartEvt(UUID.randomUUID, cartId, nowUUID, Some(firstOwner), Some(firstItem), Some(1)),
+    ShoppingCartEvt(UUID.randomUUID, cartId, nowUUID, None, Some(firstItem), Some(1)),
+    ShoppingCartEvt(UUID.randomUUID, cartId, nowUUID, Some(secondOwner), None, None))
 
   def createTables(session: Session, schema: String): Unit = {
     createTable(session, schema)

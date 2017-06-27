@@ -34,14 +34,17 @@ object CassandraShoppingCartEvtLog {
   val table = "shopping_cart_event_log"
 
   /** Create ShoppingCart Event log table asynchronously. executeAsync returns a ResultSetFuture which extends
-    * Guava ListenableFuture. getUninterruptibly is the preferred way to complete the future
+    * Guava ListenableFuture. getUninterruptibly is the preferred way to complete the future.
+    *
+    * to get the most recent events first -> WITH CLUSTERING ORDER BY ( time  DESC )
     * @param session
     * @param schema
     * @return a ResultSet which contains the first page of Rows
     */
   def createTable(session: Session, schema: String): ResultSet = {
     val resultSetF = session.executeAsync("CREATE TABLE IF NOT EXISTS " + schema + "." + table +
-      " (cartId uuid, time timeuuid, eventID uuid, owner uuid, item uuid, count int, PRIMARY KEY (cartId, time));")
+      """ (eventID uuid, cartId uuid, time timeuuid, owner uuid, item uuid, count int,
+         PRIMARY KEY ((eventID, cartId), time)) WITH CLUSTERING ORDER BY ( time  DESC );""")
     resultSetF.getUninterruptibly()
   }
 
@@ -53,7 +56,7 @@ object CassandraShoppingCartEvtLog {
     */
   def prepInsert(session: Session, schema: String): PreparedStatement = {
     session.prepare("INSERT INTO " + schema + "." + table +
-      " (cartId, time, eventID, owner, item, count) VALUES (?,?,?,?,?,?);")
+      " (eventID, cartId, time, owner, item, count) VALUES (?,?,?,?,?,?);")
   }
 
   /** Bind insert PreparedStatement to values of a case class. Does not execute.
@@ -68,17 +71,18 @@ object CassandraShoppingCartEvtLog {
       case Some(x) => Int.box(x)
       case None => null
     }
-    scBndStmt.bind(sc.cartId, sc.time, sc.eventID, sc.owner.orNull, sc.item.orNull, count)
+    scBndStmt.bind(sc.eventID, sc.cartId, sc.time, sc.owner.orNull, sc.item.orNull, count)
   }
 
   /** Tell DB to prepare a query by id ShoppingCart statement. Do this once.
     *
+    * ALLOW FILTERING is necessary because eventId should be the key but we don't query on it.
     * @param session
     * @param schema
     * @return prepared statement
     */
   def prepQuery(session: Session, schema: String): PreparedStatement = {
-    session.prepare("SELECT * FROM " + schema + "." + table + " WHERE cartId=? AND time >= ?;")
+    session.prepare("SELECT * FROM " + schema + "." + table + " WHERE cartId=? AND time >= ? ALLOW FILTERING;")
   }
 
   /** Bind query by id PreparedStatement to values of a case class. Does not execute.

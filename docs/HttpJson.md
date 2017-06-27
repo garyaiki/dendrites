@@ -1,15 +1,13 @@
 ### HTTP, JSON streaming components
-
 {% include nav.html %}
-Build streaming clients from pre-built HTTP stages and JSON mapping to case classes.
+
+Non-blocking pre-built HTTP client stages and JSON mapping to case classes. Streams can be both clients and servers.
 
 [<img src="png/TypedQueryFlow.png?raw=true" alt="TypedQueryFlow" width="20%" height="20%" title="input case class, output Future of HTTPResponse to Get query">](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/http/stream/TypedQueryFlow.scala){:target="_blank"}
 [<img src="png/TypedResponseFlow.png?raw=true" alt="TypedResponseFlow" width="20%" height="20%" title="input HTTPResponse, output Either Right is mapped case class Either Left is error message">](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/http/stream/TypedResponseFlow.scala){:target="_blank"}
 
 [<img src="png/TypedQueryResponseFlow.png?raw=true" alt="TypedQueryResponseFlow" width="50%" height="50%" title="input case class, output Either Right is mapped case class Either Left is error message">](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/http/stream/TypedQueryResponseFlow.scala){:target="_blank"}
 ###### Click image to open source code in a new tab. Hover over image for stage inputs and outputs
-#### Akka HTTP servers
-Akka HTTP's high level [routing DSL](http://doc.akka.io/docs/akka-http/current/scala/http/routing-dsl/index.html){:target="_blank"} is elegant, easy to code, and readable for non-programmers. [BalancesService](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/examples/account/http/BalancesService.scala) shows an example server with a GET request handler.
 
 #### POST, PUT, and DELETE methods
 [Akka HTTP](http://doc.akka.io/docs/akka-http/current/scala/http/index.html){:target="_blank"} built-in components and examples support these methods on the client side.  See [routing DSL](http://doc.akka.io/docs/akka-http/current/scala/http/routing-dsl/index.html){:target="_blank"}.
@@ -108,4 +106,6 @@ val fgLR = GraphDSL.create() { implicit builder =>
 val wrappedCallsLRFlow = Flow.fromGraph(fgLR)
 ```
 
-These flows are opinionated and intricate in places and may not be what you want but they can be a starting point for making custom HTTP client streaming stages.
+#### Akka HTTP servers
+Akka HTTP's high level [routing DSL](http://doc.akka.io/docs/akka-http/current/scala/http/routing-dsl/index.html){:target="_blank"} is elegant, easy to code, and readable for non-programmers. [BalancesService](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/examples/account/http/BalancesService.scala) shows an example server with a GET request handler.
+
