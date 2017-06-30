@@ -20,7 +20,7 @@ import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import com.typesafe.config.ConfigFactory
 import org.apache.avro.Schema
-import org.apache.kafka.clients.producer.{Callback, MockProducer, ProducerRecord, RecordMetadata}
+import org.apache.kafka.clients.producer.{Callback, MockProducer, RecordMetadata}
 import org.apache.kafka.common.KafkaException
 import org.apache.kafka.common.errors.{CorruptRecordException, // Retriable exceptions
   InvalidMetadataException, NetworkException, NotEnoughReplicasAfterAppendException, NotEnoughReplicasException,

@@ -158,12 +158,14 @@ In dendrites directory terminal window with sbt running
 
 `> it:testOnly com.github.garyaiki.dendrites.kafka.stream.KafkaStreamSpec`
 
+Note: sometimes Kafka tests interfere with each other, if one fails, exit sbt, then re-run. 
+
 ###### After tests, delete topic
 List topics
 
 `bin/kafka-topics.sh --zookeeper localhost:2181 --list`
 
-Delete topic, this may not happen right away
+Delete topic, this may not happen right away. The topic `_consumerOffsets` can't be deleted from the command line. [Kafka Tool](http://kafkatool.com) is a GUI tool and free for personal use.
 
 `bin/kafka-topics.sh --delete --zookeeper localhost:2181 --topic account-topic`
 

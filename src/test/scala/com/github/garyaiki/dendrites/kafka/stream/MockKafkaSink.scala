@@ -98,7 +98,7 @@ class MockKafkaSink[K, V](prod: ProducerConfig[K, V], testException: RuntimeExce
         override def onPush(): Unit = {
           if(!waitForTimer) {
             val item = grab(in)
-            val producerRecord = new ProducerRecord[K, V](prod.topic, prod.generateKey(), item)
+            val producerRecord = prod.createProducerRecord(item)
             var errorCallback: AsyncCallback[Exception] = null
             val pullCallback = getAsyncCallback{ (_: Unit) => pull(in) }
             val kafkaCallback = new Callback() {

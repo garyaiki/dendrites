@@ -16,7 +16,7 @@ package com.github.garyaiki.dendrites.kafka
 import akka.actor.ActorSystem
 import akka.event.{LoggingAdapter, Logging}
 import java.util.concurrent.{Future => JFuture}
-import org.apache.kafka.clients.producer.{Callback, MockProducer, ProducerRecord, RecordMetadata}
+import org.apache.kafka.clients.producer.{Callback, MockProducer, RecordMetadata}
 import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatest.Matchers._
 import com.github.garyaiki.dendrites.avro.{byteArrayToGenericRecord, ccToByteArray, loadSchema}
@@ -40,7 +40,7 @@ class MockAvroProducerSpec extends WordSpecLike {
     "serialize a case class and send a message" in {
       producer.clear()
       val bytes = ccToByteArray(schema, gab)
-      val record = new ProducerRecord[String, Array[Byte]](topic, mock.generateKey, bytes)
+      val record = mock.createProducerRecord(bytes)
       val kafkaCallback = new Callback() {
         def onCompletion(meta: RecordMetadata, e: Exception): Unit = {
           e should be(null)
