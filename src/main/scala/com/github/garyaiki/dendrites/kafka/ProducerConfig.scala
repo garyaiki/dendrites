@@ -13,7 +13,7 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.kafka
 
-import org.apache.kafka.clients.producer.Producer
+import org.apache.kafka.clients.producer.{Producer, ProducerRecord}
 import scala.concurrent.duration.FiniteDuration
 
 /** Abstract KafkaProducer configuration
@@ -31,11 +31,15 @@ trait ProducerConfig[K, V] {
 
   def generateKey(): K
 
+  def createProducerRecord(item: V): ProducerRecord[K, V] = {
+    new ProducerRecord[K, V](topic, generateKey, item)
+  }
+
   val minDuration: FiniteDuration // min poll, commit backoff
   val maxDuration: FiniteDuration // max poll, commit backoff
   val randomFactor: Double // random delay factor between 0.0, 1.0
   val curriedDelay: Int => FiniteDuration // curried calculateDelay
 
-  val producer: Producer[K, V]
+  def producer(): Producer[K, V]
   val topic: String
 }

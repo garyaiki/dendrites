@@ -58,15 +58,8 @@ class ShoppingCartCmdAndEvtSpec extends WordSpecLike with Matchers with BeforeAn
   }
 
   "A ShoppingCart Command and Event log" should {
-    "write to Kafka shoppingcartcmd-topic" ignore {
-
-      Thread.sleep(500) // wait for Kafka
-    }
-
     "poll commands from Kafka, execute them and save events to Cassandra" in {
-      //val rg = shoppingCartCmdRG(dispatcher, session, prepStmts)
       val cmdEvtSource = shoppingCartCmdEvtSource(dispatcher)
-      //val spy = new SpyFlow[(String, ShoppingCartCmd)]("cmd spy", 0, 0)
       val cmdAndEvtSinks = shoppingCartCmdEvtSinks(dispatcher, session, prepStmts)
       val rg = cmdEvtSource.to(cmdAndEvtSinks)
       rg.run()

@@ -15,6 +15,8 @@ package com.github.garyaiki.dendrites.examples.account.kafka
 
 import com.typesafe.config.ConfigFactory
 import java.util.UUID
+import org.apache.kafka.clients.producer.ProducerRecord
+
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 import com.github.garyaiki.dendrites.concurrent.calculateDelay
 import com.github.garyaiki.dendrites.kafka.ProducerConfig
@@ -26,6 +28,10 @@ import com.github.garyaiki.dendrites.kafka.createProducer
 object AccountProducer extends ProducerConfig[String, Array[Byte]] {
 
   override def generateKey: String = UUID.randomUUID.toString
+
+  override def createProducerRecord(item: Array[Byte]): ProducerRecord[String, Array[Byte]] = {
+    new ProducerRecord[String, Array[Byte]](topic, generateKey, item)
+  }
 
   val config = ConfigFactory.load
   val topic = config.getString("dendrites.kafka.account.topic")

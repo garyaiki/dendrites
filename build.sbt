@@ -25,7 +25,7 @@ lazy val commonSettings = Seq(
 	crossScalaVersions := Seq("2.12.2", "2.11.11")
 )
 lazy val akkaV = "2.5.3"
-lazy val akkaHttpV = "10.0.8"
+lazy val akkaHttpV = "10.0.9"
 lazy val scalaTestV = "3.0.3"
 lazy val algebirdV = "0.13.0"
 lazy val cassandraDriverV = "3.2.0"
@@ -54,7 +54,7 @@ lazy val root = (project in file(".")).
 			"io.spray" %% "spray-json" % "1.3.3",
 			"commons-io" % "commons-io" % "2.5" % "it,test",
 			"com.chuusai" %% "shapeless" % "2.3.2",
-			"org.apache.kafka" % "kafka-clients" % "0.10.2.1",
+			"org.apache.kafka" % "kafka-clients" % "0.11.0.0",
 			"com.datastax.cassandra" % "cassandra-driver-core" % cassandraDriverV,
 			"com.datastax.cassandra" % "cassandra-driver-mapping" % cassandraDriverV,
 			"com.datastax.cassandra" % "cassandra-driver-extras" % cassandraDriverV,

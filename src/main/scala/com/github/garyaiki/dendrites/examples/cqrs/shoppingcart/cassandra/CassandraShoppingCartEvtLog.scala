@@ -20,9 +20,8 @@ import java.util.UUID
 import scala.collection.JavaConverters._
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.event.ShoppingCartEvt
 
-/** Song is an example in Java Driver 3.0 reference doc. This provides Scala functions to create
-  * a table, an insert PreparedStatement, a Query PreparedStatement, a case class, an insert
-  * BoundStatement, a Query BoundStatement, and a ScalaCass Row to case class conversion
+/** Functions to create a table, an Insert PreparedStatement and BoundStatment, a Query PreparedStatement and
+  * BoundStatement, a ScalaCass map Row to ShoppingCartEvt, and map a Seq[Row] to Seq[ShoppingCartEvt}
   *
   * @see [[http://docs.datastax.com/en/latest-pdf-java-driver?permalinkv1 java-driver]]
   * @see [[https://github.com/thurstonsand/scala-cass scala-cass]]
@@ -34,9 +33,8 @@ object CassandraShoppingCartEvtLog {
   val table = "shopping_cart_event_log"
 
   /** Create ShoppingCart Event log table asynchronously. executeAsync returns a ResultSetFuture which extends
-    * Guava ListenableFuture. getUninterruptibly is the preferred way to complete the future.
+    * Guava ListenableFuture. getUninterruptibly is Cassandra's recommended way to complete their future.
     *
-    * to get the most recent events first -> WITH CLUSTERING ORDER BY ( time  DESC )
     * @param session
     * @param schema
     * @return a ResultSet which contains the first page of Rows
@@ -48,7 +46,7 @@ object CassandraShoppingCartEvtLog {
     resultSetF.getUninterruptibly()
   }
 
-  /** Tell DB to prepare insert ShoppingCart Event statement. Do this once.
+  /** Tell DB to prepare insert ShoppingCart Event statement.
     *
     * @param session
     * @param schema
@@ -59,7 +57,7 @@ object CassandraShoppingCartEvtLog {
       " (id, eventID, cartId, time, owner, item, count) VALUES (?,?,?,?,?,?,?);")
   }
 
-  /** Bind insert PreparedStatement to values of a case class. Does not execute.
+  /** Bind insert PreparedStatement to values of a case class.
     *
     * @param insert PreparedStatement
     * @param playlst case class
@@ -76,7 +74,7 @@ object CassandraShoppingCartEvtLog {
 
   /** Tell DB to prepare a query by id ShoppingCart statement. Do this once.
     *
-    * ALLOW FILTERING is necessary because eventId should be the key but we don't query on it.
+    * ALLOW FILTERING is necessary because we don't query on the key.
     * @param session
     * @param schema
     * @return prepared statement
@@ -85,7 +83,7 @@ object CassandraShoppingCartEvtLog {
     session.prepare("SELECT * FROM " + schema + "." + table + " WHERE cartId=? AND time >= ? ALLOW FILTERING;")
   }
 
-  /** Bind query by id PreparedStatement to values of a case class. Does not execute.
+  /** Bind query by id PreparedStatement to values of a case class.
     *
     * @param query PreparedStatement
     * @param queryArgs cartId, time

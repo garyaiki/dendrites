@@ -4,8 +4,14 @@
 
 A Scala library of streaming components for building Microservices, Event Sourcing, Event Logging, CQRS, and Reactive systems. Functions and pre-built stream stages for Akka Streams, HTTP, Actors, Kafka, Cassandra, Algebird, and Avro.
 
+It's meant to be used as
+- a more adaptable alternative to frameworks and products
+- examples for learning how to use these components and work with streams
+- templates for other components or custom alternatives
+- is in your product
+
 This Readme covers download, setup and configuration, unit and integration testing and adding it to your project.
-Documentation is on the [dendrites website](https://garyaiki.github.io/dendrites/), Scaladocs have examples and lower level descriptions.
+Documentation is on the [website](https://garyaiki.github.io/dendrites/), Scaladocs have examples and lower level descriptions.
 
 #### Add dendrites to your project
 ##### Download from Maven Central
@@ -89,11 +95,11 @@ In a terminal window `cd` to the dendrites directory.
 `$ mvn scala:doc-jar` Generate Scaladocs in a jar
 
 #### Kafka
-Minimal install and configure for running dendrites integration tests. [documentation](http://kafka.apache.org/documentation) [download](http://kafka.apache.org/downloads)
+Minimal install and configure for running dendrites integration tests. [Kafka's documentation](http://kafka.apache.org/documentation), [download Kafka](http://kafka.apache.org/downloads)
 
-Extract server files `tar -xvf kafka_2.1*-0.1*.*.*.tar`
+Extract server files `tar -xvf kafka_2.12-0.11.*.*.tar`
 
-Optionally, create or replace symbolic link `ln -nsf kafka_2.1*-0.1*.*.* kafka`
+Optionally, create or replace symbolic link `ln -nsf kafka_2.12-0.11.*.* kafka`
 
 ##### Configure server
 Edit configuration in install directory `/config/server.properties`
@@ -180,7 +186,7 @@ Give Zookeeper a few seconds. Then stop it too
 `bin/zookeeper-server-stop.sh`
 
 #### Cassandra
-Minimal install and configure for running dendrites integration tests, [documentation](http://www.planetcassandra.org/apache-cassandra-documentation/) [download](http://cassandra.apache.org/download/)
+Minimal install and configure for running dendrites integration tests, [Cassandra's documentation](http://cassandra.apache.org/doc/latest/), [download Cassandra](http://cassandra.apache.org/download/)
 
 Extract files `tar -xvf apache-cassandra-3.11.0-bin.tar`
 
