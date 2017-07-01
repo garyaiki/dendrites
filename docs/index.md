@@ -1,6 +1,7 @@
 # dendrites
 
-Looser than loosely coupled streaming components for Microservices, Event Sourcing, Event Logging, Command Query Responsibility Segregation (CQRS), and Reactive systems.
+Looser than loosely coupled streaming components for Microservices, Event Sourcing, Event Logging, Command Query Responsibility Segregation (CQRS), Reactive systems, and the ACK in a [SMACK stack](https://mesosphere.com/blog/2017/06/21/smack-stack-new-lamp-stack/).
+
 {% include nav.html %}
 
 <img src="png/CQRS.png?raw=true" width="80%" />

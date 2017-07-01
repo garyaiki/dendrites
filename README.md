@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-A Scala library of streaming components for building Microservices, Event Sourcing, Event Logging, CQRS, and Reactive systems. Functions and pre-built stream stages for Akka Streams, HTTP, Actors, Kafka, Cassandra, Algebird, and Avro.
+Streaming components in Scala for building Microservices, Event Sourcing, Event Logging, CQRS, and Reactive systems. Functions and pre-built stream stages for Akka Streams, HTTP, Actors, Kafka, Cassandra, Algebird, and Avro. The ACK in a [SMACK stack](https://mesosphere.com/blog/2017/06/21/smack-stack-new-lamp-stack/)
 
 It's meant to be used as
 - a more adaptable alternative to frameworks and products

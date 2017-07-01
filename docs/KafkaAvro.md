@@ -1,7 +1,7 @@
 ### Kafka, Avro streaming components
 
 {% include nav.html %}
-Build distributed streaming systems with pre-built Kafka and Avro stream stages.
+Pre-built, customizable Kafka and Avro stream stages.
 
 [<img src="png/KafkaSink.png?raw=true" alt="KafkaSink" width="25%" height="25%" title="input serialized value, publish it, uses Akka Supervision to retry temporary errors with exponential backoff or fail the stream">](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/kafka/stream/KafkaSink.scala){:target="_blank"}
 [<img src="png/KafkaSource.png?raw=true" alt="KafkaSource" width="23%" height="23%" title="input Kafka, output ConsumerRecords">](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/kafka/stream/KafkaSource.scala){:target="_blank"}
@@ -16,32 +16,37 @@ Build distributed streaming systems with pre-built Kafka and Avro stream stages.
 
 [Kafka](https://engineering.linkedin.com/kafka/benchmarking-apache-kafka-2-million-writes-second-three-cheap-machines){:target="_blank"} is the preferred  hub for [microservices](https://martinfowler.com/articles/microservices.html){:target="_blank"}, [CRQS](https://martinfowler.com/bliki/CQRS.html){:target="_blank"}, [Event Sourcing](https://www.confluent.io/blog/event-sourcing-cqrs-stream-processing-apache-kafka-whats-connection/){:target="_blank"} and  messaging systems. Scala's rich language features combined with Akka Streams allow a lot of Kafka coding to be generalized, including [backpressure](http://www.reactivemanifesto.org/glossary#Back-Pressure){:target="_blank"} to prevent overflow, in-stage error handling with recovery, and reliable message processing.
 
+It's an alternative to [Kafka Streams](http://kafka.apache.org/documentation/streams/) and [Reactive Kafka](https://github.com/akka/reactive-kafka). Akka Streams gives me  freedom to compose, decompose, and rewrite stream stages. This is a new approach, for me at least, and, so far, works surprisingly well.
+
 
 #### Kafka as a stream source
 
-<p >
 <img src="png/KafkaSourceStream.png?raw=true" width="50%" />
-</p>
+
 ###### Common stages of streams beginning with a KafkaSource, downstream can be anything
 
 Streams with a KafkaSource poll messages from a Kafka cluster, deserialize them, and commit messages once processed.
 
 Kafka is written in Scala but its built in driver is written in Java.
 
-KafkaSource wraps the driver and configures a [KafkaConsumer](http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html){:target="_blank"} which polls and commits messages.
+KafkaSource wraps the driver and configures a [KafkaConsumer](http://kafka.apache.org/0110/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html){:target="_blank"} which polls and commits messages.
 
-Polling and commit are rare blocking calls in *dendrites*, so KafkaSource uses a blocking ExecutionContext (Akka Stream’s [default ExecutionContext](http://doc.akka.io/docs/akka/2.5.1/scala/dispatchers.html#default-dispatcher){:target="_blank"} has about as many threads as cpu cores, blocking could cause thread starvation).
+Polling and commit are rare blocking calls in *dendrites*, so KafkaSource uses a blocking ExecutionContext (Akka Stream’s [default ExecutionContext](http://doc.akka.io/docs/akka/current/scala/dispatchers.html#default-dispatcher){:target="_blank"} has about as many threads as cpu cores, blocking could cause thread starvation).
 
-Available messages are returned in a [ConsumerRecords](http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/ConsumerRecords.html){:target="_blank"} object. If either polling or committing throws Kafka's [RetriableExceptions](http://kafka.apache.org/0102/javadoc/index.html?org/apache/kafka/common/errors/RetriableException.html){:target="_blank"} it's retried with [exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff){:target="_blank"} delays.
+Available messages are returned in a [ConsumerRecords](http://kafka.apache.org/0110/javadoc/org/apache/kafka/clients/consumer/ConsumerRecords.html){:target="_blank"} object. If either polling or committing throws Kafka's [RetriableExceptions](http://kafka.apache.org/0110/javadoc/index.html?org/apache/kafka/common/errors/RetriableException.html){:target="_blank"} it's retried with [exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff){:target="_blank"} delays.
 
 Kafka tracks messages with offsets. Committing a message means its offset is marked as committed. Kafka auto-commits by default but this only assures they were read OK. By turning off auto-commit we can do it after processing, assuring they were read *and processed* OK. If any failed, Kafka re-polls those messages.
 
 KafkaSource uses [Supervision](http://doc.akka.io/docs/akka/current/scala/stream/stream-error.html){:target="_blank"}, a key benefit of Akka Actors and Streams. When KafkaSource is in a stream, exceptions thrown anywhere in the stream (other than  retriable exceptions) should stop the stream. Stopping the stream means KafkaSource doesn’t commit offsets so records in a failed stream will be polled again.
 
-ConsumerRecordsToQueue initially queues every ConsumerRecord contained in ConsumerRecords. Then it pushes one ConsumerRecord for each downstream pull. If the queue is not empty it doesn't pull from upstream. This is to ensure all messages have been processed. After the queue empties it resumes pulling, causing KafkaSource to commit its previous poll and poll anew.
+ConsumerRecordsToQueue initially queues every [ConsumerRecord](http://kafka.apache.org/0110/javadoc/org/apache/kafka/clients/consumer/ConsumerRecord.html){:target="_blank"} contained in ConsumerRecords. Then it pushes one ConsumerRecord for each downstream pull. If the queue is not empty it doesn't pull from upstream. This is to ensure all messages have been processed. After the queue empties it resumes pulling, causing KafkaSource to commit its previous poll and poll anew. 
 
-ConsumerRecordDeserializer maps ConsumerRecord values to case classes. Two flavors of ConsumerRecordDeserializer are provided, one takes a UDF ([example with Avro4s](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/examples/account/avro4s/Avro4sGetAccountBalances.scala){:target="_blank"}) to deserialize from an Array of Bytes to a case class, the other takes an Avro schema and maps to a [GenericRecord](http://avro.apache.org/docs/current/api/java/org/apache/avro/generic/GenericRecord.html){:target="_blank"}, which is in turn mapped by a UDF to a case class
-serialized to `Array[Byte]` ([example](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/examples/account/avro/package.scala){:target="_blank"}). Either way a deserialized case class and the ConsumerRecord's key is pushed.
+
+
+ConsumerRecordDeserializer maps a ConsumerRecord's value to a case class and its metadata to a [ConsumerRecordMetadata](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/kafka/package.scala){:target="_blank"}. Metadata is the message's topic, partition, offset, timestamp, timestamp type, key, and headers. There's two flavors of ConsumerRecordDeserializer, one takes a UDF ([example with Avro4s](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/examples/account/avro4s/Avro4sGetAccountBalances.scala){:target="_blank"}) to deserialize from an Array of Bytes to a case class, the other takes an Avro schema and maps to a [GenericRecord](http://avro.apache.org/docs/current/api/java/org/apache/avro/generic/GenericRecord.html){:target="_blank"}, which is in turn mapped by a UDF to a case class
+serialized to `Array[Byte]` ([example](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/examples/account/avro/package.scala){:target="_blank"}). Either way a deserialized case class and ConsumerRecordMetadata is pushed.
+
+Keeping metadata lets an event log store the key and timestamp and downstream can fork by partition into parallel streams.
 
 Once all polled records pass completely through the stream, ConsumerRecordsToQueue resumes pulling causing KafkaSource to commit the  messages and then it polls again.
 
@@ -65,18 +70,19 @@ val runnableGraph = shoppingCartCmdEvtSource(dispatcher)
 .to(sink)
 ```
 
-
 #### Kafka as a stream sink
-<p >
+
 <img src="png/KafkaSinkStream.png?raw=true" width="50%" />
-</p>
+
 ###### Common stages of streams ending with a KafkaSink, upstream can be anything
 
 A KafkaSink stream serializes case classes, asynchronously calls Kafka's send method and handles errors.
 
 AvroSerializer takes a user’s Avro schema and a serialize function. [ccToByteArray](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/avro/package.scala){:target="_blank"} can serialize case classes that only have simple field types. Those with complex fields need a user defined serialize function. [Avro4sSerializer](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/avro4s/stream/Avro4sSerializer.scala){:target="_blank"} is also provided and is often easier to use.
 
-KafkaSink wraps the driver and configures a [KafkaProducer](http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html) and calls its asynchronous send method. It takes care of Java & Scala futures, callbacks and retries Kafka's [RetriableExceptions](http://kafka.apache.org/0102/javadoc/index.html?org/apache/kafka/common/errors/RetriableException.html){:target="_blank"}. Send immediately returns a [Guava ListenableFuture](https://github.com/google/guava/wiki/ListenableFutureExplained){:target="_blank"} with a Kafka [Callback](http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/producer/Callback.html){:target="_blank"}. Success invokes an Akka [AsyncCallback](http://doc.akka.io/docs/akka/current/scala/stream/stream-customize.html#using-asynchronous-side-channels){:target="_blank"} that pulls from upstream. Failure invokes an AsyncCallback which invokes a Supervision [Decider](http://doc.akka.io/docs/akka/current/scala/stream/stream-error.html){:target="_blank"}. Stop exceptions stop the stream. Kafka’s [RetriableException](http://kafka.apache.org/0100/javadoc/org/apache/kafka/connect/errors/RetriableException.html){:target="_blank"}s are retried with [exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff){:target="_blank"} delays.
+KafkaSink wraps the driver and configures a [KafkaProducer](http://kafka.apache.org/0110/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html) and calls its asynchronous send method. It takes care of Java & Scala futures, callbacks and retries Kafka's [RetriableExceptions](http://kafka.apache.org/0110/javadoc/index.html?org/apache/kafka/common/errors/RetriableException.html){:target="_blank"}. Send immediately returns a [Guava ListenableFuture](https://github.com/google/guava/wiki/ListenableFutureExplained){:target="_blank"} with a Kafka [Callback](http://kafka.apache.org/0110/javadoc/org/apache/kafka/clients/producer/Callback.html){:target="_blank"}. Success invokes an Akka [AsyncCallback](http://doc.akka.io/docs/akka/current/scala/stream/stream-customize.html#using-asynchronous-side-channels){:target="_blank"} that pulls from upstream. Failure invokes an AsyncCallback which invokes a Supervision [Decider](http://doc.akka.io/docs/akka/current/scala/stream/stream-error.html){:target="_blank"}. Stop exceptions stop the stream. Kafka’s [RetriableException](http://kafka.apache.org/0110/javadoc/org/apache/kafka/connect/errors/RetriableException.html){:target="_blank"}s are retried with [exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff){:target="_blank"} delays.
+
+[ProducerConfig](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/kafka/ProducerConfig.scala) is a trait for configuring KafkaProducer and creating a [ProducerRecord](http://kafka.apache.org/0110/javadoc/org/apache/kafka/clients/producer/ProducerRecord.html), it has 6 constructors. You extend ProducerConfig with your choice of constructor. Default is topic, key, value leaving Kafka to select the partition and create the timestamp.
 
 ```scala
 val ap = AccountProducer // example custom configured KafkaProducer
