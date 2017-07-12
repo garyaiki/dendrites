@@ -15,7 +15,7 @@ package com.github.garyaiki.dendrites.cassandra
 
 import java.net.InetAddress
 import java.util.{Collection => JCollection, List => JList}
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 /** Configuration of Cassandra Java Driver 3.0+
   *
@@ -35,9 +35,9 @@ trait CassandraConfig {
     */
   def getInetAddresses(): JCollection[InetAddress] = {
     val list = for {
-      a <- ipAddresses
+      a <- ipAddresses.asScala
       i <- InetAddress.getAllByName(a)
     } yield(i)
-    list.toSeq
+    list.toSeq.asJava
   }
 }

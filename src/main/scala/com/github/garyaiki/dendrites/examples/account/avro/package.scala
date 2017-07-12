@@ -15,7 +15,6 @@ package com.github.garyaiki.dendrites.examples.account
 
 import org.apache.avro.Schema
 import org.apache.avro.generic.{GenericData, GenericDatumWriter, GenericRecord}
-import scala.collection.JavaConverters._
 import com.github.garyaiki.dendrites.ccToMap
 import com.github.garyaiki.dendrites.avro.toByteArray
 

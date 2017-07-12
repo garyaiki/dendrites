@@ -17,7 +17,7 @@ import akka.event.LoggingAdapter
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.datastax.driver.core.{ResultSet, Row}
-import scala.collection.JavaConversions.asScalaIterator
+import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 
 /** Send a Page of specified number of Rows from a ResultSet
@@ -50,7 +50,7 @@ class CassandraPaging(size: Int)(implicit logger: LoggingAdapter) extends GraphS
 
       setHandler(in, new InHandler {
         override def onPush(): Unit = {
-          it = grab(in).iterator
+          it = grab(in).iterator.asScala
           push(out, pageRows)
         }
       })

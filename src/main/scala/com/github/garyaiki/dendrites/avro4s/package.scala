@@ -23,9 +23,9 @@ import com.sksamuel.avro4s.{AvroInputStream, AvroOutputStream, FromRecord, FromV
   *   implicit val schemaFor = SchemaFor[ShoppingCartCmd]
   *   implicit val toRecord = ToRecord[ShoppingCartCmd]
   *   implicit val fromRecord = FromRecord[ShoppingCartCmd]
-	* }}}
-	* implement case class serializer
-	* {{{  
+  * }}}
+  * implement case class serializer
+  * {{{
   *   def toBytes(caseClass: ShoppingCartCmd): Array[Byte] = {
   *     val baos = new ByteArrayOutputStream()
   *     val output = AvroOutputStream.binary[ShoppingCartCmd](baos)
@@ -33,9 +33,9 @@ import com.sksamuel.avro4s.{AvroInputStream, AvroOutputStream, FromRecord, FromV
   *     output.close()
   *     baos.toByteArray
   *   }
-	* }}}
-	* implement deserializer
-	* {{{
+  * }}}
+  * implement deserializer
+  * {{{
   *   def toCaseClass(bytes: Array[Byte]): ShoppingCartCmd = {
   *     val in = new ByteArrayInputStream(bytes)
   *     val input = AvroInputStream.binary[ShoppingCartCmd](in)

@@ -44,7 +44,7 @@ import CallStream.CompleteMessage
   *
   * @tparam A: TypeTag case class or tuple passed to stream
   * @param rg complete RunnableGraph with Source and Sink. Not yet materialized
-  * @see [[http://doc.akka.io/api/akka/current/akka/stream/scaladsl/SourceQueueWithComplete.html SourceQueueWithComplete]]
+  * @see [[http://doc.akka.io/api/akka/current/akka/stream/scaladsl/SourceQueueWithComplete.html SourceQueueWComplete]]
   * @author Gary Struthers
   */
 class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) extends Actor with ActorLogging {
@@ -88,7 +88,6 @@ class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) exte
         log.error(e, msg)
         throw(e)
       }
-      case x => log.warning("unknown offerResult {}", x)
     }
   }
 
@@ -120,7 +119,7 @@ class CallStream[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]) exte
       offerFuture pipeTo self
     }
 
-    case everythingElse => log.warning("receive unknown message {}", everythingElse)
+    case everythingElse: Any => log.warning("receive unknown message {}", everythingElse)
   }
 }
 

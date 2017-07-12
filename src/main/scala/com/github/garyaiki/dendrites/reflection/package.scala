@@ -20,7 +20,7 @@ import scala.reflect.runtime.universe.{Type, TypeRef, WeakTypeTag}
   * Log type information
   * {{{
   * val result = results.toIndexedSeq
-  * log.debug(s"result:${weakParamInfo(result)}")
+  * log.debug("result:{}", weakParamInfo(result))
   * }}}
   * @see [[http://docs.scala-lang.org/overviews/reflection/typetags-manifests.html TypeTags and Manifests]]
   * @author Gary Struthers

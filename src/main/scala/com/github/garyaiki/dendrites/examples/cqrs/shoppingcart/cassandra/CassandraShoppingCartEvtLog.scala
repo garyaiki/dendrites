@@ -17,7 +17,6 @@ import com.datastax.driver.core.{BoundStatement, PreparedStatement, ResultSet, R
 import com.datastax.driver.core.utils.UUIDs
 import com.weather.scalacass.syntax._
 import java.util.UUID
-import scala.collection.JavaConverters._
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.event.ShoppingCartEvt
 
 /** Functions to create a table, an Insert PreparedStatement and BoundStatment, a Query PreparedStatement and

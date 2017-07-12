@@ -18,7 +18,7 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import com.datastax.driver.core.{Cluster, Session}
 import org.scalatest.{Outcome, TestSuite, TestSuiteMixin}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContextExecutor
 import com.github.garyaiki.dendrites.cassandra.CassandraConfig
 import com.github.garyaiki.dendrites.cassandra.{close, connect, createSchema, dropSchema}
 
@@ -27,7 +27,7 @@ trait BeforeAfterAllBuilder extends TestSuiteMixin { this: TestSuite =>
   abstract override def withFixture(test: NoArgTest): Outcome = { super.withFixture(test) }
 
   implicit val system = ActorSystem("dendrites")
-  implicit val ec: ExecutionContext = system.dispatcher
+  implicit val ec: ExecutionContextExecutor = system.dispatcher
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging.getLogger(system, getClass)
 

@@ -40,7 +40,7 @@ object AvroGetCustomerAccountBalances extends AvroOps[GetCustomerAccountBalances
   def toStrings(from: Set[AccountType]): JList[String] = {
     val ab = new ArrayBuffer[String]
     from foreach (x => ab += x.productPrefix)
-    ab.toSeq.asJava
+    ab.asJava
   }
 
   /** Map case class values that are only simple types to GenericRecord

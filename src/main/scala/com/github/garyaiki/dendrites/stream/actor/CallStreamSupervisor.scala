@@ -65,8 +65,7 @@ class CallStreamSupervisor[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete
       case _: NullPointerException => Restart
       case _: IllegalArgumentException => Stop
       case _: IllegalStateException => Restart
-      case t =>
-        super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => SupervisorStrategy.Escalate)
+      case t: Throwable => super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => SupervisorStrategy.Escalate)
     }
 
   def receive = { case x: A ⇒ callStream forward x  }
@@ -75,4 +74,3 @@ class CallStreamSupervisor[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete
 object CallStreamSupervisor {
   def props[A: TypeTag](rg: RunnableGraph[SourceQueueWithComplete[A]]): Props = Props(new CallStreamSupervisor[A](rg))
 }
-

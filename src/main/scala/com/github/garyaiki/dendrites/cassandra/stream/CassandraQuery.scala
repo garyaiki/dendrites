@@ -20,7 +20,7 @@ import akka.stream.scaladsl.Flow
 import akka.stream.stage.{AsyncCallback, GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.datastax.driver.core.{BoundStatement, ResultSet, Session}
 import com.google.common.util.concurrent.ListenableFuture
-import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
 import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
@@ -37,13 +37,14 @@ import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
   *
   * @param session created and closed elsewhere
   * @param fetchSize used by SELECT queries for page size. Default 0 means use Cassandra default
-  * @param ec implicit ExecutionContext
+  * @param ec implicit ExecutionContextExecutor
   * @param logger implicit LoggingAdapter
   *
   * @author Gary Struthers
   */
-class CassandraQuery(session: Session, fetchSize: Int = 0)(implicit val ec: ExecutionContext, logger: LoggingAdapter)
-  extends GraphStage[FlowShape[BoundStatement, ResultSet]] {
+class CassandraQuery(session: Session, fetchSize: Int = 0)
+  (implicit val ec: ExecutionContextExecutor, logger: LoggingAdapter)
+    extends GraphStage[FlowShape[BoundStatement, ResultSet]] {
 
   val in = Inlet[BoundStatement]("CassandraQuery.in")
   val out = Outlet[ResultSet]("CassandraQuery.out")
@@ -97,9 +98,11 @@ object CassandraQuery {
     *
     * @param session Cassandra Session
     * @param fetchSize limits how many results retrieved simultaneously, 0 means use default size
+    * @param ec implicit ExecutionContextExecutor
+    * @param logger implicit LoggingAdapter
     * @return Flow[BoundStatement, ResultSet, NotUsed]
     */
-  def apply(session: Session, fetchSize: Int = 0)(implicit ec: ExecutionContext, logger: LoggingAdapter):
+  def apply(session: Session, fetchSize: Int = 0)(implicit ec: ExecutionContextExecutor, logger: LoggingAdapter):
     Flow[BoundStatement, ResultSet, NotUsed] = {
 
     Flow.fromGraph(new CassandraQuery(session, fetchSize))

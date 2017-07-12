@@ -26,7 +26,7 @@ package object event {
 // Events
 case class OwnerChanged(id: UUID, eventID: UUID, cartId: UUID, time: UUID, owner: UUID) extends Event with Cart
 case class ItemAdded(id: UUID, eventID: UUID, cartId: UUID, time: UUID, item: UUID, count: Int) extends Event with Cart
-case class ItemRemoved(id: UUID, eventID: UUID, cartId: UUID, time: UUID, item: UUID, count: Int) extends Event with Cart
+case class ItemRemoved(id: UUID, eventID: UUID, cartId: UUID, time: UUID, item: UUID, count:Int) extends Event with Cart
 // Event log
 case class ShoppingCartEvt(id: UUID, eventID: UUID, cartId: UUID, time: UUID, owner: Option[UUID], item: Option[UUID],
   count: Option[Int]) extends Event with Cart

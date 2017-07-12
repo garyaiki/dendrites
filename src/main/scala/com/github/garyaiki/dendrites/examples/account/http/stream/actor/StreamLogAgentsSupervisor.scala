@@ -105,8 +105,7 @@ class StreamLogAgentsSupervisor[A: CMSHasher: HyperLogLogLike: Numeric: QTreeLik
       case _: NullPointerException => Restart
       case _: IllegalArgumentException => Stop
       case _: IllegalStateException => Restart
-      case t =>
-        super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => SupervisorStrategy.Escalate)
+      case t: Throwable => super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => SupervisorStrategy.Escalate)
     }
 
   def receive = {

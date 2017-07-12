@@ -103,7 +103,7 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
             retries = 0
           } catch {
             case NonFatal(e) => decider(e) match {
-              case Supervision.Stop => failStage(e)
+              case Supervision.Stop | Supervision.Restart => failStage(e)
 
               case Supervision.Resume => {
                 val duration = curriedDelay(retries)
@@ -132,6 +132,7 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
           kafkaConsumer commitSync() // blocking
         }
         kafkaConsumer close()
+        logger.info("KafkaSource postStop after close")
       }
     }
   }

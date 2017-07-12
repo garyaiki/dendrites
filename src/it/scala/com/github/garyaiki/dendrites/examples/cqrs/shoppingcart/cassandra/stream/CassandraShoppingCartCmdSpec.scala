@@ -29,7 +29,7 @@ import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.fixtures.{Shoppi
 import com.github.garyaiki.dendrites.stream.SpyFlow
 
 class CassandraShoppingCartCmdSpec extends WordSpecLike with Matchers with BeforeAndAfterAll
-  with BeforeAfterAllBuilder with ShoppingCartCmdBuilder with ShoppingCartBehaviors {
+  with BeforeAfterAllBuilder with ShoppingCartBehaviors {
 
   var prepStmts: Map[String, PreparedStatement] = null
 

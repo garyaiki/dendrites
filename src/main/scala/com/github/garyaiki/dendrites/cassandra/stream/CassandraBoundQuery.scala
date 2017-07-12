@@ -21,7 +21,7 @@ import akka.stream.stage.{AsyncCallback, GraphStage, GraphStageLogic, InHandler,
 import com.datastax.driver.core.{BoundStatement, PreparedStatement, ResultSet, Session}
 import com.datastax.driver.core.exceptions.NoHostAvailableException
 import com.google.common.util.concurrent.ListenableFuture
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
 import com.github.garyaiki.dendrites.cassandra.{getRowColumnNames, noHostAvailableExceptionMsg, sessionLogInfo}
@@ -47,7 +47,7 @@ import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
   * @author Gary Struthers
   */
 class CassandraBoundQuery[A](session: Session, stmt: PreparedStatement, f:(PreparedStatement, A) => BoundStatement,
-  fetchSize: Int = 0)(implicit val ec: ExecutionContext, logger: LoggingAdapter)
+  fetchSize: Int = 0)(implicit val ec: ExecutionContextExecutor, logger: LoggingAdapter)
     extends GraphStage[FlowShape[A, ResultSet]] {
 
   val in = Inlet[A]("CassandraBoundQuery.in")
@@ -103,7 +103,7 @@ class CassandraBoundQuery[A](session: Session, stmt: PreparedStatement, f:(Prepa
           val id: A = grab(in)
           waitForHandler = true
           val msg = sessionLogInfo(session)
-          logger.debug("CassandraBoundQuery onPush " + msg)
+          logger.debug("CassandraBoundQuery onPush {}", msg)
           val boundStatement = f(stmt, id)
           boundStatement.setFetchSize(fetchSize)
           executeStmt(boundStatement)
@@ -113,7 +113,7 @@ class CassandraBoundQuery[A](session: Session, stmt: PreparedStatement, f:(Prepa
           if(!waitForHandler) {
             super.onUpstreamFinish()
           } else {
-            logger.debug(s"CassandraBoundQuery received onUpstreamFinish waitForHandler:$waitForHandler")
+            logger.debug("CassandraBoundQuery received onUpstreamFinish waitForHandler:{}", waitForHandler)
             mustFinish = true
           }
         }
@@ -138,7 +138,7 @@ object CassandraBoundQuery {
     * @return Flow[A, ResultSet, NotUsed]
     */
   def apply[A](session: Session, stmt: PreparedStatement, f:(PreparedStatement, A) => BoundStatement, fetchNum: Int = 0)
-    (implicit ec: ExecutionContext, logger: LoggingAdapter): Flow[A, ResultSet, NotUsed] = {
+    (implicit ec: ExecutionContextExecutor, logger: LoggingAdapter): Flow[A, ResultSet, NotUsed] = {
     Flow.fromGraph(new CassandraBoundQuery[A](session, stmt, f, fetchNum))
   }
 }

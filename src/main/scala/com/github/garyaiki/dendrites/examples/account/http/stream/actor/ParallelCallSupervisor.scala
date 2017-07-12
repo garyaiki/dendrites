@@ -103,7 +103,7 @@ class ParallelCallSupervisor[A <: Product: TypeTag](initSink: SinkActor) extends
       case _: IllegalStateException => Restart
       case _: IllegalUriException => Stop
       case _: ParsingException => Stop
-      case t => super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => SupervisorStrategy.Escalate)
+      case t: Throwable => super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => SupervisorStrategy.Escalate)
     }
 
   /** ready:Receive normal processing

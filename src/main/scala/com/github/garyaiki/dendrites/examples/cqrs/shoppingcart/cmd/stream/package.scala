@@ -1,3 +1,16 @@
+/**
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd
 
 import akka.NotUsed
@@ -6,7 +19,7 @@ import akka.stream.{Attributes, SinkShape, UniformFanOutShape}
 import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, RunnableGraph, Sink, Source}
 import akka.stream.scaladsl.GraphDSL.Implicits._
 import com.datastax.driver.core.{BoundStatement, PreparedStatement, Session}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContextExecutor
 import scala.language.postfixOps
 import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBind, CassandraKeyValueFlow, CassandraRetrySink,
   CassandraSink}
@@ -28,11 +41,11 @@ package object stream {
     * ShoppingCartCmd
     *
     * @param dispatcher
-    * @param ec implicit ExecutionContext
+    * @param ec implicit ExecutionContextExecutor
     * @param logger implicit LoggingAdapter
     * @return composite source
     */
-  def shoppingCartCmdEvtSource(dispatcher: Attributes)(implicit ec: ExecutionContext, logger: LoggingAdapter):
+  def shoppingCartCmdEvtSource(dispatcher: Attributes)(implicit ec: ExecutionContextExecutor, logger: LoggingAdapter):
     Source[(ConsumerRecordMetadata[String], ShoppingCartCmd), NotUsed] = {
 
     val kafkaSource = KafkaSource[String, Array[Byte]](ShoppingCartCmdConsumer).withAttributes(dispatcher)
@@ -48,12 +61,13 @@ package object stream {
     * @param dispatcher
     * @param session
     * @param prepStmts map of PreparedStatements used by Cassandra stages
-    * @param ec
-    * @param logger
+    * @param ec implicit ExecutionContextExecutor
+    * @param logger implicit Logger
     * @return composite Cassandra sink
     */
   def shoppingCartCmdEvtSink(dispatcher: Attributes, session: Session, prepStmts: Map[String, PreparedStatement])
-    (implicit ec: ExecutionContext, logger: LoggingAdapter): Sink[(ConsumerRecordMetadata[String], ShoppingCartCmd), NotUsed] = {
+    (implicit ec: ExecutionContextExecutor, logger: LoggingAdapter):
+      Sink[(ConsumerRecordMetadata[String], ShoppingCartCmd), NotUsed] = {
 
     val curriedDoCmd = doShoppingCartCmd(session, prepStmts) _
     val cmdFlowGraph = new CassandraKeyValueFlow[String, ShoppingCartCmd](RetryConfig, curriedDoCmd)
@@ -81,12 +95,13 @@ package object stream {
     * @param dispatcher
     * @param session
     * @param prepStmts map of PreparedStatements used by Cassandra stages
-    * @param ec
-    * @param logger
+    * @param ec implicit ExecutionContextExecutor
+    * @param logger implicit Logger
     * @return composite Command sink and Event log sink
     */
   def shoppingCartCmdEvtSinks(dispatcher: Attributes, session: Session, prepStmts: Map[String, PreparedStatement])
-    (implicit ec: ExecutionContext, logger: LoggingAdapter): Sink[(ConsumerRecordMetadata[String], ShoppingCartCmd), NotUsed] = {
+    (implicit ec: ExecutionContextExecutor, logger: LoggingAdapter):
+      Sink[(ConsumerRecordMetadata[String], ShoppingCartCmd), NotUsed] = {
 
     val onlyVal = Flow.fromFunction[(ConsumerRecordMetadata[String], ShoppingCartCmd), ShoppingCartCmd] { x => x._2 }
     val curriedDoCmd = doShoppingCartCmd(session, prepStmts) _
@@ -104,8 +119,8 @@ package object stream {
     val sink = new CassandraSink(session)
 
     Sink.fromGraph(GraphDSL.create() { implicit builder =>
-      val bcast: UniformFanOutShape[(ConsumerRecordMetadata[String], ShoppingCartCmd), (ConsumerRecordMetadata[String], ShoppingCartCmd)] =
-        builder.add(Broadcast[(ConsumerRecordMetadata[String], ShoppingCartCmd)](2))
+      val bcast: UniformFanOutShape[(ConsumerRecordMetadata[String], ShoppingCartCmd), (ConsumerRecordMetadata[String],
+        ShoppingCartCmd)] = builder.add(Broadcast[(ConsumerRecordMetadata[String], ShoppingCartCmd)](2))
 
       bcast ~> onlyVal ~> cmdSink
       bcast ~> toEvt ~> bndStmt ~> sink
@@ -118,12 +133,12 @@ package object stream {
     * @param dispatcher
     * @param session
     * @param prepStmts map of PreparedStatements used by Cassandra stages
-    * @param ec
-    * @param logger
+    * @param ec implicit ExecutionContextExecutor
+    * @param logger implicit Logger
     * @return
     */
   def shoppingCartCmdRG(dispatcher: Attributes, session: Session, prepStmts: Map[String, PreparedStatement])
-    (implicit ec: ExecutionContext, logger: LoggingAdapter): RunnableGraph[NotUsed] = {
+    (implicit ec: ExecutionContextExecutor, logger: LoggingAdapter): RunnableGraph[NotUsed] = {
     val cmdEvtSource = shoppingCartCmdEvtSource(dispatcher: Attributes)
     val cmdAndEvtSinks = shoppingCartCmdEvtSinks(dispatcher, session, prepStmts)
     cmdEvtSource.to(cmdAndEvtSinks)

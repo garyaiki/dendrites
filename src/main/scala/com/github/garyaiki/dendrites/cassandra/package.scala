@@ -26,7 +26,7 @@ import java.net.InetAddress
 import java.util.{Collection => JCollection, Date => JDate, HashSet => JHashSet, UUID}
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}
 import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
 
@@ -117,7 +117,7 @@ package object cassandra {
     * @return Cluster
     *
     * @see [[https://docs.oracle.com/javase/8/docs/api/index.html?java/net/InetAddress.html InetAddress]]
-    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/policies/RetryPolicy.html RetryPolicy]]
+    * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/policies/RetryPolicy.html RetryPoly]]
     */
   def createCluster(nodes: JCollection[InetAddress], policy: RetryPolicy): Cluster = {
     Cluster.builder.addContactPoints(nodes).withRetryPolicy(policy).build
@@ -154,10 +154,10 @@ package object cassandra {
     */
   def logMetadata(cluster: Cluster): Unit = {
     val metadata = cluster.getMetadata
-    logger.debug(s"Connected to cluster:${metadata.getClusterName}")
+    logger.debug("Connected to cluster:{}", metadata.getClusterName)
     val hosts = metadata.getAllHosts
     val it = hosts.iterator.asScala
-    it.foreach(h => logger.debug(s"Datacenter:${h.getDatacenter} host:${h.getAddress} rack:${h.getRack}"))
+    it.foreach(h => logger.debug("Datacenter:{} host:{} rack:{}", h.getDatacenter, h.getAddress, h.getRack))
   }
 
   /** Enable logging of RegularStatement, BoundStatement, BatchStatement queries
@@ -429,12 +429,14 @@ package object cassandra {
     * @param session
     * @param cluster
     * @param force hurry up flag
+    * @param implicit ec ListenableFuture must have an ExecutionContext that is a Java Executor
     *
     * @see [[http://docs.datastax.com/en/drivers/java/3.1/com/datastax/driver/core/CloseFuture.html CloseFuture]]
-    * @see [[http://google.github.io/guava/releases/19.0/api/docs/com/google/common/util/concurrent/ListenableFuture.html ListenableFuture]]
+    * @see [[http://google.github.io/guava/releases/22.0/api/docs/com/google/common/util/concurrent/ListenableFuture.html ListenableFuture]]
+    * @see [[http://www.scala-lang.org/api/current/scala/concurrent/ExecutionContextExecutor.html ExecutionContextExecutor]]
     *
     */
-  def close(session: Session, cluster: Cluster, force: Boolean = false)(implicit ec: ExecutionContext): Unit = {
+  def close(session: Session, cluster: Cluster, force: Boolean = false)(implicit ec: ExecutionContextExecutor): Unit = {
     val sessCloseF = session.closeAsync()
     val clusCloseF = cluster.closeAsync()
     if(force) {

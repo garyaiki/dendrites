@@ -20,7 +20,7 @@ import akka.stream.scaladsl.Flow
 import akka.stream.stage.{AsyncCallback, GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.datastax.driver.core.{BoundStatement, ResultSet, Row, Session}
 import com.google.common.util.concurrent.ListenableFuture
-import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
 import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
@@ -46,13 +46,14 @@ import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
   *
   * @param session created and closed elsewhere
   * @param rowFun: ResultSet => Option[Row] handle row returned by conditional stmt
-  * @param ec implicit ExecutionContext
+  * @param ec implicit ExecutionContextExecutor ExecutionContext and a Java Executor
   * @param logger implicit LoggingAdapter
   *
   * @author Gary Struthers
   */
-class CassandraConditional(session: Session, rowFun: ResultSet => Option[Row])(implicit val ec: ExecutionContext,
-    logger: LoggingAdapter) extends GraphStage[FlowShape[BoundStatement, Option[Row]]] {
+class CassandraConditional(session: Session, rowFun: ResultSet => Option[Row])
+  (implicit val ec: ExecutionContextExecutor, logger: LoggingAdapter)
+    extends GraphStage[FlowShape[BoundStatement, Option[Row]]] {
 
   val in = Inlet[BoundStatement]("CassandraConditional.in")
   val out = Outlet[Option[Row]]("CassandraConditional.out")
@@ -107,12 +108,12 @@ object CassandraConditional {
     *
     * @param session Cassandra Session
     * @param rowFun: ResultSet => Option[Row] handle row returned by conditional stmt
-    * @param ec implicit ExecutionContext
+    * @param ec implicit ExecutionContextExecutor
     * @param logger implicit LoggingAdapter
     * @return Flow[BoundStatement, Option[Row], NotUsed]
     */
-  def apply(session: Session, rowFun: ResultSet => Option[Row])(implicit ec: ExecutionContext, logger: LoggingAdapter):
-    Flow[BoundStatement, Option[Row], NotUsed] = {
+  def apply(session: Session, rowFun: ResultSet => Option[Row])
+    (implicit ec: ExecutionContextExecutor, logger: LoggingAdapter): Flow[BoundStatement, Option[Row], NotUsed] = {
 
     Flow.fromGraph(new CassandraConditional(session, rowFun))
   }

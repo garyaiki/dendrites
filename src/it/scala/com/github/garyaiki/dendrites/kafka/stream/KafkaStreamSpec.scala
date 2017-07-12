@@ -34,7 +34,6 @@ import com.github.garyaiki.dendrites.examples.account.avro.genericRecordToGetAcc
 import com.github.garyaiki.dendrites.examples.account.avro4s.Avro4sGetAccountBalances.toCaseClass
 import com.github.garyaiki.dendrites.examples.account.kafka.{AccountConsumer, AccountProducer}
 import com.github.garyaiki.dendrites.kafka.stream.avro4s.ConsumerRecordDeserializer
-import KafkaSource.decider
 
 /** Test integration of Kafka with Akka Streams. There are 2 multi-stage flows. The first stream
   * serializes case classes to Avro byteArrays then writes them to Kafka. The second stream reads
@@ -48,9 +47,7 @@ import KafkaSource.decider
   *
   * KafkaSink is initialized with a wrapped KafkaProducer. The wrapper includes topic, key, and Key,
   * Value types specific to this topic. KafkaProducer is heavy weight and multi-threaded and usually
-  * serves other topics and is long lived. If a Kafka RetryableException is thrown while writing
-  * KafkaSink catches it and retries the write. If a write throws a subclass of KafkaException this
-  * test's Decider stops the write stream.
+  * serves other topics and is long lived.
   *
   * To read byteArrays from Kafka and produce case classes
   *
@@ -83,10 +80,11 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
   implicit val ec: ExecutionContext = system.dispatcher
   implicit val materializer = ActorMaterializer()
   implicit val logger = Logging(system, getClass)
+  val config = ConfigFactory.load()
+  val closeTimeout = config.getLong("dendrites.kafka.close-timeout")
   val avroOps = AvroGetAccountBalances
   val schema: Schema = avroOps.schemaFor(Some("/avro/"), "getAccountBalances.avsc")
   val ap = AccountProducer
-  val accountConsumerConfig = AccountConsumer
 
   val getBals = Seq(GetAccountBalances(0L),
     GetAccountBalances(1L),
@@ -109,15 +107,16 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
 
       val dispatcher = ActorAttributes.dispatcher("dendrites.blocking-dispatcher")
 
-      val kafkaSource = KafkaSource[String, Array[Byte]](accountConsumerConfig).withAttributes(dispatcher)
+      val kafkaSource = KafkaSource[String, Array[Byte]](AccountConsumer).withAttributes(dispatcher)
       val consumerRecordQueue = new ConsumerRecordQueue[String, Array[Byte]]()
       val deserializer = new AvroDeserializer(schema, avroOps.fromRecord)
+      val testSink = TestSink.probe[GetAccountBalances]
       val streamFuture = kafkaSource
         .via(consumerRecordsFlow[String, Array[Byte]])
         .via(consumerRecordQueue)
         .via(consumerRecordValueFlow)
         .via(deserializer)
-        .runWith(TestSink.probe[GetAccountBalances])
+        .runWith(testSink)
         .request(10)
         .expectNextUnorderedN(getBals)
     }
@@ -125,9 +124,7 @@ class KafkaStreamSpec extends WordSpecLike with Matchers with BeforeAndAfterAll 
 
   override def afterAll() {
     ap.producer.flush()
-    val config = ConfigFactory.load()
-    val closeTimeout = config.getLong("dendrites.kafka.close-timeout")
-    Thread.sleep(closeTimeout)
+    //Thread.sleep(closeTimeout)
     ap.producer.close(closeTimeout, scala.concurrent.duration.MILLISECONDS)
   }
 }

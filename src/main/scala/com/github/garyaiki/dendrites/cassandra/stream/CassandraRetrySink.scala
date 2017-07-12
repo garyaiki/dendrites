@@ -21,7 +21,7 @@ import akka.stream.stage.{AsyncCallback, GraphStage, GraphStageLogic, InHandler,
 import com.datastax.driver.core.{ResultSet, ResultSetFuture, Session}
 import com.datastax.driver.core.exceptions.{DriverException, NoHostAvailableException}
 import com.google.common.util.concurrent.ListenableFuture
-import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
 import com.github.garyaiki.dendrites.cassandra.{getRowColumnNames, noHostAvailableExceptionMsg}
@@ -38,20 +38,19 @@ import com.github.garyaiki.dendrites.stream.TimerConfig
   * Future's Failure invokes an Akka Stream AsyncCallback which fails the stage
   *
   * Cassandra exceptions that may be temporary are handled by the Java driver. It reconnects and retries the statement
-  * Akka Supervision isn't used.
   *
   * If upstream completes while busy, wait for handler to complete, then completeStage
   *
   * @tparam A input case class type
-  * @param tc: TimerConfig
-  * @param f map value case class to ResultSet, Usually this function is curried with only input data argument passed at
-  * this stage, arguments that don't change for the life of the stream are passed at stream creation.
-  * @param ec implicit ExecutionContext
+  * @param tc: TimerConfig retry values
+  * @param f map value case class to ResultSetFuture, Usually this function is curried, arguments that don't change for
+  * the life of the stream are passed at stream creation.
+  * @param ec implicit ExecutionContextExecutor
   * @param logger implicit LoggingAdapter
   * @author Gary Struthers
   */
-class CassandraRetrySink[A <: Product](tc: TimerConfig, f: (A) => ResultSetFuture)(implicit val ec: ExecutionContext,
-  logger: LoggingAdapter) extends GraphStage[SinkShape[A]] {
+class CassandraRetrySink[A <: Product](tc: TimerConfig, f: (A) => ResultSetFuture)
+  (implicit val ec: ExecutionContextExecutor, logger: LoggingAdapter) extends GraphStage[SinkShape[A]] {
 
   val in = Inlet[A]("CassandraRetrySink.in")
   override val shape: SinkShape[A] = SinkShape(in)
@@ -133,7 +132,7 @@ class CassandraRetrySink[A <: Product](tc: TimerConfig, f: (A) => ResultSetFutur
         waitForTimer = false
         timerKey match {
           case caseClass: A => myHandler(caseClass)
-          case x => throw new IllegalArgumentException(s"onTimer expected caseClass received:${x.toString}")
+          case x: Any => throw new IllegalArgumentException(s"onTimer expected caseClass received:${x.toString}")
         }
       }
 
@@ -149,7 +148,7 @@ class CassandraRetrySink[A <: Product](tc: TimerConfig, f: (A) => ResultSetFutur
           if(!waitForHandler) {
             super.onUpstreamFinish()
           } else {
-            logger.debug(s"received onUpstreamFinish waitForHandler:$waitForHandler")
+            logger.debug("received onUpstreamFinish waitForHandler:{}", waitForHandler)
             mustFinish = true
           }
         }
@@ -165,10 +164,12 @@ object CassssandraRetrySink {
     * @tparam A input type
     * @param tc: TimerConfig
     * @param f map case class to ResultSetFuture, Usually curried function
+    * @param ec implicit ExecutionContextExecutor
+    * @param logger implicit LoggingAdapter
     * @return Sink[A, NotUsed]
     */
-  def apply[A <: Product](tc: TimerConfig, f: (A) => ResultSetFuture)(implicit ec: ExecutionContext,
-    logger: LoggingAdapter): Sink[A, NotUsed] = {
+  def apply[A <: Product](tc: TimerConfig, f: (A) => ResultSetFuture)
+    (implicit ec: ExecutionContextExecutor, logger: LoggingAdapter): Sink[A, NotUsed] = {
 
     Sink.fromGraph(new CassandraRetrySink[A](tc, f))
   }

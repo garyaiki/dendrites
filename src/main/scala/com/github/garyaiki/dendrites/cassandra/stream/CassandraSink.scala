@@ -21,8 +21,7 @@ import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler}
 import com.datastax.driver.core.{BoundStatement, ResultSet, Session}
 import com.datastax.driver.core.exceptions.NoHostAvailableException
 import com.google.common.util.concurrent.ListenableFuture
-import scala.concurrent.ExecutionContext
-import scala.collection.JavaConverters._
+import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
 import com.github.garyaiki.dendrites.cassandra.noHostAvailableExceptionMsg
@@ -35,14 +34,14 @@ import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
   * Future's Success invokes an Akka Stream AsyncCallback which pulls
   * Future's Failure invokes an Akka Stream AsyncCallback which fails the stage
   *
-  * Cassandra's Java driver handles retry and reconnection, so Supervision isn't used
+  * Cassandra's Java driver handles retry and reconnection
   *
   * @param session created and closed elsewhere
-  * @param ec implicit ExecutionContext
+  * @param ec implicit ExecutionContextExecutor
   * @param logger implicit LoggingAdapter
   * @author Gary Struthers
   */
-class CassandraSink(session: Session)(implicit val ec: ExecutionContext, logger: LoggingAdapter)
+class CassandraSink(session: Session)(implicit val ec: ExecutionContextExecutor, logger: LoggingAdapter)
   extends GraphStage[SinkShape[BoundStatement]] {
 
   val in = Inlet[BoundStatement]("CassandraSink.in")
@@ -102,7 +101,7 @@ class CassandraSink(session: Session)(implicit val ec: ExecutionContext, logger:
           if(!waitForHandler) {
             super.onUpstreamFinish()
           } else {
-            logger.debug(s"received onUpstreamFinish waitForHandler:$waitForHandler")
+            logger.debug("received onUpstreamFinish waitForHandler:{}", waitForHandler)
             mustFinish = true
           }
         }
@@ -116,9 +115,13 @@ object CassssandraSink {
   /** Create CassandraSink as Akka Sink
     *
     * @param session Cassandra Session
+    * @param ec implicit ExecutionContextExecutor
+    * @param logger implicit LoggingAdapter
     * @return Sink[BoundStatement, NotUsed]
     */
-  def apply(session: Session)(implicit ec: ExecutionContext, logger: LoggingAdapter): Sink[BoundStatement, NotUsed] = {
+  def apply(session: Session)(implicit ec: ExecutionContextExecutor, logger: LoggingAdapter):
+    Sink[BoundStatement, NotUsed] = {
+
     Sink.fromGraph(new CassandraSink(session))
   }
 }

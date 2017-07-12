@@ -17,7 +17,7 @@ import akka.event.LoggingAdapter
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.datastax.driver.core.{ResultSet, Row}
-import scala.collection.JavaConversions.asScalaIterator
+import scala.collection.JavaConverters._
 
 /** Map a Page of specified number of Rows from a ResultSet to case classes. Same as CassandraPaging & Map in 1 stage
   *
@@ -52,7 +52,7 @@ class CassandraMappedPaging[A <: Product](size: Int, f: Seq[Row] => Seq[A])(impl
 
       setHandler(in, new InHandler {
         override def onPush(): Unit = {
-          it = grab(in).iterator
+          it = grab(in).iterator.asScala
           val rows = pageRows
           push(out, f(rows))
         }

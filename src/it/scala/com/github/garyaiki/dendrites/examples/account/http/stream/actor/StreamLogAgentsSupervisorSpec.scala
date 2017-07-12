@@ -80,12 +80,12 @@ class StreamLogAgentsSupervisorSpec extends WordSpecLike with Matchers with Befo
       Thread.sleep(20000)//tests complete before agent updates
       val avgAgent = agents.avgAgent
       whenReady(avgAgent.agent.future(), futureTimeout) { result =>
-        logger.debug("StreamLogAgents test 1st try"+ java.util.Calendar.getInstance().getTime())
+        logger.debug("StreamLogAgents test 1st try {}", java.util.Calendar.getInstance().getTime())
         var count = result.count
         if(count > 0) testAvgVal(result) else {
           Thread.sleep(60000)//tests complete before agent updates
           whenReady(avgAgent.agent.future(), futureTimeout) { result =>
-            logger.debug("StreamLogAgents test 2nd try"+ java.util.Calendar.getInstance().getTime())
+            logger.debug("StreamLogAgents test 2nd try {}", java.util.Calendar.getInstance().getTime())
             testAvgVal(result)
           }
         }

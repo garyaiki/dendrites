@@ -15,7 +15,7 @@ package com.github.garyaiki.dendrites
 
 import com.google.common.util.concurrent.{FutureCallback, Futures, ListenableFuture}
 import java.util.concurrent.ThreadLocalRandom
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future, Promise}
 import scala.concurrent.duration.FiniteDuration
 
 /** Functions for concurrency
@@ -60,12 +60,12 @@ package object concurrent {
     * @param lf ListenableFuture
     * @return completed Scala Future
     */
-  def listenableFutureToScala[T](lf: ListenableFuture[T]): Future[T] = {
+  def listenableFutureToScala[T](lf: ListenableFuture[T])(implicit ec: ExecutionContextExecutor): Future[T] = {
     val p = Promise[T]
     Futures.addCallback(lf, new FutureCallback[T] {
       def onFailure(t: Throwable): Unit = p failure t
       def onSuccess(result: T): Unit    = p success result
-    })
+    }, ec)
     p.future
   }
 
@@ -85,11 +85,13 @@ package object concurrent {
     FiniteDuration = {
 
       val rnd = 1.0 + ThreadLocalRandom.current.nextDouble * randomFactor
-      if (retryCount >= 30) maxBackoff // Duration overflow protection
-      else
+      if (retryCount >= 30) {
+        maxBackoff // Duration overflow protection
+      } else {
         maxBackoff.min(minBackoff * math.pow(2, retryCount)) * rnd match {
           case f: FiniteDuration ⇒ f
             case _ ⇒ maxBackoff
         }
+      }
     }
 }

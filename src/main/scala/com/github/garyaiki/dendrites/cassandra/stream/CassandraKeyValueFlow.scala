@@ -21,7 +21,7 @@ import akka.stream.stage.{AsyncCallback, GraphStage, GraphStageLogic, InHandler,
 import com.datastax.driver.core.{ResultSet, ResultSetFuture, Session}
 import com.datastax.driver.core.exceptions.{DriverException, NoHostAvailableException}
 import com.google.common.util.concurrent.ListenableFuture
-import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
 import com.github.garyaiki.dendrites.cassandra.{getRowColumnNames, noHostAvailableExceptionMsg}
@@ -49,12 +49,12 @@ import com.github.garyaiki.dendrites.stream.TimerConfig
   * @param tc: TimerConfig
   * @param f map value case class to ResultSet, Usually this function is curried with only input data argument passed at
   * this stage, arguments that don't change for the life of the stream are passed at stream creation.
-  * @param ec implicit ExecutionContext
+  * @param ec implicit ExecutionContextExecutor
   * @param logger implicit LoggingAdapter
   * @author Gary Struthers
   */
 class CassandraKeyValueFlow[K, V <: Product](tc: TimerConfig, f: (V) => ResultSetFuture)
-  (implicit val ec: ExecutionContext, logger: LoggingAdapter) extends
+  (implicit val ec: ExecutionContextExecutor, logger: LoggingAdapter) extends
     GraphStage[FlowShape[(ConsumerRecordMetadata[K], V), (ConsumerRecordMetadata[K], V)]] {
 
   val in = Inlet[(ConsumerRecordMetadata[K], V)]("CassandraKeyValueFlow.in")
@@ -134,7 +134,7 @@ class CassandraKeyValueFlow[K, V <: Product](tc: TimerConfig, f: (V) => ResultSe
         waitForTimer = false
         timerKey match {
           case kv: (ConsumerRecordMetadata[K], V)  => myHandler(kv)
-          case x => throw new IllegalArgumentException(s"onTimer expected (K, V) received:${x.toString}")
+          case x: Any => throw new IllegalArgumentException(s"onTimer expected (K, V) received:${x.toString}")
         }
       }
 
@@ -167,8 +167,9 @@ object CassandraKeyValueFlow {
     * @param f map case class to ResultSetFuture, Usually a curried function
     * @return Flow[(ConsumerRecordMetadata[K], V), (ConsumerRecordMetadata[K], V), NotUsed]
     */
-  def apply[K, V <: Product](tc: TimerConfig, f: (V) => ResultSetFuture)(implicit ec: ExecutionContext,
-    logger: LoggingAdapter): Flow[(ConsumerRecordMetadata[K], V), (ConsumerRecordMetadata[K], V), NotUsed] = {
+  def apply[K, V <: Product](tc: TimerConfig, f: (V) => ResultSetFuture)
+    (implicit ec: ExecutionContextExecutor, logger: LoggingAdapter):
+      Flow[(ConsumerRecordMetadata[K], V), (ConsumerRecordMetadata[K], V), NotUsed] = {
 
       Flow.fromGraph(new CassandraKeyValueFlow[K, V](tc, f))
     }

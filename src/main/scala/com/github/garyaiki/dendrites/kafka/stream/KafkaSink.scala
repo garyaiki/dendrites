@@ -78,10 +78,8 @@ class KafkaSink[K, V](prod: ProducerConfig[K, V])(implicit logger: LoggingAdapte
       def asyncExceptions(pRecord: ProducerRecord[K, V], callback: Callback)(e: Exception): Unit = {
         e match {
           case NonFatal(e) => decider(e) match {
-              case Supervision.Stop => {
-                logger.error(e, "KafkaSink Stop ex:{}", e.getMessage)
-                failStage(e)
-              }
+              case Supervision.Stop | Supervision.Restart => failStage(e)
+
               case Supervision.Resume => {
                 val duration = curriedDelay(retries)
                 if(duration < maxDuration) {
@@ -161,7 +159,12 @@ object KafkaSink {
     sink.withAttributes(ActorAttributes.supervisionStrategy(decider))
   }
 
-  /** Supervision strategy
+  /** A Supervision strategy for KafkaSink
+    *
+    * Kafka's Retriable exceptions are mapped to Supervision.Resume but they really retry. Kafka v 0.11
+    * has a new configuration:enable.idempotence it's false by default, when it's true the driver handles Retriable
+    * exceptions and doesn't throw them to to KafkaSink. In that case this Decider adds nothing to AkkaStreams default
+    * Decider.
     *
     * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/common/errors/InvalidTopicException.html InvalidTopicException]]
     * @see [[http://kafka.apache.org/0101/javadoc/org/apache/kafka/common/errors/OffsetMetadataTooLarge.html OffsetMetadataTooLarge]]

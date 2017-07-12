@@ -73,10 +73,8 @@ class MockKafkaSink[K, V](prod: ProducerConfig[K, V], testException: RuntimeExce
       def asyncExceptions(pRecord: ProducerRecord[K, V], callback: Callback)(e: Exception): Unit = {
         e match {
           case NonFatal(e) => decider(e) match {
-              case Supervision.Stop => {
-                logger.error(e, "MockKafkaSink Stop ex:{}", e.getMessage)
-                failStage(e)
-              }
+              case Supervision.Stop | Supervision.Restart => failStage(e)
+
               case Supervision.Resume => {
                 val duration = curriedDelay(retries)
                 if(duration < maxDuration) {

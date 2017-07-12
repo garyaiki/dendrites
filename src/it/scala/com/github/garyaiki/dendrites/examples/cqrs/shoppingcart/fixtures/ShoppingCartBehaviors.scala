@@ -23,7 +23,7 @@ import com.datastax.driver.core.utils.UUIDs.timeBased
 import java.util.UUID
 import org.scalatest.{Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
-import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContextExecutor
 import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBind, CassandraBoundQuery, CassandraMappedPaging,
   CassandraSink}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.ShoppingCart
@@ -36,8 +36,8 @@ import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.event.ShoppingCa
 trait ShoppingCartBehaviors extends Matchers with ShoppingCartCmdBuilder { this: WordSpecLike =>
 
   def queryShoppingCart(session: Session, prepStmts: Map[String, PreparedStatement])
-    (implicit sys: ActorSystem, ec: ExecutionContext, mat: ActorMaterializer, logger: LoggingAdapter): Seq[ShoppingCart]
-      = {
+    (implicit sys: ActorSystem, ec: ExecutionContextExecutor, mat: ActorMaterializer, logger: LoggingAdapter):
+      Seq[ShoppingCart] = {
 
     val source = TestSource.probe[UUID]
     val prepStmt = prepStmts.get("Query") match {
@@ -57,8 +57,8 @@ trait ShoppingCartBehaviors extends Matchers with ShoppingCartCmdBuilder { this:
     response
   }
 
-  def deleteShoppingCart(session: Session, prepStmts: Map[String, PreparedStatement])(implicit ec: ExecutionContext,
-    mat: ActorMaterializer, logger: LoggingAdapter) {
+  def deleteShoppingCart(session: Session, prepStmts: Map[String, PreparedStatement])
+    (implicit ec: ExecutionContextExecutor, mat: ActorMaterializer, logger: LoggingAdapter) {
 
     val cartIds: Seq[UUID] = Seq(cartId)
     val iter = Iterable(cartIds.toSeq: _*)
@@ -73,7 +73,7 @@ trait ShoppingCartBehaviors extends Matchers with ShoppingCartCmdBuilder { this:
   }
 
   def queryShoppingCartEvent(session: Session, prepStmts: Map[String, PreparedStatement])
-    (implicit sys: ActorSystem, ec: ExecutionContext, mat: ActorMaterializer, logger: LoggingAdapter):
+    (implicit sys: ActorSystem, ec: ExecutionContextExecutor, mat: ActorMaterializer, logger: LoggingAdapter):
       Seq[ShoppingCartEvt] = {
     val source = TestSource.probe[(UUID, UUID)]
     val prepStmt = prepStmts.get("QueryEvt") match {

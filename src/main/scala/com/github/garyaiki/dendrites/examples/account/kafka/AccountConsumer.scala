@@ -15,7 +15,7 @@ package com.github.garyaiki.dendrites.examples.account.kafka
 
 import com.typesafe.config.ConfigFactory
 import org.apache.kafka.clients.consumer.Consumer
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.seqAsJavaListConverter
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 import com.github.garyaiki.dendrites.concurrent.calculateDelay
 import com.github.garyaiki.dendrites.kafka.ConsumerConfig
@@ -38,9 +38,11 @@ object AccountConsumer extends ConsumerConfig[String, Array[Byte]] {
   val curriedDelay = calculateDelay(minDuration, maxDuration, randomFactor) _
 
   /** Create consumer with configuration properties, subscribe to account topic
+    *
+    * KafkaConsumer not thread safe use same thread for all operations on it
     * @return consumer
     */
-  def createAndSubscribe(): Consumer[Key, Value] = {
+  val createAndSubscribe: Consumer[Key, Value] = {
     val c = createConsumer[Key, Value]("kafkaConsumer.properties")
     c subscribe(topics)
     c

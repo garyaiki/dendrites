@@ -15,7 +15,7 @@ package com.github.garyaiki.dendrites
 
 import org.apache.kafka.clients.consumer.{ConsumerRecord, KafkaConsumer}
 import org.apache.kafka.clients.producer.KafkaProducer
-//import org.apache.kafka.common.header.Headers v0.11
+import org.apache.kafka.common.header.Headers
 import org.apache.kafka.common.record.TimestampType
 
 /** Provides Classes to add fields to KafkaConsumer and KafkaProducer. Also Factories for
@@ -68,14 +68,26 @@ package object kafka {
     * @param timestamp
     * @param timestampType enum NO_TIMESTAMP_TYPE, CREATE_TIME, LOG_APPEND_TIME
     * @param key of ConsumerRecord
+    * @param headers optional Kafka message headers. New in v0.11
     * @author Gary Struthers
     */
   case class ConsumerRecordMetadata[K](topic: String, partition: Int, offset: Long, timestamp: Long,
-    timestampType: TimestampType, key: K)
+    timestampType: TimestampType, key: K, headers: Option[Headers] = None)
 
   object ConsumerRecordMetadata {
     def apply[K, V](cr: ConsumerRecord[K, V]): ConsumerRecordMetadata[K] = {
-      ConsumerRecordMetadata(cr.topic, cr.partition, cr.offset, cr.timestamp, cr.timestampType, cr.key)
+      ConsumerRecordMetadata(cr.topic, cr.partition, cr.offset, cr.timestamp, cr.timestampType, cr.key,Some(cr.headers))
+    }
+
+    /** timestamp and its type can be use to track message state
+      *
+      * @param src ConsumerRecordMetadata
+      * @param timestamp new timestamp
+      * @param timestampType new type
+      * @return ConsumerRecordMetadata
+      */
+    def updateTimestamp[K](src: ConsumerRecordMetadata[K], timestamp: Long, timestampType: TimestampType): ConsumerRecordMetadata[K] = {
+      ConsumerRecordMetadata[K](src.topic, src.partition, src.offset, timestamp, timestampType, src.key, src.headers)
     }
   }
 }

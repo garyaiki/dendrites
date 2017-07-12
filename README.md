@@ -158,7 +158,7 @@ In dendrites directory terminal window with sbt running
 
 `> it:testOnly com.github.garyaiki.dendrites.kafka.stream.KafkaStreamSpec`
 
-Note: sometimes Kafka tests interfere with each other, if one fails, exit sbt, then re-run. 
+Note: KafkaStreamSpec, ShoppingCartCmdSpec  creates KafkaConsumer in KafkaSource. KafkaConsumer calls must all be from the same thread. KafkaSource doesn't close KafkaConsumer until the stream it's in completes. To re-run one of these tests, exit and restart sbt.
 
 ###### After tests, delete topic
 List topics
@@ -290,9 +290,9 @@ Under the `dendrites` section
 
 [Logback configuration guide](http://logback.qos.ch/manual/configuration.html)
 
-Logging configuration for running dendrites tests is in `/src/main/resources/logback.xml`
+Logging configuration for running tests and integration tests is in `/src/test/resources/logback.xml`
 
-Your application Logback configuration is done separately.
+Your application Logback configuration is done separately. You can copy logback.xml paste it into your `/src/main/resources/` and modify it. 
 
 [Logging Separation](http://logback.qos.ch/manual/loggingSeparation.html)
 

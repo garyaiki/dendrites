@@ -66,10 +66,8 @@ class MockKafkaSource[V](iter: Iterator[V], testException: RuntimeException = nu
             if(iter.hasNext) { push(out, iter.next()) }
           } catch {
             case NonFatal(e) => decider(e) match {
-              case Supervision.Stop => {
-                logger.error(e, "MockKafkaSource Stop ex:{}", e.getMessage)
-                failStage(e)
-              }
+              case Supervision.Stop | Supervision.Restart => failStage(e)
+
               case Supervision.Resume => {
                 val duration = curriedDelay(retries)
                 if(duration < maxDuration) {

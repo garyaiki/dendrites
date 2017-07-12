@@ -53,7 +53,7 @@ package object account {
   def isAccountBalances(e: Any): Boolean = e.isInstanceOf[AccountBalances]
 
   def isAccBalances[A: TypeTag](e: Any): Boolean = typeOf[AccBalances[A]] match {
-    case t if t =:= typeOf[AccBalances[A]] => true
+    case t: Any if t =:= typeOf[AccBalances[A]] => true
     case _ => false
   }
 
