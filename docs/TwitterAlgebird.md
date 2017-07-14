@@ -2,7 +2,7 @@
 
 {% include nav.html %}
 
-Hash streaming values for near realtime approximate statistics with pre-built Algebird stages and functions.
+Near realtime approximations of stream data with pre-built [Algebird](https://twitter.github.io/algebird/){:target="_blank"} stages and stand-alone functions.
 
 [<img src="png/AvgFlow.png?raw=true" alt="AvgFlow" width="20%" height="20%" title="input a sequence of Numeric types, output their AveragedValue">](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/algebird/stream/package.scala){:target="_blank"}
 [<img src="png/sumAvgFlow.png?raw=true" alt="sumAvgFlow" width="20%" height="20%" title="input sequence of AveragedValue, output single AveragedValue">](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/algebird/stream/package.scala){:target="_blank"}
@@ -23,17 +23,19 @@ Hash streaming values for near realtime approximate statistics with pre-built Al
 [<img src="png/qTreeMinFlow.png?raw=true" alt="qTreeMinFlow" width="20%" height="20%" title="input sequence of values that are QTree like,  output QTree's min value">](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/algebird/stream/package.scala){:target="_blank"}
 ###### Click image to open source code in a new tab. Hover over image for stage inputs and outputs
 
+#### Stream Stages
+
 [AveragedValue](https://twitter.github.io/algebird/datatypes/averaged_value.html){:target="_blank"} estimates a variable's mean in the stream.
 
-[CountMinSketch](https://twitter.github.io/algebird/datatypes/approx/countminsketch.html){:target="_blank"} estimates a variable's frequency in the stream.
+[CountMinSketch](https://twitter.github.io/algebird/datatypes/approx/countminsketch.html){:target="_blank"} estimates a variable's frequency.
 
-[DecayedValue](https://twitter.github.io/algebird/datatypes/decayed_value.html){:target="_blank"} estimates a variable's moving average in the stream and de-weights values by age. The value is tupled with a timestamp in ZipTimeFlow.
+[DecayedValue](https://twitter.github.io/algebird/datatypes/decayed_value.html){:target="_blank"} estimates a variable's moving average and de-weights values by age. The value is tupled with a timestamp in ZipTimeFlow.
 
-[HyperLogLog](https://twitter.github.io/algebird/datatypes/approx/hyperloglog.html){:target="_blank"} estimates a variable's number of distinct values in the stream.
+[HyperLogLog](https://twitter.github.io/algebird/datatypes/approx/hyperloglog.html){:target="_blank"} estimates a variable's number of distinct values.
 
-[Min and Max](https://twitter.github.io/algebird/datatypes/min_and_max.html){:target="_blank"} estimates a variable's minimum or maximum values in the stream.
+[Min and Max](https://twitter.github.io/algebird/datatypes/min_and_max.html){:target="_blank"} estimates a variable's minimum or maximum values.
 
-[QTree](https://twitter.github.io/algebird/datatypes/approx/q_tree.html){:target="_blank"} estimates quartiles for a variable in the stream.
+[QTree](https://twitter.github.io/algebird/datatypes/approx/q_tree.html){:target="_blank"} estimates quartiles for a variable.
 
 [BloomFilter](https://twitter.github.io/algebird/datatypes/approx/bloom_filter.html){:target="_blank"} quickly ensures a word is *not* in a dictionary or a set of words and quickly predicts a word is *probably* in a dictionary or a set of words
 
@@ -69,4 +71,158 @@ val approximators = GraphDSL.create() { implicit builder =>
 }.named("parallelApproximators")
 ```
 
+#### Stand-alone Functions
 
+[Approximating Functions](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/algebird/package.scala){:target="_blank"}
+
+```scala
+val bigDecimals: Seq[BigDecimal]
+val avg0 = avg(bigDecimals)
+```
+###### Average a Sequence of values
+```scala
+val bigDecimals2: Seq[BigDecimal]
+val avg1 = avg(bigDecimals2)
+val avgs = Vector[AveragedValue](avg0, avg1)
+val avgSum = sumAverageValues(avgs)
+```
+###### Average a sequence of AveragedValues
+
+```scala
+val falsePositivepProb: Double = 0.01
+val words = readWords(wordsPath)
+val wordsBF = createBF(words, fpProb)
+```
+###### Create a BloomFilter
+
+```scala
+val falsePositivepProb: Double = 0.01
+val word = "path"
+val inDict = wordsBF.contains(word).isTrue
+```
+###### Is word in BloomFilter
+```scala
+val falsePositivepProb: Double = 0.01
+val wordsFalseWords: IndexedSeq[String]
+val falsePositives = for {
+  i <- wordsFalseWords
+  if wordsBF.contains(i).isTrue
+} yield i
+val acceptable = falsePositives.size < words.size * fpProb
+```
+###### Is false positive rate acceptable
+```scala
+val addrs = inetAddresses(ipRange)
+val longZips = inetToLongZip(addrs)
+val longs = testLongs(longZips)
+implicit val m = createCMSMonoid[Long]()
+val cms = createCountMinSketch(longs)
+val estimatedCount = cms.totalCount
+```
+###### Estimate total number of elements seen so far
+```scala
+val estFreq = cms.frequency(longZips(5))
+```
+###### Estimate count of elements with the same value as the one selected
+```scala
+val cms1 = createCountMinSketch(longs)
+val cmss = Vector(cms, cms1)
+val cmsSum = sumCountMinSketch(cmss)
+val estimatedCount = cmsSum.totalCount
+```
+###### Sum a Sequence of CountMinSketch then estimate combined total number of elements
+```scala
+val estFreq = cmsSum.frequency(longZips(5))
+```
+###### From a Sequence of CountMinSketch estimate count of elements with the indexed same value
+
+```scala
+val sines = genSineWave(100, 0 to 360)
+val days = Range.Double(0.0, 361.0, 1.0)
+val sinesZip = sines.zip(days)
+val decayedValues = toDecayedValues(sinesZip, 10.0, None)
+val avgAt90 = decayedValues(90).average(10.0)
+```
+###### Moving average from the initial value to specified index
+```scala
+val avg80to90 = decayedValues(90).averageFrom(10.0, 80.0, 90.0)
+```
+###### Moving average from specified index to specified index
+```scala
+implicit val ag = HyperLogLogAggregator(12)
+val ints: Seq[Int]
+val hll = createHLL(ints)
+```
+###### Create a HLL from a sequence of Int
+```scala
+val ints2: Seq[Int]
+val hll2 = createHLL(ints2)
+val hlls = Vector(hll, hll2)
+```
+###### Create a sequence of HLL
+```scala
+val longs: Seq[Long]
+val hll = createHLL(longs)
+```
+###### Create a HLL from a sequence of Long
+```scala
+val sum = hlls.reduce(_ + _)
+val size = sum.estimatedSize
+```
+###### Sum a Sequence of HLL and estimate total size
+```scala
+val hlls = Vector(hll, hll2)
+val approxs = mapHLL2Approximate(hlls)
+```
+###### Create a sequence of Approximate HHL approximate. Map a sequence of HLL to a sequence of Approximate
+```scala
+val sum = approxs.reduce(_ + _)
+```
+###### Sum a Sequence of Approximate and estimate total size
+```scala
+val level = 5
+implicit val qtBDSemigroup = new QTreeSemigroup[BigDecimal](level)
+val qtBD = buildQTree[BigDecimal](bigDecimals)
+```
+###### Build QTree from a Sequence
+```scala
+val iqm = qtBD.interQuartileMean
+```
+###### Get its InterQuartileMean
+```scala
+val qTrees = Vector(qtBD, qtBD2)
+val sumQTree = sumQTrees(qTrees)
+```
+###### Sum a Sequence of QTrees to a QTree
+```scala
+def wrapMax[Int](x: Int) = Max(x)
+val wm = SeqFunctor.map[Int, Max[Int]](List(1,2,3,4))(wrapMax)
+val bigDecimals: Seq[BigDecimal]
+val negBigDecimals = SeqFunctor.map[BigDecimal, BigDecimal](bigDecimals)(negate)
+val invertedBigDecimals = SeqFunctor.map[BigDecimal, BigDecimal](bigDecimals)(inverse)
+```
+###### Map elements of a sequence.
+```scala
+val bigDecimals: Seq[BigDecimal]
+val invertedNegBigDecimals = andThen[BigDecimal, BigDecimal, BigDecimal](ap)( inverse)( negate)
+```
+###### Map the mapped elements of a sequence: f() andThen g().
+```scala
+val iqm = qtBD.interQuartileMean
+val bigDecimals: Seq[BigDecimal]
+val max = max(bigDecimals)
+val optBigDecs: [Option[BigDecimal]]
+val max2 = max(optBigDecs.flatten)
+val eithBigInts = Seq[Either[String, BigInt]]
+val max3 = max(filterRight(eithBigInts)
+```
+###### Get Max element of a sequence. For Sequence types that have a Semigroup, Monoid and Ordering
+```scala
+val bigDecimals: Seq[BigDecimal]
+val min = min(bigDecimals)
+val optBigDecs: [Option[BigDecimal]]
+val min2 = min(optBigDecs.flatten)
+val eithBigInts = Seq[Either[String, BigInt]]
+val min3 = min(filterRight(eithBigInts)
+```
+###### Get Min element of a sequence.
