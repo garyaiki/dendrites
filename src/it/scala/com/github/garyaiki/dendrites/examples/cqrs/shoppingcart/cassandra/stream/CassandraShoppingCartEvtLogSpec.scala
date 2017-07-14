@@ -19,7 +19,7 @@ import com.datastax.driver.core.PreparedStatement
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
 import com.github.garyaiki.dendrites.cassandra.fixtures.BeforeAfterAllBuilder
-import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBind, CassandraSink}
+import com.github.garyaiki.dendrites.cassandra.stream.CassandraSink
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.event.ShoppingCartEvt
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.{ShoppingCartConfig,
   CassandraShoppingCartEvtLog}
@@ -45,9 +45,9 @@ class CassandraShoppingCartEvtLogSpec extends WordSpecLike with Matchers with Be
         case Some(stmt) => stmt
         case None       => fail("CassandraShoppingCartEvtLog InsertEvt PreparedStatement not found")
       }
-      val bndStmt = new CassandraBind(prepStmt, bndInsert)
+      val partialBndInsert = bndInsert(prepStmt, _: ShoppingCartEvt)
       val sink = new CassandraSink(session)
-      source.via(bndStmt).runWith(sink)
+      source.map(partialBndInsert).runWith(sink)
       Thread.sleep(500)
     }
   }

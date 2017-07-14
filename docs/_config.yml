@@ -1,7 +1,7 @@
 name: dendrites
-description: Scala library of streaming components
+description: Scala library for Reactive streaming Microservices, CQRS, Event Sourcing, & Event Logging 
 author: Gary Struthers
-author_email: agilej2ee@earthlink.net
+author_email: garystruthers@earthlink.net
 baseurl: /dendrites
 url: http://garyaiki.github.io/dendrites/
 theme: jekyll-theme-cayman

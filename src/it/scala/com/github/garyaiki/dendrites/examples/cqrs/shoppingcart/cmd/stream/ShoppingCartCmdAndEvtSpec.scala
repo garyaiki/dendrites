@@ -24,7 +24,7 @@ import com.github.garyaiki.dendrites.avro4s.stream.Avro4sSerializer
 import com.github.garyaiki.dendrites.cassandra.{getConditionalError, getKeyspacesNames}
 import com.github.garyaiki.dendrites.cassandra.fixtures.BeforeAfterAllBuilder
 import com.github.garyaiki.dendrites.cassandra.fixtures.getOneRow
-import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBoundQuery, CassandraMappedPaging}
+import com.github.garyaiki.dendrites.cassandra.stream.CassandraMappedPaging
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.avro4s.Avro4sShoppingCartCmd
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.{CassandraShoppingCart,
   CassandraShoppingCartEvtLog, RetryConfig, ShoppingCartConfig}

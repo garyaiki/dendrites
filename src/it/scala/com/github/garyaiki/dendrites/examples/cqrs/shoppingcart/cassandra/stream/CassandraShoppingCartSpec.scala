@@ -23,8 +23,7 @@ import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
 import com.github.garyaiki.dendrites.cassandra.getConditionalError
 import com.github.garyaiki.dendrites.cassandra.fixtures.BeforeAfterAllBuilder
-import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBind, CassandraConditional,
-  CassandraRetrySink, CassandraSink}
+import com.github.garyaiki.dendrites.cassandra.stream.{CassandraConditional, CassandraRetrySink, CassandraSink}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.{ShoppingCart, SetItems, SetOwner}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.{ShoppingCartConfig, CassandraShoppingCart}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.CassandraShoppingCart.{bndInsert,
@@ -67,9 +66,9 @@ class CassandraShoppingCartSpec extends WordSpecLike with Matchers with BeforeAn
         case Some(stmt) => stmt
         case None       => fail("CassandraShoppingCart Insert PreparedStatement not found")
       }
-      val bndStmt = new CassandraBind(prepStmt, bndInsert)
+      val partialBndInsert = bndInsert(prepStmt, _: ShoppingCart)
       val sink = new CassandraSink(session)
-      source.via(bndStmt).runWith(sink)
+      source.map(partialBndInsert).runWith(sink)
     }
   }
 
@@ -84,11 +83,11 @@ class CassandraShoppingCartSpec extends WordSpecLike with Matchers with BeforeAn
       case Some(stmt) => stmt
       case None       => fail("CassandraShoppingCart SetItem PreparedStatement not found")
     }
-    val bndStmt = new CassandraBind(prepStmt, bndUpdateItems)
+    val partialBndUpdateItems = bndUpdateItems(prepStmt, _: SetItems)
     val curriedErrorHandler = getConditionalError(rowToString) _
     val conditional = new CassandraConditional(session, curriedErrorHandler)
     def sink = TestSink.probe[Option[Row]]
-    val (pub, sub) = source.via(bndStmt).via(conditional).toMat(sink)(Keep.both).run()
+    val (pub, sub) = source.map(partialBndUpdateItems).via(conditional).toMat(sink)(Keep.both).run()
     sub.request(1)
     pub.sendNext(setItems)
     val response = sub.expectNext()

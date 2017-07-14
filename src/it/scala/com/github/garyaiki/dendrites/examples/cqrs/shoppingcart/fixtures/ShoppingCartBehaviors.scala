@@ -24,8 +24,7 @@ import java.util.UUID
 import org.scalatest.{Matchers, WordSpecLike}
 import scala.collection.immutable.Iterable
 import scala.concurrent.ExecutionContextExecutor
-import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBind, CassandraBoundQuery, CassandraMappedPaging,
-  CassandraSink}
+import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBoundQuery, CassandraMappedPaging, CassandraSink}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.ShoppingCart
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.CassandraShoppingCart.{bndDelete, bndQuery,
   mapRows}
@@ -67,9 +66,9 @@ trait ShoppingCartBehaviors extends Matchers with ShoppingCartCmdBuilder { this:
       case Some(stmt) => stmt
       case None       => fail("CassandraShoppingCart Delete PreparedStatement not found")
     }
-    val bndStmt = new CassandraBind(prepStmt, bndDelete)
+    val partialBndDelete = bndDelete(prepStmt, _: UUID)
     val sink = new CassandraSink(session)
-    source.via(bndStmt).runWith(sink)
+    source.map(partialBndDelete).runWith(sink)
   }
 
   def queryShoppingCartEvent(session: Session, prepStmts: Map[String, PreparedStatement])

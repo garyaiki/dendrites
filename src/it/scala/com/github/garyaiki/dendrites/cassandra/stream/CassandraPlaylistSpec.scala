@@ -45,23 +45,22 @@ class CassandraPlaylistSpec extends WordSpecLike with Matchers with BeforeAndAft
     "insert Playlists " in {
       val iter = Iterable(playlists.toSeq:_*)
       val source = Source[Playlist](iter)
-      val bndStmt = new CassandraBind(Playlists.prepInsert(session, schema), bndInsert)
+      val partialBndInsert = bndInsert(Playlists.prepInsert(session, schema), _: Playlist)
       val sink = new CassandraSink(session)
-      source.via(bndStmt).runWith(sink)
+      source.map(partialBndInsert).runWith(sink)
     }
   }
 
   "query a Playlist" in {
       val source = TestSource.probe[UUID]
-      val bndStmt = new CassandraBind(Playlists.prepQuery(session, schema), bndQuery)
+      val partialBndQuery = bndQuery(Playlists.prepQuery(session, schema), _: UUID)
       val query = new CassandraQuery(session)
       val paging = new CassandraPaging(10)
-      def toPlaylists: Flow[Seq[Row], Seq[Playlist], NotUsed] = Flow[Seq[Row]].map(Playlists.mapRows)
 
       def sink = TestSink.probe[Seq[Playlist]]
-      val (pub, sub) = source.via(bndStmt)
+      val (pub, sub) = source.map(partialBndQuery)
         .via(query).via(paging)
-        .via(toPlaylists)
+        .map(Playlists.mapRows)
         .toMat(sink)(Keep.both).run()
       sub.request(1)
       pub.sendNext(plId)

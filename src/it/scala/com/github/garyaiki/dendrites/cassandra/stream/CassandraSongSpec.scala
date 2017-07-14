@@ -45,23 +45,22 @@ class CassandraSongSpec extends WordSpecLike with Matchers with BeforeAndAfterAl
     "insert Songs " in {
       val iter = Iterable(songs.toSeq:_*)
       val source = Source[Song](iter)
-      val bndStmt = new CassandraBind(Songs.prepInsert(session, schema), Songs.bndInsert)
+      val partialBndInsert = Songs.bndInsert(Songs.prepInsert(session, schema), _: Song)
       val sink = new CassandraSink(session)
-      source.via(bndStmt).runWith(sink)
+      source.map(partialBndInsert).runWith(sink)
     }
   }
 
   "query a Song" in {
       val source = TestSource.probe[UUID]
-      val bndStmt = new CassandraBind(Songs.prepQuery(session, schema), Songs.bndQuery)
+      val partialBndQuery = Songs.bndQuery(Songs.prepQuery(session, schema), _: UUID)
       val query = new CassandraQuery(session)
       val paging = new CassandraPaging(10)
-      def toSongs: Flow[Seq[Row], Seq[Song], NotUsed] = Flow[Seq[Row]].map(Songs.mapRows)
 
       def sink = TestSink.probe[Seq[Song]]
-      val (pub, sub) = source.via(bndStmt)
+      val (pub, sub) = source.map(partialBndQuery)
         .via(query).via(paging)
-        .via(toSongs)
+        .map(Songs.mapRows)
         .toMat(sink)(Keep.both).run()
       sub.request(1)
       pub.sendNext(songId)

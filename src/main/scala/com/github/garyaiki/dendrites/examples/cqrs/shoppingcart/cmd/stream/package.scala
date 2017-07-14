@@ -21,8 +21,7 @@ import akka.stream.scaladsl.GraphDSL.Implicits._
 import com.datastax.driver.core.{BoundStatement, PreparedStatement, Session}
 import scala.concurrent.ExecutionContextExecutor
 import scala.language.postfixOps
-import com.github.garyaiki.dendrites.cassandra.stream.{CassandraBind, CassandraKeyValueFlow, CassandraRetrySink,
-  CassandraSink}
+import com.github.garyaiki.dendrites.cassandra.stream.{CassandraKeyValueFlow, CassandraRetrySink, CassandraSink}
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.avro4s.Avro4sShoppingCartCmd.toCaseClass
 import com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.{CassandraShoppingCart,
   CassandraShoppingCartEvtLog, RetryConfig, ShoppingCartConfig}
@@ -73,18 +72,15 @@ package object stream {
     val cmdFlowGraph = new CassandraKeyValueFlow[String, ShoppingCartCmd](RetryConfig, curriedDoCmd)
       .withAttributes(dispatcher)
     val cmdFlow = Flow.fromGraph(cmdFlowGraph)
-    val toEvt = Flow.fromFunction[(ConsumerRecordMetadata[String], ShoppingCartCmd), ShoppingCartEvt] {
-        x => cmdToEvt(x._1, x._2)
-      }
     val optInsEvtPrepStmt = prepStmts.get("InsertEvt")
     val insEvtPrepStmt = optInsEvtPrepStmt match {
       case Some(x) => x
       case None => throw new NullPointerException("ShoppingCartEvt Insert preparedStatement not found")
     }
-    val bndStmt = new CassandraBind(insEvtPrepStmt, bndInsert)
+    val partialBndInsert = bndInsert(insEvtPrepStmt, _: ShoppingCartEvt)
     val sink = new CassandraSink(session)
 
-    cmdFlow.via(toEvt).via(bndStmt).to(sink) // .to(Sink.ignore)
+    cmdFlow.map(cmdToEvt).map(partialBndInsert).to(sink) // .to(Sink.ignore)
   }
 
   /** Composite parallel Cassandra sinks. Equivalent to shoppingCartCmdEvtSink but this splits command and event logging
@@ -106,16 +102,16 @@ package object stream {
     val onlyVal = Flow.fromFunction[(ConsumerRecordMetadata[String], ShoppingCartCmd), ShoppingCartCmd] { x => x._2 }
     val curriedDoCmd = doShoppingCartCmd(session, prepStmts) _
     val cmdSink = new CassandraRetrySink[ShoppingCartCmd](RetryConfig, curriedDoCmd).withAttributes(dispatcher)
-
     val toEvt = Flow.fromFunction[(ConsumerRecordMetadata[String], ShoppingCartCmd), ShoppingCartEvt] {
         x => cmdToEvt(x._1, x._2)
-      }
+    }
     val optInsEvtPrepStmt = prepStmts.get("InsertEvt")
     val insEvtPrepStmt = optInsEvtPrepStmt match {
       case Some(x) => x
       case None => throw new NullPointerException("ShoppingCartEvt Insert preparedStatement not found")
     }
-    val bndStmt = new CassandraBind(insEvtPrepStmt, bndInsert)
+    val partialBndInsert = bndInsert(insEvtPrepStmt, _: ShoppingCartEvt)
+    val toBndInsert = Flow.fromFunction[ShoppingCartEvt, BoundStatement] { x => partialBndInsert(x) }
     val sink = new CassandraSink(session)
 
     Sink.fromGraph(GraphDSL.create() { implicit builder =>
@@ -123,7 +119,7 @@ package object stream {
         ShoppingCartCmd)] = builder.add(Broadcast[(ConsumerRecordMetadata[String], ShoppingCartCmd)](2))
 
       bcast ~> onlyVal ~> cmdSink
-      bcast ~> toEvt ~> bndStmt ~> sink
+      bcast ~> toEvt ~> toBndInsert ~> sink
       SinkShape(bcast.in)
     })
   }

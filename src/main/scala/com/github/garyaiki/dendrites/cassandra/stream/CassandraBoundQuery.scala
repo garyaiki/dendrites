@@ -27,19 +27,21 @@ import scala.util.control.NonFatal
 import com.github.garyaiki.dendrites.cassandra.{getRowColumnNames, noHostAvailableExceptionMsg, sessionLogInfo}
 import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
 
-/** Map case class to BoundStatement query, execute it, Same as CassandraBind ~> CassandraQuery in 1 stage
+/** Map case class to BoundStatement query, execute it
   *
   * Cassandra's Async Execute statement returns a Guava ListenableFuture which is converted to a
   * completed Scala Future.
   * Success invokes an Akka Stream AsyncCallback which pushes the ResultSet
   * Failure invokes an Akka Stream AsyncCallback which fails the stage
   *
-  * Cassandra's Java driver handles retry and reconnection, so Supervision isn't used
+  * Delay completing this stage if upstream completes before results are pushed.
+  *
+  * Cassandra's Java driver handles retry and reconnection
   *
   * @tparam A input type
   * @param session: Session
   * @param stmt: PreparedStatement
-  * @param f function to map PreparedStatement to BoundStatement from with case class values
+  * @param f function to map PreparedStatement to BoundStatement with case class values
   * @param fetchSize used by SELECT queries for page size. Default 0 means use Cassandra default
   * @param ec implicit ExecutionContext
   * @param logger implicit LoggingAdapter
@@ -71,8 +73,6 @@ class CassandraBoundQuery[A](session: Session, stmt: PreparedStatement, f:(Prepa
           case Success(rs) => {
             val successCallback = getAsyncCallback {
               (_: Unit) => {
-                logger.debug("CassandraBoundQuery Success available:{} fully fetched:{}",
-                  rs.getAvailableWithoutFetching, rs.isFullyFetched)
                 push(out, rs)
                 waitForHandler = false
                 if(mustFinish) completeStage()
