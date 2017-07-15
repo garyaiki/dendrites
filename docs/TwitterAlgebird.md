@@ -79,14 +79,14 @@ val approximators = GraphDSL.create() { implicit builder =>
 val bigDecimals: Seq[BigDecimal]
 val avg0 = avg(bigDecimals)
 ```
-###### Average a Sequence of values
+###### AveragedValue of a Sequence of values
 ```scala
 val bigDecimals2: Seq[BigDecimal]
 val avg1 = avg(bigDecimals2)
 val avgs = Vector[AveragedValue](avg0, avg1)
 val avgSum = sumAverageValues(avgs)
 ```
-###### Average a sequence of AveragedValues
+###### AveragedValue of a sequence of AveragedValues
 
 ```scala
 val falsePositivepProb: Double = 0.01
@@ -110,7 +110,7 @@ val falsePositives = for {
 } yield i
 val acceptable = falsePositives.size < words.size * fpProb
 ```
-###### Is false positive rate acceptable
+###### Is BloomFilter's false positive rate acceptable
 ```scala
 val addrs = inetAddresses(ipRange)
 val longZips = inetToLongZip(addrs)
@@ -119,11 +119,11 @@ implicit val m = createCMSMonoid[Long]()
 val cms = createCountMinSketch(longs)
 val estimatedCount = cms.totalCount
 ```
-###### Estimate total number of elements seen so far
+###### CountMinSketch estimate total number of elements seen so far
 ```scala
 val estFreq = cms.frequency(longZips(5))
 ```
-###### Estimate count of elements with the same value as the one selected
+###### CountMinSketch estimate count of elements with the same value as the one selected
 ```scala
 val cms1 = createCountMinSketch(longs)
 val cmss = Vector(cms, cms1)
@@ -143,35 +143,24 @@ val sinesZip = sines.zip(days)
 val decayedValues = toDecayedValues(sinesZip, 10.0, None)
 val avgAt90 = decayedValues(90).average(10.0)
 ```
-###### Moving average from the initial value to specified index
+###### DecayedValue moving average from the initial value to specified index
 ```scala
 val avg80to90 = decayedValues(90).averageFrom(10.0, 80.0, 90.0)
 ```
-###### Moving average from specified index to specified index
+###### DecayedValue moving average from specified index to specified index
 ```scala
 implicit val ag = HyperLogLogAggregator(12)
 val ints: Seq[Int]
 val hll = createHLL(ints)
 ```
-###### Create a HLL from a sequence of Int
+###### HyperLogLog create a HLL from a sequence of Int
 ```scala
-val ints2: Seq[Int]
-val hll2 = createHLL(ints2)
 val hlls = Vector(hll, hll2)
-```
-###### Create a sequence of HLL
-```scala
-val longs: Seq[Long]
-val hll = createHLL(longs)
-```
-###### Create a HLL from a sequence of Long
-```scala
 val sum = hlls.reduce(_ + _)
 val size = sum.estimatedSize
 ```
 ###### Sum a Sequence of HLL and estimate total size
 ```scala
-val hlls = Vector(hll, hll2)
 val approxs = mapHLL2Approximate(hlls)
 ```
 ###### Create a sequence of Approximate HHL approximate. Map a sequence of HLL to a sequence of Approximate
@@ -201,20 +190,15 @@ val bigDecimals: Seq[BigDecimal]
 val negBigDecimals = SeqFunctor.map[BigDecimal, BigDecimal](bigDecimals)(negate)
 val invertedBigDecimals = SeqFunctor.map[BigDecimal, BigDecimal](bigDecimals)(inverse)
 ```
-###### Map elements of a sequence.
+###### SeqFunctor map elements of a sequence to elements of another sequence.
 ```scala
 val bigDecimals: Seq[BigDecimal]
-val invertedNegBigDecimals = andThen[BigDecimal, BigDecimal, BigDecimal](ap)( inverse)( negate)
+val invertedNegBigDecimals = andThen[BigDecimal, BigDecimal, BigDecimal](bigDecimals)( inverse)( negate)
 ```
-###### Map the mapped elements of a sequence: f() andThen g().
+###### andThen Functor map the elements of a sequence, map that sequence: f() andThen g().
 ```scala
-val iqm = qtBD.interQuartileMean
 val bigDecimals: Seq[BigDecimal]
 val max = max(bigDecimals)
-val optBigDecs: [Option[BigDecimal]]
-val max2 = max(optBigDecs.flatten)
-val eithBigInts = Seq[Either[String, BigInt]]
-val max3 = max(filterRight(eithBigInts)
 ```
 ###### Get Max element of a sequence. For Sequence types that have a Semigroup, Monoid and Ordering
 ```scala
