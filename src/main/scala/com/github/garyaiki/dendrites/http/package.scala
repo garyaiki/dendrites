@@ -45,21 +45,6 @@ import scala.concurrent.{ExecutionContext, Future}
   * val balancesQuery = caseClassToGetQuery(balanceQuery)()
   * val q = checkingPath ++ balancesQuery
   * }}}
-  * Construct GET request, call server using connection pool with typedQuery
-  * typedResponse maps future to error message or case class
-  * {{{
-  * def receive = {
-  *  case GetAccountBalances(id: Long) ⇒ {
-  *    val callFuture = typedQuery(GetAccountBalances(id), clientConfig.baseURL)
-  *    typedResponse(callFuture, mapPlain, mapChecking) pipeTo sender
-  * }
-  * }}}
-  * typedQueryResponse wraps typedQuery and typedResponse. It has 2 argument lists, the first can be
-  * curried. Then it can be used in a flow which receives the case class for the 2nd argument list
-  * {{{
-  * def partial = typedQueryResponse(baseURL, mapPlain, mapChecking) _ // curried
-  * def flow: Flow[Product, Either[String, AnyRef], NotUsed] = Flow[Product].mapAsync(1)(partial)
-  * }}}
   * @see [[http://typesafehub.github.io/config/latest/api/ Config API]]
   * @author Gary Struthers
   */
