@@ -108,3 +108,45 @@ val wrappedCallsLRFlow = Flow.fromGraph(fgLR)
 #### Akka HTTP servers
 Akka HTTP's high level [routing DSL](http://doc.akka.io/docs/akka-http/current/scala/http/routing-dsl/index.html){:target="_blank"} is elegant, easy to code, and readable for non-programmers. [BalancesService](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/examples/account/http/BalancesService.scala) shows an example server with a GET request handler.
 
+#### Stand-alone Functions
+```scala
+val hostConfig: (Config, String, Int) = getHostConfig("dendrites.checking-balances.http.interface","my.http.port")
+```
+###### Get Config, ip address, port as tuple3
+```scala
+val baseURL: StringBuilder = configBaseUrl("my.http.path", hostConfig)
+```
+ ###### Append path to host URL
+```scala
+val url: StringBuilder = createUrl(scheme, ipDomain, port, path) 
+```
+###### Create URL including path
+```scala
+val balanceQuery = GetAccountBalances(goodId)
+val checkingPath = "/account/balances/checking/"
+val balancesQuery: StringBuilder = caseClassToGetQuery(balanceQuery)()
+val q = checkingPath ++ balancesQuery 
+```
+###### Create GET request with request path i.e. "?", "key=value" for case classes with only basic field types
+```scala
+val callFuture: Future[HttpResponse] = typedQuery(GetAccountBalances(id), clientConfig.baseURL)
+```
+###### Create GET request from URL with path and GET arguments mapped to JSON from case class. Call it.
+```scala
+partial: HttpResponse => Future[Either[String, AnyRef]] = typedResponse(mapLeft, mapRight) _ // curried
+``` 
+###### Handle response, mapPlain for exception & server error messages, mapRight for JSON result, 2nd arg list `callFuture` can be curried.
+```scala
+val id = 1L
+val cc = GetAccountBalances(id)
+val callFuture: Future[HttpResponse] = typedQuery(baseURL, cc.productPrefix, caseClassToGetQuery)(cc)
+val future: Future[Either[String, AnyRef]] = typedFutureResponse(mapPlain, mapChecking)(callFuture)
+```
+###### Map Future[HttpResponse} to a Future[Either] Left for error, Right for good result.
+```scala
+val partial: Product => Future[Either[String, AnyRef]] = typedQueryResponse(baseURL, mapPlain, mapChecking) _ // curried
+val responseFuture: Future[Either[String, AnyRef]] = partial(GetAccountBalances(id))
+```
+###### Combine query & response, call it with first argument list once. Call curried function with second argument list for each case class to query on.
+
+
