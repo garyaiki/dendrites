@@ -1,0 +1,47 @@
+<configuration> <!-- http://logback.qos.ch/manual/configuration.html -->
+
+  <timestamp key="bySecond" datePattern="yyyy-MM-dd'T'HH-mm-ss"/>
+  
+	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+		<File>./logs/akka-${bySecond}.log</File>
+		<encoder>
+			<pattern>%date{ISO8601} %-5level %logger{36} %X{sourceThread} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%date{ISO8601} %-5level %logger{36} %X{sourceThread} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- use AsyncAppender for lower latencies -->
+  <appender name="async" class="ch.qos.logback.classic.AsyncAppender">
+    <appender-ref ref="FILE" />
+  </appender>
+
+  <logger name="com.datastax.driver.core.QueryLogger.SLOW" level="TRACE" />
+  <logger name="com.github.garyaiki.dendrites.cassandra" level="debug" />
+  <logger name="com.github.garyaiki.dendrites.cassandra.stream" level="debug" />
+  <logger name="com.github.garyaiki.dendrites.cassandra.scalacass" level="debug" />
+  <logger name="com.github.garyaiki.dendrites.examples.cassandra" level="debug" />
+  <logger name="com.github.garyaiki.dendrites.kafka" level="debug" />
+  <logger name="com.github.garyaiki.dendrites.kafka.stream" level="debug" />
+  <logger name="com.github.garyaiki.dendrites.kafka.stream.actor" level="debug" />
+  <logger name="com.github.garyaiki.dendrites.examples.account.akka" level="debug" />
+  <logger name="com.github.garyaiki.dendrites.examples.account.http.actor" level="debug" />
+  <logger name="com.github.garyaiki.dendrites.examples.account.http.stream" level="debug" />
+  <logger name="com.github.garyaiki.dendrites.examples.account.http.stream.actor" level="debug" />
+  <logger name="com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cassandra.stream" level="debug" />
+  <logger name="com.github.garyaiki.dendrites.examples.cqrs.shoppingcart.cmd.stream" level="debug" />
+  <logger name="com.github.garyaiki.dendrites.stream" level="debug" />
+  <logger name="com.github.garyaiki.dendrites.stream.actor" level="debug" />
+  <logger name="com.github.garyaiki.dendrites.actor" level="debug" />
+
+	<root level="info">
+	  <appender-ref ref="async" />
+		<!-- <appender-ref ref="FILE" /> -->
+		<appender-ref ref="STDOUT" />
+	</root>
+
+</configuration>
