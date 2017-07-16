@@ -25,13 +25,15 @@ Near realtime approximations of stream data with pre-built [Algebird](https://tw
 
 #### Stream Stages
 
+Most of these are stand-alone functions wrapped in an Akka Streams built-in `Flow` stage. 
+
 [AveragedValue](https://twitter.github.io/algebird/datatypes/averaged_value.html){:target="_blank"} estimates a variable's mean in the stream.
 
-[CountMinSketch](https://twitter.github.io/algebird/datatypes/approx/countminsketch.html){:target="_blank"} estimates a variable's frequency.
+[CountMinSketch](https://twitter.github.io/algebird/datatypes/approx/countminsketch.html){:target="_blank"} estimates a variable's frequency. `CreateCMSFlow` is a custom Flow stage: it needs an implicit `CMSMonoid`. 
 
-[DecayedValue](https://twitter.github.io/algebird/datatypes/decayed_value.html){:target="_blank"} estimates a variable's moving average and de-weights values by age. The value is tupled with a timestamp in ZipTimeFlow.
+[DecayedValue](https://twitter.github.io/algebird/datatypes/decayed_value.html){:target="_blank"} estimates a variable's moving average and de-weights values by age. The value is tupled with a timestamp. `ZipTimeFlow` is a custom Flow stage: It takes a Numeric value and a UDF that creates a time value and returns a tuple of (value, time).
 
-[HyperLogLog](https://twitter.github.io/algebird/datatypes/approx/hyperloglog.html){:target="_blank"} estimates a variable's number of distinct values.
+[HyperLogLog](https://twitter.github.io/algebird/datatypes/approx/hyperloglog.html){:target="_blank"} estimates a variable's number of distinct values. `CreateHLLFlow` is a custom Flow stage: it needs an implicit `HyperLogLogAggregator`.
 
 [Min and Max](https://twitter.github.io/algebird/datatypes/min_and_max.html){:target="_blank"} estimates a variable's minimum or maximum values.
 
@@ -39,7 +41,7 @@ Near realtime approximations of stream data with pre-built [Algebird](https://tw
 
 [BloomFilter](https://twitter.github.io/algebird/datatypes/approx/bloom_filter.html){:target="_blank"} quickly ensures a word is *not* in a dictionary or a set of words and quickly predicts a word is *probably* in a dictionary or a set of words
 
-[Algebird](https://github.com/twitter/algebird){:target="_blank"} approximators can stream in parallel. This example uses [Agents](http://doc.akka.io/docs/akka/current/scala/agents.html){:target="_blank"} which are deprecated in Akka 2.5.
+[Algebird](https://github.com/twitter/algebird){:target="_blank"} approximators can stream in parallel. This, contrived, example uses [Agents](http://doc.akka.io/docs/akka/current/scala/agents.html){:target="_blank"} as a thread safe shared value holder. Agents are deprecated in Akka 2.5.
 
 <img src="png/AlgebirdApproximatorsAgentsFlow.png?raw=true" width="80%" />
 
