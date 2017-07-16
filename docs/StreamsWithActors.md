@@ -1,10 +1,12 @@
-### Running Akka Stream with Actors
+### Running Akka Streams with Actors
 
 {% include nav.html %}
 
-[Actors](http://doc.akka.io/docs/akka/current/scala/actors.html){:target="_blank"} can contain streams, initialize them and use [Actor Supervision](http://doc.akka.io/docs/akka/current/scala/fault-tolerance.html) to define a strategy to Resume, Restart, or Stop the Actor and its stream when the stream returns an error or Escalate error handling to a higher level supervisor.
+[Actors](http://doc.akka.io/docs/akka/current/scala/actors.html){:target="_blank"} can contain streams, initialize them and use [Actor Supervision](http://doc.akka.io/docs/akka/current/scala/fault-tolerance.html) to define a strategy for the Actor and its stream when the stream returns an error.
 
-[Akka Streams Supervision](http://doc.akka.io/docs/akka/current/scala/stream/stream-error.html#supervision-strategies){:target="_blank"} can Resume a stage, Restart a stage, or Stop the stream.
+[Akka Streams Supervision](http://doc.akka.io/docs/akka/current/scala/stream/stream-error.html#supervision-strategies){:target="_blank"} can Resume or Restart a stage, unbeknown to the Actor, or Stop the stream causing the Actor to supervise.
+
+Actor/Akka Streams hybrid applications have the benefits of pure Actor applications with less boilerplate.
 
 <img src="png/RunnableGraph4Actor.png?raw=true" width="60%" />
 
@@ -12,7 +14,7 @@
 
 [CallStreamSupervisor](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/stream/actor/CallStreamSupervisor.scala){:target="_blank"} is a generic actor supervisor that creates CallStream with a RunnableGraph and handles its errors. If CallStream’s offerResultHandler throws an exception CallStreamSupervisor has a decider that will either Restart CallStream, Stop it, or Escalate the exception. Messages received by CallStreamSupervisor are forwarded to CallStream. Actors sending messages directly to CallStream should put a [DeathWatch](http://doc.akka.io/docs/akka/current/scala/actors.html#lifecycle-monitoring-aka-deathwatch){:target="_blank"} on it.
 
-CallStream and CallStreamSupervisor are provided for convenience, users are free to combine actors and streams their way.
+CallStream and CallStreamSupervisor are provided for convenience, users can create their own actors to manage and run streams.
 
 #### Actor Ref used as a stream's sink
 An Actor Supervisor can create both an actor running a stream and another actor used as its Sink.
