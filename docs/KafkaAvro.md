@@ -32,7 +32,7 @@ KafkaSource wraps the driver and configures a [KafkaConsumer](http://kafka.apach
 
 Kafka tracks messages with offsets. Committing a message means its offset is marked as committed. Kafka auto-commits by default but this only assures they were read OK. By turning off auto-commit we wait until they were processed. If any failed, Kafka re-polls those messages.
 
-A key benefit of Akka is [Supervision](http://doc.akka.io/docs/akka/current/scala/stream/stream-error.html){:target="_blank"} for error handling and recovery. Default behavior is stopping the stream when a stage throws an exception. Kafka throws retriable exceptions so KafkaSource has a [Decider](http://doc.akka.io/docs/akka/current/scala/stream/stream-error.html){:target="_blank"} to handle them. KafkaSource doesn’t commit offsets in a failed stream so records will be polled again. Downstream stages throwing exceptions mustn't Restart or Resume: a failed message could get through.
+A key benefit of Akka is [Supervision](http://doc.akka.io/docs/akka/current/scala/stream/stream-error.html){:target="_blank"} for error handling and recovery, its default behavior is stopping the stream when an exception is thrown. Kafka throws retriable exceptions so KafkaSource has a [Decider](http://doc.akka.io/docs/akka/current/scala/stream/stream-error.html){:target="_blank"} to handle them. KafkaSource doesn’t commit offsets in a failed stream so records will be polled again. Downstream stages throwing exceptions mustn't Restart or Resume: a failed message could get through.
 
 ConsumerRecordsToQueue initially queues every [ConsumerRecord](http://kafka.apache.org/0110/javadoc/org/apache/kafka/clients/consumer/ConsumerRecord.html){:target="_blank"} contained in ConsumerRecords. Then it pushes one for each downstream pull. If the queue is not empty it doesn't pull from upstream. This is to ensure all messages have been processed. After the queue empties it resumes pulling, causing KafkaSource to commit its previous poll and poll anew. 
 
@@ -69,7 +69,7 @@ val runnableGraph = shoppingCartCmdEvtSource(dispatcher)
 
 ###### Common stages of streams ending with a KafkaSink, upstream can be anything
 
-Serializes case classes, send them, and handles errors.
+Serialize case classes, send them, and handle errors.
 
 AvroSerializer takes a user’s Avro schema and a serialize function: [ccToByteArray](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/avro/package.scala){:target="_blank"} can serialize case classes with simple field types. Those with complex fields need a user defined serialize function. [Avro4sSerializer](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/avro4s/stream/Avro4sSerializer.scala){:target="_blank"} is also provided and is often easier to use.
 
@@ -98,4 +98,4 @@ The rest of the stages are the same but duplicated in parallel.
 
 tripleConsumerRecordsFlow is provided to extract 3 Topic Partitions.
 
-There's also [Kafka Streams](http://kafka.apache.org/documentation/streams/) or [Reactive Kafka](https://github.com/akka/reactive-kafka). *dendrites* lets you use any kind of Source or Sink in a stream, not exclusively Kafka. You choose which Kafka related Flow stages to use before a Sink and after a Source. Akka Streams is a rich streams library, it's in Scala, and it's Reactive. Kafka Streams has a new Transactions API said to guarantee exactly once processing,  *dendrites* is at least once but you can eliminate duplicates on the Producer side setting `enable.idempotence=true` and compensate for duplicates, or filter them, on the consumer side.
+There's also [Kafka Streams](http://kafka.apache.org/documentation/streams/){:target="_blank"} or [Reactive Kafka](https://github.com/akka/reactive-kafka){:target="_blank"}. *dendrites* lets you use any kind of Source or Sink in a stream, not exclusively Kafka. You choose which Kafka related Flow stages to use before a Sink and after a Source. Everything is meant to be simple for users to customize. Akka Streams is a rich streams library, it's in Scala, and it's Reactive. Kafka Streams has a new Transactions API said to guarantee exactly once processing,  *dendrites* is at least once but you can eliminate duplicates on the Producer side setting `enable.idempotence=true` and compensate for duplicates, or filter them, on the consumer side.
