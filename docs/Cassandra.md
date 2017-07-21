@@ -13,7 +13,7 @@ Build distributed database clients with stream stages and stand-alone functions.
 
 ###### Click image to open source code in a new tab. Hover over image for stage inputs and outputs
 
-[Cassandra](https://academy.datastax.com/planet-cassandra/what-is-apache-cassandra){:target="_blank"} pre-built query, sink, and conditional stages wrap Datastax’s [Java Driver](http://docs.datastax.com/en/developer/java-driver//3.1/){:target="_blank"} and call it asynchronously. They handle errors with recovery in-stage. Paging stages use backpressure to push a page at a time. Pre and and post stream functions initialize and clean up client operations. 
+[Cassandra](https://academy.datastax.com/planet-cassandra/what-is-apache-cassandra){:target="_blank"} query, sink, and conditional stages wrap Datastax’s [Java Driver](http://docs.datastax.com/en/developer/java-driver//3.1/){:target="_blank"} and call it asynchronously. They handle errors with recovery in-stage. Paging stages use backpressure to push a page at a time. Pre and and post stream functions initialize and clean up client operations. 
 
 #### Stand-alone functions
 
@@ -44,14 +44,14 @@ close(session, cluster)
 
 #### Setup client and connect
 
-Before running streams, a cluster connection is configured with a [CassandraConfig](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/cassandra/CassandraConfig.scala){:target="_blank"}, initialized and managed with provided functions. [PreparedStatements](http://docs.datastax.com/en/developer/java-driver//3.1/manual/statements/prepared/){:target="_blank"} are pre-parsed in the database.
+Before running streams, a cluster connection is configured, initialized and managed with provided functions. [CassandraConfig](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/cassandra/CassandraConfig.scala){:target="_blank"} is an optional trait you can extend. [PreparedStatements](http://docs.datastax.com/en/developer/java-driver//3.1/manual/statements/prepared/){:target="_blank"} are pre-parsed in the database.
 ```scala
 createClusterSchemaSession(ShoppingCartConfig, 1)
 CassandraShoppingCart.createTable(session, schema)
 CassandraShoppingCartEvtLog.createTable(session, schema)
 prepStmts = prepareStatements(session, schema)
 ```
-###### createClusterSchemaSession groups stand-alone functions with user defined settings
+###### createClusterSchemaSession is an example of grouping stand-alone functions with user defined settings
 
 #### Query from a stream
 <img src="png/CassandraQueryStream.png?raw=true" width="60%" />
@@ -136,6 +136,11 @@ cmdFlow.map(cmdToEvt).map(partialBndInsert).to(sink)
 ```
 ###### Execute command, map input metadata & command case class to event case class, log event.
 
+#### Example Configurations
+
+[Typesafe Config](https://github.com/typesafehub/config){:target="_blank"} example, and optional, config settings for Cassandra are in `src/main/resources/reference.conf`. You can choose to use Typesafe Config and override these in your application's `src/main/resources/application.conf` See [Akka config user guide](http://doc.akka.io/docs/akka/current/scala/general/configuration.html){:target="_blank"}.
+
+#### Other Cassandra Streaming products
 
 Lightbend's Alpakka module has a [CassandraConnector](http://developer.lightbend.com/docs/alpakka/current/cassandra.html){:target="_blank"}, with a Source and Sink.
 

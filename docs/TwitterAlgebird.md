@@ -212,3 +212,7 @@ val eithBigInts = Seq[Either[String, BigInt]]
 val min3 = min(filterRight(eithBigInts)
 ```
 ###### Get Min element of a sequence.
+
+#### Example Configurations
+
+[Typesafe Config](https://github.com/typesafehub/config){:target="_blank"} example, and optional, config settings for Algebird are in `src/main/resources/reference.conf`. You can choose to use Typesafe Config and override these in your application's `src/main/resources/application.conf` See [Akka config user guide](http://doc.akka.io/docs/akka/current/scala/general/configuration.html){:target="_blank"}.

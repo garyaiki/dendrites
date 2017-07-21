@@ -14,7 +14,7 @@ Scala's functional and concurrent programming features are made for multi-core C
 
 Stream stages may need additional objects, values, or functions that don't change while the stream is running. Scala's [currying and partially applied functions](http://alvinalexander.com/scala/fp-book/partially-applied-functions-currying-in-scala){:target="_blank"} and [implicit parameters](http://baddotrobot.com/blog/2015/07/03/scala-implicit-parameters/){:target="_blank"} let generic stages, like `map`, which expect just one input, work with functions having several parameters.
 
-[Custom stages](http://doc.akka.io/docs/akka/current/scala/stream/stream-customize.html){:target="_blank"} are necessary to process functions with contextual information. Some need another object. Others need state. Logging is vital to knowing what happens in asynchronous code, handling results in-stage allows log messages to have input, output, and context information. Errors in distributed systems are often temporary, several *dendrites* stages retry these with [exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff){:target="_blank"}. Other errors have enhanced error and log messages. Kafka polling and Cassandra queries return collections, custom stages input these and output one element at a time when pulled from downstream.
+[Custom stages](http://doc.akka.io/docs/akka/current/scala/stream/stream-customize.html){:target="_blank"} are necessary to process functions with contextual information. Some need another object. Others need state. Logging is vital to knowing what happens in asynchronous code, handling results in-stage allows log messages to have input, output, and context information. Errors in distributed systems are often temporary, several *dendrites* stages retry these with [exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff){:target="_blank"}. Other errors have enhanced error and log messages. Kafka polling and Cassandra queries return collections, custom stages input these and output a specified number of elements when pulled from downstream.
 
 Generic fan-out and fan-in stages make for an elegant way to call parallel services  and proceed when results are ready. 
 
@@ -41,6 +41,10 @@ Distributed databases like Cassandra aren't suited to the traditional Request/Re
 Spray is now part of Akka HTTP and can marshal case classes to JSON requests and unmarshal responses to case classes with a few lines of code.
 
 Twitter’s [Algebird](https://twitter.github.io/algebird/){:target="_blank"} has featherweight hashing components that provide approximate statistics on streaming data in near real time.
+
+[Typesafe Config](https://github.com/typesafehub/config){:target="_blank"} example, and optional, config settings for logging, Kafka, Cassandra, Algebird, blocking thread dispatcher, and timers are in `src/main/resources/reference.conf`. You can choose to use Typesafe Config and override these in your application's `src/main/resources/application.conf` See [Akka config user guide](http://doc.akka.io/docs/akka/current/scala/general/configuration.html){:target="_blank"}.
+
+[Logback](http://logback.qos.ch/manual/configuration){:target="_blank"} example config settings are in `/src/test/resources/logback.xml`. Your application configuration is done separately. You can copy logback.xml to your `/src/main/resources/` and modify it.
  
 
 
