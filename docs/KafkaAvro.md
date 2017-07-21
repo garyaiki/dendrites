@@ -94,6 +94,8 @@ The rest of the stages are the same but duplicated in parallel.
 
 tripleConsumerRecordsFlow is provided to extract 3 Topic Partitions.
 
+#### Other Kafka Streaming products
+
 [Kafka Streams](http://kafka.apache.org/documentation/streams/){:target="_blank"} has a new Transactions API said to guarantee exactly once processing,  *dendrites* is at least once but you can eliminate duplicates on the Producer side setting `enable.idempotence=true` and compensate for duplicates, or filter them, on the consumer side.
 
 [Reactive Kafka](https://github.com/akka/reactive-kafka){:target="_blank"} also has a Source and Sink for Akka Streams.
