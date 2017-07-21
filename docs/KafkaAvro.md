@@ -39,15 +39,11 @@ ConsumerRecordsToQueue initially queues every [ConsumerRecord](http://kafka.apac
 ConsumerRecordDeserializer maps a ConsumerRecord's value to a case class and its metadata to a [ConsumerRecordMetadata](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/kafka/package.scala){:target="_blank"}. There're two flavors of ConsumerRecordDeserializer, one takes a UDF ([example with Avro4s](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/examples/account/avro4s/Avro4sGetAccountBalances.scala){:target="_blank"}) to deserialize from an Array of Bytes to a case class, the other takes an Avro schema and maps to a [GenericRecord](http://avro.apache.org/docs/current/api/java/org/apache/avro/generic/GenericRecord.html){:target="_blank"}, which is in turn mapped by a UDF to a case class
  ([example](https://github.com/garyaiki/dendrites/blob/master/src/main/scala/com/github/garyaiki/dendrites/examples/account/avro/package.scala){:target="_blank"}). Either way a deserialized case class and ConsumerRecordMetadata is pushed.
 
-ConsumerRecordMetadata is the message's topic, partition, offset, timestamp, timestamp type, key, and headers. It can be used to store the key and timestamp in an event log,  downstream can fork by partition into parallel streams, timestamps and their type can be updated to show a process state change, offsets can be tracked, and headers can add custom metadata.
+ConsumerRecordMetadata has the message's topic, partition, offset, timestamp, timestamp type, key, and headers. It can be used to store the key and timestamp in an event log,  downstream can fork by partition into parallel streams, timestamps and their type can be updated to show a process state change, offsets can be tracked, and headers can add custom metadata.
 
 Once all polled records pass completely through the stream, ConsumerRecordsToQueue resumes pulling causing KafkaSource to commit the  messages and then it polls again.
 
 ```scala
-/** Kafka poll and commit block, adding a dispatcher avoids possible thread starvation
-ShoppingCartCmdConsumer is a user specific subclass of KafkaConsumer to configure the
-driver
-*/
 val dispatcher = ActorAttributes.dispatcher("dendrites.blocking-dispatcher")
 def shoppingCartCmdEvtSource(dispatcher: Attributes)(implicit ec: ExecutionContext, logger: LoggingAdapter):
 Source[(String, ShoppingCartCmd), NotUsed] = {
@@ -98,4 +94,6 @@ The rest of the stages are the same but duplicated in parallel.
 
 tripleConsumerRecordsFlow is provided to extract 3 Topic Partitions.
 
-There's also [Kafka Streams](http://kafka.apache.org/documentation/streams/){:target="_blank"} or [Reactive Kafka](https://github.com/akka/reactive-kafka){:target="_blank"}. *dendrites* lets you use any kind of Source or Sink in a stream, not exclusively Kafka. You choose which Kafka related Flow stages to use before a Sink and after a Source. Everything is meant to be simple for users to customize. Akka Streams is a rich streams library, it's in Scala, and it's Reactive. Kafka Streams has a new Transactions API said to guarantee exactly once processing,  *dendrites* is at least once but you can eliminate duplicates on the Producer side setting `enable.idempotence=true` and compensate for duplicates, or filter them, on the consumer side.
+[Kafka Streams](http://kafka.apache.org/documentation/streams/){:target="_blank"} has a new Transactions API said to guarantee exactly once processing,  *dendrites* is at least once but you can eliminate duplicates on the Producer side setting `enable.idempotence=true` and compensate for duplicates, or filter them, on the consumer side.
+
+[Reactive Kafka](https://github.com/akka/reactive-kafka){:target="_blank"} also has a Source and Sink for Akka Streams.
