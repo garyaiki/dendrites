@@ -41,7 +41,7 @@ Most of these are stand-alone functions wrapped in an Akka Streams built-in `Flo
 
 [BloomFilter](https://twitter.github.io/algebird/datatypes/approx/bloom_filter.html){:target="_blank"} quickly ensures a word is *not* in a dictionary or a set of words and quickly predicts a word is *probably* in a dictionary or a set of words
 
-[Algebird](https://github.com/twitter/algebird){:target="_blank"} approximators can stream in parallel. This, contrived, example uses [Agents](http://doc.akka.io/docs/akka/current/scala/agents.html){:target="_blank"} as a thread safe shared value holder. Agents are deprecated in Akka 2.5.
+[Algebird](https://github.com/twitter/algebird){:target="_blank"} approximators can stream in parallel. This contrived example uses [Agents](http://doc.akka.io/docs/akka/current/scala/agents.html){:target="_blank"} as a thread safe shared value holder. Agents are deprecated in Akka 2.5.
 
 <img src="png/AlgebirdApproximatorsAgentsFlow.png?raw=true" width="80%" />
 
@@ -215,4 +215,4 @@ val min3 = min(filterRight(eithBigInts)
 
 #### Example Configurations
 
-[Typesafe Config](https://github.com/typesafehub/config){:target="_blank"} example, and optional, config settings for Algebird are in `src/main/resources/reference.conf`. You can choose to use Typesafe Config and override these in your application's `src/main/resources/application.conf` See [Akka config user guide](http://doc.akka.io/docs/akka/current/scala/general/configuration.html){:target="_blank"}.
+[Typesafe Config](https://github.com/typesafehub/config){:target="_blank"} example, and optional, config settings for Algebird are in `src/main/resources/reference.conf`. You can choose to use Typesafe Config and override these in your application's `src/main/resources/application.conf`.

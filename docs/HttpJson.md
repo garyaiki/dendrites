@@ -116,7 +116,7 @@ val hostConfig: (Config, String, Int) = getHostConfig("dendrites.checking-balanc
 ```scala
 val baseURL: StringBuilder = configBaseUrl("my.http.path", hostConfig)
 ```
- ###### Append path to host URL
+###### Append path to host URL
 ```scala
 val url: StringBuilder = createUrl(scheme, ipDomain, port, path) 
 ```
@@ -149,4 +149,7 @@ val responseFuture: Future[Either[String, AnyRef]] = partial(GetAccountBalances(
 ```
 ###### Combine query & response, call it with first argument list once. Call curried function with second argument list for each case class to query on.
 
+#### Example Configurations
+
+[Typesafe Config](https://github.com/typesafehub/config){:target="_blank"} example, and optional, config settings for HTTP are in `src/main/resources/reference.conf`. You can choose to use Typesafe Config and override these in your application's `src/main/resources/application.conf`.
 
