@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.garyaiki</groupId>
   <artifactId>dendrites_2.12</artifactId>
-  <version>0.5.0</version>
+  <version>0.6.0</version>
   <name>dendrites</name>
   <description>Scala, Akka Streams, pre-built stages, CQRS, Event Sourcing, Reactive streams</description>
   <packaging>jar</packaging>
@@ -33,11 +33,11 @@
   </scm>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <scala.version>2.12.2</scala.version>
+      <scala.version>2.12.3</scala.version>
       <java.version>1.8</java.version>
       <akka.version>2.5.3</akka.version>
       <akka.http.version>10.0.9</akka.http.version>
-      <cassandra.driver.version>3.2.0</cassandra.driver.version>
+      <cassandra.driver.version>3.3.0</cassandra.driver.version>
       <kafka-clients.version>0.11.0.0</kafka-clients.version>
       <algebird.version>0.13.0</algebird.version>
     </properties>
@@ -171,7 +171,7 @@
         <dependency>
             <groupId>com.sksamuel.avro4s</groupId>
             <artifactId>avro4s-core_2.12</artifactId>
-            <version>1.6.4</version>
+            <version>1.7.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

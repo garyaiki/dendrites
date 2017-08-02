@@ -132,7 +132,6 @@ class KafkaSource[K, V](val consumerConfig: ConsumerConfig[K, V])(implicit logge
           kafkaConsumer commitSync() // blocking
         }
         kafkaConsumer close()
-        logger.info("KafkaSource postStop after close")
       }
     }
   }

@@ -24,7 +24,7 @@ import com.google.common.util.concurrent.ListenableFuture
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
-import com.github.garyaiki.dendrites.cassandra.{getRowColumnNames, noHostAvailableExceptionMsg, sessionLogInfo}
+import com.github.garyaiki.dendrites.cassandra.{noHostAvailableExceptionMsg, sessionLogInfo}
 import com.github.garyaiki.dendrites.concurrent.listenableFutureToScala
 
 /** Map case class to BoundStatement query, execute it

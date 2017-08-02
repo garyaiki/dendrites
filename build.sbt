@@ -20,15 +20,15 @@ scalastyleConfig in Compile := file("scalastyle-config.xml")
 
 lazy val commonSettings = Seq(
 	organization := "com.github.garyaiki",
-	version := "0.5.0",
-	scalaVersion := "2.12.2",
-	crossScalaVersions := Seq("2.12.2", "2.11.11")
+	version := "0.6.0",
+	scalaVersion := "2.12.3",
+	crossScalaVersions := Seq("2.12.3", "2.11.11")
 )
 lazy val akkaV = "2.5.3"
 lazy val akkaHttpV = "10.0.9"
 lazy val scalaTestV = "3.0.3"
 lazy val algebirdV = "0.13.0"
-lazy val cassandraDriverV = "3.2.0"
+lazy val cassandraDriverV = "3.3.0"
 lazy val root = (project in file(".")).
   configs(IntegrationTest).
 	settings(commonSettings: _*).
@@ -59,7 +59,7 @@ lazy val root = (project in file(".")).
 			"com.datastax.cassandra" % "cassandra-driver-mapping" % cassandraDriverV,
 			"com.datastax.cassandra" % "cassandra-driver-extras" % cassandraDriverV,
 			"org.apache.avro" % "avro" % "1.8.2",
-			"com.sksamuel.avro4s" %% "avro4s-core" % "1.6.4",
+			"com.sksamuel.avro4s" %% "avro4s-core" % "1.7.0",
 			"com.google.guava" % "guava" % "22.0",
 			"com.google.code.findbugs" % "jsr305" % "3.0.2",
 			"com.github.thurstonsand" %% "scala-cass" % "2.1.0"
