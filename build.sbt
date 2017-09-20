@@ -20,14 +20,14 @@ scalastyleConfig in Compile := file("scalastyle-config.xml")
 
 lazy val commonSettings = Seq(
 	organization := "com.github.garyaiki",
-	version := "0.6.0",
+	version := "0.6.1",
 	scalaVersion := "2.12.3",
 	crossScalaVersions := Seq("2.12.3", "2.11.11")
 )
-lazy val akkaV = "2.5.3"
-lazy val akkaHttpV = "10.0.9"
+lazy val akkaV = "2.5.4"
+lazy val akkaHttpV = "10.0.10"
 lazy val scalaTestV = "3.0.3"
-lazy val algebirdV = "0.13.0"
+lazy val algebirdV = "0.13.2"
 lazy val cassandraDriverV = "3.3.0"
 lazy val root = (project in file(".")).
   configs(IntegrationTest).
@@ -54,13 +54,13 @@ lazy val root = (project in file(".")).
 			"io.spray" %% "spray-json" % "1.3.3",
 			"commons-io" % "commons-io" % "2.5" % "it,test",
 			"com.chuusai" %% "shapeless" % "2.3.2",
-			"org.apache.kafka" % "kafka-clients" % "0.11.0.0",
+			"org.apache.kafka" % "kafka-clients" % "0.11.0.1",
 			"com.datastax.cassandra" % "cassandra-driver-core" % cassandraDriverV,
 			"com.datastax.cassandra" % "cassandra-driver-mapping" % cassandraDriverV,
 			"com.datastax.cassandra" % "cassandra-driver-extras" % cassandraDriverV,
 			"org.apache.avro" % "avro" % "1.8.2",
 			"com.sksamuel.avro4s" %% "avro4s-core" % "1.7.0",
-			"com.google.guava" % "guava" % "22.0",
+			"com.google.guava" % "guava" % "23.0",
 			"com.google.code.findbugs" % "jsr305" % "3.0.2",
 			"com.github.thurstonsand" %% "scala-cass" % "2.1.0"
 		),
