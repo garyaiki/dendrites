@@ -33,10 +33,10 @@ package object aggregator {
     */
   def mean[A: Numeric](xs: Seq[A]): Either[String, A] = implicitly[Numeric[A]] match {
     case num: Fractional[_] =>
-      import num._;
+      import num._
       Right(xs.sum / fromInt(xs.size))
     case num: Integral[_] =>
-      import num._;
+      import num._
       Right(xs.sum / fromInt(xs.size))
     case num: Numeric[_] => Left(s"$num is not divisable")
   }
