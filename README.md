@@ -19,7 +19,7 @@ Documentation is on the [website](https://garyaiki.github.io/dendrites/), Scalad
 ##### sbt
 Add dependency in `build.sbt`
 
-`libraryDependencies += "com.github.garyaiki" % "dendrites_2.12" % "0.6.0"`
+`libraryDependencies += "com.github.garyaiki" % "dendrites_2.12" % "0.6.3"`
 ##### Maven
 Add dependency in `pom.xml`
 
@@ -27,7 +27,7 @@ Add dependency in `pom.xml`
     <dependency>
         <groupId>com.github.garyaiki</groupId>
         <artifactId>dendrites_2.12</artifactId>
-        <version>0.6.0</version>
+        <version>0.6.3</version>
     </dependency>`
 
 #### Build from source
