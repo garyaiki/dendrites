@@ -97,23 +97,18 @@ In a terminal window `cd` to the dendrites directory.
 #### Kafka
 Minimal install and configure for running dendrites integration tests. [Kafka's documentation](http://kafka.apache.org/documentation), [download Kafka](http://kafka.apache.org/downloads)
 
-Extract server files `tar -xvf kafka_2.12-0.11.*.*.tar`
+Extract server files `tar -xvf kafka_2.12-1.0.*.*.tar`
 
-Optionally, create or replace symbolic link `ln -nsf kafka_2.12-0.11.*.* kafka`
+Optionally, create or replace symbolic link `ln -nsf kafka_2.12-1.0.*.* kafka`
 
 ##### Configure server
 Edit configuration in install directory `/config/server.properties`
 
 ###### Optional settings for development
-For development, you will want to delete topics. In `Server Basics` un-comment 
-`delete.topic.enable=true`
 
 To advertise the broker in a local install. In `Socket Server Settings` add
 `listeners=PLAINTEXT://localhost:9092`
 
-`port=9092`
-
-`host.name=localhost`
 
 In production, log retention hours are 168 (1 week). For development you can shorten them to 1. In `Log Retention Policy`
 
@@ -190,9 +185,9 @@ Give Zookeeper a few seconds. Then stop it too
 #### Cassandra
 Minimal install and configure for running dendrites integration tests, [Cassandra's documentation](http://cassandra.apache.org/doc/latest/), [download Cassandra](http://cassandra.apache.org/download/)
 
-Extract files `tar -xvf apache-cassandra-3.11.0-bin.tar`
+Extract files `tar -xvf apache-cassandra-3.11.*-bin.tar`
 
-Optionally, create or replace symbolic link `ln -nsf apache-cassandra-3.11.0 cassandra`
+Optionally, create or replace symbolic link `ln -nsf apache-cassandra-3.11.* cassandra`
 ##### Configure
 For development, default configuration can be used.
 ##### Install Cassandra Java Driver
@@ -245,9 +240,8 @@ Then, `Ctrl-C` in the terminal running Cassandra
 
 `Balances Server` is an example server that handles requests from integration tests under `src/it/scala`
 ##### Run Balances Server
-These integration tests need Balances Server running to handle HTTP requests. Open a 2nd dendrites directory terminal window and start sbt in this window to run the server.
-
-`> run` Runs `Balances Server` an Http server
+These integration tests need Balances Server running to handle HTTP requests.
+`> bgRun` Runs `Balances Server` an Http server in the background
 ###### Run integration tests
 
 In the dendrites directory terminal with sbt running

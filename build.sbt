@@ -22,11 +22,11 @@ scalastyleConfig in Compile := file("scalastyle-config.xml")
 
 lazy val commonSettings = Seq(
 	organization := "com.github.garyaiki",
-	version := "0.6.1",
-	scalaVersion := "2.12.3",
-	crossScalaVersions := Seq("2.12.3", "2.11.11")
+	version := "0.6.2",
+	scalaVersion := "2.12.4",
+	crossScalaVersions := Seq("2.12.4", "2.11.11")
 )
-lazy val akkaV = "2.5.4"
+lazy val akkaV = "2.5.6"
 lazy val akkaHttpV = "10.0.10"
 lazy val scalaTestV = "3.0.3"
 lazy val root = (project in file(".")).
