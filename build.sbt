@@ -22,7 +22,7 @@ scalastyleConfig in Compile := file("scalastyle-config.xml")
 
 lazy val commonSettings = Seq(
 	organization := "com.github.garyaiki",
-	version := "0.6.2",
+	version := "0.6.3",
 	scalaVersion := "2.12.4",
 	crossScalaVersions := Seq("2.12.4", "2.11.11")
 )

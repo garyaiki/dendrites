@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.garyaiki</groupId>
   <artifactId>dendrites_2.12</artifactId>
-  <version>0.6.2</version>
+  <version>0.6.3</version>
   <name>dendrites</name>
   <description>Scala, Akka Streams for Kafka, Cassandra, HTTP, Avro, CQRS, Event Sourcing, Reactive streams</description>
   <packaging>jar</packaging>
