@@ -13,8 +13,8 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.algebird
 
-import com.typesafe.config.{Config, ConfigFactory}
 import com.twitter.algebird.{DecayedValueMonoid, HyperLogLogAggregator, HyperLogLogMonoid}
+import com.typesafe.config.{Config, ConfigFactory}
 
 /** Factory for Algebird configured constants
   *

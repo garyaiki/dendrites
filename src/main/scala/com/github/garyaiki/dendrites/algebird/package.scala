@@ -231,7 +231,7 @@ package object algebird {
     * @param xs Seq[A]
     * @return max
     *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.MaxAggregator MaxAggregator]]
+    * @see [[http://twitter.github.io/algebird/datatypes/min_and_max.html MaxAggregator]]
     * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     */
   def max[A: Ordering](xs: Seq[A]): A = MaxAggregator[A].reduce(xs)
@@ -242,14 +242,12 @@ package object algebird {
     * @param xs Seq[A]
     * @return min element
     *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.MinAggregator MinAggregator]]
+    * @see [[http://twitter.github.io/algebird/datatypes/min_and_max.html MinAggregator]]
     * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     */
   def min[A: Ordering](xs: Seq[A]): A = MinAggregator[A].reduce(xs)
 
   /** Functor maps sequence[A] to sequence[B]
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Functor Functor]]
     *
     * @tparam A original element
     * @tparam B returned element
@@ -281,9 +279,7 @@ package object algebird {
     * @return AverageValue
     *
     * @note when there's more than 1 Numeric type in scope you must use explicitly typed avg below
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedGroup$ AveragedGroup]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Averager$ Averager]]
+    * @see [[http://twitter.github.io/algebird/datatypes/averaged_value.html AveragedValue]]
     */
   def avg[A: Numeric](xs: Seq[A]): AveragedValue = {
     val at = andThen[A, Double, AveragedValue](xs)(implicitly[Numeric[A]].toDouble)(Averager.prepare(_))
@@ -294,9 +290,6 @@ package object algebird {
     *
     * @param xs Seq[AverageValue]
     * @return AverageValue
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedGroup$ AveragedGroup]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.AveragedValue AveragedValue]]
     */
   def sumAverageValues(xs: Seq[AveragedValue]): AveragedValue = xs.reduce(AveragedGroup.plus(_, _))
 
@@ -306,7 +299,7 @@ package object algebird {
     * @param fpProb false positive probability, 1% default
     * @return BloomFilter
     *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.BloomFilter$ BloomFilter]]
+    * @see [[http://twitter.github.io/algebird/datatypes/approx/bloom_filter.html BloomFilter]]
     */
   def createBF(words: Seq[String], fpProb: Double = 0.01): BF[String] = {
     val wc = words.size
@@ -319,15 +312,13 @@ package object algebird {
     * @param xs strings to test
     * @param bf configured and data initialized Bloom filter
     * @return tuple ._1 is matches including false positives, ._2 are not in BF
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.BloomFilter$ BloomFilter]]
     */
   def bloomFilterPartition(xs: Seq[String])(implicit bf: BF[String]): (Seq[String], Seq[String]) =
     xs.partition(bf.contains(_).isTrue)
 
   /** Array[Byte] hasher for CMS
     *
-    * @see [[https://twitter.github.io/algebird/index.html#com.twitter.algebird.CMSHasher CMSHasher]]
+    * @see [[http://twitter.github.io/algebird/datatypes/approx/countminsketch.html CountMinSketch]]
     */
   implicit object CMSHasherArrayByte extends CMSHasher[Array[Byte]] {
     override def hash(a: Int, b: Int, width: Int)(x: Array[Byte]): Int = {
@@ -366,9 +357,6 @@ package object algebird {
     * @param delta
     * @param seed
     * @return CMSMonoid[K]
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSMonoid CMSMonoid]]
-    * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     */
   def createCMSMonoid[K: Ordering: CMSHasher](eps: Double = 0.001, delta: Double = 1E-10, seed: Int = 1): CMSMonoid[K] =
     new CMSMonoid[K](eps, delta, seed)
@@ -379,10 +367,6 @@ package object algebird {
     * @param xs data
     * @param m implicit CMSMonoid for K
     * @return CMS for data
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSHasher CMSHasher]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSMonoid CMSMonoid]]
-    * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     */
   def createCountMinSketch[K: Ordering: CMSHasher](xs: Seq[K])(implicit m: CMSMonoid[K]): CMS[K] = m.create(xs)
 
@@ -392,10 +376,6 @@ package object algebird {
     * @param xs Sequence of CMS
     * @param m CMSMonoid
     * @return CMS as the sum of Sequence of CMS
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSHasher CMSHasher]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.CMSMonoid CMSMonoid]]
-    * @see [[http://www.scala-lang.org/api/current/index.html#scala.math.Ordering Ordering]]
     */
   def sumCountMinSketch[K: Ordering: CMSHasher](xs: Seq[CMS[K]])(implicit m: CMSMonoid[K]): CMS[K] =
     xs.reduce(m.plus(_, _))
@@ -408,8 +388,7 @@ package object algebird {
     * @param m implicit DecayedValueMonoid used to scan from initial value
     * @return seq of DecayedValues
     *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValue DecayedValue]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValueMonoid DecayedValueMonoid]]
+    * @see [[http://twitter.github.io/algebird/datatypes/decayed_value.html DecayedValue]]
     */
   def toDecayedValues(halfLife: Double, last: Option[DecayedValue] = None)(xs: Seq[(Double, Double)])
     (implicit m: DecayedValueMonoid): Seq[DecayedValue] = {
@@ -438,20 +417,18 @@ package object algebird {
     * @param agg implicit HyperLogLogAggregator, initialized with # of bits for hashing
     * @return an HLL
     *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HyperLogLogAggregator HyperLogLogAggregator]]
+    * @see [[http://twitter.github.io/algebird/datatypes/approx/hyperloglog.html HyperLogLog]]
     * @see [[com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike]]
     */
-  def createHLL[A: HyperLogLogLike](xs: Seq[A])(implicit ev: HyperLogLogLike[A], agg: HyperLogLogAggregator): HLL =
-    ev(xs)
+  def createHLL[A: HyperLogLogLike](xs: Seq[A])(implicit agg: HyperLogLogAggregator): HLL =
+    implicitly[HyperLogLogLike[A]].apply(xs)
 
   /** Map Sequence of HyperLogLogs to Sequence of Approximate
     *
     * @param xs sequence of HLL
     * @return Sequence of Approximate
     *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Approximate Approximate]]
+    * @see [[http://twitter.github.io/algebird/datatypes/approx/approximate.html Approximate]]
     */
   def mapHLL2Approximate(xs: Seq[HLL]): Seq[Approximate[Long]] = xs.map(_.approximateSize)
 
@@ -459,13 +436,10 @@ package object algebird {
     *
     * @param xs sequence of HLL
     * @return estimate count in an Approximate object
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.HLL HLL]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.Approximate Approximate]]
     */
   def sumHLLApproximateSizes(xs: Seq[HLL]): Approximate[Long] = xs.reduce(_ + _).approximateSize
 
-  def buildQTrees[A: QTreeLike](vals: Seq[A])(implicit ev: QTreeLike[A]): Seq[QTree[A]] = vals.map(ev(_))
+  def buildQTrees[A: QTreeLike](vals: Seq[A]): Seq[QTree[A]] = vals.map(implicitly[QTreeLike[A]].apply(_))
 
   /** Build a QTree from a Seq
     *
@@ -475,12 +449,11 @@ package object algebird {
     * @param sg implicit QTreeSemigroup
     * @return
     *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTreeSemigroup QTreeSemigroup]]
+    * @see [[http://twitter.github.io/algebird/datatypes/approx/q_tree.html QTree]]
     * @see [[com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike]]
     */
-  def buildQTree[A: QTreeLike](vals: Seq[A])(implicit ev: QTreeLike[A], sg: QTreeSemigroup[A]): QTree[A] =
-    vals.map(ev(_)).reduce(sg.plus(_, _))
+  def buildQTree[A: QTreeLike](vals: Seq[A])(implicit sg: QTreeSemigroup[A]): QTree[A] =
+    vals.map(implicitly[QTreeLike[A]].apply(_)).reduce(sg.plus(_, _))
 
   /** Sum a Sequence of QTrees
     *
@@ -488,10 +461,7 @@ package object algebird {
     * @param qTrees Seq[QTree[A]]
     * @param sg implicit QTreeSemigroup
     * @return QTree[A]
-    *
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTree QTree]]
-    * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.QTreeSemigroup QTreeSemigroup]]
     */
-  def sumQTrees[A: QTreeSemigroup](qTrees: Seq[QTree[A]])(implicit sg: QTreeSemigroup[A]): QTree[A] =
-    qTrees.reduce(sg.plus(_, _))
+  def sumQTrees[A: QTreeSemigroup](qTrees: Seq[QTree[A]]): QTree[A] =
+    qTrees.reduce(implicitly[QTreeSemigroup[A]].plus(_, _))
 }
