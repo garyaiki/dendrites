@@ -23,6 +23,7 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike
 
 /** Akka Agent for concurrently updating Qtree
   *
+  * @deprecated
   * @constructor Creates Agent singleton for QTree
   * @tparam A: QTreeLike either BigDecimal, BigInt, Double, Float, Int or Long
   * @param name

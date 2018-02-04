@@ -13,8 +13,7 @@ limitations under the License.
 */
 package com.github.garyaiki.dendrites.algebird
 
-/** Akka [[http://doc.akka.io/api/akka/current/akka/agent/index.html Agent]] for concurrently updating and
-  * accessing [[http://twitter.github.io/algebird/ Algebird]] approximate data structures
+/** Akka Agent for concurrently updating and accessing Algebird approximate data structures
   *
   * == AveragedAgent ==
   * Create AveragedValue Agent, update it, Future will have latest AveragedValue

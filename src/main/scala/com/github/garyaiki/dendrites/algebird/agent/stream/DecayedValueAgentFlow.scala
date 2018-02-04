@@ -26,6 +26,7 @@ import com.github.garyaiki.dendrites.algebird.stream.ZipTimeFlow
 
 /** Flow to update DecayedValue Agent
   *
+  * @deprecated
   * @param dvAgent DecayedValueAgent
   * @author Gary Struthers
   */

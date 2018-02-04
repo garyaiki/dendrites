@@ -28,6 +28,7 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike
 
 /** Flow to update HyperLogLogAgent Agent
   *
+  * @deprecated
   * @param hllAgent HyperLogLogAgent
   * @author Gary Struthers
   */

@@ -19,6 +19,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 /** Akka Agent for concurrently updating DecayedValues
   *
+  * @deprecated
   * @constructor Creates Agent singleton for HyperLogLog
   * @param name
   * @param xs optional initial values

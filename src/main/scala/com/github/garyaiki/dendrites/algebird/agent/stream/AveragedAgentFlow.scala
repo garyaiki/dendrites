@@ -26,6 +26,7 @@ import com.github.garyaiki.dendrites.algebird.stream.avgFlow
 
 /** Flow to update AveragedValue Agent
   *
+  * @deprecated
   * @param avgAgent AveragedAgent
   * @author Gary Struthers
   */

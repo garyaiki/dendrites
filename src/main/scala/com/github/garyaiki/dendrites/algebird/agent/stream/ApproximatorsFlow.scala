@@ -20,8 +20,8 @@ import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, ZipWith, ZipWith5}
 import akka.stream.scaladsl.GraphDSL.Implicits._
 import com.twitter.algebird.{AveragedValue, CMS, CMSHasher, DecayedValue, HLL, QTree}
 import scala.reflect.runtime.universe.TypeTag
-import com.github.garyaiki.dendrites.algebird.agent.{AveragedAgent, CountMinSketchAgent,
-  DecayedValueAgent, HyperLogLogAgent, QTreeAgent}
+import com.github.garyaiki.dendrites.algebird.agent.{AveragedAgent, CountMinSketchAgent, DecayedValueAgent,
+  HyperLogLogAgent, QTreeAgent}
 import com.github.garyaiki.dendrites.algebird.stream.{CreateCMSFlow, CreateHLLFlow, ZipTimeFlow}
 import com.github.garyaiki.dendrites.algebird.stream.avgFlow
 import com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike
@@ -37,6 +37,7 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.HyperLogLogLike
   * bcast ~> qtrAg        ~> zip.in4
   * }}}
   *
+  * @deprecated
   * @constructor creates graph to update Agents in parallel
   * @tparam A: HyperLogLogLike: Numeric: CMSHasher: TypeTag
   * @param avgAgent AveragedAgent

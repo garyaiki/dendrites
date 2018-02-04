@@ -17,8 +17,9 @@ import akka.agent.Agent
 import com.twitter.algebird.{AveragedGroup, AveragedValue}
 import scala.concurrent.{ExecutionContext, Future}
 
-/** Akka Agent for concurrently updating AveragedValue
+/** Akka Agent for concurrently updating AveragedValue.
   *
+  * @deprecated
   * @constructor Creates Agent singleton for AveragedValue
   * @param name
   * @param init optional initial AveragedValue
@@ -39,6 +40,5 @@ class AveragedAgent(val name: String = "", init: AveragedValue = new AveragedVal
     * @param another AveragedValue
     * @return future of new value for this and all pending updates
     */
-  def alter(avg: AveragedValue): Future[AveragedValue] =
-    agent alter (oldState => AveragedGroup.plus(oldState, avg))
+  def alter(avg: AveragedValue): Future[AveragedValue] = agent alter (oldState => AveragedGroup.plus(oldState, avg))
 }

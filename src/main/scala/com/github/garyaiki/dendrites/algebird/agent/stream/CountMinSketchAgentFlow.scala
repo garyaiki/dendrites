@@ -26,6 +26,7 @@ import com.github.garyaiki.dendrites.algebird.stream.CreateCMSFlow
 
 /** Flow to update CountMinSketch Agent
   *
+  * @deprecated
   * @tparam K: Ordering: CMSHasher
   * @param cmsAgent CountMinSketchAgent
   * @author Gary Struthers
@@ -62,7 +63,7 @@ object CountMinSketchAgentFlow {
     * @return Future for Agents updated value
     */
   def compositeFlow[A: TypeTag: Numeric: CMSHasher](cmsAgt: CountMinSketchAgent[A]):
-        Flow[Seq[A], Future[CMS[A]], NotUsed] = {
+    Flow[Seq[A], Future[CMS[A]], NotUsed] = {
 
     val cmsFlow = new CreateCMSFlow[A]()
     val ffg = Flow.fromGraph(cmsFlow)

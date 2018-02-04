@@ -124,8 +124,7 @@ object ParallelApproximators {
     hllAgent: HyperLogLogAgent,
     qtAgent: QTreeAgent[A],
     time:A => Double)
-    (implicit logger: LoggingAdapter, materializer: Materializer):
-        Sink[Seq[A], NotUsed] = {
+    (implicit logger: LoggingAdapter, materializer: Materializer): Sink[Seq[A], NotUsed] = {
 
       val composite = compositeFlow[A](avgAgent, cmsAgent, dvAgent, hllAgent, qtAgent, time)
       val ffg = Flow.fromGraph(composite)

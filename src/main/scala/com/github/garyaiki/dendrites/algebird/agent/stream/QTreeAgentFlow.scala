@@ -25,6 +25,7 @@ import com.github.garyaiki.dendrites.algebird.typeclasses.QTreeLike
 
 /** Flow to update QTreeAgent
   *
+  * @deprecated
   * @tparam A: QTreeLike either BigDecimal, BigInt, Double, Float, Int or Long
   * @param qtAgent QTreeAgent
   * @author Gary Struthers

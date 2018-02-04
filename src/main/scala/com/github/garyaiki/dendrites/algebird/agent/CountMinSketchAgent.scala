@@ -20,6 +20,7 @@ import com.github.garyaiki.dendrites.algebird.createCMSMonoid
 
 /** Akka Agent for concurrently updating CountMinSketch
   *
+  * @deprecated
   * @constructor Creates Agent singleton for CountMinSketch
   * @tparam K elements which are implicitly Ordering[K] and CMSHasher[K]
   * @param name Agent name

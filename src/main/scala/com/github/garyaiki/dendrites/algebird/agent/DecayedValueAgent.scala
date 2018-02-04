@@ -20,6 +20,7 @@ import com.github.garyaiki.dendrites.algebird.toDecayedValues
 
 /** Akka Agent for concurrently updating DecayedValue
   *
+  * @deprecated
   * @constructor Creates Agent singleton for CountMinSketch
   * @param name
   * @param halfLife to scale value based on time
@@ -28,9 +29,8 @@ import com.github.garyaiki.dendrites.algebird.toDecayedValues
   * @param monoid implicit DecayedValueMonoid to scan from initial value
   *
   * @example [[com.github.garyaiki.dendrites.algebird.agent.stream.DecayedValueAgentFlow]]
-  * @see [[http://doc.akka.io/api/akka/current/#akka.agent.Agent Agent]]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValue DecayedValue]]
-  * @see [[http://twitter.github.io/algebird/#com.twitter.algebird.DecayedValueMonoid DecayedValueMonoid]]
+  * @see [[http://doc.akka.io/api/akka/current/akka/agent/index.html Agent]]
+  * @see [[http://twitter.github.io/algebird/datatypes/decayed_value.html DecayedValue]]
   * @author Gary Struthers
   */
 class DecayedValueAgent(val name: String = "", halfLife: Double, last: Option[DecayedValue] = None)
@@ -47,9 +47,6 @@ class DecayedValueAgent(val name: String = "", halfLife: Double, last: Option[De
     * @return future of new value after this and all pending updates
     */
   def alter(xs: Seq[(Double, Double)]): Future[Seq[DecayedValue]] = {
-    agent alter (oldState => {
-      val decayed = toDecayedValues(halfLife, Some(oldState.last))(xs)
-      oldState ++ decayed
-    })
+    agent alter (oldState => oldState ++ toDecayedValues(halfLife, Some(oldState.last))(xs))
   }
 }
