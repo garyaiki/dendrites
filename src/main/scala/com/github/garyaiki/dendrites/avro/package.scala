@@ -16,8 +16,8 @@ package com.github.garyaiki.dendrites
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import org.apache.avro.Schema
 import org.apache.avro.generic.{GenericData, GenericDatumReader, GenericDatumWriter, GenericRecord}
-import org.apache.avro.specific.SpecificDatumWriter
 import org.apache.avro.io.{Decoder, DecoderFactory, Encoder, EncoderFactory}
+import org.apache.avro.specific.SpecificDatumWriter
 import scala.io.Source
 import scala.io.Source.fromInputStream
 
